@@ -1,0 +1,14 @@
+{
+    "$ref": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#",
+    "types":
+    [
+    ],
+    "options":
+    {
+        "files":
+        {
+            "type": "",
+            "validator": ""
+        }
+    }
+}
