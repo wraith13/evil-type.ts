@@ -1,15 +1,15 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
     "compilerOptions": {
-        "module": "amd",
+        "module": "CommonJS",
         "moduleResolution": "node",
-        "strict": true,
         "declaration": true,
         "target": "es5",
         "lib": [
             "es6",
-            "dom"
+            "scripthost"
         ],
+        "strict": true,
         "noImplicitAny": true,
         "strictNullChecks": true,
         "noFallthroughCasesInSwitch": true,
@@ -30,8 +30,7 @@
         "noEmitOnError": true,
         "esModuleInterop": true,
         "resolveJsonModule": true,
-        "outFile": "index.js",
-        "rootDir": "."
+        // "outFile": "index.js",
     },
     "files": [
         "index.ts"
