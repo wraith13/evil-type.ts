@@ -2,10 +2,13 @@ export const isBoolean = (value: any): value is boolean => "boolean" === typeof 
 export const isNumber = (value: any): value is number => "number" === typeof value;
 export const isString = (value: any): value is number => "string" === typeof value;
 export const isValueType = <V>(cv: V) => (value: any): value is V => cv === value;
+export const isAnd = <TypeA, TypeB>(isA: ((value: unknown) => value is TypeA), isB: ((value: unknown) => value is TypeB)) =>
+    (value: unknown): value is TypeA & TypeB => isA(value) && isB(value);
 export const isOr = <TypeA, TypeB>(isA: ((value: unknown) => value is TypeA), isB: ((value: unknown) => value is TypeB)) =>
     (value: unknown): value is TypeA | TypeB => isA(value) || isB(value);
+export const isNever = (data: any, key: string) => ! (key in data);
 export const isOptionalOr = <TypeA>(isA: ((value: unknown) => value is TypeA)) =>
-    (data: any, key: string) => ( ! (key in data) || isA(data[key]));
+    (data: any, key: string) => ( isNever(data, key) || isA(data[key]));
 export interface ValidateResultEntry
 {
     key: string;
