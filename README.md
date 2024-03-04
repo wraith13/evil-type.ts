@@ -4,6 +4,13 @@
 
 ## Features
 
+Generate the following TypeScript code from the JSON definition file.
+
+- type definitions
+- interface definitions
+- validator functions
+- literal union type values lists
+
 ## How to install for your project by npm
 
 ```sh

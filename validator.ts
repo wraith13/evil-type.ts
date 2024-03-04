@@ -92,7 +92,7 @@ export const ContantValueTypeValidator = <T>(cv: T): ValueTypeValidator =>
 export const OptionalValidator: ValueTypeValidator =
 {
     requiredType: "optional",
-    isRequiredType: (data, key) => !(key in data),
+    isRequiredType: isNever,
 };
 export const BooleanValidator: ValueTypeValidator =
 {
@@ -109,3 +109,8 @@ export const StringValidator: ValueTypeValidator =
     requiredType: "string",
     isRequiredType: (data, key) => isString(data[key]),
 };
+export const ValueValidator = <V>(cv: V): ValueTypeValidator =>
+({
+    requiredType: JSON.stringify(cv),
+    isRequiredType: (data, key) => isValueType<V>(cv)(data[key]),
+});
