@@ -5,18 +5,18 @@
         "schema":
         {
             "export": "true",
-            "type": "value",
+            "$type": "value",
             "value": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#",
         },
         "TypeSchema":
         {
             "export": "true",
-            "type": "interface",
+            "$type": "interface",
             "members":
             {
                 "$ref":
                 {
-                    "type": "$ref",
+                    "$type": "$ref",
                     "name": "schema"
                 },
                 "defines":
