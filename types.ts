@@ -6,31 +6,36 @@ export module Types
         $ref: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
         defines: { [key: string]: Define; };
     }
-    export interface BaseDefine
+    export interface Refer
+    {
+        $ref: string;
+    }
+    export interface AlphaDefine
     {
         $type: $type;
     }
-    export interface ModuleDefine extends BaseDefine
+    export interface ModuleDefine extends AlphaDefine
     {
         $type: "module";
         members: { [key: string]: Define; };
     }
-    export interface ValueDefine<ValueType> extends BaseDefine
+    export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
-        value: ValueType;
+        value: unknown;
     }
-    export interface TypeDefine extends BaseDefine
+    export interface TypeDefine extends AlphaDefine
     {
         $type: "type";
-        define: TypeOfInterface;
+        define: TypeOrInterface;
     }
-    export interface InterfaceDefine extends BaseDefine
+    export interface InterfaceDefine extends AlphaDefine
     {
         $type: "interface";
-        members: { [key: string]: TypeOfInterface; };
+        members: { [key: string]: TypeOrInterface; };
     }
     export type $type = Define["$type"];
-    export type TypeOfInterface = TypeDefine | InterfaceDefine;
-    export type Define = ModuleDefine | ValueDefine<any> | TypeOfInterface;
+    export type TypeOrInterface = TypeDefine | InterfaceDefine;
+    export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
+    export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
 }
