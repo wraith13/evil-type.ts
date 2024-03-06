@@ -12,6 +12,7 @@ export module Types
     }
     export interface AlphaDefine
     {
+        export?: boolean;
         $type: string;
     }
     export interface ModuleDefine extends AlphaDefine
