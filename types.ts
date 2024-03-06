@@ -3,7 +3,7 @@ export module Types
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
     export interface TypeSchema
     {
-        $ref: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
+        $ref: typeof schema;
         defines: { [key: string]: Define; };
     }
     export interface Refer
@@ -12,7 +12,7 @@ export module Types
     }
     export interface AlphaDefine
     {
-        $type: $type;
+        $type: string;
     }
     export interface ModuleDefine extends AlphaDefine
     {
@@ -34,8 +34,7 @@ export module Types
         $type: "interface";
         members: { [key: string]: TypeOrInterface; };
     }
-    export type $type = Define["$type"];
-    export type TypeOrInterface = TypeDefine | InterfaceDefine;
+    export type TypeOrInterface = TypeDefine | InterfaceDefine | ValueDefine;
     export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
 }
