@@ -9,7 +9,9 @@ try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
-    const typeSource = fget(jsonPath);
+    const typeSource = fget(jsonPath) as Types.TypeSchema;;
+    
+
 }
 catch(error)
 {

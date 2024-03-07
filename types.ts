@@ -5,7 +5,13 @@ export module Types
     {
         $ref: typeof schema;
         defines: { [key: string]: Define; };
+        options: TypeOptions;
     }
+    export type ValidatorOptionType = "none" | "simple" | "full";
+    export interface TypeOptions
+    {
+    }
+    export type FilePath = string;
     export interface Refer
     {
         $ref: string;

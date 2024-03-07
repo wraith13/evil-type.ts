@@ -17,16 +17,16 @@
                 "$ref": { "$ref": "schema" },
                 "defines":
                 {
+
+                },
+                "options":
+                {
+
                 }
             }
         }
     },
     "options":
     {
-        "files":
-        {
-            "type": "",
-            "validator": ""
-        }
     }
 }
