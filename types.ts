@@ -28,14 +28,24 @@ export module Types
     export interface TypeDefine extends AlphaDefine
     {
         $type: "type";
-        define: TypeOrInterface;
+        define: TypeOrInterfaceOrRefer;
     }
     export interface InterfaceDefine extends AlphaDefine
     {
         $type: "interface";
-        members: { [key: string]: TypeOrInterface; };
+        members: { [key: string]: TypeOrInterfaceOrRefer; };
     }
-    export type TypeOrInterface = TypeDefine | InterfaceDefine | ValueDefine;
+    export interface ObjectDefine extends AlphaDefine
+    {
+        $type: "object";
+        members: { [key: string]: TypeOrInterfaceOrRefer; };
+    }
+    export interface ArrayDefine extends AlphaDefine
+    {
+        $type: "array";
+        items: TypeOrInterfaceOrRefer;
+    }
+    export type TypeOrInterface = TypeDefine | InterfaceDefine | ValueDefine | ObjectDefine | ArrayDefine;
     export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
 }
