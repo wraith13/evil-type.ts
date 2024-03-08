@@ -5,12 +5,20 @@ const startAt = new Date();
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
+const buildIndent = (indentUnit: Types.TypeOptions["indentUnit"], indent: number) =>
+    Array.from({ length: indent, })
+        .map(_ => "number" === typeof indentUnit ? Array.from({ length: indentUnit, }).map(_ => " ").join(""): indentUnit)
+        .join("");
+const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indent: number, define: Types.Define) =>
+{
+
+};
 try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     const typeSource = fget(jsonPath) as Types.TypeSchema;;
-    
+    typeSource.defines.map(i => )
 
 }
 catch(error)
