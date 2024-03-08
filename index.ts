@@ -9,9 +9,12 @@ const buildIndent = (indentUnit: Types.TypeOptions["indentUnit"], indent: number
     Array.from({ length: indent, })
         .map(_ => "number" === typeof indentUnit ? Array.from({ length: indentUnit, }).map(_ => " ").join(""): indentUnit)
         .join("");
+const buildExport = (define: { export?: boolean }) =>
+    (define.export ?? true) ? "export": null;
+const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indent: number, name: string, value: Types.ValueDefine) =>
+    buildIndent(indentUnit, indent) +[buildExport(value), name, "=", value.value].filter(i => null !== i) +";";
 const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indent: number, define: Types.Define) =>
 {
-
 };
 try
 {
