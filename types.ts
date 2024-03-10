@@ -10,12 +10,18 @@ export module Types
     export type ValidatorOptionType = "none" | "simple" | "full";
     export interface TypeOptions
     {
+        indentUnit: number | "\t";
     }
     export type FilePath = string;
     export interface Refer
     {
         $ref: string;
     }
+    export const isRefer = (value: unknown): value is Refer =>
+        null !== value &&
+        "object" === typeof value &&
+        "$ref" in value &&
+        "string" === typeof value.$ref;
     export interface AlphaDefine
     {
         export?: boolean;

@@ -33,24 +33,27 @@ const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indent: number
 };
 const buildInlineDefine = (indentUnit: Types.TypeOptions["indentUnit"], indent: number,  define: Types.TypeOrInterfaceOrRefer) =>
 {
-    if (define.$ref)
+    if (Types.isRefer(define))
     {
-
+        return define.$ref;
     }
-    switch(define.$type)
+    else
     {
-    case "value":
-        return buildInlineValue(indentUnit, indent, define);
-    case "type":
-        return buildInlineType(indentUnit, indent, define);
+        switch(define.$type)
+        {
+        case "value":
+            return buildInlineValue(indentUnit, indent, define);
+        case "type":
+            return buildInlineType(indentUnit, indent, define);
 
+        }
     }
 };
 try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
-    const typeSource = fget(jsonPath) as Types.TypeSchema;;
+    const typeSource = JSON.parse(fget(jsonPath)) as Types.TypeSchema;;
     Object.keys(typeSource.defines)
         .map(name => buildDefine(typeSource.options.indentUnit, 0, name, typeSource.defines[name]))
         .join("");
