@@ -6,32 +6,46 @@ const returnCode = "\n";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
-const buildIndent = (indentUnit: Types.TypeOptions["indentUnit"], indent: number) =>
-    Array.from({ length: indent, })
+const buildIndent = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number) =>
+    Array.from({ length: indentDepth, })
         .map(_ => "number" === typeof indentUnit ? Array.from({ length: indentUnit, }).map(_ => " ").join(""): indentUnit)
         .join("");
 const buildExport = (define: { export?: boolean }) =>
     (define.export ?? true) ? "export": null;
-const buildInlineValue = (_indentUnit: Types.TypeOptions["indentUnit"], _indent: number, value: Types.ValueDefine) =>
+const buildInlineValue = (_indentUnit: Types.TypeOptions["indentUnit"], _indentDepth: number, value: Types.ValueDefine) =>
     value.value;
-const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indent: number, name: string, value: Types.ValueDefine) =>
-    buildIndent(indentUnit, indent) +[buildExport(value), "const", name, "=", buildInlineValue(indentUnit, indent, value)].filter(i => null !== i) +";" +returnCode;
+const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.ValueDefine) =>
+    buildIndent(indentUnit, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(indentUnit, indentDepth, value)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInlineType = (_indentUnit: Types.TypeOptions["indentUnit"], _indent: number, value: Types.TypeDefine) =>
     value.define;
-const buildType = (indentUnit: Types.TypeOptions["indentUnit"], indent: number, name: string, value: Types.TypeDefine) =>
-    buildIndent(indentUnit, indent) +[buildExport(value), "type", name, "=", buildInlineDefine(indentUnit, indent, value.define)].filter(i => null !== i) +";" +returnCode;
-const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indent: number, name: string, define: Types.Define) =>
+const buildType = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.TypeDefine) =>
+    buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(indentUnit, indentDepth, value.define)].filter(i => null !== i).join("") +";" +returnCode;
+const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.InterfaceDefine) =>
+{
+    let result = "";
+    result += buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name].filter(i => null !== i).join("") +returnCode;
+    result += buildIndent(indentUnit, indentDepth) +"{" +returnCode;
+    Object.keys(value.members).forEach
+    (
+        name => result += buildIndent(indentUnit, indentDepth +1) +name+ ": " +buildInlineDefine(indentUnit, indentDepth, value.members[name]) +returnCode
+    );
+    result += buildIndent(indentUnit, indentDepth) +"}" +returnCode;
+    return result;
+};
+const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, define: Types.Define) =>
 {
     switch(define.$type)
     {
     case "value":
-        return buildValue(indentUnit, indent, name, define);
+        return buildValue(indentUnit, indentDepth, name, define);
     case "type":
-        return buildType(indentUnit, indent, name, define);
-
+        return buildType(indentUnit, indentDepth, name, define);
+    case "interface":
+        return buildInterface(indentUnit, indentDepth, name, define);
+    
     }
 };
-const buildInlineDefine = (indentUnit: Types.TypeOptions["indentUnit"], indent: number,  define: Types.TypeOrInterfaceOrRefer) =>
+const buildInlineDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number,  define: Types.TypeOrInterfaceOrRefer) =>
 {
     if (Types.isRefer(define))
     {
@@ -42,9 +56,9 @@ const buildInlineDefine = (indentUnit: Types.TypeOptions["indentUnit"], indent: 
         switch(define.$type)
         {
         case "value":
-            return buildInlineValue(indentUnit, indent, define);
+            return buildInlineValue(indentUnit, indentDepth, define);
         case "type":
-            return buildInlineType(indentUnit, indent, define);
+            return buildInlineType(indentUnit, indentDepth, define);
 
         }
     }
