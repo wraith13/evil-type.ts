@@ -12,14 +12,12 @@ const buildIndent = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: n
         .join("");
 const buildExport = (define: { export?: boolean }) =>
     (define.export ?? true) ? "export": null;
-const buildInlineValue = (_indentUnit: Types.TypeOptions["indentUnit"], _indentDepth: number, value: Types.ValueDefine) =>
-    value.value;
+const buildInlineValue = (value: Types.ValueDefine) => value.value;
 const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.ValueDefine) =>
-    buildIndent(indentUnit, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(indentUnit, indentDepth, value)].filter(i => null !== i).join("") +";" +returnCode;
-const buildInlineType = (_indentUnit: Types.TypeOptions["indentUnit"], _indent: number, value: Types.TypeDefine) =>
-    value.define;
+    buildIndent(indentUnit, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(value)].filter(i => null !== i).join("") +";" +returnCode;
+const buildInlineType = (value: Types.TypeDefine) => value.define;
 const buildType = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.TypeDefine) =>
-    buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(indentUnit, indentDepth, value.define)].filter(i => null !== i).join("") +";" +returnCode;
+    buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(value.define)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.InterfaceDefine) =>
 {
     let result = "";
@@ -27,7 +25,7 @@ const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth
     result += buildIndent(indentUnit, indentDepth) +"{" +returnCode;
     Object.keys(value.members).forEach
     (
-        name => result += buildIndent(indentUnit, indentDepth +1) +name+ ": " +buildInlineDefine(indentUnit, indentDepth, value.members[name]) +returnCode
+        name => result += buildIndent(indentUnit, indentDepth +1) +name+ ": " +buildInlineDefine(value.members[name]) +returnCode
     );
     result += buildIndent(indentUnit, indentDepth) +"}" +returnCode;
     return result;
@@ -45,7 +43,7 @@ const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: n
     
     }
 };
-const buildInlineDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number,  define: Types.TypeOrInterfaceOrRefer) =>
+const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer) =>
 {
     if (Types.isRefer(define))
     {
@@ -56,9 +54,9 @@ const buildInlineDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDe
         switch(define.$type)
         {
         case "value":
-            return buildInlineValue(indentUnit, indentDepth, define);
+            return buildInlineValue(define);
         case "type":
-            return buildInlineType(indentUnit, indentDepth, define);
+            return buildInlineType(define);
 
         }
     }
