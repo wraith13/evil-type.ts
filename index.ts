@@ -18,6 +18,17 @@ const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: nu
 const buildInlineType = (value: Types.TypeDefine) => value.define;
 const buildType = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.TypeDefine) =>
     buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(value.define)].filter(i => null !== i).join("") +";" +returnCode;
+const buildInlineInterface = (value: Types.InterfaceDefine) =>
+{
+    let result = [];
+    result.push("{");
+    Object.keys(value.members).forEach
+    (
+        name => result.push(name+ ": " +buildInlineDefine(value.members[name]) +";")
+    );
+    result.push("}");
+    return result.join(" ");
+};
 const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.InterfaceDefine) =>
 {
     let result = "";
@@ -25,7 +36,7 @@ const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth
     result += buildIndent(indentUnit, indentDepth) +"{" +returnCode;
     Object.keys(value.members).forEach
     (
-        name => result += buildIndent(indentUnit, indentDepth +1) +name+ ": " +buildInlineDefine(value.members[name]) +returnCode
+        name => result += buildIndent(indentUnit, indentDepth +1) +name+ ": " +buildInlineDefine(value.members[name]) +";" +returnCode
     );
     result += buildIndent(indentUnit, indentDepth) +"}" +returnCode;
     return result;
@@ -57,6 +68,8 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer) =>
             return buildInlineValue(define);
         case "type":
             return buildInlineType(define);
+        case "interface":
+            return buildInlineInterface(define);
 
         }
     }
