@@ -12,14 +12,14 @@ const buildIndent = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: n
         .join("");
 const buildExport = (define: { export?: boolean }) =>
     (define.export ?? true) ? "export": null;
-const buildInlineValue = (value: Types.ValueDefine) => value.value;
-const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.ValueDefine) =>
+const buildInlineValue = (value: Types.ValueDefine): string => value.value;
+const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.ValueDefine): string =>
     buildIndent(indentUnit, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(value)].filter(i => null !== i).join("") +";" +returnCode;
-const buildInlineType = (value: Types.TypeDefine) => buildInlineDefine(value.define);
-const buildInlineArray = (value: Types.ArrayDefine) => buildInlineDefine(value.items) +"[]";
-const buildType = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.TypeDefine) =>
+const buildInlineType = (value: Types.TypeDefine): string => buildInlineDefine(value.define);
+const buildInlineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
+const buildType = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.TypeDefine): string =>
     buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(value.define)].filter(i => null !== i).join("") +";" +returnCode;
-const buildInlineInterface = (value: Types.InterfaceDefine) =>
+const buildInlineInterface = (value: Types.InterfaceDefine): string =>
 {
     let result = [];
     result.push("{");
@@ -55,7 +55,7 @@ const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: n
     
     }
 };
-const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): sgtring =>
+const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): string =>
 {
     if (Types.isRefer(define))
     {
