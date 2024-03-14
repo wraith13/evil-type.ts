@@ -15,7 +15,8 @@ const buildExport = (define: { export?: boolean }) =>
 const buildInlineValue = (value: Types.ValueDefine) => value.value;
 const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.ValueDefine) =>
     buildIndent(indentUnit, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(value)].filter(i => null !== i).join("") +";" +returnCode;
-const buildInlineType = (value: Types.TypeDefine) => value.define;
+const buildInlineType = (value: Types.TypeDefine) => buildInlineDefine(value.define);
+const buildInlineArray = (value: Types.ArrayDefine) => buildInlineDefine(value.items) +"[]";
 const buildType = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.TypeDefine) =>
     buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(value.define)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInlineInterface = (value: Types.InterfaceDefine) =>
@@ -41,7 +42,7 @@ const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth
     result += buildIndent(indentUnit, indentDepth) +"}" +returnCode;
     return result;
 };
-const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, define: Types.Define) =>
+const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, define: Types.Define): string =>
 {
     switch(define.$type)
     {
@@ -54,7 +55,7 @@ const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: n
     
     }
 };
-const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer) =>
+const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): sgtring =>
 {
     if (Types.isRefer(define))
     {
@@ -68,6 +69,8 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer) =>
             return buildInlineValue(define);
         case "type":
             return buildInlineType(define);
+        case "array":
+            return buildInlineArray(define);
         case "interface":
             return buildInlineInterface(define);
 
