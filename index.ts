@@ -12,7 +12,7 @@ const buildIndent = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: n
         .join("");
 const buildExport = (define: { export?: boolean }) =>
     (define.export ?? true) ? "export": null;
-const buildInlineValue = (value: Types.ValueDefine): string => value.value;
+const buildInlineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
 const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.ValueDefine): string =>
     buildIndent(indentUnit, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(value)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInlineType = (value: Types.TypeDefine): string => buildInlineDefine(value.define);
