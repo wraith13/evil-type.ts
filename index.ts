@@ -33,13 +33,15 @@ const buildInlineInterface = (value: Types.InterfaceDefine): string =>
 const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.InterfaceDefine) =>
 {
     let result = "";
-    result += buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name].filter(i => null !== i).join("") +returnCode;
-    result += buildIndent(indentUnit, indentDepth) +"{" +returnCode;
+    const currentIndent = buildIndent(indentUnit, indentDepth);
+    const nextIndent = buildIndent(indentUnit, indentDepth +1);
+    result += currentIndent +[buildExport(value), "type", name].filter(i => null !== i).join("") +returnCode;
+    result += currentIndent +"{" +returnCode;
     Object.keys(value.members).forEach
     (
-        name => result += buildIndent(indentUnit, indentDepth +1) +name+ ": " +buildInlineDefine(value.members[name]) +";" +returnCode
+        name => result += nextIndent +name+ ": " +buildInlineDefine(value.members[name]) +";" +returnCode
     );
-    result += buildIndent(indentUnit, indentDepth) +"}" +returnCode;
+    result += currentIndent +"}" +returnCode;
     return result;
 };
 const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, define: Types.Define): string =>
