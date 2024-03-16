@@ -6,19 +6,19 @@ const returnCode = "\n";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
-const buildIndent = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number) =>
+const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
     Array.from({ length: indentDepth, })
-        .map(_ => "number" === typeof indentUnit ? Array.from({ length: indentUnit, }).map(_ => " ").join(""): indentUnit)
+        .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): options.indentUnit)
         .join("");
 const buildExport = (define: { export?: boolean }) =>
     (define.export ?? true) ? "export": null;
 const buildInlineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
-const buildValue = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.ValueDefine): string =>
-    buildIndent(indentUnit, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(value)].filter(i => null !== i).join("") +";" +returnCode;
+const buildValue = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): string =>
+    buildIndent(options, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(value)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInlineType = (value: Types.TypeDefine): string => buildInlineDefine(value.define);
 const buildInlineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
-const buildType = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.TypeDefine): string =>
-    buildIndent(indentUnit, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(value.define)].filter(i => null !== i).join("") +";" +returnCode;
+const buildType = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.TypeDefine): string =>
+    buildIndent(options, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(value.define)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInlineInterface = (value: Types.InterfaceDefine): string =>
 {
     let result = [];
@@ -30,11 +30,11 @@ const buildInlineInterface = (value: Types.InterfaceDefine): string =>
     result.push("}");
     return result.join(" ");
 };
-const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, value: Types.InterfaceDefine) =>
+const buildInterface = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.InterfaceDefine) =>
 {
     let result = "";
-    const currentIndent = buildIndent(indentUnit, indentDepth);
-    const nextIndent = buildIndent(indentUnit, indentDepth +1);
+    const currentIndent = buildIndent(options, indentDepth);
+    const nextIndent = buildIndent(options, indentDepth +1);
     result += currentIndent +[buildExport(value), "type", name].filter(i => null !== i).join("") +returnCode;
     result += currentIndent +"{" +returnCode;
     Object.keys(value.members).forEach
@@ -44,16 +44,16 @@ const buildInterface = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth
     result += currentIndent +"}" +returnCode;
     return result;
 };
-const buildDefine = (indentUnit: Types.TypeOptions["indentUnit"], indentDepth: number, name: string, define: Types.Define): string =>
+const buildDefine = (options: Types.TypeOptions, indentDepth: number, name: string, define: Types.Define): string =>
 {
     switch(define.$type)
     {
     case "value":
-        return buildValue(indentUnit, indentDepth, name, define);
+        return buildValue(options, indentDepth, name, define);
     case "type":
-        return buildType(indentUnit, indentDepth, name, define);
+        return buildType(options, indentDepth, name, define);
     case "interface":
-        return buildInterface(indentUnit, indentDepth, name, define);
+        return buildInterface(options, indentDepth, name, define);
     
     }
 };
@@ -85,7 +85,7 @@ try
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     const typeSource = JSON.parse(fget(jsonPath)) as Types.TypeSchema;;
     Object.keys(typeSource.defines)
-        .map(name => buildDefine(typeSource.options.indentUnit, 0, name, typeSource.defines[name]))
+        .map(name => buildDefine(typeSource.options, 0, name, typeSource.defines[name]))
         .join("");
 }
 catch(error)

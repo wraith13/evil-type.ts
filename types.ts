@@ -11,6 +11,7 @@ export module Types
     export interface TypeOptions
     {
         indentUnit: number | "\t";
+        indentStyle: "allman" | "egyptian";
     }
     export type FilePath = string;
     export interface Refer
