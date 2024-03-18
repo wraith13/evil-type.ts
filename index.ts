@@ -10,15 +10,17 @@ const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
     Array.from({ length: indentDepth, })
         .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): options.indentUnit)
         .join("");
-const buildExport = (define: { export?: boolean }) =>
-    (define.export ?? true) ? "export": null;
+const buildExport = (define: { export?: boolean } | { }) =>
+    ("export" in define && (define.export ?? true)) ? "export": null;
+const buildDefineLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
+    buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineDefine(define)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInlineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
 const buildValue = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): string =>
-    buildIndent(options, indentDepth) +[buildExport(value), "const", name, "=", buildInlineValue(value)].filter(i => null !== i).join("") +";" +returnCode;
+    buildDefineLine(options, indentDepth, "const", name, value);
 const buildInlineType = (value: Types.TypeDefine): string => buildInlineDefine(value.define);
-const buildInlineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
 const buildType = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.TypeDefine): string =>
-    buildIndent(options, indentDepth) +[buildExport(value), "type", name, "=", buildInlineDefine(value.define)].filter(i => null !== i).join("") +";" +returnCode;
+    buildDefineLine(options, indentDepth, "type", name, value);
+const buildInlineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
 const buildInlineInterface = (value: Types.InterfaceDefine): string =>
 {
     let result = [];
