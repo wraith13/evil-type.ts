@@ -46,6 +46,17 @@ const buildInterface = (options: Types.TypeOptions, indentDepth: number, name: s
     result += currentIndent +"}" +returnCode;
     return result;
 };
+const buildModule = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ModuleDefine) =>
+{
+    let result = "";
+    const currentIndent = buildIndent(options, indentDepth);
+    const nextIndent = indentDepth +1;
+    result += currentIndent +[buildExport(value), "type", name].filter(i => null !== i).join("") +returnCode;
+    result += currentIndent +"{" +returnCode;
+    Object.keys(value.members).forEach(name => result += buildDefine(options, nextIndent, name, value.members[name]));
+    result += currentIndent +"}" +returnCode;
+    return result;
+};
 const buildDefine = (options: Types.TypeOptions, indentDepth: number, name: string, define: Types.Define): string =>
 {
     switch(define.$type)
@@ -56,7 +67,8 @@ const buildDefine = (options: Types.TypeOptions, indentDepth: number, name: stri
         return buildType(options, indentDepth, name, define);
     case "interface":
         return buildInterface(options, indentDepth, name, define);
-    
+    case "module":
+        return buildModule(options, indentDepth, name, define);
     }
 };
 const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): string =>
@@ -77,7 +89,6 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): string =>
             return buildInlineArray(define);
         case "interface":
             return buildInlineInterface(define);
-
         }
     }
 };
