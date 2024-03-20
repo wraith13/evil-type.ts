@@ -12,6 +12,7 @@ export module Types
     {
         indentUnit: number | "\t";
         indentStyle: "allman" | "egyptian";
+        ValidatorOption: ValidatorOptionType;
     }
     export type FilePath = string;
     export interface Refer
