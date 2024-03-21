@@ -14,11 +14,31 @@ const buildExport = (define: { export?: boolean } | { }) =>
     ("export" in define && (define.export ?? true)) ? "export": null;
 const buildDefineLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineDefine(define)].filter(i => null !== i).join("") +";" +returnCode;
-const buildValueValidatorExpression = (options: Types.TypeOptions, name: string, value: Types.ValueDefine): string =>
+const buildValueValidatorExpression = (options: Types.TypeOptions, name: string, value: unknown): string =>
 {
     if (null !== value && "object" === typeof value)
     {
+        if (Array.isArray(value))
+        {
 
+        }
+        else
+        {
+            const list: string[] = [];
+            list.push(`null === ${name}`);
+            list.push(`"object" === typeof ${name}`);
+            Object.keys(value).forEach
+            (
+                key =>
+                {
+                    {
+                        list.push(`"${key}" in ${name}`);
+                        list.push(buildValueValidatorExpression(options, `${name}.${key}`, value[key]));
+                    }
+                }
+            );
+            return list.join(" && ");
+        }
     }
     if (undefined === value)
     {
