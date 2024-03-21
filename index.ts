@@ -14,9 +14,28 @@ const buildExport = (define: { export?: boolean } | { }) =>
     ("export" in define && (define.export ?? true)) ? "export": null;
 const buildDefineLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineDefine(define)].filter(i => null !== i).join("") +";" +returnCode;
+const buildValueValidatorExpression = (options: Types.TypeOptions, name: string, value: Types.ValueDefine): string =>
+{
+    if (null !== value && "object" === typeof value)
+    {
+
+    }
+    if (undefined === value)
+    {
+        return `undefined === ${name}`;
+    }
+    else
+    {
+        return `${JSON.stringify(value)} === ${name}`;
+    }
+};
+const buildValidatorLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
+    buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
 const buildDefineValue = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): string =>
     buildDefineLine(options, indentDepth, "const", name, value);
+const buildValueValidator = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): string =>
+    buildValidatorLine(options, indentDepth, "const", name, value);
 const buildInlineDefineType = (value: Types.TypeDefine): string => buildInlineDefine(value.define);
 const buildDefineType = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.TypeDefine): string =>
     buildDefineLine(options, indentDepth, "type", name, value);
@@ -103,13 +122,34 @@ const buildValidator = (options: Types.TypeOptions, indentDepth: number, name: s
     switch(define.$type)
     {
     case "value":
-        return buildDefineValue(options, indentDepth, name, define);
+        return buildValueValidator(options, indentDepth, name, define);
     case "type":
         return buildDefineType(options, indentDepth, name, define);
     case "interface":
         return buildDefineInterface(options, indentDepth, name, define);
     case "module":
         return buildDefineModule(options, indentDepth, name, define);
+    }
+};
+const buildInlineValidator = (define: Types.TypeOrInterfaceOrRefer): string =>
+{
+    if (Types.isRefer(define))
+    {
+        return define.$ref;
+    }
+    else
+    {
+        switch(define.$type)
+        {
+        case "value":
+            return buildInlineDefineValue(define);
+        case "type":
+            return buildInlineDefineType(define);
+        case "array":
+            return buildInlineDefineArray(define);
+        case "interface":
+            return buildInlineDefineInterface(define);
+        }
     }
 };
 try
