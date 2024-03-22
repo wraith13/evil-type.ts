@@ -33,7 +33,7 @@ const buildValueValidatorExpression = (options: Types.TypeOptions, name: string,
                 {
                     {
                         list.push(`"${key}" in ${name}`);
-                        list.push(buildValueValidatorExpression(options, `${name}.${key}`, value[key]));
+                        list.push(buildValueValidatorExpression(options, `${name}.${key}`, (value as any)[key]));
                     }
                 }
             );
