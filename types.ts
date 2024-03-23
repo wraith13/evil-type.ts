@@ -1,6 +1,13 @@
 export module Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
+    export type JsonableValue = null | boolean | number | string;
+    export interface JsonableObject
+    {
+        [key: string]: Jsonable;
+    }
+    export type Jsonable = JsonableValue | Jsonable[] | JsonableObject;
+    export type JsonablePartial<Target> = { [key in keyof Target]?: Target[key] } & JsonableObject;
     export interface TypeSchema
     {
         $ref: typeof schema;
@@ -37,7 +44,7 @@ export module Types
     export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
-        value: unknown;
+        value: Jsonable;
     }
     export interface TypeDefine extends AlphaDefine
     {

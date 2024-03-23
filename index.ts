@@ -14,7 +14,7 @@ const buildExport = (define: { export?: boolean } | { }) =>
     ("export" in define && (define.export ?? true)) ? "export": null;
 const buildDefineLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineDefine(define)].filter(i => null !== i).join("") +";" +returnCode;
-const buildValueValidatorExpression = (options: Types.TypeOptions, name: string, value: unknown): string =>
+const buildValueValidatorExpression = (options: Types.TypeOptions, name: string, value: Types.Jsonable): string =>
 {
     if (null !== value && "object" === typeof value)
     {
@@ -33,7 +33,7 @@ const buildValueValidatorExpression = (options: Types.TypeOptions, name: string,
                 {
                     {
                         list.push(`"${key}" in ${name}`);
-                        list.push(buildValueValidatorExpression(options, `${name}.${key}`, (value as any)[key]));
+                        list.push(buildValueValidatorExpression(options, `${name}.${key}`, value[key]));
                     }
                 }
             );
