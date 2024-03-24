@@ -14,7 +14,7 @@ const buildExport = (define: { export?: boolean } | { }) =>
     ("export" in define && (define.export ?? true)) ? "export": null;
 const buildDefineLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineDefine(define)].filter(i => null !== i).join("") +";" +returnCode;
-const buildValueValidatorExpression = (options: Types.TypeOptions, name: string, value: Types.Jsonable): string =>
+const buildValueValidatorExpression = (name: string, value: Types.Jsonable): string =>
 {
     if (null !== value && "object" === typeof value)
     {
@@ -23,7 +23,7 @@ const buildValueValidatorExpression = (options: Types.TypeOptions, name: string,
             const list: string[] = [];
             list.push(`Array.isArray(${name})`);
             list.push(`${value.length} <= ${name}.length`)
-            value.forEach((i, ix) => list.push(buildValueValidatorExpression(options, `${name}[${ix}]`, i)));
+            value.forEach((i, ix) => list.push(buildValueValidatorExpression(`${name}[${ix}]`, i)));
             return list.join(" && ");
         }
         else
@@ -37,7 +37,7 @@ const buildValueValidatorExpression = (options: Types.TypeOptions, name: string,
                 {
                     {
                         list.push(`"${key}" in ${name}`);
-                        list.push(buildValueValidatorExpression(options, `${name}.${key}`, value[key]));
+                        list.push(buildValueValidatorExpression(`${name}.${key}`, value[key]));
                     }
                 }
             );
@@ -53,6 +53,8 @@ const buildValueValidatorExpression = (options: Types.TypeOptions, name: string,
         return `${JSON.stringify(value)} === ${name}`;
     }
 };
+const buildInlineValueValidator = (define: Types.ValueDefine) =>
+    `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
 const buildValidatorLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
 const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
@@ -166,7 +168,7 @@ const buildInlineValidator = (define: Types.TypeOrInterfaceOrRefer): string =>
         switch(define.$type)
         {
         case "value":
-            return buildInlineDefineValue(define);
+            return buildInlineValueValidator(define);
         case "type":
             return buildInlineDefineType(define);
         case "array":
