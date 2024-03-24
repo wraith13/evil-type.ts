@@ -20,12 +20,16 @@ const buildValueValidatorExpression = (options: Types.TypeOptions, name: string,
     {
         if (Array.isArray(value))
         {
-
+            const list: string[] = [];
+            list.push(`Array.isArray(${name})`);
+            list.push(`${value.length} <= ${name}.length`)
+            value.forEach((i, ix) => list.push(buildValueValidatorExpression(options, `${name}[${ix}]`, i)));
+            return list.join(" && ");
         }
         else
         {
             const list: string[] = [];
-            list.push(`null === ${name}`);
+            list.push(`null !== ${name}`);
             list.push(`"object" === typeof ${name}`);
             Object.keys(value).forEach
             (
