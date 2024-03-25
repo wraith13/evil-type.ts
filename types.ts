@@ -51,6 +51,11 @@ export module Types
         $type: "type";
         define: TypeOrInterfaceOrRefer;
     }
+    export interface PrimitiveTypeDefine extends AlphaDefine
+    {
+        $type: "primitive-type";
+        define: "undefined" | "bool" | "boolean" | "number" | "string";
+    }
     export interface InterfaceDefine extends AlphaDefine
     {
         $type: "interface";
