@@ -46,15 +46,15 @@ export module Types
         $type: "value";
         value: Jsonable;
     }
-    export interface TypeDefine extends AlphaDefine
-    {
-        $type: "type";
-        define: TypeOrInterfaceOrRefer;
-    }
     export interface PrimitiveTypeDefine extends AlphaDefine
     {
         $type: "primitive-type";
         define: "undefined" | "bool" | "boolean" | "number" | "string";
+    }
+    export interface TypeDefine extends AlphaDefine
+    {
+        $type: "type";
+        define: TypeOrInterfaceOrRefer;
     }
     export interface InterfaceDefine extends AlphaDefine
     {
@@ -76,7 +76,7 @@ export module Types
         $type: "and";
         types: TypeOrInterfaceOrRefer[];
     }
-    export type TypeOrInterface = TypeDefine | InterfaceDefine | ValueDefine | ArrayDefine | OrDefine | AndDefine;
+    export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ValueDefine | ArrayDefine | OrDefine | AndDefine;
     export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
 }
