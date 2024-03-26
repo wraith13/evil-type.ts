@@ -66,7 +66,17 @@ export module Types
         $type: "array";
         items: TypeOrInterfaceOrRefer;
     }
-    export type TypeOrInterface = TypeDefine | InterfaceDefine | ValueDefine;
-    export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer | ArrayDefine;
+    export interface OrDefine extends AlphaDefine
+    {
+        $type: "or";
+        types: TypeOrInterfaceOrRefer[];
+    }
+    export interface AndDefine extends AlphaDefine
+    {
+        $type: "and";
+        types: TypeOrInterfaceOrRefer[];
+    }
+    export type TypeOrInterface = TypeDefine | InterfaceDefine | ValueDefine | ArrayDefine | OrDefine | AndDefine;
+    export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
 }
