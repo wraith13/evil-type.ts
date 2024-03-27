@@ -57,14 +57,21 @@ const buildInlineValueValidator = (define: Types.ValueDefine) =>
     `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
 const buildValidatorLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
+
 const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
 const buildDefineValue = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): string =>
     buildDefineLine(options, indentDepth, "const", name, value);
 const buildValueValidator = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): string =>
     buildValidatorLine(options, indentDepth, "const", name, value);
+
 const buildInlineDefineType = (value: Types.TypeDefine): string => buildInlineDefine(value.define);
 const buildDefineType = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.TypeDefine): string =>
     buildDefineLine(options, indentDepth, "type", name, value);
+
+const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeDefine): string => value.define;
+const buildDefinePrimitiveType = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.PrimitiveTypeDefine): string =>
+    buildDefineLine(options, indentDepth, "type", name, value);
+    
 const buildInlineDefineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
 const buildInlineDefineInterface = (value: Types.InterfaceDefine): string =>
 {
@@ -114,6 +121,8 @@ const buildDefine = (options: Types.TypeOptions, indentDepth: number, name: stri
     {
     case "value":
         return buildDefineValue(options, indentDepth, name, define);
+    case "primitive-type":
+        return buildDefinePrimitiveType(options, indentDepth, name, define);
     case "type":
         return buildDefineType(options, indentDepth, name, define);
     case "interface":
@@ -134,6 +143,8 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): string =>
         {
         case "value":
             return buildInlineDefineValue(define);
+        case "primitive-type":
+            return buildInlineDefinePrimitiveType(define);
         case "type":
             return buildInlineDefineType(define);
         case "array":
