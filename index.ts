@@ -53,6 +53,20 @@ const buildValueValidatorExpression = (name: string, value: Types.Jsonable): str
         return `${JSON.stringify(value)} === ${name}`;
     }
 };
+interface Builder<Define extends Types.AlphaDefine>
+{
+    declarator: "const" | "type" | "interface" | "module";
+    buildInlineDefine: (value: Define) => string;
+    buildInlineValidator: (value: Define) => string;
+}
+const valueBuilder: Builder<Types.ValueDefine> =
+{
+    declarator: "const",
+    buildInlineDefine: (value: Types.ValueDefine): string => JSON.stringify(value.value),
+    buildInlineValidator: (define: Types.ValueDefine) =>
+        `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`,
+};
+
 const buildInlineValueValidator = (define: Types.ValueDefine) =>
     `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
 const buildValidatorLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
@@ -160,6 +174,8 @@ const buildValidator = (options: Types.TypeOptions, indentDepth: number, name: s
     {
     case "value":
         return buildValueValidator(options, indentDepth, name, define);
+    case "primitive-type":
+        return buildDefinePrimitiveType(options, indentDepth, name, define);
     case "type":
         return buildDefineType(options, indentDepth, name, define);
     case "interface":
@@ -180,6 +196,8 @@ const buildInlineValidator = (define: Types.TypeOrInterfaceOrRefer): string =>
         {
         case "value":
             return buildInlineValueValidator(define);
+        case "primitive-type":
+            return buildInlineDefinePrimitiveType(define);
         case "type":
             return buildInlineDefineType(define);
         case "array":
