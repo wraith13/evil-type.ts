@@ -56,14 +56,14 @@ const buildValueValidatorExpression = (name: string, value: Types.Jsonable): str
 interface Builder<Define extends Types.AlphaDefine>
 {
     declarator: "const" | "type" | "interface" | "module";
-    buildInlineDefine: (value: Define) => string;
-    buildInlineValidator: (value: Define) => string;
+    define: (value: Define) => string;
+    validator: (value: Define) => string;
 }
 const valueBuilder: Builder<Types.ValueDefine> =
 {
     declarator: "const",
-    buildInlineDefine: (value: Types.ValueDefine): string => JSON.stringify(value.value),
-    buildInlineValidator: (define: Types.ValueDefine) =>
+    define: (value: Types.ValueDefine): string => JSON.stringify(value.value),
+    validator: (define: Types.ValueDefine) =>
         `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`,
 };
 
