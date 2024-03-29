@@ -66,6 +66,22 @@ const valueBuilder: Builder<Types.ValueDefine> =
     validator: (define: Types.ValueDefine) =>
         `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`,
 };
+const getBuilder = (define: Types.Define) =>
+{
+    switch(define.$type)
+    {
+    case "value":
+        return valueBuilder;
+    case "primitive-type":
+        return primitiveTypeBuilder;
+    case "type":
+        return typeBuilder;
+    case "interface":
+        return interfaceBuilder;
+    case "module":
+        return moduleBuilder;
+    }
+};
 
 const buildInlineValueValidator = (define: Types.ValueDefine) =>
     `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
