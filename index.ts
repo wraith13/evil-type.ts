@@ -53,32 +53,32 @@ const buildValueValidatorExpression = (name: string, value: Types.Jsonable): str
         return `${JSON.stringify(value)} === ${name}`;
     }
 };
-interface Builder<Define extends Types.AlphaDefine>
+interface Builder
 {
     declarator: "const" | "type" | "interface" | "module";
-    define: (value: Define) => string;
-    validator: (name: string, value: Define) => string;
+    define: string;
+    validator: (name: string) => string;
 }
-const valueBuilder: Builder<Types.ValueDefine> =
-{
+const makeValueBuilder = (define: Types.ValueDefine): Builder =>
+({
     declarator: "const",
-    define: (value: Types.ValueDefine): string => JSON.stringify(value.value),
-    validator: (name: string, define: Types.ValueDefine) => buildValueValidatorExpression(name, define.value),
-};
-const primitiveTypeBuilder: Builder<Types.PrimitiveTypeDefine> =
-{
-    declarator: "type",
-    define: (value: Types.PrimitiveTypeDefine): string => JSON.stringify(value.define),
-    validator: (name: string, define: Types.PrimitiveTypeDefine) => `"${define.$type}" === typeof ${name}`,
-};
-const getBuilder = (define: Types.Define) =>
+    define: JSON.stringify(define.value),
+    validator: (name: string) => buildValueValidatorExpression(name, define.value),
+});
+const makePrimitiveTypeBuilder = (define: Types.PrimitiveTypeDefine): Builder =>
+({
+    declarator: "const",
+    define: JSON.stringify(define.define),
+    validator: (name: string) => `"${define.$type}" === typeof ${name}`,
+});
+const getBuilder = (define: Types.Define): Builder =>
 {
     switch(define.$type)
     {
     case "value":
-        return valueBuilder;
+        return makeValueBuilder(define);
     case "primitive-type":
-        return primitiveTypeBuilder;
+        return makePrimitiveTypeBuilder(define);
     case "type":
         return typeBuilder;
     case "interface":
