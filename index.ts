@@ -57,14 +57,19 @@ interface Builder<Define extends Types.AlphaDefine>
 {
     declarator: "const" | "type" | "interface" | "module";
     define: (value: Define) => string;
-    validator: (value: Define) => string;
+    validator: (name: string, value: Define) => string;
 }
 const valueBuilder: Builder<Types.ValueDefine> =
 {
     declarator: "const",
     define: (value: Types.ValueDefine): string => JSON.stringify(value.value),
-    validator: (define: Types.ValueDefine) =>
-        `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`,
+    validator: (name: string, define: Types.ValueDefine) => buildValueValidatorExpression(name, define.value),
+};
+const primitiveTypeBuilder: Builder<Types.PrimitiveTypeDefine> =
+{
+    declarator: "type",
+    define: (value: Types.PrimitiveTypeDefine): string => JSON.stringify(value.define),
+    validator: (name: string, define: Types.PrimitiveTypeDefine) => `"${define.$type}" === typeof ${name}`,
 };
 const getBuilder = (define: Types.Define) =>
 {
