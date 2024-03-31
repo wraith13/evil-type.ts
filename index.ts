@@ -205,29 +205,8 @@ const buildValidator = (options: Types.TypeOptions, indentDepth: number, name: s
         return buildDefineModule(options, indentDepth, name, define);
     }
 };
-const buildInlineValidator = (define: Types.TypeOrInterfaceOrRefer): string =>
-{
-    if (Types.isRefer(define))
-    {
-        return define.$ref;
-    }
-    else
-    {
-        switch(define.$type)
-        {
-        case "value":
-            return buildInlineValueValidator(define);
-        case "primitive-type":
-            return buildInlineDefinePrimitiveType(define);
-        case "type":
-            return buildInlineDefineType(define);
-        case "array":
-            return buildInlineDefineArray(define);
-        case "interface":
-            return buildInlineDefineInterface(define);
-        }
-    }
-};
+const buildInlineValidator = (name: string, define: Types.TypeOrInterface): string =>
+    `(value: unknown): value is ${name} => ${getBuilder(define).validator("value")}`;
 try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
