@@ -14,7 +14,7 @@ const buildExport = (define: { export?: boolean } | { }) =>
     ("export" in define && (define.export ?? true)) ? "export": null;
 const buildDefineLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineDefine(define)].filter(i => null !== i).join("") +";" +returnCode;
-const buildValueValidatorExpression = (name: string, value: Types.Jsonable): string =>
+const buildValueValidatorExpression = (name: string, value: Types.Jsonable): CodeExpression[] =>
 {
     if (null !== value && "object" === typeof value)
     {
@@ -62,37 +62,37 @@ interface CodeExpression extends Code
     $code: "expression";
     expression: string;
 };
-const $expression = (expression: string):CodeExpression => ({ $code: "expression", expression, });
+const $expression = (expression: string): CodeExpression => ({ $code: "expression", expression, });
 interface CodeLine extends Code
 {
     $code: "line";
     expressions: CodeExpression[];
 };
-const $line = (expressions: CodeExpression[]):CodeLine => ({ $code: "line", expressions, });
+const $line = (expressions: CodeExpression[]): CodeLine => ({ $code: "line", expressions, });
 interface CodeBlock extends Code
 {
     $code: "block";
     lines: CodeLine[];
 };
-const $block = (lines: CodeLine[]):CodeBlock => ({ $code: "block", lines, });
+const $block = (lines: CodeLine[]): CodeBlock => ({ $code: "block", lines, });
 type CodeEntry = CodeLine | CodeBlock;
 interface Builder
 {
-    declarator: "const" | "type" | "interface" | "module";
-    define: string;
-    validator: (name: string) => string;
+    declarator: CodeExpression;
+    define: CodeExpression;
+    validator: (name: string) => CodeExpression[];
 }
 const makeValueBuilder = (define: Types.ValueDefine): Builder =>
 ({
-    declarator: "const",
-    define: JSON.stringify(define.value),
+    declarator: $expression("const"),
+    define: $expression(JSON.stringify(define.value)),
     validator: (name: string) => buildValueValidatorExpression(name, define.value),
 });
 const makePrimitiveTypeBuilder = (define: Types.PrimitiveTypeDefine): Builder =>
 ({
-    declarator: "const",
-    define: JSON.stringify(define.define),
-    validator: (name: string) => `"${define.$type}" === typeof ${name}`,
+    declarator: $expression("const"),
+    define: $expression(JSON.stringify(define.define)),
+    validator: (name: string) => [ $expression(`"${define.$type}" === typeof ${name}`), ],
 });
 const getBuilder = (define: Types.Define): Builder =>
 {
