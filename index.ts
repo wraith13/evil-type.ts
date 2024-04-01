@@ -53,6 +53,29 @@ const buildValueValidatorExpression = (name: string, value: Types.Jsonable): str
         return `${JSON.stringify(value)} === ${name}`;
     }
 };
+interface Code
+{
+    $code: (CodeExpression | CodeLine | CodeBlock)["$code"];
+}
+interface CodeExpression extends Code
+{
+    $code: "expression";
+    expression: string;
+};
+const $expression = (expression: string):CodeExpression => ({ $code: "expression", expression, });
+interface CodeLine extends Code
+{
+    $code: "line";
+    expressions: CodeExpression[];
+};
+const $line = (expressions: CodeExpression[]):CodeLine => ({ $code: "line", expressions, });
+interface CodeBlock extends Code
+{
+    $code: "block";
+    lines: CodeLine[];
+};
+const $block = (lines: CodeLine[]):CodeBlock => ({ $code: "block", lines, });
+type CodeEntry = CodeLine | CodeBlock;
 interface Builder
 {
     declarator: "const" | "type" | "interface" | "module";
