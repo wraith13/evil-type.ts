@@ -72,16 +72,35 @@ const $line = (expressions: CodeExpression[]): CodeLine => ({ $code: "line", exp
 interface CodeBlock extends Code
 {
     $code: "block";
+    header: CodeExpression[];
     lines: CodeLine[];
 };
-const $block = (lines: CodeLine[]): CodeBlock => ({ $code: "block", lines, });
+const $block = (header: CodeExpression[], lines: CodeLine[]): CodeBlock => ({ $code: "block", header, lines, });
 type CodeEntry = CodeLine | CodeBlock;
-const buildCode = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry[]): string =>
+const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
+    buildIndent(options, indentDepth) +code.expressions.join(" ") +";\n";
+const buildCodeBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
 {
     const currentIndent = buildIndent(options, indentDepth);
-    const nextIndent = buildIndent(options, indentDepth +1);
-    return code.map(i => i.$code === "line" ? (currentIndent +i.expressions.join(" ") +";"): ...);
-};
+    let result = "";
+    if (0 < (code.header ?? []).length)
+    {
+        result += currentIndent +code.header.join(" ") +"\n";
+    }
+    result += currentIndent +"{\n";
+    result += buildCode(options, indentDepth +1, code.lines);
+    result += currentIndent +"}\n";
+    return result;
+}
+const buildCode = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry[]): string =>
+    code
+        .map
+        (
+            i => i.$code === "line" ?
+                buildCodeLine(options, indentDepth, i):
+                buildCodeBlock(options, indentDepth, i)
+        )
+        .join("\n");
 interface Builder
 {
     declarator: CodeExpression;
