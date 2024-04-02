@@ -76,6 +76,12 @@ interface CodeBlock extends Code
 };
 const $block = (lines: CodeLine[]): CodeBlock => ({ $code: "block", lines, });
 type CodeEntry = CodeLine | CodeBlock;
+const buildCode = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry[]): string =>
+{
+    const currentIndent = buildIndent(options, indentDepth);
+    const nextIndent = buildIndent(options, indentDepth +1);
+    return code.map(i => i.$code === "line" ? (currentIndent +i.expressions.join(" ") +";"): ...);
+};
 interface Builder
 {
     declarator: CodeExpression;
