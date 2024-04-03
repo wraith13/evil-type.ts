@@ -11,9 +11,9 @@ const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
         .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): options.indentUnit)
         .join("");
 const buildExport = (define: { export?: boolean } | { }) =>
-    ("export" in define && (define.export ?? true)) ? "export": null;
-const buildDefineLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
-    buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineDefine(define)].filter(i => null !== i).join("") +";" +returnCode;
+    ("export" in define && (define.export ?? true)) ? $expression("export"): null;
+const buildDefineLine = (options: Types.TypeOptions, indentDepth: number, declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): CodeLine =>
+    $line([buildExport(define), $expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]);
 const buildValueValidatorExpression = (name: string, value: Types.Jsonable): CodeExpression[] =>
 {
     if (null !== value && "object" === typeof value)
@@ -79,7 +79,7 @@ const $block = (header: CodeExpression[], lines: CodeLine[]): CodeBlock => ({ $c
 type CodeEntry = CodeLine | CodeBlock;
 const getReturnCode = (_options: Types.TypeOptions) => "\n";
 const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
-    buildIndent(options, indentDepth) +code.expressions.join(" ") +";" +getReturnCode(options);
+    buildIndent(options, indentDepth) +code.expressions.filter(i => null !== i).join(" ") +";" +getReturnCode(options);
 const buildCodeBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
 {
     const currentIndent = buildIndent(options, indentDepth);
@@ -144,7 +144,7 @@ const buildValidatorLine = (options: Types.TypeOptions, indentDepth: number, dec
     buildIndent(options, indentDepth) +[buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
 
 const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
-const buildDefineValue = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): string =>
+const buildDefineValue = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): CodeLine =>
     buildDefineLine(options, indentDepth, "const", name, value);
 const buildValueValidator = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ValueDefine): string =>
     buildValidatorLine(options, indentDepth, "const", name, value);
@@ -183,13 +183,11 @@ const buildDefineInterface = (options: Types.TypeOptions, indentDepth: number, n
     result += currentIndent +"}" +returnCode;
     return result;
 };
-const buildDefineModuleCore = (options: Types.TypeOptions, indentDepth: number, members: { [key: string]: Types.Define; }) =>
-{
-    let result = "";
-    Object.keys(members).forEach(name => result += buildDefine(options, indentDepth, name, members[name]));
-    Object.keys(members).forEach(name => result += buildValidator(options, indentDepth, name, members[name]));
-    return result;
-};
+const buildDefineModuleCore = (options: Types.TypeOptions, indentDepth: number, members: { [key: string]: Types.Define; }): CodeEntry[] =>
+[
+    ...Object.keys(members).map(name => buildDefine(options, indentDepth, name, members[name])),
+    ...Object.keys(members).map(name => buildValidator(options, indentDepth, name, members[name])),
+];
 const buildDefineModule = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ModuleDefine) =>
 {
     let result = "";
@@ -200,7 +198,7 @@ const buildDefineModule = (options: Types.TypeOptions, indentDepth: number, name
     result += currentIndent +"}" +returnCode;
     return result;
 };
-const buildDefine = (options: Types.TypeOptions, indentDepth: number, name: string, define: Types.Define): string =>
+const buildDefine = (options: Types.TypeOptions, indentDepth: number, name: string, define: Types.Define): CodeEntry =>
 {
     switch(define.$type)
     {
@@ -216,7 +214,7 @@ const buildDefine = (options: Types.TypeOptions, indentDepth: number, name: stri
         return buildDefineModule(options, indentDepth, name, define);
     }
 };
-const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): string =>
+const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): CodeEpression[] =>
 {
     if (Types.isRefer(define))
     {
