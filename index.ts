@@ -73,6 +73,11 @@ interface CodeLine extends Code
     $code: "line";
     expressions: CodeExpression[];
 };
+const isCodeLine = (value: unknown): value is CodeLine =>
+    null !== value &&
+    "object" === typeof value &&
+    "$code" in value && "line" === value.$code &&
+    "expressions" in value && Array.isArray(value.expressions) && value.expressions.filter(i => ! isCodeExpression(i)).length <= 0;
 const $line = (expressions: CodeExpression[]): CodeLine => ({ $code: "line", expressions, });
 interface CodeBlock extends Code
 {
