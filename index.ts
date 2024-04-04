@@ -46,11 +46,11 @@ const buildValueValidatorExpression = (name: string, value: Types.Jsonable): Cod
     }
     if (undefined === value)
     {
-        return `undefined === ${name}`;
+        return [ $expression("undefined"), $expression("==="), $expression(name), ];
     }
     else
     {
-        return `${JSON.stringify(value)} === ${name}`;
+        return [ $expression(JSON.stringify(value)), $expression("==="), $expression(name), ];
     }
 };
 interface Code
@@ -63,6 +63,11 @@ interface CodeExpression extends Code
     expression: string;
 };
 const $expression = (expression: string): CodeExpression => ({ $code: "expression", expression, });
+const isCodeExpression = (value: unknown): value is CodeExpression =>
+    null !== value &&
+    "object" === typeof value &&
+    "$code" in value && "expression" === value.$code &&
+    "expression" in value && "string" === typeof value.expression;
 interface CodeLine extends Code
 {
     $code: "line";
@@ -79,7 +84,7 @@ const $block = (header: CodeExpression[], lines: CodeLine[]): CodeBlock => ({ $c
 type CodeEntry = CodeLine | CodeBlock;
 const getReturnCode = (_options: Types.TypeOptions) => "\n";
 const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
-    buildIndent(options, indentDepth) +code.expressions.filter(i => null !== i).join(" ") +";" +getReturnCode(options);
+    buildIndent(options, indentDepth) +code.expressions.filter(isCodeExpression).join(" ") +";" +getReturnCode(options);
 const buildCodeBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
 {
     const currentIndent = buildIndent(options, indentDepth);
