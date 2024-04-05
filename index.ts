@@ -137,7 +137,13 @@ const makePrimitiveTypeBuilder = (define: Types.PrimitiveTypeDefine): Builder =>
     define: $expression(JSON.stringify(define.define)),
     validator: (name: string) => [ $expression(`"${define.$type}" === typeof ${name}`), ],
 });
-const getBuilder = (define: Types.Define): Builder =>
+const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
+({
+    declarator: $expression("type"),
+    define: $expression(JSON.stringify(define.define)),
+    validator: (name: string) => getBuilder(define.define).validator(name),
+});
+const getBuilder = (define: Types.DefineOrRefer): Builder =>
 {
     switch(define.$type)
     {
@@ -146,7 +152,7 @@ const getBuilder = (define: Types.Define): Builder =>
     case "primitive-type":
         return makePrimitiveTypeBuilder(define);
     case "type":
-        return typeBuilder;
+        return makeTypeBuilder(define);
     case "interface":
         return interfaceBuilder;
     case "module":
