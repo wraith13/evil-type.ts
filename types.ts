@@ -49,7 +49,7 @@ export module Types
     export interface PrimitiveTypeDefine extends AlphaDefine
     {
         $type: "primitive-type";
-        define: "undefined" | "bool" | "boolean" | "number" | "string";
+        define: "undefined" | "boolean" | "number" | "string";
     }
     export interface TypeDefine extends AlphaDefine
     {

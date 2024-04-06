@@ -143,7 +143,7 @@ const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
     define: $expression(JSON.stringify(define.define)),
     validator: (name: string) => getBuilder(define.define).validator(name),
 });
-const getBuilder = (define: Types.DefineOrRefer): Builder =>
+const getBuilder = (define: Types.Define): Builder =>
 {
     switch(define.$type)
     {
@@ -259,20 +259,15 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): CodeEpression[
         }
     }
 };
-const buildValidator = (options: Types.TypeOptions, indentDepth: number, name: string, define: Types.Define): string =>
+const buildValidator = (name: string, define: Types.DefineOrRefer): CodeExpression[] =>
 {
-    switch(define.$type)
+    if (Types.isRefer(define))
     {
-    case "value":
-        return buildValueValidator(options, indentDepth, name, define);
-    case "primitive-type":
-        return buildDefinePrimitiveType(options, indentDepth, name, define);
-    case "type":
-        return buildDefineType(options, indentDepth, name, define);
-    case "interface":
-        return buildDefineInterface(options, indentDepth, name, define);
-    case "module":
-        return buildDefineModule(options, indentDepth, name, define);
+
+    }
+    else
+    {
+        return getBuilder(define).validator(name);
     }
 };
 const buildInlineValidator = (name: string, define: Types.TypeOrInterface): string =>
