@@ -259,11 +259,13 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): CodeEpression[
         }
     }
 };
-const buildValidator = (name: string, define: Types.DefineOrRefer): CodeExpression[] =>
+const toUpperCamelCase = (name: string) => `${name.slice(0, 1).toUpperCase()}${name.slice(1)}`;
+const buildValidatorName = (_options: Types.TypeOptions, name: string) => `is${toUpperCamelCase(name)}`;
+const buildValidator = (options: Types.TypeOptions, name: string, define: Types.DefineOrRefer): CodeExpression[] =>
 {
     if (Types.isRefer(define))
     {
-
+        return [$expression(`${buildValidatorName(options, define.$ref)}(${name})`)];
     }
     else
     {
