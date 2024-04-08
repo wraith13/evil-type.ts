@@ -79,4 +79,5 @@ export module Types
     export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ValueDefine | ArrayDefine | OrDefine | AndDefine;
     export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
+    export type DefineOrRefer = Define | Refer;
 }

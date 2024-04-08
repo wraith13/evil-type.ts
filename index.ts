@@ -2,6 +2,7 @@
 const startAt = new Date();
 import fs from "fs";
 import { Types } from "./types";
+import { Text } from "./text";
 const returnCode = "\n";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
@@ -259,8 +260,9 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): CodeEpression[
         }
     }
 };
-const toUpperCamelCase = (name: string) => `${name.slice(0, 1).toUpperCase()}${name.slice(1)}`;
-const buildValidatorName = (_options: Types.TypeOptions, name: string) => `is${toUpperCamelCase(name)}`;
+
+const buildValidatorName = (_options: Types.TypeOptions, name: string) =>
+    Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).join(".");
 const buildValidator = (options: Types.TypeOptions, name: string, define: Types.DefineOrRefer): CodeExpression[] =>
 {
     if (Types.isRefer(define))
