@@ -261,21 +261,24 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): CodeEpression[
     }
 };
 
-const buildValidatorName = (_options: Types.TypeOptions, name: string) =>
+const buildValidatorName = (name: string) =>
     Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).join(".");
-const buildValidator = (options: Types.TypeOptions, name: string, define: Types.DefineOrRefer): CodeExpression[] =>
+const buildValidatorExpression = (name: string, define: Types.DefineOrRefer): CodeExpression[] =>
 {
     if (Types.isRefer(define))
     {
-        return [$expression(`${buildValidatorName(options, define.$ref)}(${name})`)];
+        return [$expression(`${buildValidatorName( define.$ref)}(${name})`)];
     }
     else
     {
         return getBuilder(define).validator(name);
     }
 };
-const buildInlineValidator = (name: string, define: Types.TypeOrInterface): string =>
-    `(value: unknown): value is ${name} => ${getBuilder(define).validator("value")}`;
+const buildInlineValidator = (name: string, define: Types.TypeOrInterface): CodeExpression[] =>
+    [$expression(`(value: unknown): value is ${name} =>`)].concat(buildValidatorExpression("value", define));
+const buildValidator = (name: string, define: Types.TypeOrInterface): CodeLine =>
+    $line([$expression("const"), $expression(buildValidatorName(name))].concat(buildInlineValidator(name, define)));
+    
 try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
