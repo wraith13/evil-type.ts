@@ -208,8 +208,12 @@ const buildDefineInterface = (options: Types.TypeOptions, indentDepth: number, n
 };
 const buildDefineModuleCore = (members: { [key: string]: Types.Define; }): CodeEntry[] =>
 [
-    ...Object.keys(members).map(name => buildDefine(name, members[name])),
-    ...Object.keys(members).map(name => buildValidator(name, members[name])),
+    ...Object.entries(members).map
+    (
+        i => Types.isModuleDefine(i[1]) ?
+            [buildDefine(i[0], i[1])]:
+            [buildDefine(i[0], i[1]), buildValidator(i[0], i[1]), ]
+    ).reduce((a, b) => a.concat(b), []),
 ];
 const buildDefineModule = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ModuleDefine) =>
 {
@@ -264,16 +268,9 @@ const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): CodeEpression[
 const buildValidatorName = (name: string) =>
     Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).join(".");
 const buildValidatorExpression = (name: string, define: Types.DefineOrRefer): CodeExpression[] =>
-{
-    if (Types.isRefer(define))
-    {
-        return [$expression(`${buildValidatorName( define.$ref)}(${name})`)];
-    }
-    else
-    {
-        return getBuilder(define).validator(name);
-    }
-};
+    Types.isRefer(define) ?
+        [$expression(`${buildValidatorName( define.$ref)}(${name})`)]:
+        getBuilder(define).validator(name);
 const buildInlineValidator = (name: string, define: Types.TypeOrInterface): CodeExpression[] =>
     [$expression(`(value: unknown): value is ${name} =>`)].concat(buildValidatorExpression("value", define));
 const buildValidator = (name: string, define: Types.TypeOrInterface): CodeLine =>

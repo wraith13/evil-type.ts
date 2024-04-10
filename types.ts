@@ -29,18 +29,26 @@ export module Types
     export const isRefer = (value: unknown): value is Refer =>
         null !== value &&
         "object" === typeof value &&
-        "$ref" in value &&
-        "string" === typeof value.$ref;
+        "$ref" in value && "string" === typeof value.$ref;
     export interface AlphaDefine
     {
         export?: boolean;
         $type: string;
     }
+    export const isAlphaDefine = (value: unknown): value is AlphaDefine =>
+        null !== value &&
+        "object" === typeof value &&
+        (! ("export" in value) || "boolean" === typeof value.export) &&
+        "$type" in value && "string" === typeof value.$type;
     export interface ModuleDefine extends AlphaDefine
     {
         $type: "module";
         members: { [key: string]: Define; };
     }
+    export const isModuleDefine = (value: unknown): value is AlphaDefine =>
+        isAlphaDefine(value) &&
+        "module" === value.$type &&
+        "members" in value && "object" === typeof value.members && Object.values(value.members).filter(v => ! isDefine(v)) <= 0;
     export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
