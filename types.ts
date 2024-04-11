@@ -61,22 +61,34 @@ export module Types
     export const isModuleDefine = (value: unknown): value is AlphaDefine =>
         isAlphaDefine(value) &&
         "module" === value.$type &&
-        "members" in value && "object" === typeof value.members && Object.values(value.members).filter(v => ! isDefine(v)) <= 0;
+        "members" in value && null === value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isDefine(v)).length <= 0;
     export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
         value: Jsonable;
     }
+    export const isValueDefine = (value: unknown): value is ValueDefine =>
+        isAlphaDefine(value) &&
+        "value" === value.$type &&
+        "value" in value && isJsonable(value);
     export interface PrimitiveTypeDefine extends AlphaDefine
     {
         $type: "primitive-type";
         define: "undefined" | "boolean" | "number" | "string";
     }
+    export const isPrimitiveTypeDefine = (value: unknown): value is PrimitiveTypeDefine =>
+        isAlphaDefine(value) &&
+        "primitive-type" === value.$type &&
+        "define" in value && ("undefined" === value.define || "boolean" === value.define || "number" === value.define || "string" === value.define);
     export interface TypeDefine extends AlphaDefine
     {
         $type: "type";
         define: TypeOrInterfaceOrRefer;
     }
+    export const isTypeDefine = (value: unknown): value is TypeDefine =>
+        isAlphaDefine(value) &&
+        "type" === value.$type &&
+        "define" in value && isTypeOrInterfaceOrRefer(value.define);
     export interface InterfaceDefine extends AlphaDefine
     {
         $type: "interface";
@@ -97,8 +109,21 @@ export module Types
         $type: "and";
         types: TypeOrInterfaceOrRefer[];
     }
-    export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ValueDefine | ArrayDefine | OrDefine | AndDefine;
+    export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
+    export const isTypeOrInterface = (value: unknown): value is TypeOrInterface =>
+        isPrimitiveTypeDefine(value) ||
+        isTypeDefine(value) ||
+        isInterfaceDefine(value) ||
+        isArrayDefine(value) ||
+        isOrDefine(value) ||
+        isAndDefine(value);
     export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
+    export const isTypeOrInterfaceOrRefer = (value: unknown): value is TypeOrInterfaceOrRefer =>
+        isTypeOrInterface(value) || isRefer(value);
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
+    export const isDefine = (value: unknown): value is Define =>
+        isModuleDefine(value) || isValueDefine(value) || isTypeOrInterface(value);
     export type DefineOrRefer = Define | Refer;
+    export const isDefineOrRefer = (value: unknown): value is DefineOrRefer =>
+        isDefine(value) || isRefer(value);
 }
