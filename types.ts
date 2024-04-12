@@ -97,13 +97,16 @@ export module Types
     export const isInterfaceDefine = (value: unknown): value is InterfaceDefine =>
         isAlphaDefine(value) &&
         "interface" === value.$type &&
-        "members" in value && Object.values(value.members).filter(v => ! isTypeOrInterfaceOrRefer(v)).length <= 0;
-    
+        "members" in value && null === value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isTypeOrInterfaceOrRefer(v)).length <= 0;
     export interface ArrayDefine extends AlphaDefine
     {
         $type: "array";
         items: TypeOrInterfaceOrRefer;
     }
+    export const isArrayDefine = (value: unknown): value is ArrayDefine =>
+        isAlphaDefine(value) &&
+        "array" === value.$type &&
+        "items" in value && isTypeOrInterfaceOrRefer(value.items);
     export interface OrDefine extends AlphaDefine
     {
         $type: "or";
