@@ -142,7 +142,7 @@ const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
 ({
     declarator: $expression("type"),
     define: $expression(JSON.stringify(define.define)),
-    validator: (name: string) => getBuilder(define.define).validator(name),
+    validator: (name: string) => buildValidatorExpression(name, define.define),
 });
 const getBuilder = (define: Types.Define): Builder =>
 {
