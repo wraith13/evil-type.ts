@@ -112,11 +112,19 @@ export module Types
         $type: "or";
         types: TypeOrInterfaceOrRefer[];
     }
+    export const isOrDefine = (value: unknown): value is OrDefine =>
+        isAlphaDefine(value) &&
+        "or" === value.$type &&
+        "types" in value && Array.isArray(value.types) && value.types.filter(i => ! isTypeOrInterfaceOrRefer(i)).length <= 0;
     export interface AndDefine extends AlphaDefine
     {
         $type: "and";
         types: TypeOrInterfaceOrRefer[];
     }
+    export const isAndDefine = (value: unknown): value is AndDefine =>
+        isAlphaDefine(value) &&
+        "and" === value.$type &&
+        "types" in value && Array.isArray(value.types) && value.types.filter(i => ! isTypeOrInterfaceOrRefer(i)).length <= 0;
     export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     export const isTypeOrInterface = (value: unknown): value is TypeOrInterface =>
         isPrimitiveTypeDefine(value) ||
