@@ -72,7 +72,7 @@ const isCodeExpression = (value: unknown): value is CodeExpression =>
 interface CodeLine extends Code
 {
     $code: "line";
-    expressions: CodeExpression[];
+    expressions: (CodeExpression | CodeInlineBlock)[];
 };
 const isCodeLine = (value: unknown): value is CodeLine =>
     null !== value &&
@@ -80,11 +80,17 @@ const isCodeLine = (value: unknown): value is CodeLine =>
     "$code" in value && "line" === value.$code &&
     "expressions" in value && Array.isArray(value.expressions) && value.expressions.filter(i => ! isCodeExpression(i)).length <= 0;
 const $line = (expressions: CodeExpression[]): CodeLine => ({ $code: "line", expressions, });
+interface CodeInlineBlock extends Code
+{
+    $code: "block";
+    header: never;
+    lines: CodeEntry[];
+};
 interface CodeBlock extends Code
 {
     $code: "block";
     header: CodeExpression[];
-    lines: CodeLine[];
+    lines: CodeEntry[];
 };
 const isCodeBlock = (value: unknown): value is CodeBlock =>
     null !== value &&
@@ -123,26 +129,32 @@ const buildCode = (options: Types.TypeOptions, indentDepth: number, code: CodeEn
 interface Builder
 {
     declarator: CodeExpression;
-    define: CodeExpression;
+    define: CodeEntry;
     validator: (name: string) => CodeExpression[];
 }
 const makeValueBuilder = (define: Types.ValueDefine): Builder =>
 ({
     declarator: $expression("const"),
-    define: $expression(JSON.stringify(define.value)),
+    define: $line([$expression(JSON.stringify(define.value))]),
     validator: (name: string) => buildValueValidatorExpression(name, define.value),
 });
 const makePrimitiveTypeBuilder = (define: Types.PrimitiveTypeDefine): Builder =>
 ({
     declarator: $expression("const"),
-    define: $expression(JSON.stringify(define.define)),
+    define: $line([$expression(JSON.stringify(define.define))]),
     validator: (name: string) => [ $expression(`"${define.$type}" === typeof ${name}`), ],
 });
 const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
 ({
     declarator: $expression("type"),
-    define: $expression(JSON.stringify(define.define)),
+    define: $line([$expression(JSON.stringify(define.define))]),
     validator: (name: string) => buildValidatorExpression(name, define.define),
+});
+const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
+({
+    declarator: $expression("interface"),
+    define: buildDefineInterface(define),
+    validator: (name: string) => buildInterfaceValidator(name, define,
 });
 const getBuilder = (define: Types.Define): Builder =>
 {
@@ -155,7 +167,7 @@ const getBuilder = (define: Types.Define): Builder =>
     case "type":
         return makeTypeBuilder(define);
     case "interface":
-        return interfaceBuilder;
+        return makeInterfaceBuilder(define);
     case "module":
         return moduleBuilder;
     }
@@ -181,7 +193,7 @@ const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine
     buildDefineLine("type", name, value);
     
 const buildInlineDefineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
-const buildInlineDefineInterface = (value: Types.InterfaceDefine): string =>
+const buildInlineDefineInterface = (value: Types.InterfaceDefine): CodeBlock =>
 {
     let result = [];
     result.push("{");
@@ -192,19 +204,14 @@ const buildInlineDefineInterface = (value: Types.InterfaceDefine): string =>
     result.push("}");
     return result.join(" ");
 };
-const buildDefineInterface = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.InterfaceDefine) =>
+const buildDefineInterface = (name: string, value: Types.InterfaceDefine): CodeBlock =>
 {
-    let result = "";
-    const currentIndent = buildIndent(options, indentDepth);
-    const nextIndent = buildIndent(options, indentDepth +1);
-    result += currentIndent +[buildExport(value), "type", name].filter(i => null !== i).join("") +returnCode;
-    result += currentIndent +"{" +returnCode;
-    Object.keys(value.members).forEach
+    const header = [buildExport(value), "interface", name].filter(i => null !== i).map(i => $expression(i));
+    const lines = Object.keys(value.members).map
     (
-        name => result += nextIndent +name+ ": " +buildInlineDefine(value.members[name]) +";" +returnCode
+        name => $line([$expression(name+ ":"), buildInlineDefine(value.members[name])])
     );
-    result += currentIndent +"}" +returnCode;
-    return result;
+    return $block(header, lines);
 };
 const buildDefineModuleCore = (members: { [key: string]: Types.Define; }): CodeEntry[] =>
 [
@@ -215,7 +222,7 @@ const buildDefineModuleCore = (members: { [key: string]: Types.Define; }): CodeE
             [buildDefine(i[0], i[1]), buildValidator(i[0], i[1]), ]
     ).reduce((a, b) => a.concat(b), []),
 ];
-const buildDefineModule = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ModuleDefine) =>
+const buildDefineModule = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ModuleDefine): CodeBlock =>
 {
     let result = "";
     const currentIndent = buildIndent(options, indentDepth);
