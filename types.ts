@@ -61,7 +61,7 @@ export module Types
     export const isModuleDefine = (value: unknown): value is AlphaDefine =>
         isAlphaDefine(value) &&
         "module" === value.$type &&
-        "members" in value && null === value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isDefine(v)).length <= 0;
+        "members" in value && null !== value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isDefine(v)).length <= 0;
     export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
@@ -97,7 +97,7 @@ export module Types
     export const isInterfaceDefine = (value: unknown): value is InterfaceDefine =>
         isAlphaDefine(value) &&
         "interface" === value.$type &&
-        "members" in value && null === value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isTypeOrInterfaceOrRefer(v)).length <= 0;
+        "members" in value && null !== value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isTypeOrInterfaceOrRefer(v)).length <= 0;
     export interface ArrayDefine extends AlphaDefine
     {
         $type: "array";
