@@ -21,15 +21,15 @@ const buildValueValidatorExpression = (name: string, value: Types.Jsonable): Cod
     {
         if (Array.isArray(value))
         {
-            const list: string[] = [];
-            list.push(`Array.isArray(${name})`);
-            list.push(`${value.length} <= ${name}.length`)
-            value.forEach((i, ix) => list.push(buildValueValidatorExpression(`${name}[${ix}]`, i)));
-            return list.join(" && ");
+            let list: CodeExpression[] = [];
+            list.push($expression(`Array.isArray(${name})`));
+            list.push($expression(`${value.length} <= ${name}.length`));
+            value.forEach((i, ix) => list = list.concat(buildValueValidatorExpression(`${name}[${ix}]`, i)));
+            return list.reduce((a, b) => a.concat([$expression("&&"), b]), <CodeExpression[]>[]);
         }
         else
         {
-            const list: string[] = [];
+            const list: CodeExpression[] = [];
             list.push(`null !== ${name}`);
             list.push(`"object" === typeof ${name}`);
             Object.keys(value).forEach
