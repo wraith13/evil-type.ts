@@ -56,7 +56,7 @@ const buildValueValidatorExpression = (name: string, value: Types.Jsonable): Cod
 };
 interface Code
 {
-    $code: (CodeExpression | CodeLine | CodeBlock)["$code"];
+    $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
 }
 interface CodeExpression extends Code
 {
@@ -82,10 +82,16 @@ const isCodeLine = (value: unknown): value is CodeLine =>
 const $line = (expressions: CodeExpression[]): CodeLine => ({ $code: "line", expressions, });
 interface CodeInlineBlock extends Code
 {
-    $code: "block";
+    $code: "inline-block";
     header: never;
     lines: CodeEntry[];
 };
+const isCodeInlineBlock = (value: unknown): value is CodeBlock =>
+    null !== value &&
+    "object" === typeof value &&
+    "$code" in value && "inline-block" === value.$code &&
+    ! ("header" in value) &&
+    "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
 interface CodeBlock extends Code
 {
     $code: "block";
