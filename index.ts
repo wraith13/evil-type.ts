@@ -72,8 +72,9 @@ const isCodeExpression = (value: unknown): value is CodeExpression =>
 interface CodeLine extends Code
 {
     $code: "line";
-    expressions: (CodeExpression | CodeInlineBlock)[];
+    expressions: CodeInlineEntry[];
 };
+type CodeInlineEntry = CodeExpression | CodeInlineBlock
 const isCodeLine = (value: unknown): value is CodeLine =>
     null !== value &&
     "object" === typeof value &&
@@ -135,25 +136,25 @@ const buildCode = (options: Types.TypeOptions, indentDepth: number, code: CodeEn
 interface Builder
 {
     declarator: CodeExpression;
-    define: CodeEntry;
-    validator: (name: string) => CodeExpression[];
+    define: CodeInlineEntry[];
+    validator: (name: string) => CodeInlineEntry[];
 }
 const makeValueBuilder = (define: Types.ValueDefine): Builder =>
 ({
     declarator: $expression("const"),
-    define: $line([$expression(JSON.stringify(define.value))]),
+    define: [$expression(JSON.stringify(define.value))],
     validator: (name: string) => buildValueValidatorExpression(name, define.value),
 });
 const makePrimitiveTypeBuilder = (define: Types.PrimitiveTypeDefine): Builder =>
 ({
     declarator: $expression("const"),
-    define: $line([$expression(JSON.stringify(define.define))]),
+    define: [$expression(JSON.stringify(define.define))],
     validator: (name: string) => [ $expression(`"${define.$type}" === typeof ${name}`), ],
 });
 const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
 ({
     declarator: $expression("type"),
-    define: $line([$expression(JSON.stringify(define.define))]),
+    define: [$expression(JSON.stringify(define.define))],
     validator: (name: string) => buildValidatorExpression(name, define.define),
 });
 const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
