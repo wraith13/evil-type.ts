@@ -84,9 +84,10 @@ const $line = (expressions: CodeExpression[]): CodeLine => ({ $code: "line", exp
 interface CodeInlineBlock extends Code
 {
     $code: "inline-block";
-    header: never;
+    //header: never;
     lines: CodeEntry[];
 };
+const $iblock = (lines: CodeEntry[]): CodeInlineBlock => ({ $code: "inline-block", lines, });
 const isCodeInlineBlock = (value: unknown): value is CodeBlock =>
     null !== value &&
     "object" === typeof value &&
@@ -160,7 +161,7 @@ const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
 const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
 ({
     declarator: $expression("interface"),
-    define: buildDefineInterface(define),
+    define: [buildDefineInlineInterface(define)],
     validator: (name: string) => buildInterfaceValidator(name, define,
 });
 const getBuilder = (define: Types.Define): Builder =>
@@ -211,13 +212,18 @@ const buildInlineDefineInterface = (value: Types.InterfaceDefine): CodeBlock =>
     result.push("}");
     return result.join(" ");
 };
+const buildDefineInlineInterface = (value: Types.InterfaceDefine): CodeInlineBlock =>
+{
+    const lines = Object.keys(value.members).map
+    (
+        name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])])
+    );
+    return $iblock(lines);
+};
 const buildDefineInterface = (name: string, value: Types.InterfaceDefine): CodeBlock =>
 {
     const header = [buildExport(value), "interface", name].filter(i => null !== i).map(i => $expression(i));
-    const lines = Object.keys(value.members).map
-    (
-        name => $line([$expression(name+ ":"), buildInlineDefine(value.members[name])])
-    );
+    const lines = buildDefineInlineInterface(value).lines;
     return $block(header, lines);
 };
 const buildDefineModuleCore = (members: { [key: string]: Types.Define; }): CodeEntry[] =>
