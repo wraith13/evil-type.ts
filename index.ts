@@ -106,7 +106,7 @@ const isCodeBlock = (value: unknown): value is CodeBlock =>
     "$code" in value && "block" === value.$code &&
     "header" in value && Array.isArray(value.header) && value.header.filter(i => ! isCodeExpression(i)).length <= 0 &&
     "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
-const $block = (header: CodeExpression[], lines: CodeLine[]): CodeBlock => ({ $code: "block", header, lines, });
+const $block = (header: CodeExpression[], lines: CodeEntry[]): CodeBlock => ({ $code: "block", header, lines, });
 type CodeEntry = CodeLine | CodeBlock;
 const getReturnCode = (_options: Types.TypeOptions) => "\n";
 const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
