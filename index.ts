@@ -15,6 +15,8 @@ const buildExport = (define: { export?: boolean } | { }) =>
     ("export" in define && (define.export ?? true)) ? $expression("export"): null;
 const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): CodeLine =>
     $line([buildExport(define), $expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]);
+const kindofJoinExpression = (list: CodeExpression[], separator: CodeExpression) =>
+list.reduce((a, b) => a.concat([separator, b]), <CodeExpression[]>[]);
 const buildValueValidatorExpression = (name: string, value: Types.Jsonable): CodeExpression[] =>
 {
     if (null !== value && "object" === typeof value)
@@ -25,24 +27,24 @@ const buildValueValidatorExpression = (name: string, value: Types.Jsonable): Cod
             list.push($expression(`Array.isArray(${name})`));
             list.push($expression(`${value.length} <= ${name}.length`));
             value.forEach((i, ix) => list = list.concat(buildValueValidatorExpression(`${name}[${ix}]`, i)));
-            return list.reduce((a, b) => a.concat([$expression("&&"), b]), <CodeExpression[]>[]);
+            return kindofJoinExpression(list,$expression("&&"));
         }
         else
         {
             const list: CodeExpression[] = [];
-            list.push(`null !== ${name}`);
-            list.push(`"object" === typeof ${name}`);
+            list.push($expression(`null !== ${name}`));
+            list.push($expression(`"object" === typeof ${name}`));
             Object.keys(value).forEach
             (
                 key =>
                 {
                     {
-                        list.push(`"${key}" in ${name}`);
-                        list.push(buildValueValidatorExpression(`${name}.${key}`, value[key]));
+                        list.push($expression(`"${key}" in ${name}`));
+                        list.push(...buildValueValidatorExpression(`${name}.${key}`, value[key]));
                     }
                 }
             );
-            return list.join(" && ");
+            return kindofJoinExpression(list,$expression("&&"));
         }
     }
     if (undefined === value)
