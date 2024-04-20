@@ -164,7 +164,7 @@ const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
 ({
     declarator: $expression("interface"),
     define: [buildDefineInlineInterface(define)],
-    validator: (name: string) => buildInterfaceValidator(name, define,
+    validator: (name: string) => buildInterfaceValidator(name, define),
 });
 const getBuilder = (define: Types.Define): Builder =>
 {
