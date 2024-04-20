@@ -140,7 +140,7 @@ interface Builder
 {
     declarator: CodeExpression;
     define: CodeInlineEntry[];
-    validator: (name: string) => CodeInlineEntry[];
+    validator?: (name: string) => CodeInlineEntry[];
 }
 const makeValueBuilder = (define: Types.ValueDefine): Builder =>
 ({
@@ -166,6 +166,11 @@ const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
     define: [buildDefineInlineInterface(define)],
     validator: (name: string) => buildInterfaceValidator(name, define),
 });
+const makeModuleBuilder = (define: Types.ModuleDefine): Builder =>
+({
+    declarator: $expression("module"),
+    define: buildDefineModuleCore(define),
+});
 const getBuilder = (define: Types.Define): Builder =>
 {
     switch(define.$type)
@@ -179,7 +184,7 @@ const getBuilder = (define: Types.Define): Builder =>
     case "interface":
         return makeInterfaceBuilder(define);
     case "module":
-        return moduleBuilder;
+        return makeModuleBuilder(define);
     }
 };
 
