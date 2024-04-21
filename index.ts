@@ -190,7 +190,7 @@ const getBuilder = (define: Types.Define): Builder =>
 
 const buildInlineValueValidator = (define: Types.ValueDefine) =>
     `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
-const buildValidatorLine = (string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
+const buildValidatorLine = (declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     [buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
 
 const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
@@ -248,7 +248,7 @@ const buildDefineModule = (options: Types.TypeOptions, indentDepth: number, name
     const currentIndent = buildIndent(options, indentDepth);
     result += currentIndent +[buildExport(value), "type", name].filter(i => null !== i).join("") +returnCode;
     result += currentIndent +"{" +returnCode;
-    result += buildDefineModuleCore(options, indentDepth +1, value.members);
+    result += buildDefineModuleCore(value.members);
     result += currentIndent +"}" +returnCode;
     return result;
 };
