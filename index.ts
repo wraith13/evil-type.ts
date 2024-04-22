@@ -242,15 +242,11 @@ const buildDefineModuleCore = (members: { [key: string]: Types.Define; }): CodeE
             [buildDefine(i[0], i[1]), buildValidator(i[0], i[1]), ]
     ).reduce((a, b) => a.concat(b), []),
 ];
-const buildDefineModule = (options: Types.TypeOptions, indentDepth: number, name: string, value: Types.ModuleDefine): CodeBlock =>
+const buildDefineModule = (name: string, value: Types.ModuleDefine): CodeBlock =>
 {
-    let result = "";
-    const currentIndent = buildIndent(options, indentDepth);
-    result += currentIndent +[buildExport(value), "type", name].filter(i => null !== i).join("") +returnCode;
-    result += currentIndent +"{" +returnCode;
-    result += buildDefineModuleCore(value.members);
-    result += currentIndent +"}" +returnCode;
-    return result;
+    const header = <CodeExpression[]>[buildExport(value), $expression("module"), $expression(name)].filter(i => null !== i);
+    const lines = buildDefineModuleCore(value.members);
+    return $block(header, lines);
 };
 const buildDefine = (name: string, define: Types.Define): CodeEntry =>
 {
