@@ -208,29 +208,12 @@ const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine
     buildDefineLine("type", name, value);
     
 const buildInlineDefineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
-const buildInlineDefineInterface = (value: Types.InterfaceDefine): CodeBlock =>
-{
-    let result = [];
-    result.push("{");
-    Object.keys(value.members).forEach
-    (
-        name => result.push(name+ ": " +buildInlineDefine(value.members[name]) +";")
-    );
-    result.push("}");
-    return result.join(" ");
-};
-const buildDefineInlineInterface = (value: Types.InterfaceDefine): CodeInlineBlock =>
-{
-    const lines = Object.keys(value.members).map
-    (
-        name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])])
-    );
-    return $iblock(lines);
-};
+const buildDefineInlineInterface = (value: Types.InterfaceDefine) => Object.keys(value.members).map
+    (name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]));
 const buildDefineInterface = (name: string, value: Types.InterfaceDefine): CodeBlock =>
 {
     const header = [buildExport(value), "interface", name].filter(i => null !== i).map(i => $expression(i));
-    const lines = buildDefineInlineInterface(value).lines;
+    const lines = buildDefineInlineInterface(value);
     return $block(header, lines);
 };
 const buildDefineModuleCore = (members: { [key: string]: Types.Define; }): CodeEntry[] =>
