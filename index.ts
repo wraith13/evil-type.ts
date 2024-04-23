@@ -74,9 +74,9 @@ const isCodeExpression = (value: unknown): value is CodeExpression =>
 interface CodeLine extends Code
 {
     $code: "line";
-    expressions: CodeInlineEntry[];
+    expressions: CodeInlineEntry;
 };
-type CodeInlineEntry = CodeExpression | CodeInlineBlock
+type CodeInlineEntry = CodeExpression[] | CodeInlineBlock;
 const isCodeLine = (value: unknown): value is CodeLine =>
     null !== value &&
     "object" === typeof value &&
@@ -139,8 +139,8 @@ const buildCode = (options: Types.TypeOptions, indentDepth: number, code: CodeEn
 interface Builder
 {
     declarator: CodeExpression;
-    define: CodeInlineEntry[];
-    validator?: (name: string) => CodeInlineEntry[];
+    define: CodeInlineEntry;
+    validator?: (name: string) => CodeInlineEntry;
 }
 const makeValueBuilder = (define: Types.ValueDefine): Builder =>
 ({
@@ -163,7 +163,7 @@ const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
 const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
 ({
     declarator: $expression("interface"),
-    define: [buildDefineInlineInterface(define)],
+    define: buildDefineInlineInterface(define),
     validator: (name: string) => buildInterfaceValidator(name, define),
 });
 const makeModuleBuilder = (define: Types.ModuleDefine): Builder =>
@@ -205,8 +205,11 @@ const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine
     buildDefineLine("type", name, value);
     
 const buildInlineDefineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
-const buildDefineInlineInterface = (value: Types.InterfaceDefine) => Object.keys(value.members).map
-    (name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]));
+const buildDefineInlineInterface = (value: Types.InterfaceDefine) => $iblock
+(
+    Object.keys(value.members)
+        .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]))
+);
 const buildDefineInterface = (name: string, value: Types.InterfaceDefine): CodeBlock =>
 {
     const header = [buildExport(value), "interface", name].filter(i => null !== i).map(i => $expression(i));
