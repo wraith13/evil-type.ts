@@ -187,24 +187,21 @@ const getBuilder = (define: Types.Define): Builder =>
         return makeModuleBuilder(define);
     }
 };
-
 const buildInlineValueValidator = (define: Types.ValueDefine) =>
     `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
 const buildValidatorLine = (declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
     [buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
-
 const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
 const buildDefineValue = (name: string, value: Types.ValueDefine): CodeLine =>
     buildDefineLine("const", name, value);
 const buildValueValidator = (name: string, value: Types.ValueDefine): string =>
     buildValidatorLine("const", name, value);
-
 const buildInlineDefineType = (value: Types.TypeDefine): string => buildInlineDefine(value.define);
-const buildDefineType = (name: string, value: Types.TypeDefine): string =>
+const buildDefineType = (name: string, value: Types.TypeDefine): CodeLine =>
     buildDefineLine("type", name, value);
 
 const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeDefine): string => value.define;
-const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): string =>
+const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
     buildDefineLine("type", name, value);
     
 const buildInlineDefineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
