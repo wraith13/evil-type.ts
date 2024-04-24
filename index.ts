@@ -13,7 +13,7 @@ const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
         .join("");
 const buildExport = (define: { export?: boolean } | { }) =>
     ("export" in define && (define.export ?? true)) ? $expression("export"): null;
-const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): CodeLine =>
+const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
     $line([buildExport(define), $expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]);
 const kindofJoinExpression = (list: CodeExpression[], separator: CodeExpression) =>
 list.reduce((a, b) => a.concat([separator, b]), <CodeExpression[]>[]);
