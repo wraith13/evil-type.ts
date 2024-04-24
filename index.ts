@@ -65,7 +65,7 @@ interface CodeExpression extends Code
     $code: "expression";
     expression: string;
 };
-const $expression = (expression: string): CodeExpression => ({ $code: "expression", expression, });
+const $expression = (expression: CodeExpression["expression"]): CodeExpression => ({ $code: "expression", expression, });
 const isCodeExpression = (value: unknown): value is CodeExpression =>
     null !== value &&
     "object" === typeof value &&
@@ -82,14 +82,14 @@ const isCodeLine = (value: unknown): value is CodeLine =>
     "object" === typeof value &&
     "$code" in value && "line" === value.$code &&
     "expressions" in value && Array.isArray(value.expressions) && value.expressions.filter(i => ! isCodeExpression(i)).length <= 0;
-const $line = (expressions: CodeExpression[]): CodeLine => ({ $code: "line", expressions, });
+const $line = (expressions: CodeLine["expressions"]): CodeLine => ({ $code: "line", expressions, });
 interface CodeInlineBlock extends Code
 {
     $code: "inline-block";
     //header: never;
     lines: CodeEntry[];
 };
-const $iblock = (lines: CodeEntry[]): CodeInlineBlock => ({ $code: "inline-block", lines, });
+const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ $code: "inline-block", lines, });
 const isCodeInlineBlock = (value: unknown): value is CodeBlock =>
     null !== value &&
     "object" === typeof value &&
@@ -108,7 +108,7 @@ const isCodeBlock = (value: unknown): value is CodeBlock =>
     "$code" in value && "block" === value.$code &&
     "header" in value && Array.isArray(value.header) && value.header.filter(i => ! isCodeExpression(i)).length <= 0 &&
     "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
-const $block = (header: CodeExpression[], lines: CodeEntry[]): CodeBlock => ({ $code: "block", header, lines, });
+const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
 type CodeEntry = CodeLine | CodeBlock;
 const getReturnCode = (_options: Types.TypeOptions) => "\n";
 const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
