@@ -87,7 +87,7 @@ interface CodeInlineBlock extends Code
 {
     $code: "inline-block";
     //header: never;
-    lines: CodeEntry[];
+    lines: CodeInlineEntry[];
 };
 const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ $code: "inline-block", lines, });
 const isCodeInlineBlock = (value: unknown): value is CodeBlock =>
@@ -112,7 +112,19 @@ const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlo
 type CodeEntry = CodeLine | CodeBlock;
 const getReturnCode = (_options: Types.TypeOptions) => "\n";
 const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
-    buildIndent(options, indentDepth) +code.expressions.filter(isCodeExpression).join(" ") +";" +getReturnCode(options);
+{
+    const indent = buildIndent(options, indentDepth);
+    if (Array.isArray(code.expressions))
+    {
+        return indent +code.expressions.filter(isCodeExpression).join(" ") +";" +getReturnCode(options);
+    }
+    else
+    {
+        return indent +buildCodeInlineBlock(options: Types.TypeOptions, indentDepth: number, code.expressions);
+    }
+}
+const buildCodeInlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
+    [ "{", ...code.lines.map(i => buildCode(options, indentDepth +1, i)).reduce((a, b) => a.concat(b), []), "}" ].join(" ");
 const buildCodeBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
 {
     const currentIndent = buildIndent(options, indentDepth);
