@@ -120,7 +120,7 @@ const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: Co
     }
     else
     {
-        return indent +buildCodeInlineBlock(options: Types.TypeOptions, indentDepth: number, code.expressions);
+        return indent +buildCodeInlineBlock(options, indentDepth, code.expressions);
     }
 }
 const buildCodeInlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
