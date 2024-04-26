@@ -289,6 +289,10 @@ const buildValidatorExpression = (name: string, define: Types.DefineOrRefer): Co
     Types.isRefer(define) ?
         [$expression(`${buildValidatorName( define.$ref)}(${name})`)]:
         getBuilder(define).validator(name);
+const buildInterfaceValidator = (name: string, define: Types.InterfaceDefine): CodeExpression[] =>
+{
+
+};
 const buildInlineValidator = (name: string, define: Types.TypeOrInterface): CodeExpression[] =>
     [$expression(`(value: unknown): value is ${name} =>`)].concat(buildValidatorExpression("value", define));
 const buildValidator = (name: string, define: Types.TypeOrInterface): CodeLine =>
