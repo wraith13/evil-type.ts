@@ -294,7 +294,10 @@ const buildInterfaceValidator = (name: string, define: Types.InterfaceDefine): C
 
 };
 const buildInlineValidator = (name: string, define: Types.TypeOrInterface): CodeExpression[] =>
-    [$expression(`(value: unknown): value is ${name} =>`)].concat(buildValidatorExpression("value", define));
+[
+    $expression(`(value: unknown): value is ${name} =>`),
+    ...buildValidatorExpression("value", define),
+];
 const buildValidator = (name: string, define: Types.TypeOrInterface): CodeLine =>
     $line([$expression("const"), $expression(buildValidatorName(name))].concat(buildInlineValidator(name, define)));
     
