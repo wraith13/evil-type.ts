@@ -127,6 +127,7 @@ export module Types
         "types" in value && Array.isArray(value.types) && value.types.filter(i => ! isTypeOrInterfaceOrRefer(i)).length <= 0;
     export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     export type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
+    export type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
     export const isTypeOrInterface = (value: unknown): value is TypeOrInterface =>
         isPrimitiveTypeDefine(value) ||
         isTypeDefine(value) ||

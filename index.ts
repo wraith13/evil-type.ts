@@ -259,7 +259,7 @@ const buildDefine = (name: string, define: Types.Define): CodeEntry =>
         return buildDefineModule(name, define);
     }
 };
-const buildInlineDefine = (define: Types.TypeOrInterfaceOrRefer): CodeEpression[] =>
+const buildInlineDefine = (define: Types.ValueOrTypeOfInterfaceOrRefer): CodeEpression[] =>
 {
     if (Types.isRefer(define))
     {
