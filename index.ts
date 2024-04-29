@@ -172,6 +172,12 @@ const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
     define: [$expression(JSON.stringify(define.define))],
     validator: (name: string) => buildValidatorExpression(name, define.define),
 });
+const makeOrTypeBuilder = (define: Types.OrDefine): Builder =>
+({
+    declarator: $expression("type"),
+    define: kindofJoinExpression(define.types.map(i => $expression(i)), $expression("||")),
+    validator: (name: string) => ...,
+});
 const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
 ({
     declarator: $expression("interface"),
@@ -228,9 +234,9 @@ const buildDefineInterface = (name: string, value: Types.InterfaceDefine): CodeB
     const lines = buildDefineInlineInterface(value);
     return $block(header, lines);
 };
-const buildDefineModuleCore = (members: { [key: string]: Types.Define; }): CodeEntry[] =>
+const buildDefineModuleCore = (value: Types.ModuleDefine): CodeEntry[] =>
 [
-    ...Object.entries(members).map
+    ...Object.entries(value.members).map
     (
         i => Types.isModuleDefine(i[1]) ?
             [buildDefine(i[0], i[1])]:
@@ -240,7 +246,7 @@ const buildDefineModuleCore = (members: { [key: string]: Types.Define; }): CodeE
 const buildDefineModule = (name: string, value: Types.ModuleDefine): CodeBlock =>
 {
     const header = <CodeExpression[]>[buildExport(value), $expression("module"), $expression(name)].filter(i => null !== i);
-    const lines = buildDefineModuleCore(value.members);
+    const lines = buildDefineModuleCore(value);
     return $block(header, lines);
 };
 const buildDefine = (name: string, define: Types.Define): CodeEntry =>
