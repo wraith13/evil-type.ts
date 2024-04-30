@@ -222,8 +222,51 @@ const buildDefineType = (name: string, value: Types.TypeDefine): CodeLine =>
 const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeDefine): string => value.define;
 const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
     buildDefineLine("type", name, value);
-    
-const buildInlineDefineArray = (value: Types.ArrayDefine): string => buildInlineDefine(value.items) +"[]";
+const enParenthesis = (expressions: CodeExpression[]) =>
+    [ $expression("("), ...expressions, $expression(")"), ];
+const isNeedParenthesis = (expressions: CodeExpression[]) =>
+{
+    if (expressions.length <= 1)
+    {
+        return false;
+    }
+    const lastIx = expressions.length -1;
+    if ("(" === expressions[0].expression && ")" === expressions[lastIx].expression)
+    {
+        let result = false;
+        let count = 0;
+        expressions.forEach
+        (
+            (i, ix) =>
+            {
+                if ("(" === i.expression)
+                {
+                    ++count;
+                }
+                else
+                if (")" === i.expression)
+                {
+                    --count;
+                    if (count <= 0 && ix !== lastIx)
+                    {
+                        // splitted
+                        result = true;
+                    }
+                }
+            }
+        );
+        if (0 !== count)
+        {
+            // unmatch parenthesis error...
+            result = true;
+        }
+        return result;
+    }
+    return true;
+};
+const enParenthesisIfNeed = (expressions: CodeExpression[]) =>
+    isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
+const buildInlineDefineArray = (value: Types.ArrayDefine) => buildInlineDefine(value.items) +"[]";
 const buildDefineInlineInterface = (value: Types.InterfaceDefine) => $iblock
 (
     Object.keys(value.members)
