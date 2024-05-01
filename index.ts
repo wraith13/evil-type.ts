@@ -74,9 +74,9 @@ const isCodeExpression = (value: unknown): value is CodeExpression =>
 interface CodeLine extends Code
 {
     $code: "line";
-    expressions: CodeInlineEntry;
+    expressions: CodeInlineEntry | CodeInlineEntry[];
 };
-type CodeInlineEntry = CodeExpression[] | CodeInlineBlock;
+type CodeInlineEntry = CodeExpression | CodeLine | CodeInlineBlock;
 const isCodeLine = (value: unknown): value is CodeLine =>
     null !== value &&
     "object" === typeof value &&
