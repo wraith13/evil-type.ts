@@ -109,7 +109,7 @@ const isCodeBlock = (value: unknown): value is CodeBlock =>
     "header" in value && Array.isArray(value.header) && value.header.filter(i => ! isCodeExpression(i)).length <= 0 &&
     "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
 const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
-type CodeEntry = CodeLine | CodeBlock;
+type CodeEntry = CodeInlineBlock | CodeLine | CodeBlock;
 const getReturnCode = (_options: Types.TypeOptions) => "\n";
 const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
 {
@@ -276,7 +276,7 @@ const buildDefineInterface = (name: string, value: Types.InterfaceDefine): CodeB
 {
     const header = [buildExport(value), "interface", name].filter(i => null !== i).map(i => $expression(i));
     const lines = buildDefineInlineInterface(value);
-    return $block(header, lines);
+    return $block(header, [lines]);
 };
 const buildDefineModuleCore = (value: Types.ModuleDefine): CodeEntry[] =>
 [
