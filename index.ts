@@ -172,6 +172,18 @@ const makeTypeBuilder = (define: Types.TypeDefine): Builder =>
     define: [$expression(JSON.stringify(define.define))],
     validator: (name: string) => buildValidatorExpression(name, define.define),
 });
+const makeArrayTypeBuilder = (define: Types.ArrayDefine): Builder =>
+({
+    declarator: $expression("type"),
+    define: [$expression(JSON.stringify(define.items) +"[]")],
+    validator: (name: string) => ...,
+});
+const makeAndTypeBuilder = (define: Types.AndDefine): Builder =>
+({
+    declarator: $expression("type"),
+    define: kindofJoinExpression(define.types.map(i => buildInlineDefineType(i)), $expression("&&")),
+    validator: (name: string) => ...,
+});
 const makeOrTypeBuilder = (define: Types.OrDefine): Builder =>
 ({
     declarator: $expression("type"),
@@ -199,6 +211,12 @@ const getBuilder = (define: Types.Define): Builder =>
         return makePrimitiveTypeBuilder(define);
     case "type":
         return makeTypeBuilder(define);
+    case "array":
+        return makeArrayTypeBuilder(define);
+    case "and":
+        return makeAndTypeBuilder(define);
+    case "or":
+        return makeOrTypeBuilder(define);
     case "interface":
         return makeInterfaceBuilder(define);
     case "module":
