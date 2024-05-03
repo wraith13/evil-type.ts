@@ -151,8 +151,8 @@ const buildCode = (options: Types.TypeOptions, indentDepth: number, code: CodeEn
 interface Builder
 {
     declarator: CodeExpression;
-    define: CodeInlineEntry;
-    validator?: (name: string) => CodeInlineEntry;
+    define: CodeInlineEntry | CodeInlineEntry[];
+    validator?: (name: string) => CodeInlineEntry | CodeInlineEntry[];
 }
 const makeValueBuilder = (define: Types.ValueDefine): Builder =>
 ({
@@ -176,7 +176,17 @@ const makeArrayTypeBuilder = (define: Types.ArrayDefine): Builder =>
 ({
     declarator: $expression("type"),
     define: [$expression(JSON.stringify(define.items) +"[]")],
-    validator: (name: string) => ...,
+    validator: (name: string) =>
+    [
+        $expression(`Array.isArray(${name})`),
+        $expression("&&"),
+        $expression("!"),
+        $expression(`${name}.some(`),
+        $expression("i"),
+        $expression("=>"),
+        ...buildValidatorExpression("i", define.items),
+        $expression(")")
+    ]
 });
 const makeAndTypeBuilder = (define: Types.AndDefine): Builder =>
 ({
