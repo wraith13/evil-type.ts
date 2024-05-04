@@ -15,8 +15,8 @@ const buildExport = (define: { export?: boolean } | { }) =>
     ("export" in define && (define.export ?? true)) ? $expression("export"): null;
 const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
     $line([buildExport(define), $expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]);
-const kindofJoinExpression = (list: CodeExpression[], separator: CodeExpression) =>
-list.reduce((a, b) => a.concat([separator, b]), <CodeExpression[]>[]);
+const kindofJoinExpression = (list: (CodeExpression | CodeExpression[])[], separator: CodeExpression) =>
+    list.reduce((a, b) => (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]), <CodeExpression[]>[]);
 const buildValueValidatorExpression = (name: string, value: Types.Jsonable): CodeExpression[] =>
 {
     if (null !== value && "object" === typeof value)
