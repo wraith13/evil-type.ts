@@ -5,6 +5,52 @@ import { Types } from "./types";
 import { Text } from "./text";
 const returnCode = "\n";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
+export module Build
+{
+//  data:input(json) to data:code(object)
+}
+export module Format
+{
+//  data:code(object) to data:output(text)
+    export const getReturnCode = (_options: Types.TypeOptions) => "\n";
+    export const line = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
+    {
+        const indent = buildIndent(options, indentDepth);
+        if (Array.isArray(code.expressions))
+        {
+            return indent +code.expressions.filter(isCodeExpression).join(" ") +";" +getReturnCode(options);
+        }
+        else
+        {
+            return indent +inlineBlock(options, indentDepth, code.expressions);
+        }
+    }
+    export const inlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
+        [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)).reduce((a, b) => a.concat(b), []), "}" ].join(" ");
+    export const block = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
+    {
+        const currentIndent = buildIndent(options, indentDepth);
+        const returnCode = getReturnCode(options);
+        let result = "";
+        if (0 < (code.header ?? []).length)
+        {
+            result += currentIndent +code.header.join(" ") +returnCode;
+        }
+        result += currentIndent +"{" +returnCode;
+        result += text(options, indentDepth +1, code.lines);
+        result += currentIndent +"}" +returnCode;
+        return result;
+    }
+    export const text = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry[]): string =>
+        code
+            .map
+            (
+                i => i.$code === "line" ?
+                    line(options, indentDepth, i):
+                    block(options, indentDepth, i)
+            )
+            .join(getReturnCode(options));
+}
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
 const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
@@ -110,44 +156,6 @@ const isCodeBlock = (value: unknown): value is CodeBlock =>
     "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
 const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
 type CodeEntry = CodeInlineBlock | CodeLine | CodeBlock;
-const getReturnCode = (_options: Types.TypeOptions) => "\n";
-const buildCodeLine = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
-{
-    const indent = buildIndent(options, indentDepth);
-    if (Array.isArray(code.expressions))
-    {
-        return indent +code.expressions.filter(isCodeExpression).join(" ") +";" +getReturnCode(options);
-    }
-    else
-    {
-        return indent +buildCodeInlineBlock(options, indentDepth, code.expressions);
-    }
-}
-const buildCodeInlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
-    [ "{", ...code.lines.map(i => buildCode(options, indentDepth +1, i)).reduce((a, b) => a.concat(b), []), "}" ].join(" ");
-const buildCodeBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
-{
-    const currentIndent = buildIndent(options, indentDepth);
-    const returnCode = getReturnCode(options);
-    let result = "";
-    if (0 < (code.header ?? []).length)
-    {
-        result += currentIndent +code.header.join(" ") +returnCode;
-    }
-    result += currentIndent +"{" +returnCode;
-    result += buildCode(options, indentDepth +1, code.lines);
-    result += currentIndent +"}" +returnCode;
-    return result;
-}
-const buildCode = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry[]): string =>
-    code
-        .map
-        (
-            i => i.$code === "line" ?
-                buildCodeLine(options, indentDepth, i):
-                buildCodeBlock(options, indentDepth, i)
-        )
-        .join(getReturnCode(options));
 interface Builder
 {
     declarator: CodeExpression;
@@ -392,7 +400,7 @@ try
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     const typeSource = JSON.parse(fget(jsonPath)) as Types.TypeSchema;;
-    const result = buildCode(typeSource.options, 0, buildDefineModuleCore(typeSource.defines));
+    const result = Format.text(typeSource.options, 0, buildDefineModuleCore(typeSource.defines));
 }
 catch(error)
 {
