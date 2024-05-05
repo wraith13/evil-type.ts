@@ -192,13 +192,21 @@ const makeAndTypeBuilder = (define: Types.AndDefine): Builder =>
 ({
     declarator: $expression("type"),
     define: kindofJoinExpression(define.types.map(i => buildInlineDefineType(i)), $expression("&&")),
-    validator: (name: string) => ...,
+    validator: (name: string) => kindofJoinExpression
+    (
+        define.types.map(i => buildValidatorExpression(name, i)),
+        $expression("&&")
+    ),
 });
 const makeOrTypeBuilder = (define: Types.OrDefine): Builder =>
 ({
     declarator: $expression("type"),
     define: kindofJoinExpression(define.types.map(i => buildInlineDefineType(i)), $expression("||")),
-    validator: (name: string) => ...,
+    validator: (name: string) => kindofJoinExpression
+    (
+        define.types.map(i => buildValidatorExpression(name, i)),
+        $expression("||")
+    ),
 });
 const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
 ({
@@ -242,7 +250,7 @@ const buildDefineValue = (name: string, value: Types.ValueDefine): CodeLine =>
     buildDefineLine("const", name, value);
 const buildValueValidator = (name: string, value: Types.ValueDefine) =>
     buildValidatorLine("const", name, value);
-const buildInlineDefineType = (value: Types.TypeDefine) =>
+const buildInlineDefineType = (value: Types.TypeOrInterfaceOrRefer) =>
     buildInlineDefine(value.define);
 const buildDefineType = (name: string, value: Types.TypeDefine): CodeLine =>
     buildDefineLine("type", name, value);
