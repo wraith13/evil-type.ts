@@ -45,9 +45,10 @@ export module Format
         code
             .map
             (
-                i => i.$code === "line" ?
-                    line(options, indentDepth, i):
-                    block(options, indentDepth, i)
+                i =>
+                    i.$code === "line" ? line(options, indentDepth, i):
+                    i.$code === "block" ? block(options, indentDepth, i):
+                    inlineBlock(options, indentDepth, i)
             )
             .join(getReturnCode(options));
 }
