@@ -26,7 +26,7 @@ export module Format
         }
     }
     export const inlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
-        [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)).reduce((a, b) => a.concat(b), []), "}" ].join(" ");
+        [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)), "}" ].join(" ");
     export const block = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
     {
         const currentIndent = buildIndent(options, indentDepth);
@@ -41,16 +41,11 @@ export module Format
         result += currentIndent +"}" +returnCode;
         return result;
     }
-    export const text = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry[]): string =>
-        code
-            .map
-            (
-                i =>
-                    i.$code === "line" ? line(options, indentDepth, i):
-                    i.$code === "block" ? block(options, indentDepth, i):
-                    inlineBlock(options, indentDepth, i)
-            )
-            .join(getReturnCode(options));
+    export const text = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry | CodeEntry[]): string =>
+        Array.isArray(code) ? code.map(i => text(options, indentDepth, i)).join(getReturnCode(options)):
+        code.$code === "line" ? line(options, indentDepth, code):
+        code.$code === "block" ? block(options, indentDepth, code):
+        inlineBlock(options, indentDepth, code);
 }
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
