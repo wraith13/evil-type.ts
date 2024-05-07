@@ -22,7 +22,15 @@ export module Format
         }
         else
         {
-            return indent +inlineBlock(options, indentDepth, code.expressions);
+            switch(code.expressions.$code)
+            {
+            case "expression":
+                return indent +code.expressions.expression +";" +getReturnCode(options);
+            case "line":
+                return line(options, indentDepth, code.expressions);
+            case "inline-block":
+                return indent +inlineBlock(options, indentDepth, code.expressions);
+            }
         }
     }
     export const inlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
