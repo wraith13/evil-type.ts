@@ -50,10 +50,24 @@ export module Format
         return result;
     }
     export const text = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry | CodeEntry[]): string =>
-        Array.isArray(code) ? code.map(i => text(options, indentDepth, i)).join(getReturnCode(options)):
-        code.$code === "line" ? line(options, indentDepth, code):
-        code.$code === "block" ? block(options, indentDepth, code):
-        inlineBlock(options, indentDepth, code);
+    {
+        if (Array.isArray(code))
+        {
+            return code.map(i => text(options, indentDepth, i)).join(getReturnCode(options));
+        }
+        else
+        {
+            switch(code.$code)
+            {
+            case "line":
+                return line(options, indentDepth, code);
+            case "inline-block":
+                return inlineBlock(options, indentDepth, code);
+            case "block":
+                return block(options, indentDepth, code);
+            }
+        }
+    }
 }
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
