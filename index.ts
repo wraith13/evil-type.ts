@@ -49,7 +49,7 @@ export module Format
         result += currentIndent +"}" +returnCode;
         return result;
     }
-    export const text = (options: Types.TypeOptions, indentDepth: number, code: CodeEntry | CodeEntry[]): string =>
+    export const text = (options: Types.TypeOptions, indentDepth: number, code: CodeExpression | CodeEntry | CodeEntry[]): string =>
     {
         if (Array.isArray(code))
         {
@@ -59,6 +59,8 @@ export module Format
         {
             switch(code.$code)
             {
+            case "expression":
+                return line(options, indentDepth, $line(code));
             case "line":
                 return line(options, indentDepth, code);
             case "inline-block":
