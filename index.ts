@@ -13,6 +13,8 @@ export module Format
 {
 //  data:code(object) to data:output(text)
     export const getReturnCode = (_options: Types.TypeOptions) => "\n";
+    export const expressions = (code: CodeExpression[]): string =>
+        code.join(" ");
     export const line = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
     {
         const indent = buildIndent(options, indentDepth);
@@ -42,7 +44,7 @@ export module Format
         let result = "";
         if (0 < (code.header ?? []).length)
         {
-            result += currentIndent +code.header.join(" ") +returnCode;
+            result += currentIndent +expressions(code.header) +returnCode;
         }
         result += currentIndent +"{" +returnCode;
         result += text(options, indentDepth +1, code.lines);
