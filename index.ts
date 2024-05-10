@@ -330,7 +330,7 @@ export module Build
             }
         };
         export const buildInlineValueValidator = (define: Types.ValueDefine) =>
-            `(value: unknown): value is ${buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
+            `(value: unknown): value is ${Define.buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
         export const buildValidatorLine = (declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
             [buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
         export const buildValidatorName = (name: string) =>
@@ -427,7 +427,7 @@ try
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     const typeSource = JSON.parse(fget(jsonPath)) as Types.TypeSchema;;
-    const result = Format.text(typeSource.options, 0, buildDefineModuleCore(typeSource.defines));
+    const result = Format.text(typeSource.options, 0, Build.Define.buildDefineModuleCore(typeSource.defines));
 }
 catch(error)
 {
