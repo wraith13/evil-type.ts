@@ -426,8 +426,15 @@ try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
-    const typeSource = JSON.parse(fget(jsonPath)) as Types.TypeSchema;;
-    const result = Format.text(typeSource.options, 0, Build.Define.buildDefineModuleCore(typeSource.defines));
+    const typeSource = JSON.parse(fget(jsonPath)) as Types.TypeSchema;
+    const result = Format.text
+    (
+        typeSource.options,
+        0,
+        Object.entries(typeSource.defines)
+            .map(i => Build.Define.buildDefine(i[0], i[1]))
+    );
+    console.log(result);
 }
 catch(error)
 {
