@@ -74,13 +74,11 @@ export module Build
     export const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
     export const buildExport = (define: { export?: boolean } | { }) =>
         ("export" in define && (define.export ?? true)) ? $expression("export"): null;
-    export const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
-        $line([buildExport(define), $expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]);
     export const makeValueBuilder = (define: Types.ValueDefine): Builder =>
     ({
         declarator: $expression("const"),
         define: [$expression(JSON.stringify(define.value))],
-        validator: (name: string) => buildValueValidatorExpression(name, define.value),
+        validator: (name: string) => Validator.buildValueValidatorExpression(name, define.value),
     });
     export const makePrimitiveTypeBuilder = (define: Types.PrimitiveTypeDefine): Builder =>
     ({
@@ -92,7 +90,7 @@ export module Build
     ({
         declarator: $expression("type"),
         define: [$expression(JSON.stringify(define.define))],
-        validator: (name: string) => buildValidatorExpression(name, define.define),
+        validator: (name: string) => Validator.buildValidatorExpression(name, define.define),
     });
     export const makeArrayTypeBuilder = (define: Types.ArrayDefine): Builder =>
     ({
@@ -106,40 +104,40 @@ export module Build
             $expression(`${name}.some(`),
             $expression("i"),
             $expression("=>"),
-            ...buildValidatorExpression("i", define.items),
+            ...Validator.buildValidatorExpression("i", define.items),
             $expression(")")
         ]
     });
     export const makeAndTypeBuilder = (define: Types.AndDefine): Builder =>
     ({
         declarator: $expression("type"),
-        define: kindofJoinExpression(define.types.map(i => buildInlineDefineType(i)), $expression("&&")),
+        define: kindofJoinExpression(define.types.map(i => Define.buildInlineDefineType(i)), $expression("&&")),
         validator: (name: string) => kindofJoinExpression
         (
-            define.types.map(i => buildValidatorExpression(name, i)),
+            define.types.map(i => Validator.buildValidatorExpression(name, i)),
             $expression("&&")
         ),
     });
     export const makeOrTypeBuilder = (define: Types.OrDefine): Builder =>
     ({
         declarator: $expression("type"),
-        define: kindofJoinExpression(define.types.map(i => buildInlineDefineType(i)), $expression("||")),
+        define: kindofJoinExpression(define.types.map(i => Define.buildInlineDefineType(i)), $expression("||")),
         validator: (name: string) => kindofJoinExpression
         (
-            define.types.map(i => buildValidatorExpression(name, i)),
+            define.types.map(i => Validator.buildValidatorExpression(name, i)),
             $expression("||")
         ),
     });
     export const makeInterfaceBuilder = (define: Types.InterfaceDefine): Builder =>
     ({
         declarator: $expression("interface"),
-        define: buildDefineInlineInterface(define),
-        validator: (name: string) => buildInterfaceValidator(name, define),
+        define: Define.buildDefineInlineInterface(define),
+        validator: (name: string) => Validator.buildInterfaceValidator(name, define),
     });
     export const makeModuleBuilder = (define: Types.ModuleDefine): Builder =>
     ({
         declarator: $expression("module"),
-        define: buildDefineModuleCore(define),
+        define: Define.buildDefineModuleCore(define),
     });
     export const getBuilder = (define: Types.Define): Builder =>
     {
@@ -165,7 +163,9 @@ export module Build
     };
     export module Define
     {
-        export const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
+        export const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
+            $line([buildExport(define), $expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]);
+            export const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
         export const buildDefineValue = (name: string, value: Types.ValueDefine): CodeLine =>
             buildDefineLine("const", name, value);
         export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
