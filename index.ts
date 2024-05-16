@@ -268,14 +268,14 @@ export module Build
         {
             if (Types.isRefer(define))
             {
-                return define.$ref;
+                return [ $expression(define.$ref), ];
             }
             else
             {
                 switch(define.$type)
                 {
                 case "value":
-                    return buildInlineDefineValue(define);
+                    return [ buildInlineDefineValue(define), ];
                 case "primitive-type":
                     return buildInlineDefinePrimitiveType(define);
                 case "type":
@@ -330,7 +330,7 @@ export module Build
             }
         };
         export const buildInlineValueValidator = (define: Types.ValueDefine) =>
-            `(value: unknown): value is ${Define.buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`;
+            $expression(`(value: unknown): value is ${Define.buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`);
         export const buildValidatorLine = (declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
             [buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
         export const buildValidatorName = (name: string) =>
