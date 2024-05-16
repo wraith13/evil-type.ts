@@ -169,12 +169,13 @@ export module Build
         export const buildDefineValue = (name: string, value: Types.ValueDefine): CodeLine =>
             buildDefineLine("const", name, value);
         export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
-            buildValidatorLine("const", name, value);
+            Validator.buildValidatorLine("const", name, value);
         export const buildInlineDefineType = (value: Types.TypeOrInterfaceOrRefer) =>
             buildInlineDefine(value.define);
         export const buildDefineType = (name: string, value: Types.TypeDefine): CodeLine =>
             buildDefineLine("type", name, value);
-        export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeDefine): string => value.define;
+        export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeDefine) =>
+            $expression(value.define);
         export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
             buildDefineLine("type", name, value);
         export const enParenthesis = (expressions: CodeExpression[]) =>
@@ -277,7 +278,7 @@ export module Build
                 case "value":
                     return [ buildInlineDefineValue(define), ];
                 case "primitive-type":
-                    return buildInlineDefinePrimitiveType(define);
+                    return [ buildInlineDefinePrimitiveType(define), ];
                 case "type":
                     return buildInlineDefineType(define);
                 case "array":
