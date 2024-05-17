@@ -7,8 +7,8 @@ const returnCode = "\n";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
-const kindofJoinExpression = (list: (CodeExpression | CodeExpression[])[], separator: CodeExpression) =>
-    list.reduce((a, b) => (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]), <CodeExpression[]>[]);
+const kindofJoinExpression = <T extends CodeExpression | CodeExpression[]>(list: T[], separator: CodeExpression) =>
+        list.reduce((a, b) => (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]), <CodeExpression[]>[]);
 interface Code
 {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
