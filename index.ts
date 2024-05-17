@@ -222,7 +222,8 @@ export module Build
         };
         const enParenthesisIfNeed = (expressions: CodeExpression[]) =>
             isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
-        const buildInlineDefineArray = (value: Types.ArrayDefine) => buildInlineDefine(value.items) +"[]";
+        const buildInlineDefineArray = (value: Types.ArrayDefine) =>
+                buildInlineDefine(value.items) +"[]";
         export const buildDefineInlineInterface = (value: Types.InterfaceDefine) => $iblock
         (
             Object.keys(value.members)
@@ -301,7 +302,7 @@ export module Build
                     list.push($expression(`Array.isArray(${name})`));
                     list.push($expression(`${value.length} <= ${name}.length`));
                     value.forEach((i, ix) => list = list.concat(buildValueValidatorExpression(`${name}[${ix}]`, i)));
-                    return kindofJoinExpression(list,$expression("&&"));
+                    return kindofJoinExpression(list, $expression("&&"));
                 }
                 else
                 {
@@ -333,7 +334,7 @@ export module Build
         export const buildInlineValueValidator = (define: Types.ValueDefine) =>
             $expression(`(value: unknown): value is ${Define.buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`);
         export const buildValidatorLine = (declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): string =>
-            [buildExport(define), declarator, name, "=", buildInlineValidator(define)].filter(i => null !== i).join("") +";" +returnCode;
+            [buildExport(define), declarator, name, "=", buildInlineValidator(name, define)].filter(i => null !== i).join("") +";" +returnCode;
         export const buildValidatorName = (name: string) =>
             Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).join(".");
         export const buildValidatorExpression = (name: string, define: Types.DefineOrRefer): CodeExpression[] =>
