@@ -63,12 +63,12 @@ type CodeEntry = CodeInlineBlock | CodeLine | CodeBlock;
 interface Builder
 {
     declarator: CodeExpression;
-    define: CodeInlineEntry | CodeInlineEntry[];
+    define: CodeInlineEntry | CodeInlineEntry[] | CodeEntry[];
     validator?: (name: string) => CodeInlineEntry | CodeInlineEntry[];
 }
 export module Build
 {
-//  data:input(json) to data:code(object)
+// data:input(json) to data:code(object)
     export const $expression = (expression: CodeExpression["expression"]): CodeExpression => ({ $code: "expression", expression, });
     export const $line = (expressions: CodeLine["expressions"]): CodeLine => ({ $code: "line", expressions, });
     export const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ $code: "inline-block", lines, });
@@ -357,7 +357,7 @@ export module Build
 }
 export module Format
 {
-//  data:code(object) to data:output(text)
+// data:code(object) to data:output(text)
     export const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
         Array.from({ length: indentDepth, })
         .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): options.indentUnit)
