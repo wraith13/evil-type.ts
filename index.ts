@@ -169,8 +169,8 @@ export module Build
             export const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
         export const buildDefineValue = (name: string, value: Types.ValueDefine): CodeLine =>
             buildDefineLine("const", name, value);
-        export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
-            Validator.buildValidatorLine("const", name, value);
+        //export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
+        //    Validator.buildValidatorLine("const", name, value);
         export const buildInlineDefineType = (value: Types.TypeOrInterfaceOrRefer) =>
             buildInlineDefine(value.define);
         export const buildDefineType = (name: string, value: Types.TypeDefine): CodeLine =>
@@ -179,51 +179,51 @@ export module Build
             $expression(value.define);
         export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
             buildDefineLine("type", name, value);
-        export const enParenthesis = (expressions: CodeExpression[]) =>
-            [ $expression("("), ...expressions, $expression(")"), ];
-        export const isNeedParenthesis = (expressions: CodeExpression[]) =>
-        {
-            if (expressions.length <= 1)
-            {
-                return false;
-            }
-            const lastIx = expressions.length -1;
-            if ("(" === expressions[0].expression && ")" === expressions[lastIx].expression)
-            {
-                let result = false;
-                let count = 0;
-                expressions.forEach
-                (
-                    (i, ix) =>
-                    {
-                        if ("(" === i.expression)
-                        {
-                            ++count;
-                        }
-                        else
-                        if (")" === i.expression)
-                        {
-                            --count;
-                            if (count <= 0 && ix !== lastIx)
-                            {
-                                // splitted
-                                result = true;
-                            }
-                        }
-                    }
-                );
-                if (0 !== count)
-                {
-                    // unmatch parenthesis error...
-                    result = true;
-                }
-                return result;
-            }
-            return true;
-        };
-        const enParenthesisIfNeed = (expressions: CodeExpression[]) =>
-            isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
-        const buildInlineDefineArray = (value: Types.ArrayDefine) =>
+        // export const enParenthesis = (expressions: CodeExpression[]) =>
+        //     [ $expression("("), ...expressions, $expression(")"), ];
+        // export const isNeedParenthesis = (expressions: CodeExpression[]) =>
+        // {
+        //     if (expressions.length <= 1)
+        //     {
+        //         return false;
+        //     }
+        //     const lastIx = expressions.length -1;
+        //     if ("(" === expressions[0].expression && ")" === expressions[lastIx].expression)
+        //     {
+        //         let result = false;
+        //         let count = 0;
+        //         expressions.forEach
+        //         (
+        //             (i, ix) =>
+        //             {
+        //                 if ("(" === i.expression)
+        //                 {
+        //                     ++count;
+        //                 }
+        //                 else
+        //                 if (")" === i.expression)
+        //                 {
+        //                     --count;
+        //                     if (count <= 0 && ix !== lastIx)
+        //                     {
+        //                         // splitted
+        //                         result = true;
+        //                     }
+        //                 }
+        //             }
+        //         );
+        //         if (0 !== count)
+        //         {
+        //             // unmatch parenthesis error...
+        //             result = true;
+        //         }
+        //         return result;
+        //     }
+        //     return true;
+        // };
+        //export const enParenthesisIfNeed = (expressions: CodeExpression[]) =>
+        //    isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
+        export const buildInlineDefineArray = (value: Types.ArrayDefine) =>
                 buildInlineDefine(value.items) +"[]";
         export const buildDefineInlineInterface = (value: Types.InterfaceDefine) => $iblock
         (
@@ -358,7 +358,7 @@ export module Build
 export module Format
 {
 //  data:code(object) to data:output(text)
-    const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
+    export const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
         Array.from({ length: indentDepth, })
         .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): options.indentUnit)
         .join("");
@@ -423,8 +423,6 @@ export module Format
         }
     }
 }
-
-    
 try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
