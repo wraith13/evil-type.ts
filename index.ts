@@ -173,14 +173,6 @@ export module Build
         //    Validator.buildValidatorLine("const", name, value);
         export const buildInlineDefineType = (value: Types.TypeOrInterfaceOrRefer) =>
             buildInlineDefine(value.define);
-        export const buildDefineType = (name: string, value: Types.TypeDefine): CodeLine =>
-            buildDefineLine("type", name, value);
-        export const buildDefineArrayType = (name: string, value: Types.ArrayDefine): CodeLine =>
-            buildDefineLine("type", name, value);
-        export const buildDefineAndType = (name: string, value: Types.AndDefine): CodeLine =>
-            buildDefineLine("type", name, value);
-        export const buildDefineOrType = (name: string, value: Types.OrDefine): CodeLine =>
-            buildDefineLine("type", name, value);
         export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeDefine) =>
             $expression(value.define);
         export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
@@ -261,22 +253,10 @@ export module Build
         {
             switch(define.$type)
             {
-            case "value":
-                return buildDefineValue(name, define);
-            case "primitive-type":
-                return buildDefinePrimitiveType(name, define);
-            case "type":
-                return buildDefineType(name, define);
-            case "array":
-                return buildDefineArrayType(name, define);
-            case "and":
-                return buildDefineAndType(name, define);
-            case "or":
-                return buildDefineOrType(name, define);
-            case "interface":
-                return buildDefineInterface(name, define);
             case "module":
                 return buildDefineModule(name, define);
+            default:
+                return buildDefineLine(getBuilder(define).declarator.expression, name, define);
             }
         };
         export const buildInlineDefine = (define: Types.ValueOrTypeOfInterfaceOrRefer): CodeEpression[] =>
