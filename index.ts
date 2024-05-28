@@ -112,7 +112,7 @@ export module Build
     export const makeAndTypeBuilder = (define: Types.AndDefine): Builder =>
     ({
         declarator: $expression("type"),
-        define: kindofJoinExpression(define.types.map(i => Define.buildInlineDefineType(i)), $expression("&&")),
+        define: kindofJoinExpression(define.types.map(i => Define.buildInlineDefine(i)), $expression("&&")),
         validator: (name: string) => kindofJoinExpression
         (
             define.types.map(i => Validator.buildValidatorExpression(name, i)),
@@ -122,7 +122,7 @@ export module Build
     export const makeOrTypeBuilder = (define: Types.OrDefine): Builder =>
     ({
         declarator: $expression("type"),
-        define: kindofJoinExpression(define.types.map(i => Define.buildInlineDefineType(i)), $expression("||")),
+        define: kindofJoinExpression(define.types.map(i => Define.buildInlineDefine(i)), $expression("||")),
         validator: (name: string) => kindofJoinExpression
         (
             define.types.map(i => Validator.buildValidatorExpression(name, i)),
@@ -166,13 +166,11 @@ export module Build
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
             $line([buildExport(define), $expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]);
-            export const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
+        export const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
         export const buildDefineValue = (name: string, value: Types.ValueDefine): CodeLine =>
             buildDefineLine("const", name, value);
         //export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
         //    Validator.buildValidatorLine("const", name, value);
-        export const buildInlineDefineType = (value: Types.TypeOrInterfaceOrRefer) =>
-            buildInlineDefine(value.define);
         export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeDefine) =>
             $expression(value.define);
         export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
@@ -222,7 +220,7 @@ export module Build
         //export const enParenthesisIfNeed = (expressions: CodeExpression[]) =>
         //    isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
         export const buildInlineDefineArray = (value: Types.ArrayDefine) =>
-                buildInlineDefine(value.items) +"[]";
+            [ $expression(buildInlineDefine(value.items) +"[]"), ];
         export const buildDefineInlineInterface = (value: Types.InterfaceDefine) => $iblock
         (
             Object.keys(value.members)
@@ -274,11 +272,11 @@ export module Build
                 case "primitive-type":
                     return [ buildInlineDefinePrimitiveType(define), ];
                 case "type":
-                    return buildInlineDefineType(define);
+                    return buildInlineDefine(define.define);
                 case "array":
                     return buildInlineDefineArray(define);
                 case "interface":
-                    return buildInlineDefineInterface(define);
+                    return buildDefineInlineInterface(define);
                 }
             }
         };
