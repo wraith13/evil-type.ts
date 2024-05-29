@@ -175,52 +175,56 @@ export module Build
             $expression(value.define);
         export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
             buildDefineLine("type", name, value);
-        // export const enParenthesis = (expressions: CodeExpression[]) =>
-        //     [ $expression("("), ...expressions, $expression(")"), ];
-        // export const isNeedParenthesis = (expressions: CodeExpression[]) =>
-        // {
-        //     if (expressions.length <= 1)
-        //     {
-        //         return false;
-        //     }
-        //     const lastIx = expressions.length -1;
-        //     if ("(" === expressions[0].expression && ")" === expressions[lastIx].expression)
-        //     {
-        //         let result = false;
-        //         let count = 0;
-        //         expressions.forEach
-        //         (
-        //             (i, ix) =>
-        //             {
-        //                 if ("(" === i.expression)
-        //                 {
-        //                     ++count;
-        //                 }
-        //                 else
-        //                 if (")" === i.expression)
-        //                 {
-        //                     --count;
-        //                     if (count <= 0 && ix !== lastIx)
-        //                     {
-        //                         // splitted
-        //                         result = true;
-        //                     }
-        //                 }
-        //             }
-        //         );
-        //         if (0 !== count)
-        //         {
-        //             // unmatch parenthesis error...
-        //             result = true;
-        //         }
-        //         return result;
-        //     }
-        //     return true;
-        // };
-        //export const enParenthesisIfNeed = (expressions: CodeExpression[]) =>
-        //    isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
+        export const enParenthesis = (expressions: CodeExpression[]) =>
+            [ $expression("("), ...expressions, $expression(")"), ];
+        export const isNeedParenthesis = (expressions: CodeExpression[]) =>
+        {
+            if (expressions.length <= 1)
+            {
+                return false;
+            }
+            const lastIx = expressions.length -1;
+            if ("(" === expressions[0].expression && ")" === expressions[lastIx].expression)
+            {
+                let result = false;
+                let count = 0;
+                expressions.forEach
+                (
+                    (i, ix) =>
+                    {
+                        if ("(" === i.expression)
+                        {
+                            ++count;
+                        }
+                        else
+                        if (")" === i.expression)
+                        {
+                            --count;
+                            if (count <= 0 && ix !== lastIx)
+                            {
+                                // splitted
+                                result = true;
+                            }
+                        }
+                    }
+                );
+                if (0 !== count)
+                {
+                    // unmatch parenthesis error...
+                    result = true;
+                }
+                return result;
+            }
+            return true;
+        };
+        export const enParenthesisIfNeed = (expressions: CodeExpression[]) =>
+           isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
         export const buildInlineDefineArray = (value: Types.ArrayDefine) =>
             [ $expression(buildInlineDefine(value.items) +"[]"), ];
+        export const buildInlineDefineAnd = (value: Types.AndDefine) =>
+            kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("&"));
+        export const buildInlineDefineOr = (value: Types.AndDefine) =>
+            kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("|"));
         export const buildDefineInlineInterface = (value: Types.InterfaceDefine) => $iblock
         (
             Object.keys(value.members)
@@ -257,7 +261,7 @@ export module Build
                 return buildDefineLine(getBuilder(define).declarator.expression, name, define);
             }
         };
-        export const buildInlineDefine = (define: Types.ValueOrTypeOfInterfaceOrRefer): CodeExpression[] =>
+        export const buildInlineDefine = (define: Types.ValueOrTypeOfInterfaceOrRefer): (CodeExpression | CodeInlineBlock)[] =>
         {
             if (Types.isRefer(define))
             {
@@ -275,8 +279,12 @@ export module Build
                     return buildInlineDefine(define.define);
                 case "array":
                     return buildInlineDefineArray(define);
+                case "and":
+                    return buildInlineDefineAnd(define);
+                case "or":
+                    return buildInlineDefineOr(define);
                 case "interface":
-                    return buildDefineInlineInterface(define);
+                    return [ buildDefineInlineInterface(define), ];
                 }
             }
         };
