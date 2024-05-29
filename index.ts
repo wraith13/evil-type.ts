@@ -166,7 +166,7 @@ export module Build
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
             $line([buildExport(define), $expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]);
-        export const buildInlineDefineValue = (value: Types.ValueDefine): string => JSON.stringify(value.value);
+        export const buildInlineDefineValue = (value: Types.ValueDefine) => $expression(JSON.stringify(value.value));
         export const buildDefineValue = (name: string, value: Types.ValueDefine): CodeLine =>
             buildDefineLine("const", name, value);
         //export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
@@ -257,7 +257,7 @@ export module Build
                 return buildDefineLine(getBuilder(define).declarator.expression, name, define);
             }
         };
-        export const buildInlineDefine = (define: Types.ValueOrTypeOfInterfaceOrRefer): CodeEpression[] =>
+        export const buildInlineDefine = (define: Types.ValueOrTypeOfInterfaceOrRefer): CodeExpression[] =>
         {
             if (Types.isRefer(define))
             {
