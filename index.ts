@@ -218,12 +218,12 @@ export module Build
             return true;
         };
         export const enParenthesisIfNeed = (expressions: CodeExpression[]) =>
-           isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
+            isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
         export const buildInlineDefineArray = (value: Types.ArrayDefine) =>
             [ $expression(buildInlineDefine(value.items) +"[]"), ];
         export const buildInlineDefineAnd = (value: Types.AndDefine) =>
             kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("&"));
-        export const buildInlineDefineOr = (value: Types.AndDefine) =>
+        export const buildInlineDefineOr = (value: Types.OrDefine) =>
             kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("|"));
         export const buildDefineInlineInterface = (value: Types.InterfaceDefine) => $iblock
         (
