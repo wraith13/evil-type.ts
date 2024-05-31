@@ -186,7 +186,7 @@ export module Build
             const lastIx = expressions.length -1;
             const first = expressions[0];
             const last = expressions[lastIx];
-            if ("(" === first.expression && ")" === last.expression)
+            if (isCodeExpression(first) && "(" === first.expression &&  isCodeExpression(last) && ")" === last.expression)
             {
                 let result = false;
                 let count = 0;
