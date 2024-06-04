@@ -162,6 +162,8 @@ export module Build
             return makeModuleBuilder(define);
         }
     };
+    export const getValidator = (define: Exclude<Types.Define, Types.ModuleDefine>) =>
+        getBuilder(define).validator as Required<Builder>["validator"];
     export module Define
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
@@ -338,10 +340,10 @@ export module Build
             buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...buildInlineValidator(name, define)]);
         export const buildValidatorName = (name: string) =>
             Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).join(".");
-        export const buildValidatorExpression = (name: string, define: Types.DefineOrRefer): CodeExpression[] =>
+        export const buildValidatorExpression = (name: string, define: Exclude<Types.DefineOrRefer, Types.ModuleDefine>): CodeExpression[] =>
             Types.isRefer(define) ?
                 [$expression(`${buildValidatorName( define.$ref)}(${name})`)]:
-                getBuilder(define).validator(name);
+                getValidator(define)(name);
         export const buildInterfaceValidator = (name: string, define: Types.InterfaceDefine): CodeExpression[] =>
         {
         
