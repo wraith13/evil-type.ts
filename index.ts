@@ -64,7 +64,7 @@ interface Builder
 {
     declarator: CodeExpression;
     define: CodeInlineEntry | CodeInlineEntry[] | CodeEntry[];
-    validator?: (name: string) => CodeInlineEntry | CodeInlineEntry[];
+    validator?: (name: string) => CodeInlineEntry[];
 }
 export module Build
 {
