@@ -196,18 +196,21 @@ export module Build
                 (
                     (i, ix) =>
                     {
-                        if ("(" === i.expression)
+                        if (isCodeExpression(i))
                         {
-                            ++count;
-                        }
-                        else
-                        if (")" === i.expression)
-                        {
-                            --count;
-                            if (count <= 0 && ix !== lastIx)
+                            if ("(" === i.expression)
                             {
-                                // splitted
-                                result = true;
+                                ++count;
+                            }
+                            else
+                            if (")" === i.expression)
+                            {
+                                --count;
+                                if (count <= 0 && ix !== lastIx)
+                                {
+                                    // splitted
+                                    result = true;
+                                }
                             }
                         }
                     }
