@@ -177,7 +177,7 @@ export module Build
             $expression(value.define);
         export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
             buildDefineLine("type", name, value);
-        export const enParenthesis = (expressions: (CodeExpression | CodeInlineBlock)[]) =>
+        export const enParenthesis = <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) =>
             [ $expression("("), ...expressions, $expression(")"), ];
         export const isNeedParenthesis = (expressions: (CodeExpression | CodeInlineBlock)[]) =>
         {
@@ -224,7 +224,7 @@ export module Build
             }
             return true;
         };
-        export const enParenthesisIfNeed = (expressions: (CodeExpression | CodeInlineBlock)[]) =>
+        export const enParenthesisIfNeed = <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) =>
             isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
         export const buildInlineDefineArray = (value: Types.ArrayDefine) =>
             [ $expression(buildInlineDefine(value.items) +"[]"), ];
