@@ -27,7 +27,7 @@ const isCodeExpression = (value: unknown): value is CodeExpression =>
 interface CodeLine extends Code
 {
     $code: "line";
-    expressions: CodeInlineEntry | CodeInlineEntry[];
+    expressions: (CodeInlineEntry | CodeInlineEntry | CodeInlineBlock)[];
 };
 type CodeInlineEntry = CodeExpression | CodeLine | CodeInlineBlock;
 const isCodeLine = (value: unknown): value is CodeLine =>
@@ -343,7 +343,7 @@ export module Build
             buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...buildInlineValidator(name, define)]);
         export const buildValidatorName = (name: string) =>
             Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).join(".");
-        export const buildValidatorExpression = (name: string, define: Exclude<Types.DefineOrRefer, Types.ModuleDefine>): CodeExpression[] =>
+        export const buildValidatorExpression = (name: string, define: Exclude<Types.DefineOrRefer, Types.ModuleDefine>) =>
             Types.isRefer(define) ?
                 [$expression(`${buildValidatorName( define.$ref)}(${name})`)]:
                 getValidator(define)(name);
@@ -351,7 +351,7 @@ export module Build
         {
         
         };
-        export const buildInlineValidator = (name: string, define: Types.TypeOrInterface): CodeExpression[] =>
+        export const buildInlineValidator = (name: string, define: Types.TypeOrInterface) =>
         [
             $expression(`(value: unknown): value is ${name} =>`),
             ...buildValidatorExpression("value", define),
