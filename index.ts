@@ -370,26 +370,23 @@ export module Format
     export const getReturnCode = (_options: Types.TypeOptions) => "\n";
     export const expressions = (code: CodeExpression[]): string =>
         code.join(" ");
-    export const line = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
+    export const tokens = (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock): string[] =>
     {
-        const indent = buildIndent(options, indentDepth);
-        if (Array.isArray(code.expressions))
+        switch(code.$code)
         {
-            return indent +code.expressions.filter(isCodeExpression).join(" ") +";" +getReturnCode(options);
+        case "inline-block":
+            return code.lines.map(i => tokens(i)).reduce((a, b) => a.concat(b), []);
+        case "line":
+            return code.expressions.map(i => tokens(i)).reduce((a, b) => a.concat(b), []);
+        case "expression":
+            return [ code.expression ];
         }
-        else
-        {
-            switch(code.expressions.$code)
-            {
-            case "expression":
-                return indent +code.expressions.expression +";" +getReturnCode(options);
-            case "line":
-                return line(options, indentDepth, code.expressions);
-            case "inline-block":
-                return indent +inlineBlock(options, indentDepth, code.expressions);
-            }
-        }
-    }
+    };
+    export const line = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
+        buildIndent(options, indentDepth)
+        +code.expressions.map(i => tokens(i)).reduce((a, b) => a.concat(b), []).join(" ")
+        +";"
+        +getReturnCode(options);
     export const inlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
         [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)), "}" ].join(" ");
     export const block = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
@@ -417,7 +414,7 @@ export module Format
             switch(code.$code)
             {
             case "expression":
-                return line(options, indentDepth, Build.$line(code));
+                return line(options, indentDepth, Build.$line([code]));
             case "line":
                 return line(options, indentDepth, code);
             case "inline-block":
