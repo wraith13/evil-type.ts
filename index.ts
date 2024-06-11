@@ -357,7 +357,11 @@ export module Build
             ...buildValidatorExpression("value", define),
         ];
         export const buildValidator = (name: string, define: Types.TypeOrInterface): CodeLine =>
-            $line([$expression("const"), $expression(buildValidatorName(name))].concat(buildInlineValidator(name, define)));
+            $line
+            (
+                (<CodeLine["expressions"]>[$expression("const"), $expression(buildValidatorName(name))])
+                    .concat(buildInlineValidator(name, define))
+            );
     }
 }
 export module Format
