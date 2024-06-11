@@ -8,7 +8,7 @@ const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
 const removeNullFilter = <ElementType>(list: (ElementType | null)[]): ElementType[] =>
     list.filter(i => null !== i) as ElementType[];
-const kindofJoinExpression = <T extends CodeExpression | CodeExpression[]>(list: T[], separator: CodeExpression) =>
+const kindofJoinExpression = <T>(list: T[], separator: CodeExpression) =>
         list.reduce((a, b) => (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]), <CodeExpression[]>[]);
 interface Code
 {
@@ -339,7 +339,7 @@ export module Build
         };
         export const buildInlineValueValidator = (define: Types.ValueDefine) =>
             $expression(`(value: unknown): value is ${Define.buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`);
-        export const buildValidatorLine = (declarator: string, name: string, define: Types.TypeOrInterfaceOrRefer): CodeExpression[] =>
+        export const buildValidatorLine = (declarator: string, name: string, define: Types.TypeOrInterface): CodeExpression[] =>
             buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...buildInlineValidator(name, define)]);
         export const buildValidatorName = (name: string) =>
             Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).join(".");
