@@ -347,6 +347,34 @@ export module Build
             Types.isRefer(define) ?
                 [$expression(`${buildValidatorName( define.$ref)}(${name})`)]:
                 getValidator(define)(name);
+        export const convertToExpression = (code: CodeInlineEntry[]) =>
+        {
+            let result: CodeExpression[] = [];
+            code.forEach
+            (
+                i =>
+                {
+                    switch(i.$code)
+                    {
+                    case "inline-block":
+                        result.concat($expression("{"), ...convertToExpression(i.lines), $expression("}"));
+                        break;
+                    case "line":
+                        {
+                            const line = convertToExpression(i.expressions);
+                            const last = line[line.length -1];
+                            last.expression += ";"
+                            result.concat(...line);
+                        }
+                        break;
+                    case "expression":
+                        result.push(i);
+                        break;
+                    }
+                }
+            );
+            return result;
+        };
         export const buildInterfaceValidator = (name: string, define: Types.InterfaceDefine): CodeExpression[] =>
         {
             const list: CodeExpression[] = [];
@@ -358,7 +386,7 @@ export module Build
                 {
                     {
                         list.push($expression(`"${key}" in ${name}`));
-                        list.push(...buildValidatorExpression(`${name}.${key}`, define.members[key]));
+                        list.push(...convertToExpression(buildValidatorExpression(`${name}.${key}`, define.members[key])));
                     }
                 }
             );
