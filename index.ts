@@ -349,7 +349,20 @@ export module Build
                 getValidator(define)(name);
         export const buildInterfaceValidator = (name: string, define: Types.InterfaceDefine): CodeExpression[] =>
         {
-        
+            const list: CodeExpression[] = [];
+            list.push($expression(`null !== ${name}`));
+            list.push($expression(`"object" === typeof ${name}`));
+            Object.keys(define.members).forEach
+            (
+                key =>
+                {
+                    {
+                        list.push($expression(`"${key}" in ${name}`));
+                        list.push(...buildValidatorExpression(`${name}.${key}`, define.members[key]));
+                    }
+                }
+            );
+            return kindofJoinExpression(list,$expression("&&"));
         };
         export const buildInlineValidator = (name: string, define: Types.TypeOrInterface) =>
         [
