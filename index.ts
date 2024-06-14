@@ -6,8 +6,8 @@ import { Text } from "./text";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
-const removeNullFilter = <ElementType>(list: (ElementType | null)[]): ElementType[] =>
-    list.filter(i => null !== i) as ElementType[];
+// const removeNullFilter = <ElementType>(list: (ElementType | null)[]): ElementType[] =>
+//     list.filter(i => null !== i) as ElementType[];
 const kindofJoinExpression = <T>(list: T[], separator: CodeExpression) =>
         list.reduce((a, b) => (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]), <CodeExpression[]>[]);
 interface Code
@@ -24,6 +24,34 @@ const isCodeExpression = (value: unknown): value is CodeExpression =>
     "object" === typeof value &&
     "$code" in value && "expression" === value.$code &&
     "expression" in value && "string" === typeof value.expression;
+export const convertToExpression = (code: CodeInlineEntry[]) =>
+    {
+        let result: CodeExpression[] = [];
+        code.forEach
+        (
+            i =>
+            {
+                switch(i.$code)
+                {
+                case "inline-block":
+                    result.concat($expression("{"), ...convertToExpression(i.lines), $expression("}"));
+                    break;
+                case "line":
+                    {
+                        const line = convertToExpression(i.expressions);
+                        const last = line[line.length -1];
+                        last.expression += ";"
+                        result.concat(...line);
+                    }
+                    break;
+                case "expression":
+                    result.push(i);
+                    break;
+                }
+            }
+        );
+        return result;
+    };
 interface CodeLine extends Code
 {
     $code: "line";
@@ -66,13 +94,13 @@ interface Builder
     define: CodeInlineEntry | CodeInlineEntry[] | CodeEntry[];
     validator?: (name: string) => CodeInlineEntry[];
 }
+export const $expression = (expression: CodeExpression["expression"]): CodeExpression => ({ $code: "expression", expression, });
+export const $line = (expressions: CodeLine["expressions"]): CodeLine => ({ $code: "line", expressions, });
+export const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ $code: "inline-block", lines, });
+export const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
 export module Build
 {
 // data:input(json) to data:code(object)
-    export const $expression = (expression: CodeExpression["expression"]): CodeExpression => ({ $code: "expression", expression, });
-    export const $line = (expressions: CodeLine["expressions"]): CodeLine => ({ $code: "line", expressions, });
-    export const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ $code: "inline-block", lines, });
-    export const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
     export const buildExport = (define: { export?: boolean } | { }): CodeExpression[] =>
         ("export" in define && (define.export ?? true)) ? [$expression("export")]: [];
     export const makeValueBuilder = (define: Types.ValueDefine): Builder =>
@@ -167,7 +195,7 @@ export module Build
     export module Define
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
-            $line(buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...buildInlineDefine(define)]));
+            $line(buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define))]));
         export const buildInlineDefineValue = (value: Types.ValueDefine) => $expression(JSON.stringify(value.value));
         export const buildDefineValue = (name: string, value: Types.ValueDefine): CodeLine =>
             buildDefineLine("const", name, value);
@@ -347,34 +375,6 @@ export module Build
             Types.isRefer(define) ?
                 [$expression(`${buildValidatorName( define.$ref)}(${name})`)]:
                 getValidator(define)(name);
-        export const convertToExpression = (code: CodeInlineEntry[]) =>
-        {
-            let result: CodeExpression[] = [];
-            code.forEach
-            (
-                i =>
-                {
-                    switch(i.$code)
-                    {
-                    case "inline-block":
-                        result.concat($expression("{"), ...convertToExpression(i.lines), $expression("}"));
-                        break;
-                    case "line":
-                        {
-                            const line = convertToExpression(i.expressions);
-                            const last = line[line.length -1];
-                            last.expression += ";"
-                            result.concat(...line);
-                        }
-                        break;
-                    case "expression":
-                        result.push(i);
-                        break;
-                    }
-                }
-            );
-            return result;
-        };
         export const buildInterfaceValidator = (name: string, define: Types.InterfaceDefine): CodeExpression[] =>
         {
             const list: CodeExpression[] = [];
@@ -459,7 +459,7 @@ export module Format
             switch(code.$code)
             {
             case "expression":
-                return line(options, indentDepth, Build.$line([code]));
+                return line(options, indentDepth, $line([code]));
             case "line":
                 return line(options, indentDepth, code);
             case "inline-block":
