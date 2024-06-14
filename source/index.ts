@@ -58,35 +58,35 @@ interface CodeLine extends Code
     expressions: (CodeInlineEntry | CodeInlineEntry | CodeInlineBlock)[];
 };
 type CodeInlineEntry = CodeExpression | CodeLine | CodeInlineBlock;
-const isCodeLine = (value: unknown): value is CodeLine =>
-    null !== value &&
-    "object" === typeof value &&
-    "$code" in value && "line" === value.$code &&
-    "expressions" in value && Array.isArray(value.expressions) && value.expressions.filter(i => ! isCodeExpression(i)).length <= 0;
+// const isCodeLine = (value: unknown): value is CodeLine =>
+//     null !== value &&
+//     "object" === typeof value &&
+//     "$code" in value && "line" === value.$code &&
+//     "expressions" in value && Array.isArray(value.expressions) && value.expressions.filter(i => ! isCodeExpression(i)).length <= 0;
 interface CodeInlineBlock extends Code
 {
     $code: "inline-block";
     //header: never;
     lines: CodeInlineEntry[];
 };
-const isCodeInlineBlock = (value: unknown): value is CodeBlock =>
-    null !== value &&
-    "object" === typeof value &&
-    "$code" in value && "inline-block" === value.$code &&
-    ! ("header" in value) &&
-    "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
+// const isCodeInlineBlock = (value: unknown): value is CodeBlock =>
+//     null !== value &&
+//     "object" === typeof value &&
+//     "$code" in value && "inline-block" === value.$code &&
+//     ! ("header" in value) &&
+//     "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
 interface CodeBlock extends Code
 {
     $code: "block";
     header: CodeExpression[];
     lines: CodeEntry[];
 };
-const isCodeBlock = (value: unknown): value is CodeBlock =>
-    null !== value &&
-    "object" === typeof value &&
-    "$code" in value && "block" === value.$code &&
-    "header" in value && Array.isArray(value.header) && value.header.filter(i => ! isCodeExpression(i)).length <= 0 &&
-    "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
+// const isCodeBlock = (value: unknown): value is CodeBlock =>
+//     null !== value &&
+//     "object" === typeof value &&
+//     "$code" in value && "block" === value.$code &&
+//     "header" in value && Array.isArray(value.header) && value.header.filter(i => ! isCodeExpression(i)).length <= 0 &&
+//     "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
 type CodeEntry = CodeInlineBlock | CodeLine | CodeBlock;
 interface Builder
 {

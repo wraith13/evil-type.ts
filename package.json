@@ -2,10 +2,10 @@
   "name": "@wraith13/evil-type.ts",
   "version": "0.0.0",
   "description": "... for TypeScript",
-  "main": "index.js",
+  "main": "./source/index.js",
   "scripts": {
-    "build script": "tsc -p ./tsconfig.json",
-    "watch script": "tsc --watch -p ./tsconfig.json"
+    "build script": "tsc -p ./source/tsconfig.json",
+    "watch script": "tsc --watch -p ./source/tsconfig.json"
   },
   "repository": {
     "type": "git",
