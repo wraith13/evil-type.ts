@@ -2,7 +2,7 @@
   "name": "@wraith13/evil-type.ts",
   "version": "0.0.0",
   "description": "... for TypeScript",
-  "main": "./source/index.js",
+  "main": "./library/index.js",
   "scripts": {
     "build script": "tsc -p ./source/tsconfig.json",
     "watch script": "tsc --watch -p ./source/tsconfig.json"

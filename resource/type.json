@@ -17,7 +17,12 @@
                 "$ref": { "$ref": "schema" },
                 "defines":
                 {
-
+                    "schema":
+                    {
+                        "$type": "value",
+                        "export": true,
+                        "value": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#"
+                    }
                 },
                 "options":
                 {
