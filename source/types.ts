@@ -27,6 +27,12 @@ export module Types
         defines: { [key: string]: Define; };
         options: TypeOptions;
     }
+    export const isTypeSchema = (value: unknown): value is TypeSchema =>
+        null !== value &&
+        "object" === typeof value &&
+        "$ref" in value && "string" === typeof value.$ref &&
+        "defines" in value && "object" === typeof value.defines && Object.values(value).filter(v => ! isDefine(v)).length <= 0 &&
+        "options" in value && isTypeOptions(value.options);
     export type ValidatorOptionType = "none" | "simple" | "full";
     export interface TypeOptions
     {
