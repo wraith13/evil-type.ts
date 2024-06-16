@@ -38,8 +38,14 @@ export module Types
     {
         indentUnit: number | "\t";
         indentStyle: "allman" | "egyptian";
-        ValidatorOption: ValidatorOptionType;
+        validatorOption: ValidatorOptionType;
     }
+    export const isTypeOptions = (value: unknown): value is TypeOptions =>
+        null !== value &&
+        "object" === typeof value &&
+        "indentUnit" in value && ("number" === typeof value.indentUnit || "\t" === value.indentUnit) &&
+        "indentStyle" in value && (0 <= [ "allman", "egyptian" ].indexOf(value.indentStyle)) &&
+        "validatorOption" in value && isValidatorOptionType(value);
     export type FilePath = string;
     export interface Refer
     {
