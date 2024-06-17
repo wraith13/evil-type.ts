@@ -34,6 +34,9 @@ export module Types
         "defines" in value && "object" === typeof value.defines && Object.values(value).filter(v => ! isDefine(v)).length <= 0 &&
         "options" in value && isTypeOptions(value.options);
     export type ValidatorOptionType = "none" | "simple" | "full";
+    export const isValidatorOptionType = (value: unknown): value is ValidatorOptionType =>
+        "string" === typeof value &&
+        0 <= [ "none", "simple", "full", ].indexOf(value);
     export interface TypeOptions
     {
         indentUnit: number | "\t";
@@ -44,7 +47,7 @@ export module Types
         null !== value &&
         "object" === typeof value &&
         "indentUnit" in value && ("number" === typeof value.indentUnit || "\t" === value.indentUnit) &&
-        "indentStyle" in value && (0 <= [ "allman", "egyptian" ].indexOf(value.indentStyle)) &&
+        "indentStyle" in value && "string" === typeof value.indentStyle && (0 <= [ "allman", "egyptian" ].indexOf(value.indentStyle)) &&
         "validatorOption" in value && isValidatorOptionType(value);
     export type FilePath = string;
     export interface Refer
