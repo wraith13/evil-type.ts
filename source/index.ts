@@ -474,15 +474,22 @@ try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
-    const typeSource = JSON.parse(fget(jsonPath)) as Types.TypeSchema;
-    const result = Format.text
-    (
-        typeSource.options,
-        0,
-        Object.entries(typeSource.defines)
-            .map(i => Build.Define.buildDefine(i[0], i[1]))
-    );
-    console.log(result);
+    const typeSource = JSON.parse(fget(jsonPath));
+    if (Types.isTypeSchema(typeSource))
+    {
+        const result = Format.text
+        (
+            typeSource.options,
+            0,
+            Object.entries(typeSource.defines)
+                .map(i => Build.Define.buildDefine(i[0], i[1]))
+        );
+        console.log(result);
+    }
+    else
+    {
+        console.error("Invalid TypeSchema", typeSource);
+    }
 }
 catch(error)
 {
