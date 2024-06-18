@@ -20,6 +20,23 @@ var Types;
             (Array.isArray(value) && value.filter(function (v) { return !Types.isJsonable(v); }).length <= 0) ||
             Types.isJsonableObject(value);
     };
+    Types.isTypeSchema = function (value) {
+        return null !== value &&
+            "object" === typeof value &&
+            "$ref" in value && "string" === typeof value.$ref &&
+            "defines" in value && "object" === typeof value.defines && Object.values(value).filter(function (v) { return !Types.isDefine(v); }).length <= 0 &&
+            "options" in value && Types.isTypeOptions(value.options);
+    };
+    Types.isValidatorOptionType = function (value) {
+        return 0 <= ["none", "simple", "full",].indexOf(value);
+    };
+    Types.isTypeOptions = function (value) {
+        return null !== value &&
+            "object" === typeof value &&
+            "indentUnit" in value && ("number" === typeof value.indentUnit || "\t" === value.indentUnit) &&
+            "indentStyle" in value && 0 <= ["allman", "egyptian"].indexOf(value.indentStyle) &&
+            "validatorOption" in value && Types.isValidatorOptionType(value);
+    };
     Types.isRefer = function (value) {
         return null !== value &&
             "object" === typeof value &&

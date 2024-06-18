@@ -4,13 +4,13 @@
     {
         "schema":
         {
-            "export": "true",
+            "export": true,
             "$type": "value",
             "value": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#"
         },
         "TypeSchema":
         {
-            "export": "true",
+            "export": true,
             "$type": "interface",
             "members":
             {
@@ -19,19 +19,28 @@
                 {
                     "schema":
                     {
-                        "$type": "value",
                         "export": true,
+                        "$type": "value",
                         "value": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#"
                     }
                 },
-                "options":
-                {
+                "options": { "$ref": "TypeOptions" }
+            }
+        },
+        "TypeOptions":
+        {
+            "export": true,
+            "$type": "interface",
+            "members":
+            {
 
-                }
             }
         }
     },
     "options":
     {
+        "indentUnit": 4,
+        "indentStyle": "allman",
+        "validatorOption": "full"
     }
 }

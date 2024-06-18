@@ -18,12 +18,15 @@ export declare namespace Types {
         };
         options: TypeOptions;
     }
+    const isTypeSchema: (value: unknown) => value is TypeSchema;
     type ValidatorOptionType = "none" | "simple" | "full";
+    const isValidatorOptionType: (value: unknown) => value is ValidatorOptionType;
     interface TypeOptions {
         indentUnit: number | "\t";
         indentStyle: "allman" | "egyptian";
-        ValidatorOption: ValidatorOptionType;
+        validatorOption: ValidatorOptionType;
     }
+    const isTypeOptions: (value: unknown) => value is TypeOptions;
     type FilePath = string;
     interface Refer {
         $ref: string;

@@ -406,9 +406,14 @@ try {
     var fget = function (path) { return fs_1.default.readFileSync(path, { encoding: "utf-8" }); };
     console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     var typeSource = JSON.parse(fget(jsonPath));
-    var result = Format.text(typeSource.options, 0, Object.entries(typeSource.defines)
-        .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); }));
-    console.log(result);
+    if (types_1.Types.isTypeSchema(typeSource)) {
+        var result = Format.text(typeSource.options, 0, Object.entries(typeSource.defines)
+            .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); }));
+        console.log(result);
+    }
+    else {
+        console.error("Invalid TypeSchema", typeSource);
+    }
 }
 catch (error) {
     console.error(error);
