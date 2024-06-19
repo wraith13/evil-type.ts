@@ -36,13 +36,11 @@ var Types;
             "validatorOption" in value && Types.isValidatorOptionType(value.validatorOption);
     };
     Types.isRefer = function (value) {
-        return null !== value &&
-            "object" === typeof value &&
+        return Types.isJsonableObject(value) &&
             "$ref" in value && "string" === typeof value.$ref;
     };
     Types.isAlphaDefine = function (value) {
-        return null !== value &&
-            "object" === typeof value &&
+        return Types.isJsonableObject(value) &&
             (!("export" in value) || "boolean" === typeof value.export) &&
             "$type" in value && "string" === typeof value.$type;
     };

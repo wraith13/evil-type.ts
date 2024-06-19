@@ -52,8 +52,7 @@ export module Types
         $ref: string;
     }
     export const isRefer = (value: unknown): value is Refer =>
-        null !== value &&
-        "object" === typeof value &&
+        isJsonableObject(value) &&
         "$ref" in value && "string" === typeof value.$ref;
     export interface AlphaDefine
     {
@@ -61,8 +60,7 @@ export module Types
         $type: string;
     }
     export const isAlphaDefine = (value: unknown): value is AlphaDefine =>
-        null !== value &&
-        "object" === typeof value &&
+        isJsonableObject(value) &&
         (! ("export" in value) || "boolean" === typeof value.export) &&
         "$type" in value && "string" === typeof value.$type;
     export interface ModuleDefine extends AlphaDefine
