@@ -21,21 +21,19 @@ var Types;
             Types.isJsonableObject(value);
     };
     Types.isTypeSchema = function (value) {
-        return null !== value &&
-            "object" === typeof value &&
+        return Types.isJsonableObject(value) &&
             "$ref" in value && "string" === typeof value.$ref &&
-            "defines" in value && "object" === typeof value.defines && Object.values(value).filter(function (v) { return !Types.isDefine(v); }).length <= 0 &&
+            "defines" in value && Types.isJsonableObject(value.defines) && Object.values(value.defines).filter(function (v) { return !Types.isDefine(v); }).length <= 0 &&
             "options" in value && Types.isTypeOptions(value.options);
     };
     Types.isValidatorOptionType = function (value) {
         return 0 <= ["none", "simple", "full",].indexOf(value);
     };
     Types.isTypeOptions = function (value) {
-        return null !== value &&
-            "object" === typeof value &&
+        return Types.isJsonableObject(value) &&
             "indentUnit" in value && ("number" === typeof value.indentUnit || "\t" === value.indentUnit) &&
             "indentStyle" in value && 0 <= ["allman", "egyptian"].indexOf(value.indentStyle) &&
-            "validatorOption" in value && Types.isValidatorOptionType(value);
+            "validatorOption" in value && Types.isValidatorOptionType(value.validatorOption);
     };
     Types.isRefer = function (value) {
         return null !== value &&

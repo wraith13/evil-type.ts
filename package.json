@@ -4,6 +4,7 @@
   "description": "... for TypeScript",
   "main": "./library/index.js",
   "scripts": {
+    "run": "node ./ ./resource/type.json",
     "build script": "tsc -p ./source/tsconfig.json",
     "watch script": "tsc --watch -p ./source/tsconfig.json"
   },

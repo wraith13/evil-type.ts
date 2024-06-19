@@ -28,10 +28,9 @@ export module Types
         options: TypeOptions;
     }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
-        null !== value &&
-        "object" === typeof value &&
+        isJsonableObject(value) &&
         "$ref" in value && "string" === typeof value.$ref &&
-        "defines" in value && "object" === typeof value.defines && Object.values(value).filter(v => ! isDefine(v)).length <= 0 &&
+        "defines" in value && isJsonableObject(value.defines) && Object.values(value.defines).filter(v => ! isDefine(v)).length <= 0 &&
         "options" in value && isTypeOptions(value.options);
     export type ValidatorOptionType = "none" | "simple" | "full";
     export const isValidatorOptionType = (value: unknown): value is ValidatorOptionType =>
@@ -43,11 +42,10 @@ export module Types
         validatorOption: ValidatorOptionType;
     }
     export const isTypeOptions = (value: unknown): value is TypeOptions =>
-        null !== value &&
-        "object" === typeof value &&
+        isJsonableObject(value) &&
         "indentUnit" in value && ("number" === typeof value.indentUnit || "\t" === value.indentUnit) &&
         "indentStyle" in value && 0 <= [ "allman", "egyptian" ].indexOf(value.indentStyle as TypeOptions["indentStyle"]) &&
-        "validatorOption" in value && isValidatorOptionType(value);
+        "validatorOption" in value && isValidatorOptionType(value.validatorOption);
     export type FilePath = string;
     export interface Refer
     {
