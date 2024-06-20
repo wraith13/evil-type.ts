@@ -59,18 +59,17 @@ export module Types
         export?: boolean;
         $type: string;
     }
-    export const isAlphaDefine = (value: unknown): value is AlphaDefine =>
+    export const isAlphaDefine = <T extends AlphaDefine>(value: unknown, $type: T["$type"]): value is AlphaDefine =>
         isJsonableObject(value) &&
         (! ("export" in value) || "boolean" === typeof value.export) &&
-        "$type" in value && "string" === typeof value.$type;
+        "$type" in value && "string" === typeof value.$type && $type === value.$type;
     export interface ModuleDefine extends AlphaDefine
     {
         $type: "module";
         members: { [key: string]: Define; };
     }
-    export const isModuleDefine = (value: unknown): value is AlphaDefine =>
-        isAlphaDefine(value) &&
-        "module" === value.$type &&
+    export const isModuleDefine = (value: unknown): value is ModuleDefine =>
+        isAlphaDefine<ModuleDefine>(value, "module") &&
         "members" in value && null !== value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isDefine(v)).length <= 0;
     export interface ValueDefine extends AlphaDefine
     {
@@ -78,8 +77,7 @@ export module Types
         value: Jsonable;
     }
     export const isValueDefine = (value: unknown): value is ValueDefine =>
-        isAlphaDefine(value) &&
-        "value" === value.$type &&
+        isAlphaDefine<ValueDefine>(value, "value") &&
         "value" in value && isJsonable(value);
     export type PrimitiveType = "undefined" | "boolean" | "number" | "string";
     export const isPrimitiveType = (value: unknown): value is PrimitiveType =>
@@ -90,8 +88,7 @@ export module Types
         define: PrimitiveType;
     }
     export const isPrimitiveTypeDefine = (value: unknown): value is PrimitiveTypeDefine =>
-        isAlphaDefine(value) &&
-        "primitive-type" === value.$type &&
+        isAlphaDefine<PrimitiveTypeDefine>(value, "primitive-type") &&
         "define" in value && isPrimitiveType(value.define);
     export interface TypeDefine extends AlphaDefine
     {
@@ -99,8 +96,7 @@ export module Types
         define: TypeOrInterfaceOrRefer;
     }
     export const isTypeDefine = (value: unknown): value is TypeDefine =>
-        isAlphaDefine(value) &&
-        "type" === value.$type &&
+        isAlphaDefine<TypeDefine>(value, "type") &&
         "define" in value && isTypeOrInterfaceOrRefer(value.define);
     export interface InterfaceDefine extends AlphaDefine
     {
@@ -108,8 +104,7 @@ export module Types
         members: { [key: string]: TypeOrInterfaceOrRefer; };
     }
     export const isInterfaceDefine = (value: unknown): value is InterfaceDefine =>
-        isAlphaDefine(value) &&
-        "interface" === value.$type &&
+        isAlphaDefine<InterfaceDefine>(value, "interface") &&
         "members" in value && null !== value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isTypeOrInterfaceOrRefer(v)).length <= 0;
     export interface ArrayDefine extends AlphaDefine
     {
@@ -117,8 +112,7 @@ export module Types
         items: TypeOrInterfaceOrRefer;
     }
     export const isArrayDefine = (value: unknown): value is ArrayDefine =>
-        isAlphaDefine(value) &&
-        "array" === value.$type &&
+        isAlphaDefine<ArrayDefine>(value, "array") &&
         "items" in value && isTypeOrInterfaceOrRefer(value.items);
     export interface OrDefine extends AlphaDefine
     {
@@ -126,8 +120,7 @@ export module Types
         types: TypeOrInterfaceOrRefer[];
     }
     export const isOrDefine = (value: unknown): value is OrDefine =>
-        isAlphaDefine(value) &&
-        "or" === value.$type &&
+        isAlphaDefine<OrDefine>(value, "or") &&
         "types" in value && Array.isArray(value.types) && value.types.filter(i => ! isTypeOrInterfaceOrRefer(i)).length <= 0;
     export interface AndDefine extends AlphaDefine
     {
@@ -135,8 +128,7 @@ export module Types
         types: TypeOrInterfaceOrRefer[];
     }
     export const isAndDefine = (value: unknown): value is AndDefine =>
-        isAlphaDefine(value) &&
-        "and" === value.$type &&
+        isAlphaDefine<AndDefine>(value, "and") &&
         "types" in value && Array.isArray(value.types) && value.types.filter(i => ! isTypeOrInterfaceOrRefer(i)).length <= 0;
     export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     export type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
