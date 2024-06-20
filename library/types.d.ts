@@ -49,9 +49,11 @@ export declare namespace Types {
         value: Jsonable;
     }
     const isValueDefine: (value: unknown) => value is ValueDefine;
+    type PrimitiveType = "undefined" | "boolean" | "number" | "string";
+    const isPrimitiveType: (value: unknown) => value is PrimitiveType;
     interface PrimitiveTypeDefine extends AlphaDefine {
         $type: "primitive-type";
-        define: "undefined" | "boolean" | "number" | "string";
+        define: PrimitiveType;
     }
     const isPrimitiveTypeDefine: (value: unknown) => value is PrimitiveTypeDefine;
     interface TypeDefine extends AlphaDefine {

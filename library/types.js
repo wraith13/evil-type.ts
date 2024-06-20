@@ -54,10 +54,13 @@ var Types;
             "value" === value.$type &&
             "value" in value && Types.isJsonable(value);
     };
+    Types.isPrimitiveType = function (value) {
+        return 0 <= ["undefined", "boolean", "number", "string"].indexOf(value);
+    };
     Types.isPrimitiveTypeDefine = function (value) {
         return Types.isAlphaDefine(value) &&
             "primitive-type" === value.$type &&
-            "define" in value && ("undefined" === value.define || "boolean" === value.define || "number" === value.define || "string" === value.define);
+            "define" in value && Types.isPrimitiveType(value.define);
     };
     Types.isTypeDefine = function (value) {
         return Types.isAlphaDefine(value) &&

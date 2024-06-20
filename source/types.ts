@@ -81,15 +81,18 @@ export module Types
         isAlphaDefine(value) &&
         "value" === value.$type &&
         "value" in value && isJsonable(value);
+    export type PrimitiveType = "undefined" | "boolean" | "number" | "string";
+    export const isPrimitiveType = (value: unknown): value is PrimitiveType =>
+        0 <= ["undefined", "boolean", "number", "string"].indexOf(value as PrimitiveType);
     export interface PrimitiveTypeDefine extends AlphaDefine
     {
         $type: "primitive-type";
-        define: "undefined" | "boolean" | "number" | "string";
+        define: PrimitiveType;
     }
     export const isPrimitiveTypeDefine = (value: unknown): value is PrimitiveTypeDefine =>
         isAlphaDefine(value) &&
         "primitive-type" === value.$type &&
-        "define" in value && ("undefined" === value.define || "boolean" === value.define || "number" === value.define || "string" === value.define);
+        "define" in value && isPrimitiveType(value.define);
     export interface TypeDefine extends AlphaDefine
     {
         $type: "type";
