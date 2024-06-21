@@ -21,6 +21,11 @@ export module Types
         (Array.isArray(value) && value.filter(v => ! isJsonable(v)).length <= 0) ||
         isJsonableObject(value);
     export type JsonablePartial<Target> = { [key in keyof Target]?: Target[key] } & JsonableObject;
+    export const isMemberType = (value: JsonableObject, member: keyof JsonableObject, isType: ((v: unknown) => boolean)): boolean =>
+        member in value && isType(value[member]);
+    export const isMemberTypeOrUndefined = (value: JsonableObject, member: keyof JsonableObject, isType: ((v: unknown) => boolean)): boolean =>
+        ! (member in value) || isType(value[member]);
+    export const isStringType = (value: unknown): value is string => "string" === typeof value;
     export interface TypeSchema
     {
         $ref: typeof schema;
@@ -29,9 +34,9 @@ export module Types
     }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
         isJsonableObject(value) &&
-        "$ref" in value && "string" === typeof value.$ref &&
-        "defines" in value && isJsonableObject(value.defines) && Object.values(value.defines).filter(v => ! isDefine(v)).length <= 0 &&
-        "options" in value && isTypeOptions(value.options);
+        isMemberType(value, "$ref", isStringType) &&
+        isMemberType(value, "defines", defines => isJsonableObject(defines) && Object.values(defines).filter(v => ! isDefine(v)).length <= 0) &&
+        isMemberType(value, "options", isTypeOptions);
     export type ValidatorOptionType = "none" | "simple" | "full";
     export const isValidatorOptionType = (value: unknown): value is ValidatorOptionType =>
         0 <= [ "none", "simple", "full", ].indexOf(value as ValidatorOptionType);
