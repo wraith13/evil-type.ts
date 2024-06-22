@@ -21,10 +21,14 @@ export module Types
         (Array.isArray(value) && value.filter(v => ! isJsonable(v)).length <= 0) ||
         isJsonableObject(value);
     export type JsonablePartial<Target> = { [key in keyof Target]?: Target[key] } & JsonableObject;
-    export const isMemberType = (value: JsonableObject, member: keyof JsonableObject, isType: ((v: unknown) => boolean)): boolean =>
+    export const isMemberType = <ObjectType extends JsonableObject>(value: ObjectType, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
         member in value && isType(value[member]);
     export const isMemberTypeOrUndefined = (value: JsonableObject, member: keyof JsonableObject, isType: ((v: unknown) => boolean)): boolean =>
         ! (member in value) || isType(value[member]);
+    export const isUndefinedType = (value: unknown): value is undefined => undefined === value;
+    export const isNullType = (value: unknown): value is null => null === value;
+    export const isBooleanType = (value: unknown): value is boolean => "boolean" === typeof value;
+    export const isNumberType = (value: unknown): value is number => "number" === typeof value;
     export const isStringType = (value: unknown): value is string => "string" === typeof value;
     export interface TypeSchema
     {
@@ -66,7 +70,7 @@ export module Types
     }
     export const isAlphaDefine = <T extends AlphaDefine>(value: unknown, $type: T["$type"]): value is AlphaDefine =>
         isJsonableObject(value) &&
-        (! ("export" in value) || "boolean" === typeof value.export) &&
+        isMemberTypeOrUndefined(value, "export", v => "boolean" === typeof v) &&
         "$type" in value && "string" === typeof value.$type && $type === value.$type;
     export interface ModuleDefine extends AlphaDefine
     {
