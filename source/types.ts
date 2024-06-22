@@ -1,6 +1,6 @@
 export module Types
 {
-    export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
+    export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
     export type JsonableValue = null | boolean | number | string;
     export const isJsonableValue = (value: unknown): value is JsonableValue =>
         null === value ||
@@ -21,15 +21,36 @@ export module Types
         (Array.isArray(value) && value.filter(v => ! isJsonable(v)).length <= 0) ||
         isJsonableObject(value);
     export type JsonablePartial<Target> = { [key in keyof Target]?: Target[key] } & JsonableObject;
-    export const isMemberType = <ObjectType extends JsonableObject>(value: ObjectType, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
-        member in value && isType(value[member]);
-    export const isMemberTypeOrUndefined = (value: JsonableObject, member: keyof JsonableObject, isType: ((v: unknown) => boolean)): boolean =>
-        ! (member in value) || isType(value[member]);
-    export const isUndefinedType = (value: unknown): value is undefined => undefined === value;
-    export const isNullType = (value: unknown): value is null => null === value;
-    export const isBooleanType = (value: unknown): value is boolean => "boolean" === typeof value;
-    export const isNumberType = (value: unknown): value is number => "number" === typeof value;
-    export const isStringType = (value: unknown): value is string => "string" === typeof value;
+    export type ActualObject = Exclude<object, null>;
+    export const isJust = <T>(target: T) => (value: unknown): value is T => target === value;
+    export const isUndefined = isJust(undefined);
+    export const isNull = isJust(null);
+    export const isBoolean = (value: unknown): value is boolean => "boolean" === typeof value;
+    export const isNumber = (value: unknown): value is number => "number" === typeof value;
+    export const isString = (value: unknown): value is string => "string" === typeof value;
+    export const isObject = (value: unknown): value is ActualObject => null !== value && "object" === typeof value;
+    export const isEnum = <T>(list: readonly T[]) => (value: unknown): value is T => list.includes(value as T);
+    export const isArray = <T>(isType: (value: unknown) => value is T) => (value: unknown): value is T[] =>
+        Array.isArray(value) && value.filter(i => ! isType(i)).length <= 0;
+    export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown) => value is T[K]) }) =>
+        (value: unknown): value is T[number] => 0 < isTypeList.filter(i => i(value)).length;
+    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
+        member in value && isType((value as ObjectType)[member]);
+    export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
+        ! (member in value) || isType((value as ObjectType)[member]);
+    export const isSpecificObject = <ObjectType extends ActualObject>(memberSpecification: { [key: string]: ((v: unknown) => boolean) }) => (value: unknown): value is ObjectType =>
+        isObject(value) &&
+        Object.entries(memberSpecification).filter
+        (
+            kv => !
+            (
+                kv[0].endsWith("?") ?
+                    isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1]):
+                    isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1])
+            )
+        ).length <= 0;
+    export const isDictionaryObject = <MemberType>(isType: ((m: unknown) => m is MemberType)) => (value: unknown): value is { [key: string]: MemberType } =>
+        isObject(value) && Object.values(value).filter(i => ! isType(i)).length <= 0;
     export interface TypeSchema
     {
         $ref: typeof schema;
@@ -37,13 +58,16 @@ export module Types
         options: TypeOptions;
     }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
-        isJsonableObject(value) &&
-        isMemberType(value, "$ref", isStringType) &&
-        isMemberType(value, "defines", defines => isJsonableObject(defines) && Object.values(defines).filter(v => ! isDefine(v)).length <= 0) &&
-        isMemberType(value, "options", isTypeOptions);
-    export type ValidatorOptionType = "none" | "simple" | "full";
-    export const isValidatorOptionType = (value: unknown): value is ValidatorOptionType =>
-        0 <= [ "none", "simple", "full", ].indexOf(value as ValidatorOptionType);
+        isSpecificObject<TypeSchema>
+        ({
+            $ref: isJust(schema),
+            defines: isDictionaryObject(isDefine),
+            options: isTypeOptions
+        })
+        (value);
+    export const ValidatorOptionTypeMembers = [ "none", "simple", "full", ] as const;
+    export type ValidatorOptionType = typeof ValidatorOptionTypeMembers[number];
+    export const isValidatorOptionType = isEnum(ValidatorOptionTypeMembers);
     export interface TypeOptions
     {
         indentUnit: number | "\t";
@@ -52,9 +76,9 @@ export module Types
     }
     export const isTypeOptions = (value: unknown): value is TypeOptions =>
         isJsonableObject(value) &&
-        "indentUnit" in value && ("number" === typeof value.indentUnit || "\t" === value.indentUnit) &&
-        "indentStyle" in value && 0 <= [ "allman", "egyptian" ].indexOf(value.indentStyle as TypeOptions["indentStyle"]) &&
-        "validatorOption" in value && isValidatorOptionType(value.validatorOption);
+        isMemberType(value, "indentUnit", isOr(isNumber, isJust("\t" as const))) &&
+        isMemberType(value, "indentStyle", isEnum([ "allman", "egyptian", ] as const)) &&
+        isMemberType(value, "validatorOption", isValidatorOptionType);
     export type FilePath = string;
     export interface Refer
     {
@@ -88,9 +112,9 @@ export module Types
     export const isValueDefine = (value: unknown): value is ValueDefine =>
         isAlphaDefine<ValueDefine>(value, "value") &&
         "value" in value && isJsonable(value);
-    export type PrimitiveType = "undefined" | "boolean" | "number" | "string";
-    export const isPrimitiveType = (value: unknown): value is PrimitiveType =>
-        0 <= ["undefined", "boolean", "number", "string"].indexOf(value as PrimitiveType);
+    export const PrimitiveTypeMembers = ["undefined", "boolean", "number", "string"] as const;
+    export type PrimitiveType = typeof PrimitiveTypeMembers[number];
+    export const isPrimitiveType = isEnum(PrimitiveTypeMembers);
     export interface PrimitiveTypeDefine extends AlphaDefine
     {
         $type: "primitive-type";
