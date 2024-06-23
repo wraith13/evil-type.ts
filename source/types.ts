@@ -21,13 +21,13 @@ export module Types
         (Array.isArray(value) && value.filter(v => ! isJsonable(v)).length <= 0) ||
         isJsonableObject(value);
     export type JsonablePartial<Target> = { [key in keyof Target]?: Target[key] } & JsonableObject;
-    export type ActualObject = Exclude<object, null>;
     export const isJust = <T>(target: T) => (value: unknown): value is T => target === value;
     export const isUndefined = isJust(undefined);
     export const isNull = isJust(null);
     export const isBoolean = (value: unknown): value is boolean => "boolean" === typeof value;
     export const isNumber = (value: unknown): value is number => "number" === typeof value;
     export const isString = (value: unknown): value is string => "string" === typeof value;
+    export type ActualObject = Exclude<object, null>;
     export const isObject = (value: unknown): value is ActualObject => null !== value && "object" === typeof value;
     export const isEnum = <T>(list: readonly T[]) => (value: unknown): value is T => list.includes(value as T);
     export const isArray = <T>(isType: (value: unknown) => value is T) => (value: unknown): value is T[] =>
@@ -51,6 +51,48 @@ export module Types
         ).length <= 0;
     export const isDictionaryObject = <MemberType>(isType: ((m: unknown) => m is MemberType)) => (value: unknown): value is { [key: string]: MemberType } =>
         isObject(value) && Object.values(value).filter(i => ! isType(i)).length <= 0;
+    export const ValidatorOptionTypeMembers = [ "none", "simple", "full", ] as const;
+    export type ValidatorOptionType = typeof ValidatorOptionTypeMembers[number];
+    export const isValidatorOptionType = isEnum(ValidatorOptionTypeMembers);
+    export const IndentStyleMembers = [ "allman", "egyptian", ] as const;
+    export type IndentStyleType = typeof IndentStyleMembers[number];
+    export const isIndentStyleType = isEnum(IndentStyleMembers);
+    export interface TypeOptions
+    {
+        indentUnit: number | "\t";
+        indentStyle: IndentStyleType;
+        validatorOption: ValidatorOptionType;
+    }
+    export const isTypeOptions = isSpecificObject<TypeOptions>
+    ({
+        indentUnit: isOr(isNumber, isJust("\t" as const)),
+        indentStyle: isIndentStyleType,
+        validatorOption: isValidatorOptionType,
+    });
+    // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。
+    // VS Coce + TypeScript の挙動がいまよりマシになったらこれベースのコードの採用を再検討
+    // https://x.com/wraith13/status/1804464507755884969
+    // export type GuardType<T> = T extends (value: unknown) => value is infer U ? U : never;
+    // export type BuildInterface<T extends { [key: string]: (value: unknown) => value is any}> = { -readonly [key in keyof T]: GuardType<T[key]>; };
+    // export const isSpecificObjectX = <T extends { [key: string]: (value: unknown) => value is any}>(memberSpecification: { [key: string]: ((v: unknown) => boolean) }) => (value: unknown): value is BuildInterface<T> =>
+    //     isObject(value) &&
+    //     Object.entries(memberSpecification).filter
+    //     (
+    //         kv => !
+    //         (
+    //             kv[0].endsWith("?") ?
+    //                 isMemberTypeOrUndefined<BuildInterface<T>>(value, kv[0].slice(0, -1) as keyof BuildInterface<T>, kv[1]):
+    //                 isMemberType<BuildInterface<T>>(value, kv[0] as keyof BuildInterface<T>, kv[1])
+    //         )
+    //     ).length <= 0;
+    // export const TypeOptionsTypeSource =
+    // {
+    //     indentUnit: isOr(isNumber, isJust("\t" as const)),
+    //     indentStyle: isIndentStyleType,
+    //     validatorOption: isValidatorOptionType,
+    // } as const;
+    // export type GenericTypeOptions = BuildInterface<typeof TypeOptionsTypeSource>;
+    // export const isGenericTypeOptions = isSpecificObjectX(TypeOptionsTypeSource);
     export interface TypeSchema
     {
         $ref: typeof schema;
@@ -65,35 +107,22 @@ export module Types
             options: isTypeOptions
         })
         (value);
-    export const ValidatorOptionTypeMembers = [ "none", "simple", "full", ] as const;
-    export type ValidatorOptionType = typeof ValidatorOptionTypeMembers[number];
-    export const isValidatorOptionType = isEnum(ValidatorOptionTypeMembers);
-    export interface TypeOptions
-    {
-        indentUnit: number | "\t";
-        indentStyle: "allman" | "egyptian";
-        validatorOption: ValidatorOptionType;
-    }
-    export const isTypeOptions = (value: unknown): value is TypeOptions =>
-        isJsonableObject(value) &&
-        isMemberType(value, "indentUnit", isOr(isNumber, isJust("\t" as const))) &&
-        isMemberType(value, "indentStyle", isEnum([ "allman", "egyptian", ] as const)) &&
-        isMemberType(value, "validatorOption", isValidatorOptionType);
     export type FilePath = string;
     export interface Refer
     {
         $ref: string;
     }
-    export const isRefer = (value: unknown): value is Refer =>
-        isJsonableObject(value) &&
-        "$ref" in value && "string" === typeof value.$ref;
+    export const isRefer = isSpecificObject<Refer>
+    ({
+        $ref: isString,
+    });
     export interface AlphaDefine
     {
         export?: boolean;
         $type: string;
     }
     export const isAlphaDefine = <T extends AlphaDefine>(value: unknown, $type: T["$type"]): value is AlphaDefine =>
-        isJsonableObject(value) &&
+        isObject(value) &&
         isMemberTypeOrUndefined(value, "export", v => "boolean" === typeof v) &&
         "$type" in value && "string" === typeof value.$type && $type === value.$type;
     export interface ModuleDefine extends AlphaDefine
@@ -122,7 +151,7 @@ export module Types
     }
     export const isPrimitiveTypeDefine = (value: unknown): value is PrimitiveTypeDefine =>
         isAlphaDefine<PrimitiveTypeDefine>(value, "primitive-type") &&
-        "define" in value && isPrimitiveType(value.define);
+        isMemberType(value as PrimitiveTypeDefine, "define", isPrimitiveType);
     export interface TypeDefine extends AlphaDefine
     {
         $type: "type";
@@ -138,7 +167,7 @@ export module Types
     }
     export const isInterfaceDefine = (value: unknown): value is InterfaceDefine =>
         isAlphaDefine<InterfaceDefine>(value, "interface") &&
-        "members" in value && null !== value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isTypeOrInterfaceOrRefer(v)).length <= 0;
+        isMemberType(value as InterfaceDefine, "members", isDictionaryObject(isTypeOrInterfaceOrRefer));
     export interface ArrayDefine extends AlphaDefine
     {
         $type: "array";
@@ -166,19 +195,11 @@ export module Types
     export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     export type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
     export type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
-    export const isTypeOrInterface = (value: unknown): value is TypeOrInterface =>
-        isPrimitiveTypeDefine(value) ||
-        isTypeDefine(value) ||
-        isInterfaceDefine(value) ||
-        isArrayDefine(value) ||
-        isOrDefine(value) ||
-        isAndDefine(value);
+    export const isTypeOrInterface = isOr(isPrimitiveTypeDefine, isTypeDefine, isInterfaceDefine, isArrayDefine, isOrDefine, isAndDefine);
     export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
-    export const isTypeOrInterfaceOrRefer = (value: unknown): value is TypeOrInterfaceOrRefer =>
-        isTypeOrInterface(value) || isRefer(value);
+    export const isTypeOrInterfaceOrRefer = isOr(isTypeOrInterface, isRefer);
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
-    export const isDefine = (value: unknown): value is Define =>
-        isModuleDefine(value) || isValueDefine(value) || isTypeOrInterface(value);
+    export const isDefine = isOr(isModuleDefine, isValueDefine, isTypeOrInterface);
     export type DefineOrRefer = Define | Refer;
     export const isDefineOrRefer = (value: unknown): value is DefineOrRefer =>
         isDefine(value) || isRefer(value);
