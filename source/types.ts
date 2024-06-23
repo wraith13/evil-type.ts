@@ -38,16 +38,19 @@ export module Types
         member in value && isType((value as ObjectType)[member]);
     export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
         ! (member in value) || isType((value as ObjectType)[member]);
-    export const isSpecificObject = <ObjectType extends ActualObject>(memberSpecification: { [key: string]: ((v: unknown) => boolean) }) => (value: unknown): value is ObjectType =>
+    export const isSpecificObject = <ObjectType extends ActualObject>(memberSpecification: { [key: string]: ((v: unknown) => boolean) }[]) => (value: unknown): value is ObjectType =>
         isObject(value) &&
-        Object.entries(memberSpecification).filter
+        memberSpecification.filter
         (
-            kv => !
+            m => Object.entries(m).filter
             (
-                kv[0].endsWith("?") ?
-                    isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1]):
-                    isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1])
-            )
+                kv => !
+                (
+                    kv[0].endsWith("?") ?
+                        isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1]):
+                        isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1])
+                )
+            ).length <= 0
         ).length <= 0;
     export const isDictionaryObject = <MemberType>(isType: ((m: unknown) => m is MemberType)) => (value: unknown): value is { [key: string]: MemberType } =>
         isObject(value) && Object.values(value).filter(i => ! isType(i)).length <= 0;
@@ -64,11 +67,11 @@ export module Types
         validatorOption: ValidatorOptionType;
     }
     export const isTypeOptions = isSpecificObject<TypeOptions>
-    ({
-        indentUnit: isOr(isNumber, isJust("\t" as const)),
-        indentStyle: isIndentStyleType,
-        validatorOption: isValidatorOptionType,
-    });
+    ([{
+        "indentUnit": isOr(isNumber, isJust("\t" as const)),
+        "indentStyle": isIndentStyleType,
+        "validatorOption": isValidatorOptionType,
+    }]);
     // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。
     // VS Coce + TypeScript の挙動がいまよりマシになったらこれベースのコードの採用を再検討
     // https://x.com/wraith13/status/1804464507755884969
@@ -101,11 +104,11 @@ export module Types
     }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
         isSpecificObject<TypeSchema>
-        ({
-            $ref: isJust(schema),
-            defines: isDictionaryObject(isDefine),
-            options: isTypeOptions
-        })
+        ([{
+            "$ref": isJust(schema),
+            "defines": isDictionaryObject(isDefine),
+            "options": isTypeOptions
+        }])
         (value);
     export type FilePath = string;
     export interface Refer
@@ -113,34 +116,43 @@ export module Types
         $ref: string;
     }
     export const isRefer = isSpecificObject<Refer>
-    ({
-        $ref: isString,
-    });
+    ([{
+        "$ref": isString,
+    }]);
     export interface AlphaDefine
     {
         export?: boolean;
         $type: string;
     }
-    export const isAlphaDefine = <T extends AlphaDefine>(value: unknown, $type: T["$type"]): value is AlphaDefine =>
-        isObject(value) &&
-        isMemberTypeOrUndefined(value, "export", v => "boolean" === typeof v) &&
-        "$type" in value && "string" === typeof value.$type && $type === value.$type;
+    export const isAlphaDefine = <T extends AlphaDefine>($type: T["$type"]) =>
+    ({
+        "export?": isBoolean,
+        "$type": isJust($type),
+    });
     export interface ModuleDefine extends AlphaDefine
     {
         $type: "module";
         members: { [key: string]: Define; };
     }
-    export const isModuleDefine = (value: unknown): value is ModuleDefine =>
-        isAlphaDefine<ModuleDefine>(value, "module") &&
-        "members" in value && null !== value.members && "object" === typeof value.members && Object.values(value.members).filter(v => ! isDefine(v)).length <= 0;
+    export const isModuleDefine = (value: unknown): value is ModuleDefine => isSpecificObject<ModuleDefine>
+    ([
+        isAlphaDefine<ModuleDefine>("module"),
+        {
+            "members": isDictionaryObject(isDefine),
+        },
+    ])(value);
     export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
         value: Jsonable;
     }
-    export const isValueDefine = (value: unknown): value is ValueDefine =>
-        isAlphaDefine<ValueDefine>(value, "value") &&
-        "value" in value && isJsonable(value);
+    export const isValueDefine = (value: unknown): value is ValueDefine =>isSpecificObject<ModuleDefine>
+    ([
+        isAlphaDefine<ValueDefine>("value"),
+        {
+            "value": isJsonable,
+        },
+    ])(value);
     export const PrimitiveTypeMembers = ["undefined", "boolean", "number", "string"] as const;
     export type PrimitiveType = typeof PrimitiveTypeMembers[number];
     export const isPrimitiveType = isEnum(PrimitiveTypeMembers);
