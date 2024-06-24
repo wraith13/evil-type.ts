@@ -34,6 +34,23 @@ export module Types
         Array.isArray(value) && value.filter(i => ! isType(i)).length <= 0;
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown) => value is T[K]) }) =>
         (value: unknown): value is T[number] => 0 < isTypeList.filter(i => i(value)).length;
+    export interface OptionalKeyTypeGuard<T>
+    {
+        $type: "optional-type-guard";
+        isType: (value: unknown) => value is T;
+    }
+    export const sss: OptionalKeyTypeGuard<number> =
+    {
+        $type: "optional-type-guard",
+        isType: isNumber,
+    }
+    export const isOptionalKeyTypeGuard = (value: unknown): value is OptionalKeyTypeGuard<unknown> =>
+        isSpecificObject<OptionalKeyTypeGuard<unknown>>
+        ({
+            $type: isJust("optional-type-guard"),
+            isType: (value: unknown): value is ((v: unknown) => v is unknown) => "function" === typeof value,
+        })(value);
+
     export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
         member in value && isType((value as ObjectType)[member]);
     export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
