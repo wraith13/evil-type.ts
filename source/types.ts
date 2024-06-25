@@ -50,12 +50,20 @@ export module Types
             $type: isJust("optional-type-guard"),
             isType: (value: unknown): value is ((v: unknown) => v is unknown) => "function" === typeof value,
         })(value);
-
-    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
-        member in value && isType((value as ObjectType)[member]);
+    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown) => value is T): OptionalKeyTypeGuard<unknown> =>
+    ({
+        $type: "optional-type-guard",
+        isType,
+    });
+    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean) | OptionalKeyTypeGuard<unknown>): boolean =>
+        isOptionalKeyTypeGuard(isType) ?
+            (! (member in value) || isType.isType((value as ObjectType)[member])):
+            (member in value && isType((value as ObjectType)[member]));
     export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
         ! (member in value) || isType((value as ObjectType)[member]);
-    export const isSpecificObject = <ObjectType extends ActualObject>(memberSpecification: { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) }) => (value: unknown): value is ObjectType =>
+    export type ObjectSpecification<ObjectType> =
+        { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
+    export const isSpecificObject = <ObjectType extends ActualObject>(memberSpecification: ObjectSpecification<ObjectType>) => (value: unknown): value is ObjectType =>
         isObject(value) &&
         Object.entries(memberSpecification).filter
         (
@@ -140,7 +148,7 @@ export module Types
     }
     export const isAlphaDefine = <T extends AlphaDefine>($type: T["$type"]) =>
     ({
-        "export?": isBoolean,
+        export: makeOptionalKeyTypeGuard(isBoolean),
         "$type": isJust($type),
     });
     export interface ModuleDefine extends AlphaDefine
