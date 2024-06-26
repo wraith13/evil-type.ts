@@ -50,7 +50,7 @@ export module Types
             $type: isJust("optional-type-guard"),
             isType: (value: unknown): value is ((v: unknown) => v is unknown) => "function" === typeof value,
         })(value);
-    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown) => value is T): OptionalKeyTypeGuard<unknown> =>
+    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown) => value is T): OptionalKeyTypeGuard<T> =>
     ({
         $type: "optional-type-guard",
         isType,
@@ -69,7 +69,7 @@ export module Types
     export type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
     export type ObjectSpecification<ObjectType> =
         { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) } &
-        { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<ObjectType[key]> };
+        { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     export const isSpecificObject = <ObjectType extends ActualObject>(memberSpecification: ObjectSpecification<ObjectType>) => (value: unknown): value is ObjectType =>
         isObject(value) &&
