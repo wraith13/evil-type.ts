@@ -61,8 +61,16 @@ export module Types
             (member in value && isType((value as ObjectType)[member]));
     export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
         ! (member in value) || isType((value as ObjectType)[member]);
+    export type OptionalKeys<T> =
+        { [K in keyof T]: T extends Record<K, T[K]> ? never : K } extends { [_ in keyof T]: infer U }
+        ? U : never;
+    export type OptionalType<T> = Required<Pick<T, OptionalKeys<T>>>;
+    export type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
+    export type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
     export type ObjectSpecification<ObjectType> =
-        { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
+        { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) } &
+        { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<ObjectType[key]> };
+        // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     export const isSpecificObject = <ObjectType extends ActualObject>(memberSpecification: ObjectSpecification<ObjectType>) => (value: unknown): value is ObjectType =>
         isObject(value) &&
         Object.entries(memberSpecification).filter
