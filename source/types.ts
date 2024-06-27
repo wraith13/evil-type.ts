@@ -197,17 +197,31 @@ export module Types
         $type: "primitive-type";
         define: PrimitiveType;
     }
-    export const isPrimitiveTypeDefine = (value: unknown): value is PrimitiveTypeDefine =>
-        isAlphaDefine<PrimitiveTypeDefine>(value, "primitive-type") &&
-        isMemberType(value as PrimitiveTypeDefine, "define", isPrimitiveType);
+    export const isPrimitiveTypeDefine = (value: unknown): value is PrimitiveTypeDefine => isSpecificObject<PrimitiveTypeDefine>
+    (
+        Object.assign
+        (
+            isAlphaDefine<PrimitiveTypeDefine>("primitive-type"),
+            {
+                "define": isPrimitiveType,
+            }
+        )
+    )(value);
     export interface TypeDefine extends AlphaDefine
     {
         $type: "type";
         define: TypeOrInterfaceOrRefer;
     }
-    export const isTypeDefine = (value: unknown): value is TypeDefine =>
-        isAlphaDefine<TypeDefine>(value, "type") &&
-        "define" in value && isTypeOrInterfaceOrRefer(value.define);
+    export const isTypeDefine = (value: unknown): value is TypeDefine => isSpecificObject<TypeDefine>
+    (
+        Object.assign
+        (
+            isAlphaDefine<TypeDefine>("type"),
+            {
+                "define": isTypeOrInterfaceOrRefer,
+            }
+        )
+    )(value);
     export interface InterfaceDefine extends AlphaDefine
     {
         $type: "interface";
