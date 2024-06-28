@@ -227,33 +227,61 @@ export module Types
         $type: "interface";
         members: { [key: string]: TypeOrInterfaceOrRefer; };
     }
-    export const isInterfaceDefine = (value: unknown): value is InterfaceDefine =>
-        isAlphaDefine<InterfaceDefine>(value, "interface") &&
-        isMemberType(value as InterfaceDefine, "members", isDictionaryObject(isTypeOrInterfaceOrRefer));
+    export const isInterfaceDefine = (value: unknown): value is InterfaceDefine => isSpecificObject<InterfaceDefine>
+    (
+        Object.assign
+        (
+            isAlphaDefine<InterfaceDefine>("interface"),
+            {
+                "members": isDictionaryObject(isTypeOrInterfaceOrRefer),
+            }
+        )
+    )(value);
     export interface ArrayDefine extends AlphaDefine
     {
         $type: "array";
         items: TypeOrInterfaceOrRefer;
     }
-    export const isArrayDefine = (value: unknown): value is ArrayDefine =>
-        isAlphaDefine<ArrayDefine>(value, "array") &&
-        "items" in value && isTypeOrInterfaceOrRefer(value.items);
+    export const isArrayDefine = (value: unknown): value is ArrayDefine => isSpecificObject<ArrayDefine>
+    (
+        Object.assign
+        (
+            isAlphaDefine<ArrayDefine>("array"),
+            {
+                "items": isTypeOrInterfaceOrRefer,
+            }
+        )
+    )(value);
     export interface OrDefine extends AlphaDefine
     {
         $type: "or";
         types: TypeOrInterfaceOrRefer[];
     }
-    export const isOrDefine = (value: unknown): value is OrDefine =>
-        isAlphaDefine<OrDefine>(value, "or") &&
-        "types" in value && Array.isArray(value.types) && value.types.filter(i => ! isTypeOrInterfaceOrRefer(i)).length <= 0;
+    export const isOrDefine = (value: unknown): value is OrDefine => isSpecificObject<OrDefine>
+    (
+        Object.assign
+        (
+            isAlphaDefine<OrDefine>("or"),
+            {
+                "types": isArray(isTypeOrInterfaceOrRefer),
+            }
+        )
+    )(value);
     export interface AndDefine extends AlphaDefine
     {
         $type: "and";
         types: TypeOrInterfaceOrRefer[];
     }
-    export const isAndDefine = (value: unknown): value is AndDefine =>
-        isAlphaDefine<AndDefine>(value, "and") &&
-        "types" in value && Array.isArray(value.types) && value.types.filter(i => ! isTypeOrInterfaceOrRefer(i)).length <= 0;
+    export const isAndDefine = (value: unknown): value is AndDefine => isSpecificObject<AndDefine>
+    (
+        Object.assign
+        (
+            isAlphaDefine<AndDefine>("and"),
+            {
+                "types": isArray(isTypeOrInterfaceOrRefer),
+            }
+        )
+    )(value);
     export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     export type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
     export type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
