@@ -39,12 +39,12 @@ export declare namespace Types {
     type OptionalType<T> = Required<Pick<T, OptionalKeys<T>>>;
     type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
     type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
-    type ObjectSpecification<ObjectType> = {
+    type ObjectValidator<ObjectType> = {
         [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]);
     } & {
         [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
     };
-    const isSpecificObject: <ObjectType extends object>(memberSpecification: ObjectSpecification<ObjectType>) => (value: unknown) => value is ObjectType;
+    const isSpecificObject: <ObjectType extends object>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown) => value is ObjectType;
     const isDictionaryObject: <MemberType>(isType: (m: unknown) => m is MemberType) => (value: unknown) => value is {
         [key: string]: MemberType;
     };
@@ -77,7 +77,7 @@ export declare namespace Types {
         export?: boolean;
         $type: string;
     }
-    const isAlphaDefine: <T extends AlphaDefine>($type: T["$type"]) => {
+    const getAlphaDefineSpecification: <T extends AlphaDefine>($type: T["$type"]) => {
         export: OptionalKeyTypeGuard<boolean>;
         $type: (value: unknown) => value is T["$type"];
     };

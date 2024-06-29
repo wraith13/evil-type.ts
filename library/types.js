@@ -63,9 +63,9 @@ var Types;
         return !(member in value) || isType(value[member]);
     };
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
-    Types.isSpecificObject = function (memberSpecification) { return function (value) {
+    Types.isSpecificObject = function (memberValidator) { return function (value) {
         return Types.isObject(value) &&
-            Object.entries(memberSpecification).filter(function (kv) { return !(kv[0].endsWith("?") ?
+            Object.entries(memberValidator).filter(function (kv) { return !(kv[0].endsWith("?") ?
                 Types.isMemberTypeOrUndefined(value, kv[0].slice(0, -1), kv[1]) :
                 Types.isMemberType(value, kv[0], kv[1])); }).length <= 0;
     }; };
@@ -91,36 +91,36 @@ var Types;
     Types.isRefer = Types.isSpecificObject({
         "$ref": Types.isString,
     });
-    Types.isAlphaDefine = function ($type) {
+    Types.getAlphaDefineSpecification = function ($type) {
         return ({
             export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
             "$type": Types.isJust($type),
         });
     };
-    Types.isModuleDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.isAlphaDefine("module"), {
+    Types.isModuleDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("module"), {
         "members": Types.isDictionaryObject(Types.isDefine),
     }))(value); };
-    Types.isValueDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.isAlphaDefine("value"), {
+    Types.isValueDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("value"), {
         "value": Types.isJsonable,
     }))(value); };
     Types.PrimitiveTypeMembers = ["undefined", "boolean", "number", "string"];
     Types.isPrimitiveType = Types.isEnum(Types.PrimitiveTypeMembers);
-    Types.isPrimitiveTypeDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.isAlphaDefine("primitive-type"), {
+    Types.isPrimitiveTypeDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("primitive-type"), {
         "define": Types.isPrimitiveType,
     }))(value); };
-    Types.isTypeDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.isAlphaDefine("type"), {
+    Types.isTypeDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("type"), {
         "define": Types.isTypeOrInterfaceOrRefer,
     }))(value); };
-    Types.isInterfaceDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.isAlphaDefine("interface"), {
+    Types.isInterfaceDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("interface"), {
         "members": Types.isDictionaryObject(Types.isTypeOrInterfaceOrRefer),
     }))(value); };
-    Types.isArrayDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.isAlphaDefine("array"), {
+    Types.isArrayDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("array"), {
         "items": Types.isTypeOrInterfaceOrRefer,
     }))(value); };
-    Types.isOrDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.isAlphaDefine("or"), {
+    Types.isOrDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("or"), {
         "types": Types.isArray(Types.isTypeOrInterfaceOrRefer),
     }))(value); };
-    Types.isAndDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.isAlphaDefine("and"), {
+    Types.isAndDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("and"), {
         "types": Types.isArray(Types.isTypeOrInterfaceOrRefer),
     }))(value); };
     Types.isTypeOrInterface = Types.isOr(Types.isPrimitiveTypeDefine, Types.isTypeDefine, Types.isInterfaceDefine, Types.isArrayDefine, Types.isOrDefine, Types.isAndDefine);

@@ -67,13 +67,13 @@ export module Types
     export type OptionalType<T> = Required<Pick<T, OptionalKeys<T>>>;
     export type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
     export type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
-    export type ObjectSpecification<ObjectType> =
+    export type ObjectValidator<ObjectType> =
         { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) } &
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
-    export const isSpecificObject = <ObjectType extends ActualObject>(memberSpecification: ObjectSpecification<ObjectType>) => (value: unknown): value is ObjectType =>
+    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown): value is ObjectType =>
         isObject(value) &&
-        Object.entries(memberSpecification).filter
+        Object.entries(memberValidator).filter
         (
             kv => !
             (
@@ -154,7 +154,7 @@ export module Types
         export?: boolean;
         $type: string;
     }
-    export const isAlphaDefine = <T extends AlphaDefine>($type: T["$type"]) =>
+    export const getAlphaDefineSpecification = <T extends AlphaDefine>($type: T["$type"]) =>
     ({
         export: makeOptionalKeyTypeGuard(isBoolean),
         "$type": isJust($type),
@@ -168,7 +168,7 @@ export module Types
     (
         Object.assign
         (
-            isAlphaDefine<ModuleDefine>("module"),
+            getAlphaDefineSpecification<ModuleDefine>("module"),
             {
                 "members": isDictionaryObject(isDefine),
             }
@@ -183,7 +183,7 @@ export module Types
     (
         Object.assign
         (
-            isAlphaDefine<ValueDefine>("value"),
+            getAlphaDefineSpecification<ValueDefine>("value"),
             {
                 "value": isJsonable,
             },
@@ -201,7 +201,7 @@ export module Types
     (
         Object.assign
         (
-            isAlphaDefine<PrimitiveTypeDefine>("primitive-type"),
+            getAlphaDefineSpecification<PrimitiveTypeDefine>("primitive-type"),
             {
                 "define": isPrimitiveType,
             }
@@ -216,7 +216,7 @@ export module Types
     (
         Object.assign
         (
-            isAlphaDefine<TypeDefine>("type"),
+            getAlphaDefineSpecification<TypeDefine>("type"),
             {
                 "define": isTypeOrInterfaceOrRefer,
             }
@@ -231,7 +231,7 @@ export module Types
     (
         Object.assign
         (
-            isAlphaDefine<InterfaceDefine>("interface"),
+            getAlphaDefineSpecification<InterfaceDefine>("interface"),
             {
                 "members": isDictionaryObject(isTypeOrInterfaceOrRefer),
             }
@@ -246,7 +246,7 @@ export module Types
     (
         Object.assign
         (
-            isAlphaDefine<ArrayDefine>("array"),
+            getAlphaDefineSpecification<ArrayDefine>("array"),
             {
                 "items": isTypeOrInterfaceOrRefer,
             }
@@ -261,7 +261,7 @@ export module Types
     (
         Object.assign
         (
-            isAlphaDefine<OrDefine>("or"),
+            getAlphaDefineSpecification<OrDefine>("or"),
             {
                 "types": isArray(isTypeOrInterfaceOrRefer),
             }
@@ -276,7 +276,7 @@ export module Types
     (
         Object.assign
         (
-            isAlphaDefine<AndDefine>("and"),
+            getAlphaDefineSpecification<AndDefine>("and"),
             {
                 "types": isArray(isTypeOrInterfaceOrRefer),
             }
