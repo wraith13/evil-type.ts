@@ -231,9 +231,13 @@ var Build;
             return (0, exports.$block)(header, [lines]);
         };
         Define.buildDefineModuleCore = function (value) {
-            return __spreadArray([], Object.entries(value.members).map(function (i) { return types_1.Types.isModuleDefine(i[1]) ?
-                [Define.buildDefine(i[0], i[1])] :
-                [Define.buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]),]; }).reduce(function (a, b) { return a.concat(b); }, []), true);
+            return __spreadArray([], Object.entries(value.members).map(function (i) {
+                return types_1.Types.isModuleDefine(i[1]) ? [Define.buildDefine(i[0], i[1])] :
+                    types_1.Types.isTypeOrInterface(i[1]) ? [Define.buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]),] :
+                        [];
+            } // Types.isValueDefine(i[1])
+            )
+                .reduce(function (a, b) { return a.concat(b); }, []), true);
         };
         Define.buildDefineModule = function (name, value) {
             var header = Build.buildExport(value).concat([(0, exports.$expression)("module"), (0, exports.$expression)(name)]);

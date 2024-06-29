@@ -1,5 +1,5 @@
 export declare namespace Types {
-    const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
+    const schema: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
     type JsonableValue = null | boolean | number | string;
     const isJsonableValue: (value: unknown) => value is JsonableValue;
     interface JsonableObject {
@@ -11,6 +11,55 @@ export declare namespace Types {
     type JsonablePartial<Target> = {
         [key in keyof Target]?: Target[key];
     } & JsonableObject;
+    const isJust: <T>(target: T) => (value: unknown) => value is T;
+    const isUndefined: (value: unknown) => value is undefined;
+    const isNull: (value: unknown) => value is null;
+    const isBoolean: (value: unknown) => value is boolean;
+    const isNumber: (value: unknown) => value is number;
+    const isString: (value: unknown) => value is string;
+    type ActualObject = Exclude<object, null>;
+    const isObject: (value: unknown) => value is object;
+    const isEnum: <T>(list: readonly T[]) => (value: unknown) => value is T;
+    const isArray: <T>(isType: (value: unknown) => value is T) => (value: unknown) => value is T[];
+    const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown) => value is T[K]; }) => (value: unknown) => value is T[number];
+    interface OptionalKeyTypeGuard<T> {
+        $type: "optional-type-guard";
+        isType: (value: unknown) => value is T;
+    }
+    const sss: OptionalKeyTypeGuard<number>;
+    const isOptionalKeyTypeGuard: (value: unknown) => value is OptionalKeyTypeGuard<unknown>;
+    const makeOptionalKeyTypeGuard: <T>(isType: (value: unknown) => value is T) => OptionalKeyTypeGuard<T>;
+    const isMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, isType: OptionalKeyTypeGuard<unknown> | ((v: unknown) => boolean)) => boolean;
+    const isMemberTypeOrUndefined: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, isType: (v: unknown) => boolean) => boolean;
+    type OptionalKeys<T> = {
+        [K in keyof T]: T extends Record<K, T[K]> ? never : K;
+    } extends {
+        [_ in keyof T]: infer U;
+    } ? U : never;
+    type OptionalType<T> = Required<Pick<T, OptionalKeys<T>>>;
+    type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
+    type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
+    type ObjectSpecification<ObjectType> = {
+        [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]);
+    } & {
+        [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
+    };
+    const isSpecificObject: <ObjectType extends object>(memberSpecification: ObjectSpecification<ObjectType>) => (value: unknown) => value is ObjectType;
+    const isDictionaryObject: <MemberType>(isType: (m: unknown) => m is MemberType) => (value: unknown) => value is {
+        [key: string]: MemberType;
+    };
+    const ValidatorOptionTypeMembers: readonly ["none", "simple", "full"];
+    type ValidatorOptionType = typeof ValidatorOptionTypeMembers[number];
+    const isValidatorOptionType: (value: unknown) => value is "none" | "simple" | "full";
+    const IndentStyleMembers: readonly ["allman", "egyptian"];
+    type IndentStyleType = typeof IndentStyleMembers[number];
+    const isIndentStyleType: (value: unknown) => value is "allman" | "egyptian";
+    interface TypeOptions {
+        indentUnit: number | "\t";
+        indentStyle: IndentStyleType;
+        validatorOption: ValidatorOptionType;
+    }
+    const isTypeOptions: (value: unknown) => value is TypeOptions;
     interface TypeSchema {
         $ref: typeof schema;
         defines: {
@@ -19,14 +68,6 @@ export declare namespace Types {
         options: TypeOptions;
     }
     const isTypeSchema: (value: unknown) => value is TypeSchema;
-    type ValidatorOptionType = "none" | "simple" | "full";
-    const isValidatorOptionType: (value: unknown) => value is ValidatorOptionType;
-    interface TypeOptions {
-        indentUnit: number | "\t";
-        indentStyle: "allman" | "egyptian";
-        validatorOption: ValidatorOptionType;
-    }
-    const isTypeOptions: (value: unknown) => value is TypeOptions;
     type FilePath = string;
     interface Refer {
         $ref: string;
@@ -36,21 +77,25 @@ export declare namespace Types {
         export?: boolean;
         $type: string;
     }
-    const isAlphaDefine: (value: unknown) => value is AlphaDefine;
+    const isAlphaDefine: <T extends AlphaDefine>($type: T["$type"]) => {
+        export: OptionalKeyTypeGuard<boolean>;
+        $type: (value: unknown) => value is T["$type"];
+    };
     interface ModuleDefine extends AlphaDefine {
         $type: "module";
         members: {
             [key: string]: Define;
         };
     }
-    const isModuleDefine: (value: unknown) => value is AlphaDefine;
+    const isModuleDefine: (value: unknown) => value is ModuleDefine;
     interface ValueDefine extends AlphaDefine {
         $type: "value";
         value: Jsonable;
     }
     const isValueDefine: (value: unknown) => value is ValueDefine;
-    type PrimitiveType = "undefined" | "boolean" | "number" | "string";
-    const isPrimitiveType: (value: unknown) => value is PrimitiveType;
+    const PrimitiveTypeMembers: readonly ["undefined", "boolean", "number", "string"];
+    type PrimitiveType = typeof PrimitiveTypeMembers[number];
+    const isPrimitiveType: (value: unknown) => value is "string" | "number" | "boolean" | "undefined";
     interface PrimitiveTypeDefine extends AlphaDefine {
         $type: "primitive-type";
         define: PrimitiveType;
@@ -86,11 +131,11 @@ export declare namespace Types {
     type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
     type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
-    const isTypeOrInterface: (value: unknown) => value is TypeOrInterface;
+    const isTypeOrInterface: (value: unknown) => value is PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
-    const isTypeOrInterfaceOrRefer: (value: unknown) => value is TypeOrInterfaceOrRefer;
+    const isTypeOrInterfaceOrRefer: (value: unknown) => value is PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine | Refer;
     type Define = ModuleDefine | ValueDefine | TypeOrInterface;
-    const isDefine: (value: unknown) => value is Define;
+    const isDefine: (value: unknown) => value is ModuleDefine | ValueDefine | PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     type DefineOrRefer = Define | Refer;
     const isDefineOrRefer: (value: unknown) => value is DefineOrRefer;
 }

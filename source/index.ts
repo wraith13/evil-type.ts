@@ -275,10 +275,12 @@ export module Build
         [
             ...Object.entries(value.members).map
             (
-                i => Types.isModuleDefine(i[1]) ?
-                    [buildDefine(i[0], i[1])]:
-                    [buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]), ]
-            ).reduce((a, b) => a.concat(b), []),
+                i =>
+                    Types.isModuleDefine(i[1]) ? [buildDefine(i[0], i[1])]:
+                    Types.isTypeOrInterface(i[1]) ? [buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]), ]:
+                    [] // Types.isValueDefine(i[1])
+            )
+            .reduce((a, b) => a.concat(b), []),
         ];
         export const buildDefineModule = (name: string, value: Types.ModuleDefine): CodeBlock =>
         {
