@@ -237,6 +237,21 @@ export module Types
             }
         )
     )(value);
+    export interface DictionaryDefine extends AlphaDefine
+    {
+        $type: "dictionary";
+        members: TypeOrInterfaceOrRefer;
+    }
+    export const isDictionaryDefine = (value: unknown): value is DictionaryDefine => isSpecificObject<DictionaryDefine>
+    (
+        Object.assign
+        (
+            getAlphaDefineSpecification<DictionaryDefine>("dictionary"),
+            {
+                "members": isTypeOrInterfaceOrRefer,
+            }
+        )
+    )(value);
     export interface ArrayDefine extends AlphaDefine
     {
         $type: "array";

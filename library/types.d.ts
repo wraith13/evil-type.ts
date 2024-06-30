@@ -113,6 +113,11 @@ export declare namespace Types {
         };
     }
     const isInterfaceDefine: (value: unknown) => value is InterfaceDefine;
+    interface DictionaryDefine extends AlphaDefine {
+        $type: "dictionary";
+        members: TypeOrInterfaceOrRefer;
+    }
+    const isDictionaryDefine: (value: unknown) => value is DictionaryDefine;
     interface ArrayDefine extends AlphaDefine {
         $type: "array";
         items: TypeOrInterfaceOrRefer;

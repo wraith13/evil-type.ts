@@ -114,6 +114,9 @@ var Types;
     Types.isInterfaceDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("interface"), {
         "members": Types.isDictionaryObject(Types.isTypeOrInterfaceOrRefer),
     }))(value); };
+    Types.isDictionaryDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("dictionary"), {
+        "members": Types.isTypeOrInterfaceOrRefer,
+    }))(value); };
     Types.isArrayDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("array"), {
         "items": Types.isTypeOrInterfaceOrRefer,
     }))(value); };

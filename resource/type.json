@@ -17,11 +17,9 @@
                 "$ref": { "$ref": "schema" },
                 "defines":
                 {
-                    "schema":
+                    "$type": "interface",
+                    "members":
                     {
-                        "export": true,
-                        "$type": "value",
-                        "value": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#"
                     }
                 },
                 "options": { "$ref": "TypeOptions" }
