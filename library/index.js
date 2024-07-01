@@ -246,6 +246,8 @@ var Build;
         };
         Define.buildDefine = function (name, define) {
             switch (define.$type) {
+                case "interface":
+                    return Define.buildDefineInterface(name, define);
                 case "module":
                     return Define.buildDefineModule(name, define);
                 default:

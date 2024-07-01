@@ -292,6 +292,8 @@ export module Build
         {
             switch(define.$type)
             {
+            case "interface":
+                return buildDefineInterface(name, define);
             case "module":
                 return buildDefineModule(name, define);
             default:
