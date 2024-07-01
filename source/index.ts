@@ -479,13 +479,10 @@ try
     const typeSource = JSON.parse(fget(jsonPath));
     if (Types.isTypeSchema(typeSource))
     {
-        const result = Format.text
-        (
-            typeSource.options,
-            0,
-            Object.entries(typeSource.defines)
-                .map(i => Build.Define.buildDefine(i[0], i[1]))
-        );
+        const defines = Object.entries(typeSource.defines)
+            .map(i => Build.Define.buildDefine(i[0], i[1]));
+        console.log(JSON.stringify(defines, null, 4));
+        const result = Format.text(typeSource.options, 0, defines);
         console.log(result);
     }
     else

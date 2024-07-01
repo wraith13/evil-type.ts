@@ -411,8 +411,10 @@ try {
     console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     var typeSource = JSON.parse(fget(jsonPath));
     if (types_1.Types.isTypeSchema(typeSource)) {
-        var result = Format.text(typeSource.options, 0, Object.entries(typeSource.defines)
-            .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); }));
+        var defines = Object.entries(typeSource.defines)
+            .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); });
+        console.log(JSON.stringify(defines, null, 4));
+        var result = Format.text(typeSource.options, 0, defines);
         console.log(result);
     }
     else {
