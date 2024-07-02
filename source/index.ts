@@ -457,7 +457,7 @@ export module Format
     {
         if (Array.isArray(code))
         {
-            return code.map(i => text(options, indentDepth, i)).join(getReturnCode(options));
+            return code.map(i => text(options, indentDepth, i)).join("");
         }
         else
         {

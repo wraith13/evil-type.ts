@@ -393,7 +393,7 @@ var Format;
     };
     Format.text = function (options, indentDepth, code) {
         if (Array.isArray(code)) {
-            return code.map(function (i) { return Format.text(options, indentDepth, i); }).join(Format.getReturnCode(options));
+            return code.map(function (i) { return Format.text(options, indentDepth, i); }).join("");
         }
         else {
             switch (code.$code) {
