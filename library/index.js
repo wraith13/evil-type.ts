@@ -227,8 +227,9 @@ var Build;
             .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); })); };
         Define.buildDefineInterface = function (name, value) {
             var header = Build.buildExport(value).concat(["interface", name].filter(function (i) { return null !== i; }).map(function (i) { return (0, exports.$expression)(i); }));
-            var lines = Define.buildDefineInlineInterface(value);
-            return (0, exports.$block)(header, [lines]);
+            var lines = Object.keys(value.members)
+                .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); });
+            return (0, exports.$block)(header, lines);
         };
         Define.buildDefineModuleCore = function (value) {
             return __spreadArray([], Object.entries(value.members).map(function (i) {
@@ -356,7 +357,7 @@ var Format;
     };
     Format.getReturnCode = function (_options) { return "\n"; };
     Format.expressions = function (code) {
-        return code.join(" ");
+        return code.map(function (i) { return i.expression; }).join(" ");
     };
     Format.tokens = function (code) {
         switch (code.$code) {

@@ -268,8 +268,9 @@ export module Build
         export const buildDefineInterface = (name: string, value: Types.InterfaceDefine): CodeBlock =>
         {
             const header = buildExport(value).concat(["interface", name].filter(i => null !== i).map(i => $expression(i)));
-            const lines = buildDefineInlineInterface(value);
-            return $block(header, [lines]);
+            const lines = Object.keys(value.members)
+                .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]));
+            return $block(header, lines);
         };
         export const buildDefineModuleCore = (value: Types.ModuleDefine): CodeEntry[] =>
         [
@@ -418,7 +419,7 @@ export module Format
         .join("");
     export const getReturnCode = (_options: Types.TypeOptions) => "\n";
     export const expressions = (code: CodeExpression[]): string =>
-        code.join(" ");
+        code.map(i => i.expression).join(" ");
     export const tokens = (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock): string[] =>
     {
         switch(code.$code)
