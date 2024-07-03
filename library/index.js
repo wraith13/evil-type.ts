@@ -20,8 +20,9 @@ var text_1 = require("./text");
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
 var jsonPath = process.argv[2];
 console.log("\uD83D\uDE80 ".concat(jsonPath, " build start: ").concat(startAt));
-// const removeNullFilter = <ElementType>(list: (ElementType | null)[]): ElementType[] =>
-//     list.filter(i => null !== i) as ElementType[];
+var removeNullFilter = function (list) {
+    return list.filter(function (i) { return null !== i; });
+};
 var kindofJoinExpression = function (list, separator) {
     return list.reduce(function (a, b) { return (Array.isArray(a) ? a : [a]).concat(Array.isArray(b) ? __spreadArray([separator], b, true) : [separator, b]); }, []);
 };
@@ -417,7 +418,11 @@ try {
         var defines = Object.entries(typeSource.defines)
             .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); });
         console.log(JSON.stringify(defines, null, 4));
-        var result = Format.text(typeSource.options, 0, defines);
+        var validators = removeNullFilter(Object.entries(typeSource.defines)
+            .map(function (i) { return types_1.Types.isTypeOrInterface(i[1]) ? Build.Validator.buildValidator(i[0], i[1]) : null; })
+            .filter(function (i) { return null !== i; }));
+        console.log(JSON.stringify(validators, null, 4));
+        var result = Format.text(typeSource.options, 0, __spreadArray(__spreadArray([], defines, true), validators, true));
         console.log(result);
     }
     else {

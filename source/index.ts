@@ -6,8 +6,8 @@ import { Text } from "./text";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
-// const removeNullFilter = <ElementType>(list: (ElementType | null)[]): ElementType[] =>
-//     list.filter(i => null !== i) as ElementType[];
+const removeNullFilter = <ElementType>(list: (ElementType | null)[]): ElementType[] =>
+    list.filter(i => null !== i) as ElementType[];
 const kindofJoinExpression = <T>(list: T[], separator: CodeExpression) =>
         list.reduce((a, b) => (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]), <CodeExpression[]>[]);
 interface Code
@@ -485,7 +485,14 @@ try
         const defines = Object.entries(typeSource.defines)
             .map(i => Build.Define.buildDefine(i[0], i[1]));
         console.log(JSON.stringify(defines, null, 4));
-        const result = Format.text(typeSource.options, 0, defines);
+        const validators = removeNullFilter
+        (
+            Object.entries(typeSource.defines)
+                .map(i => Types.isTypeOrInterface(i[1]) ? Build.Validator.buildValidator(i[0], i[1]): null)
+                .filter(i => null !== i)
+        );
+        console.log(JSON.stringify(validators, null, 4));
+        const result = Format.text(typeSource.options, 0, [...defines, ...validators]);
         console.log(result);
     }
     else
