@@ -318,7 +318,7 @@ var Build;
             return Build.buildExport(define).concat(__spreadArray([(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], (0, exports.convertToExpression)(Validator.buildInlineValidator(name, define)), true));
         };
         Validator.buildValidatorName = function (name) {
-            return text_1.Text.getNameSpace(name).split(".").concat(["is".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name)))]).join(".");
+            return text_1.Text.getNameSpace(name).split(".").concat(["is".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name)))]).filter(function (i) { return "" !== i; }).join(".");
         };
         Validator.buildValidatorExpression = function (name, define) {
             return types_1.Types.isRefer(define) ?
@@ -342,10 +342,10 @@ var Build;
                 (0, exports.$expression)("(value: unknown): value is ".concat(name, " =>"))
             ], Validator.buildValidatorExpression("value", define), true);
         };
-        Validator.buildValidator = function (name, define) {
-            return (0, exports.$line)([(0, exports.$expression)("const"), (0, exports.$expression)(Validator.buildValidatorName(name))]
-                .concat(Validator.buildInlineValidator(name, define)));
-        };
+        Validator.buildValidator = function (name, define) { return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+            (0, exports.$expression)("const"),
+            (0, exports.$expression)(Validator.buildValidatorName(name))
+        ], false), Validator.buildInlineValidator(name, define), true)); };
     })(Validator = Build.Validator || (Build.Validator = {}));
 })(Build || (exports.Build = Build = {}));
 var Format;

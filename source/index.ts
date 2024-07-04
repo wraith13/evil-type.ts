@@ -375,10 +375,10 @@ export module Build
         export const buildValidatorLine = (declarator: string, name: string, define: Types.TypeOrInterface): CodeExpression[] =>
             buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define))]);
         export const buildValidatorName = (name: string) =>
-            Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).join(".");
+            Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).filter(i => "" !== i).join(".");
         export const buildValidatorExpression = (name: string, define: Exclude<Types.DefineOrRefer, Types.ModuleDefine>) =>
             Types.isRefer(define) ?
-                [$expression(`${buildValidatorName( define.$ref)}(${name})`)]:
+                [$expression(`${buildValidatorName(define.$ref)}(${name})`)]:
                 getValidator(define)(name);
         export const buildInterfaceValidator = (name: string, define: Types.InterfaceDefine): CodeExpression[] =>
         {
@@ -402,12 +402,13 @@ export module Build
             $expression(`(value: unknown): value is ${name} =>`),
             ...buildValidatorExpression("value", define),
         ];
-        export const buildValidator = (name: string, define: Types.TypeOrInterface): CodeLine =>
-            $line
-            (
-                (<CodeLine["expressions"]>[$expression("const"), $expression(buildValidatorName(name))])
-                    .concat(buildInlineValidator(name, define))
-            );
+        export const buildValidator = (name: string, define: Types.TypeOrInterface): CodeLine => $line
+        ([
+            ...buildExport(define),
+            $expression("const"),
+            $expression(buildValidatorName(name)),
+            ...buildInlineValidator(name, define),
+        ]);
     }
 }
 export module Format
