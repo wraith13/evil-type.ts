@@ -8,8 +8,15 @@ const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
 const removeNullFilter = <ElementType>(list: (ElementType | null)[]): ElementType[] =>
     list.filter(i => null !== i) as ElementType[];
+const isEmptyArray = (list: unknown) => Array.isArray(list) && list.length <= 0;
 const kindofJoinExpression = <T>(list: T[], separator: CodeExpression) =>
-        list.reduce((a, b) => (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]), <CodeExpression[]>[]);
+        list.reduce
+        (
+            (a, b) => isEmptyArray(a) || isEmptyArray(b) ?
+                (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [...b]: [b]):
+                (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]),
+            <CodeExpression[]>[]
+        );
 interface Code
 {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
@@ -358,7 +365,7 @@ export module Build
                             }
                         }
                     );
-                    return kindofJoinExpression(list,$expression("&&"));
+                    return kindofJoinExpression(list, $expression("&&"));
                 }
             }
             if (undefined === value)
@@ -395,7 +402,7 @@ export module Build
                     }
                 }
             );
-            return kindofJoinExpression(list,$expression("&&"));
+            return kindofJoinExpression(list, $expression("&&"));
         };
         export const buildInlineValidator = (name: string, define: Types.TypeOrInterface) =>
         [

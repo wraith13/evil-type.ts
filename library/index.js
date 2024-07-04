@@ -23,8 +23,11 @@ console.log("\uD83D\uDE80 ".concat(jsonPath, " build start: ").concat(startAt));
 var removeNullFilter = function (list) {
     return list.filter(function (i) { return null !== i; });
 };
+var isEmptyArray = function (list) { return Array.isArray(list) && list.length <= 0; };
 var kindofJoinExpression = function (list, separator) {
-    return list.reduce(function (a, b) { return (Array.isArray(a) ? a : [a]).concat(Array.isArray(b) ? __spreadArray([separator], b, true) : [separator, b]); }, []);
+    return list.reduce(function (a, b) { return isEmptyArray(a) || isEmptyArray(b) ?
+        (Array.isArray(a) ? a : [a]).concat(Array.isArray(b) ? __spreadArray([], b, true) : [b]) :
+        (Array.isArray(a) ? a : [a]).concat(Array.isArray(b) ? __spreadArray([separator], b, true) : [separator, b]); }, []);
 };
 ;
 var isCodeExpression = function (value) {
