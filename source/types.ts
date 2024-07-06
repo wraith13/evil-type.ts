@@ -132,6 +132,7 @@ export module Types
         defines: { [key: string]: Define; };
         options: TypeOptions;
     }
+    export type Root = TypeSchema["defines"];
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
         isSpecificObject<TypeSchema>
         ({
