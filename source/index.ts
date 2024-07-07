@@ -26,6 +26,11 @@ interface CodeExpression extends Code
     $code: "expression";
     expression: string;
 };
+const makeNextContext = (context: Types.Context, name: string): Types.Context =>
+({
+    root: context.root,
+    namespace: context.namespace.concat([ name, ]),
+});
 const isCodeExpression = (value: unknown): value is CodeExpression =>
     null !== value &&
     "object" === typeof value &&
@@ -122,13 +127,13 @@ export module Build
         define: [$expression(JSON.stringify(define.define))],
         validator: (name: string) => [ $expression(`"${define.$type}" === typeof ${name}`), ],
     });
-    export const makeTypeBuilder = (root: Types.Root, define: Types.TypeDefine): Builder =>
+    export const makeTypeBuilder = (context: Types.Context, define: Types.TypeDefine): Builder =>
     ({
         declarator: $expression("type"),
         define: [$expression(JSON.stringify(define.define))],
-        validator: (name: string) => Validator.buildValidatorExpression(root, name, define.define),
+        validator: (name: string) => Validator.buildValidatorExpression(context, name, define.define),
     });
-    export const makeArrayTypeBuilder = (root: Types.Root, define: Types.ArrayDefine): Builder =>
+    export const makeArrayTypeBuilder = (context: Types.Context, define: Types.ArrayDefine): Builder =>
     ({
         declarator: $expression("type"),
         define: [$expression(JSON.stringify(define.items) +"[]")],
@@ -140,42 +145,42 @@ export module Build
             $expression(`${name}.some(`),
             $expression("i"),
             $expression("=>"),
-            ...Validator.buildValidatorExpression(root, "i", define.items),
+            ...Validator.buildValidatorExpression(context, "i", define.items),
             $expression(")")
         ]
     });
-    export const makeAndTypeBuilder = (root: Types.Root, define: Types.AndDefine): Builder =>
+    export const makeAndTypeBuilder = (context: Types.Context, define: Types.AndDefine): Builder =>
     ({
         declarator: $expression("type"),
         define: kindofJoinExpression(define.types.map(i => Define.buildInlineDefine(i)), $expression("&&")),
         validator: (name: string) => kindofJoinExpression
         (
-            define.types.map(i => Validator.buildValidatorExpression(root, name, i)),
+            define.types.map(i => Validator.buildValidatorExpression(context, name, i)),
             $expression("&&")
         ),
     });
-    export const makeOrTypeBuilder = (root: Types.Root, define: Types.OrDefine): Builder =>
+    export const makeOrTypeBuilder = (context: Types.Context, define: Types.OrDefine): Builder =>
     ({
         declarator: $expression("type"),
         define: kindofJoinExpression(define.types.map(i => Define.buildInlineDefine(i)), $expression("||")),
         validator: (name: string) => kindofJoinExpression
         (
-            define.types.map(i => Validator.buildValidatorExpression(root, name, i)),
+            define.types.map(i => Validator.buildValidatorExpression(context, name, i)),
             $expression("||")
         ),
     });
-    export const makeInterfaceBuilder = (root: Types.Root, define: Types.InterfaceDefine): Builder =>
+    export const makeInterfaceBuilder = (context: Types.Context, define: Types.InterfaceDefine): Builder =>
     ({
         declarator: $expression("interface"),
         define: Define.buildDefineInlineInterface(define),
-        validator: (name: string) => Validator.buildInterfaceValidator(root, name, define),
+        validator: (name: string) => Validator.buildInterfaceValidator(context, name, define),
     });
-    export const makeModuleBuilder = (root: Types.Root, define: Types.ModuleDefine): Builder =>
+    export const makeModuleBuilder = (context: Types.Context, define: Types.ModuleDefine): Builder =>
     ({
         declarator: $expression("module"),
-        define: Define.buildDefineModuleCore(root, define),
+        define: Define.buildDefineModuleCore(context, define),
     });
-    export const getBuilder = (root: Types.Root, define: Types.Define): Builder =>
+    export const getBuilder = (context: Types.Context, define: Types.Define): Builder =>
     {
         switch(define.$type)
         {
@@ -184,21 +189,21 @@ export module Build
         case "primitive-type":
             return makePrimitiveTypeBuilder(define);
         case "type":
-            return makeTypeBuilder(root, define);
+            return makeTypeBuilder(context, define);
         case "array":
-            return makeArrayTypeBuilder(root, define);
+            return makeArrayTypeBuilder(context, define);
         case "and":
-            return makeAndTypeBuilder(root, define);
+            return makeAndTypeBuilder(context, define);
         case "or":
-            return makeOrTypeBuilder(root, define);
+            return makeOrTypeBuilder(context, define);
         case "interface":
-            return makeInterfaceBuilder(root, define);
+            return makeInterfaceBuilder(context, define);
         case "module":
-            return makeModuleBuilder(root, define);
+            return makeModuleBuilder(context, define);
         }
     };
-    export const getValidator = (root: Types.Root, define: Exclude<Types.Define, Types.ModuleDefine>) =>
-        getBuilder(root, define).validator as Required<Builder>["validator"];
+    export const getValidator = (context: Types.Context, define: Exclude<Types.Define, Types.ModuleDefine>) =>
+        getBuilder(context, define).validator as Required<Builder>["validator"];
     export module Define
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrTypeOfInterface): CodeLine =>
@@ -272,40 +277,40 @@ export module Build
             Object.keys(value.members)
                 .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]))
         );
-        export const buildDefineInterface = (root: Types.Root, name: string, value: Types.InterfaceDefine): CodeBlock =>
+        export const buildDefineInterface = (context: Types.Context, name: string, value: Types.InterfaceDefine): CodeBlock =>
         {
             const header = buildExport(value).concat(["interface", name].filter(i => null !== i).map(i => $expression(i)));
             const lines = Object.keys(value.members)
                 .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]));
             return $block(header, lines);
         };
-        export const buildDefineModuleCore = (root: Types.Root, value: Types.ModuleDefine): CodeEntry[] =>
+        export const buildDefineModuleCore = (context: Types.Context, value: Types.ModuleDefine): CodeEntry[] =>
         [
             ...Object.entries(value.members).map
             (
                 i =>
-                    Types.isModuleDefine(i[1]) ? <CodeEntry[]>[buildDefine(root, i[0], i[1])]:
-                    Types.isTypeOrInterface(i[1]) ? <CodeEntry[]>[buildDefine(root, i[0], i[1]), Validator.buildValidator(root, i[0], i[1]), ]:
+                    Types.isModuleDefine(i[1]) ? <CodeEntry[]>[buildDefine(context, i[0], i[1])]:
+                    Types.isTypeOrInterface(i[1]) ? <CodeEntry[]>[buildDefine(context, i[0], i[1]), Validator.buildValidator(context, i[0], i[1]), ]:
                     [] // Types.isValueDefine(i[1])
             )
             .reduce((a, b) => a.concat(b), []),
         ];
-        export const buildDefineModule = (root: Types.Root, name: string, value: Types.ModuleDefine): CodeBlock =>
+        export const buildDefineModule = (context: Types.Context, name: string, value: Types.ModuleDefine): CodeBlock =>
         {
             const header = buildExport(value).concat([$expression("module"), $expression(name)]);
-            const lines = buildDefineModuleCore(root, value);
+            const lines = buildDefineModuleCore(makeNextContext(context, name), value);
             return $block(header, lines);
         };
-        export const buildDefine = (root: Types.Root, name: string, define: Types.Define): CodeEntry =>
+        export const buildDefine = (context: Types.Context, name: string, define: Types.Define): CodeEntry =>
         {
             switch(define.$type)
             {
             case "interface":
-                return buildDefineInterface(root, name, define);
+                return buildDefineInterface(context, name, define);
             case "module":
-                return buildDefineModule(root, name, define);
+                return buildDefineModule(context, name, define);
             default:
-                return buildDefineLine(getBuilder(root, define).declarator.expression, name, define);
+                return buildDefineLine(getBuilder(context, define).declarator.expression, name, define);
             }
         };
         export const buildInlineDefine = (define: Types.ValueOrTypeOfInterfaceOrRefer): (CodeExpression | CodeInlineBlock)[] =>
@@ -379,15 +384,15 @@ export module Build
         };
         export const buildInlineValueValidator = (define: Types.ValueDefine) =>
             $expression(`(value: unknown): value is ${Define.buildInlineDefineValue(define)} => ${buildValueValidatorExpression("value", define.value)};`);
-        export const buildValidatorLine = (root: Types.Root, declarator: string, name: string, define: Types.TypeOrInterface): CodeExpression[] =>
-            buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(root, name, define))]);
+        export const buildValidatorLine = (context: Types.Context, declarator: string, name: string, define: Types.TypeOrInterface): CodeExpression[] =>
+            buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(context, name, define))]);
         export const buildValidatorName = (name: string) =>
             Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).filter(i => "" !== i).join(".");
-        export const buildValidatorExpression = (root: Types.Root, name: string, define: Exclude<Types.DefineOrRefer, Types.ModuleDefine>) =>
+        export const buildValidatorExpression = (context: Types.Context, name: string, define: Exclude<Types.DefineOrRefer, Types.ModuleDefine>) =>
             Types.isRefer(define) ?
                 [$expression(`${buildValidatorName(define.$ref)}(${name})`)]:
-                getValidator(root, define)(name);
-        export const buildInterfaceValidator = (root: Types.Root, name: string, define: Types.InterfaceDefine): CodeExpression[] =>
+                getValidator(context, define)(name);
+        export const buildInterfaceValidator = (context: Types.Context, name: string, define: Types.InterfaceDefine): CodeExpression[] =>
         {
             const list: CodeExpression[] = [];
             list.push($expression(`null !== ${name}`));
@@ -398,23 +403,23 @@ export module Build
                 {
                     {
                         list.push($expression(`"${key}" in ${name}`));
-                        list.push(...convertToExpression(buildValidatorExpression(root, `${name}.${key}`, define.members[key])));
+                        list.push(...convertToExpression(buildValidatorExpression(context, `${name}.${key}`, define.members[key])));
                     }
                 }
             );
             return kindofJoinExpression(list, $expression("&&"));
         };
-        export const buildInlineValidator = (root: Types.Root, name: string, define: Types.TypeOrInterface) =>
+        export const buildInlineValidator = (context: Types.Context, name: string, define: Types.TypeOrInterface) =>
         [
             $expression(`(value: unknown): value is ${name} =>`),
-            ...buildValidatorExpression(root, "value", define),
+            ...buildValidatorExpression(context, "value", define),
         ];
-        export const buildValidator = (root: Types.Root, name: string, define: Types.TypeOrInterface): CodeLine => $line
+        export const buildValidator = (context: Types.Context, name: string, define: Types.TypeOrInterface): CodeLine => $line
         ([
             ...buildExport(define),
             $expression("const"),
             $expression(buildValidatorName(name)),
-            ...buildInlineValidator(root, name, define),
+            ...buildInlineValidator(context, name, define),
         ]);
     }
 }
@@ -490,14 +495,18 @@ try
     const typeSource = JSON.parse(fget(jsonPath));
     if (Types.isTypeSchema(typeSource))
     {
-        const root = typeSource.defines;
+        const context: Types.Context =
+        {
+            root: typeSource.defines,
+            namespace: [],
+        };
         const defines = Object.entries(typeSource.defines)
-            .map(i => Build.Define.buildDefine(root, i[0], i[1]));
+            .map(i => Build.Define.buildDefine(context, i[0], i[1]));
         console.log(JSON.stringify(defines, null, 4));
         const validators = removeNullFilter
         (
             Object.entries(typeSource.defines)
-                .map(i => Types.isTypeOrInterface(i[1]) ? Build.Validator.buildValidator(root, i[0], i[1]): null)
+                .map(i => Types.isTypeOrInterface(i[1]) ? Build.Validator.buildValidator(context, i[0], i[1]): null)
                 .filter(i => null !== i)
         );
         console.log(JSON.stringify(validators, null, 4));

@@ -133,6 +133,11 @@ export module Types
         options: TypeOptions;
     }
     export type Root = TypeSchema["defines"];
+    export interface Context
+    {
+        root: Root;
+        namespace: string[];
+    }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
         isSpecificObject<TypeSchema>
         ({
