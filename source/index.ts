@@ -31,6 +31,33 @@ const makeNextContext = (context: Types.Context, name: string): Types.Context =>
     root: context.root,
     namespace: context.namespace.concat([ name, ]),
 });
+const getDefineFromRoot = (root: { [key: string]: Types.DefineOrRefer }, name: string[]): Types.DefineOrRefer | null =>
+{
+    const result = root[name[0]] ?? null;
+    if (result && 2 <= name.length)
+    {
+        if (Types.isModuleDefine(result))
+        {
+            return getDefineFromRoot(result.members, name.splice(1));
+        }
+        if (Types.isInterfaceDefine(result))
+        {
+            return getDefineFromRoot(result.members, name.splice(1));
+        }
+        return null;
+    }
+    else
+    {
+        return result;
+    }
+};
+const getDefine = (context: Types.Context, name: string): Types.Define =>
+{
+    const namespace = context.namespace.concat();
+    const nameParts = name.split(".");
+
+    namespace.concat(nameParts);
+};
 const isCodeExpression = (value: unknown): value is CodeExpression =>
     null !== value &&
     "object" === typeof value &&
