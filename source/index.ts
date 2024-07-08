@@ -31,18 +31,38 @@ const makeNextContext = (context: Types.Context, name: string): Types.Context =>
     root: context.root,
     namespace: context.namespace.concat([ name, ]),
 });
-const getDefineFromRoot = (root: { [key: string]: Types.DefineOrRefer }, name: string[]): Types.DefineOrRefer | null =>
+const getDefineFromModule = (members: Types.ModuleDefine["members"], name: string[]): Types.DefineOrRefer | null =>
 {
-    const result = root[name[0]] ?? null;
+    const result = members[name[0]] ?? null;
     if (result && 2 <= name.length)
     {
         if (Types.isModuleDefine(result))
         {
-            return getDefineFromRoot(result.members, name.splice(1));
+            return getDefineFromModule(result.members, name.splice(1));
         }
         if (Types.isInterfaceDefine(result))
         {
-            return getDefineFromRoot(result.members, name.splice(1));
+            return getDefineFromInterface(result.members, name.splice(1));
+        }
+        return null;
+    }
+    else
+    {
+        return result;
+    }
+};
+const getDefineFromInterface = (members: Types.InterfaceDefine["members"], name: string[]): Types.DefineOrRefer | null =>
+{
+    const result = members[name[0]] ?? null;
+    if (result && 2 <= name.length)
+    {
+        if (Types.isModuleDefine(result))
+        {
+            return getDefineFromModule(result.members, name.splice(1));
+        }
+        if (Types.isInterfaceDefine(result))
+        {
+            return getDefineFromInterface(result.members, name.splice(1));
         }
         return null;
     }
