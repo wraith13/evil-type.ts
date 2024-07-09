@@ -44,6 +44,7 @@ const getDefineFromModule = (members: Types.ModuleDefine["members"], name: strin
         {
             return getDefineFromInterface(result.members, name.splice(1));
         }
+        console.error(members, name, result);
         return null;
     }
     else
@@ -64,6 +65,7 @@ const getDefineFromInterface = (members: Types.InterfaceDefine["members"], name:
         {
             return getDefineFromInterface(result.members, name.splice(1));
         }
+        console.error(members, name, result);
         return null;
     }
     else
@@ -71,12 +73,21 @@ const getDefineFromInterface = (members: Types.InterfaceDefine["members"], name:
         return result;
     }
 };
-const getDefine = (context: Types.Context, name: string): Types.Define =>
+const getDefine = (context: Types.Context, name: string): Types.DefineOrRefer | null =>
 {
     const namespace = context.namespace.concat();
     const nameParts = name.split(".");
-
-    namespace.concat(nameParts);
+    do
+    {
+        const current = namespace.concat(nameParts);
+        const result = getDefineFromModule(context.root, current);
+        if (null !== result)
+        {
+            return result;
+        }
+    }
+    while(undefined !== namespace.pop());
+    return null;
 };
 const isCodeExpression = (value: unknown): value is CodeExpression =>
     null !== value &&
