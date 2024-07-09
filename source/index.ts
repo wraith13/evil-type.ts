@@ -31,20 +31,20 @@ const makeNextContext = (context: Types.Context, name: string): Types.Context =>
     root: context.root,
     namespace: context.namespace.concat([ name, ]),
 });
-const getDefineFromModule = (members: Types.ModuleDefine["members"], name: string[]): Types.DefineOrRefer | null =>
+const getDefineFromModule = (define: Types.ModuleDefine, name: string[]): Types.DefineOrRefer | null =>
 {
-    const result = members[name[0]] ?? null;
+    const result = define.members[name[0]] ?? null;
     if (result && 2 <= name.length)
     {
         if (Types.isModuleDefine(result))
         {
-            return getDefineFromModule(result.members, name.splice(1));
+            return getDefineFromModule(result, name.splice(1));
         }
         if (Types.isInterfaceDefine(result))
         {
-            return getDefineFromInterface(result.members, name.splice(1));
+            return getDefineFromInterface(result, name.splice(1));
         }
-        console.error(members, name, result);
+        console.error(define, name, result);
         return null;
     }
     else
@@ -52,20 +52,20 @@ const getDefineFromModule = (members: Types.ModuleDefine["members"], name: strin
         return result;
     }
 };
-const getDefineFromInterface = (members: Types.InterfaceDefine["members"], name: string[]): Types.DefineOrRefer | null =>
+const getDefineFromInterface = (define: Types.InterfaceDefine, name: string[]): Types.DefineOrRefer | null =>
 {
-    const result = members[name[0]] ?? null;
+    const result = define.members[name[0]] ?? null;
     if (result && 2 <= name.length)
     {
         if (Types.isModuleDefine(result))
         {
-            return getDefineFromModule(result.members, name.splice(1));
+            return getDefineFromModule(result, name.splice(1));
         }
         if (Types.isInterfaceDefine(result))
         {
-            return getDefineFromInterface(result.members, name.splice(1));
+            return getDefineFromInterface(result, name.splice(1));
         }
-        console.error(members, name, result);
+        console.error(define, name, result);
         return null;
     }
     else
