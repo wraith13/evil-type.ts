@@ -132,10 +132,9 @@ export module Types
         defines: { [key: string]: Define; };
         options: TypeOptions;
     }
-    export type Root = TypeSchema["defines"];
     export interface Context
     {
-        root: Root;
+        root: ModuleDefine;
         namespace: string[];
     }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>

@@ -555,7 +555,11 @@ try
     {
         const context: Types.Context =
         {
-            root: typeSource.defines,
+            root:
+            {
+                $type: "module",
+                members: typeSource.defines,
+            },
             namespace: [],
         };
         const defines = Object.entries(typeSource.defines)
