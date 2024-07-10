@@ -73,9 +73,9 @@ const getDefineFromInterface = (define: Types.InterfaceDefine, name: string[]): 
         return result;
     }
 };
-const getDefine = (context: Types.Context, name: string): Types.DefineOrRefer | null =>
+const getDefineOrRefer = (context: Types.Context, name: string): { context: Types.Context, defineOrRefer: Types.DefineOrRefer, } | null =>
 {
-    const namespace = context.namespace.concat();
+    const namespace = context.namespace.concat([]);
     const nameParts = name.split(".");
     do
     {
@@ -83,10 +83,40 @@ const getDefine = (context: Types.Context, name: string): Types.DefineOrRefer | 
         const result = getDefineFromModule(context.root, current);
         if (null !== result)
         {
-            return result;
+            return {
+                context:
+                {
+                    namespace,
+                    root: context.root,
+                },
+                defineOrRefer: result,
+            };
         }
     }
     while(undefined !== namespace.pop());
+    return null;
+};
+const getDefine = (context: Types.Context, name: string): Types.Define | null =>
+{
+    const current =
+    {
+        context,
+        name,
+    };
+    while(true)
+    {
+        const result = getDefineOrRefer(current.context, current.name);
+        if (null === result)
+        {
+            return null;
+        }
+        if (Types.isDefine(result.defineOrRefer))
+        {
+            return result.defineOrRefer;
+        }
+        current.context = result.context;
+        current.name = result.defineOrRefer.$ref;
+    }
     return null;
 };
 const isCodeExpression = (value: unknown): value is CodeExpression =>
