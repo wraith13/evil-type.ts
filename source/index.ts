@@ -119,6 +119,24 @@ const getDefine = (context: Types.Context, name: string): Types.Define | null =>
     }
     return null;
 };
+const getType = (context: Types.Context, defineOrRefer: Types.DefineOrRefer): Types.Define | null =>
+{
+    if (Types.isValueDefine(defineOrRefer))
+    {
+        return null;
+        //return "typeof"...;
+    }
+    if (Types.isRefer(defineOrRefer))
+    {
+        const define = getDefine(context, defineOrRefer.$ref);
+        if (Types.isDefineOrRefer(define))
+        {
+            return getType(context, define);
+        }
+        return null;
+    }
+    return defineOrRefer;
+};
 const isCodeExpression = (value: unknown): value is CodeExpression =>
     null !== value &&
     "object" === typeof value &&
