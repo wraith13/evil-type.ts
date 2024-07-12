@@ -14,7 +14,11 @@
             "$type": "interface",
             "members":
             {
-                "$ref": { "$ref": "schema" },
+                "$ref":
+                {
+                    "$type": "typeof",
+                    "value": { "$ref": "schema" }
+                },
                 "defines":
                 {
                     "$type": "interface",

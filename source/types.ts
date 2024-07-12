@@ -132,11 +132,6 @@ export module Types
         defines: { [key: string]: Define; };
         options: TypeOptions;
     }
-    export interface Context
-    {
-        root: ModuleDefine;
-        namespace: string[];
-    }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
         isSpecificObject<TypeSchema>
         ({
@@ -191,6 +186,21 @@ export module Types
             getAlphaDefineSpecification<ValueDefine>("value"),
             {
                 "value": isJsonable,
+            },
+        )
+    )(value);
+    export interface TypeofDefine extends AlphaDefine
+    {
+        $type: "typeof";
+        value: ValueDefine | Refer;
+    }
+    export const isTypeofDefine = (value: unknown): value is TypeofDefine =>isSpecificObject<TypeofDefine>
+    (
+        Object.assign
+        (
+            getAlphaDefineSpecification<TypeofDefine>("typeof"),
+            {
+                "value": isOr(isValueDefine, isRefer),
             },
         )
     )(value);
@@ -302,7 +312,7 @@ export module Types
             }
         )
     )(value);
-    export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
+    export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | TypeofDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     export type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
     export type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
     export const isTypeOrInterface = isOr(isPrimitiveTypeDefine, isTypeDefine, isInterfaceDefine, isArrayDefine, isOrDefine, isAndDefine);
