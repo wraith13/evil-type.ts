@@ -175,7 +175,7 @@ export module Build
         declarator: $expression("module"),
         //define: Define.buildDefineModuleCore(define),
     });
-    export const getBuilder = (define: Types.Define): Builder =>
+    export const getBuilder = (define: Exclude<Types.Define, Types.TypeofDefine>): Builder =>
     {
         switch(define.$type)
         {
@@ -197,7 +197,7 @@ export module Build
             return makeModuleBuilder(define);
         }
     };
-    export const getValidator = (define: Exclude<Types.Define, Types.ModuleDefine>) =>
+    export const getValidator = (define: Exclude<Types.Define, Types.ModuleDefine | Types.TypeofDefine>) =>
         getBuilder(define).validator as Required<Builder>["validator"];
     export module Define
     {
@@ -296,7 +296,7 @@ export module Build
             const lines = buildDefineModuleCore(value);
             return $block(header, lines);
         };
-        export const buildDefine = (name: string, define: Types.Define): CodeEntry =>
+        export const buildDefine = (name: string, define: Exclude<Types.Define, Types.TypeofDefine>): CodeEntry =>
         {
             switch(define.$type)
             {
@@ -313,6 +313,11 @@ export module Build
             if (Types.isRefer(define))
             {
                 return [ $expression(define.$ref), ];
+            }
+            else
+            if (Types.isTypeofDefine(define))
+            {
+                return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat(buildInlineDefine(define.value));
             }
             else
             {
@@ -383,9 +388,9 @@ export module Build
             buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define))]);
         export const buildValidatorName = (name: string) =>
             Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).filter(i => "" !== i).join(".");
-        export const buildValidatorExpression = (name: string, define: Exclude<Types.DefineOrRefer, Types.ModuleDefine>) =>
-            Types.isRefer(define) ?
-                [$expression(`${buildValidatorName(define.$ref)}(${name})`)]:
+        export const buildValidatorExpression = (name: string, define: Exclude<Types.DefineOrRefer, Types.ModuleDefine>): CodeInlineEntry[] =>
+            Types.isRefer(define) ? [$expression(`${buildValidatorName(define.$ref)}(${name})`)]:
+            Types.isTypeofDefine(define) ? buildValidatorExpression(name, define.value):
                 getValidator(define)(name);
         export const buildInterfaceValidator = (name: string, define: Types.InterfaceDefine): CodeExpression[] =>
         {

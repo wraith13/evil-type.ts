@@ -103,6 +103,9 @@ var Types;
     Types.isValueDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("value"), {
         "value": Types.isJsonable,
     }))(value); };
+    Types.isTypeofDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("typeof"), {
+        "value": Types.isOr(Types.isValueDefine, Types.isRefer),
+    }))(value); };
     Types.PrimitiveTypeMembers = ["undefined", "boolean", "number", "string"];
     Types.isPrimitiveType = Types.isEnum(Types.PrimitiveTypeMembers);
     Types.isPrimitiveTypeDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("primitive-type"), {

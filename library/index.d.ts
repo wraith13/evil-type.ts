@@ -24,7 +24,6 @@ interface CodeBlock extends Code {
 type CodeEntry = CodeInlineBlock | CodeLine | CodeBlock;
 interface Builder {
     declarator: CodeExpression;
-    define: CodeInlineEntry | CodeInlineEntry[] | CodeEntry[];
     validator?: (name: string) => CodeInlineEntry[];
 }
 export declare const $expression: (expression: CodeExpression["expression"]) => CodeExpression;
@@ -42,12 +41,12 @@ export declare namespace Build {
     const makeAndTypeBuilder: (define: Types.AndDefine) => Builder;
     const makeOrTypeBuilder: (define: Types.OrDefine) => Builder;
     const makeInterfaceBuilder: (define: Types.InterfaceDefine) => Builder;
-    const makeModuleBuilder: (define: Types.ModuleDefine) => Builder;
-    const getBuilder: (define: Types.Define) => Builder;
-    const getValidator: (define: Exclude<Types.Define, Types.ModuleDefine>) => (name: string) => CodeInlineEntry[];
+    const makeModuleBuilder: (_define: Types.ModuleDefine) => Builder;
+    const getBuilder: (define: Exclude<Types.Define, Types.TypeofDefine>) => Builder;
+    const getValidator: (define: Exclude<Types.Define, Types.ModuleDefine | Types.TypeofDefine>) => (name: string) => CodeInlineEntry[];
     namespace Define {
         const buildDefineLine: (declarator: string, name: string, define: Types.ValueOrTypeOfInterface) => CodeLine;
-        const buildInlineDefineValue: (value: Types.ValueDefine) => CodeExpression;
+        const buildInlineDefineValue: (define: Types.ValueDefine) => CodeExpression[];
         const buildDefineValue: (name: string, value: Types.ValueDefine) => CodeLine;
         const buildInlineDefinePrimitiveType: (value: Types.PrimitiveTypeDefine) => CodeExpression;
         const buildDefinePrimitiveType: (name: string, value: Types.PrimitiveTypeDefine) => CodeLine;
@@ -61,7 +60,7 @@ export declare namespace Build {
         const buildDefineInterface: (name: string, value: Types.InterfaceDefine) => CodeBlock;
         const buildDefineModuleCore: (value: Types.ModuleDefine) => CodeEntry[];
         const buildDefineModule: (name: string, value: Types.ModuleDefine) => CodeBlock;
-        const buildDefine: (name: string, define: Types.Define) => CodeEntry;
+        const buildDefine: (name: string, define: Exclude<Types.Define, Types.TypeofDefine>) => CodeEntry;
         const buildInlineDefine: (define: Types.ValueOrTypeOfInterfaceOrRefer) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {

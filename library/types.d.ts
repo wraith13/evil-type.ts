@@ -63,7 +63,7 @@ export declare namespace Types {
     interface TypeSchema {
         $ref: typeof schema;
         defines: {
-            [key: string]: Define;
+            [key: string]: Exclude<Define, TypeofDefine>;
         };
         options: TypeOptions;
     }
@@ -93,6 +93,11 @@ export declare namespace Types {
         value: Jsonable;
     }
     const isValueDefine: (value: unknown) => value is ValueDefine;
+    interface TypeofDefine extends AlphaDefine {
+        $type: "typeof";
+        value: ValueDefine | Refer;
+    }
+    const isTypeofDefine: (value: unknown) => value is TypeofDefine;
     const PrimitiveTypeMembers: readonly ["undefined", "boolean", "number", "string"];
     type PrimitiveType = typeof PrimitiveTypeMembers[number];
     const isPrimitiveType: (value: unknown) => value is "string" | "number" | "boolean" | "undefined";
@@ -133,7 +138,7 @@ export declare namespace Types {
         types: TypeOrInterfaceOrRefer[];
     }
     const isAndDefine: (value: unknown) => value is AndDefine;
-    type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
+    type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | TypeofDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
     type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
     const isTypeOrInterface: (value: unknown) => value is PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;

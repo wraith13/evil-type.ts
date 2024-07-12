@@ -129,7 +129,7 @@ export module Types
     export interface TypeSchema
     {
         $ref: typeof schema;
-        defines: { [key: string]: Define; };
+        defines: { [key: string]: Exclude<Define, TypeofDefine>; };
         options: TypeOptions;
     }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
