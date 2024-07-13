@@ -492,7 +492,8 @@ try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
-    const typeSource = JSON.parse(fget(jsonPath));
+    const rawSource = fget(jsonPath);
+    const typeSource = JSON.parse(rawSource);
     if (Types.isTypeSchema(typeSource))
     {
         const defines = Object.entries(typeSource.defines)
@@ -510,7 +511,7 @@ try
     }
     else
     {
-        console.error("Invalid TypeSchema", typeSource);
+        console.error("Invalid TypeSchema", rawSource);
     }
 }
 catch(error)

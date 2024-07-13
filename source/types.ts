@@ -136,7 +136,7 @@ export module Types
         isSpecificObject<TypeSchema>
         ({
             "$ref": isJust(schema),
-            "defines": isDictionaryObject(isDefine),
+            "defines": isDictionaryObject(isOr(isModuleDefine, isValueDefine, isTypeOrInterface)),
             "options": isTypeOptions
         })
         (value);
@@ -179,7 +179,7 @@ export module Types
         $type: "value";
         value: Jsonable;
     }
-    export const isValueDefine = (value: unknown): value is ValueDefine =>isSpecificObject<ValueDefine>
+    export const isValueDefine = (value: unknown): value is ValueDefine => isSpecificObject<ValueDefine>
     (
         Object.assign
         (
@@ -194,7 +194,7 @@ export module Types
         $type: "typeof";
         value: ValueDefine | Refer;
     }
-    export const isTypeofDefine = (value: unknown): value is TypeofDefine =>isSpecificObject<TypeofDefine>
+    export const isTypeofDefine = (value: unknown): value is TypeofDefine => isSpecificObject<TypeofDefine>
     (
         Object.assign
         (
@@ -315,11 +315,11 @@ export module Types
     export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | TypeofDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     export type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
     export type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
-    export const isTypeOrInterface = isOr(isPrimitiveTypeDefine, isTypeDefine, isInterfaceDefine, isArrayDefine, isOrDefine, isAndDefine);
+    export const isTypeOrInterface = isOr(isPrimitiveTypeDefine, isTypeDefine, isTypeofDefine, isInterfaceDefine, isArrayDefine, isOrDefine, isAndDefine);
     export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
     export const isTypeOrInterfaceOrRefer = isOr(isTypeOrInterface, isRefer);
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;
-    export const isDefine = isOr(isModuleDefine, isValueDefine, isTypeOrInterface);
+    export const isDefine = isOr(isModuleDefine, isValueDefine, isTypeofDefine, isTypeOrInterface);
     export type DefineOrRefer = Define | Refer;
     export const isDefineOrRefer = (value: unknown): value is DefineOrRefer =>
         isDefine(value) || isRefer(value);
