@@ -149,10 +149,13 @@ export module Types
     ({
         "$ref": isString,
     });
-    export interface AlphaDefine
+    export interface AlphaType
+    {
+        $type: string;
+    }
+    export interface AlphaDefine extends AlphaType
     {
         export?: boolean;
-        $type: string;
     }
     export const getAlphaDefineSpecification = <T extends AlphaDefine>($type: T["$type"]) =>
     ({
