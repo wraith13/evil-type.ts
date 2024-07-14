@@ -182,6 +182,16 @@ export module Types
         $type: "literal";
         literal: Jsonable;
     }
+    export const isLiteral = (value: unknown): value is Literal => isSpecificObject<Literal>
+    (
+        Object.assign
+        (
+            getAlphaDefineSpecification<Literal>("literal"),
+            {
+                "literal": isJsonable,
+            },
+        )
+    )(value);
     export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
@@ -193,7 +203,7 @@ export module Types
         (
             getAlphaDefineSpecification<ValueDefine>("value"),
             {
-                "value": isJsonable,
+                "value": isOr(isLiteral, isRefer),
             },
         )
     )(value);

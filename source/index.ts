@@ -364,10 +364,8 @@ export module Build
                     (
                         key =>
                         {
-                            {
-                                list.push($expression(`"${key}" in ${name}`));
-                                list.push(...buildValueValidatorExpression(`${name}.${key}`, value[key]));
-                            }
+                            list.push($expression(`"${key}" in ${name}`));
+                            list.push(...buildValueValidatorExpression(`${name}.${key}`, value[key]));
                         }
                     );
                     return kindofJoinExpression(list, $expression("&&"));
@@ -401,10 +399,8 @@ export module Build
             (
                 key =>
                 {
-                    {
-                        list.push($expression(`"${key}" in ${name}`));
-                        list.push(...convertToExpression(buildValidatorExpression(`${name}.${key}`, define.members[key])));
-                    }
+                    list.push($expression(`"${key}" in ${name}`));
+                    list.push(...convertToExpression(buildValidatorExpression(`${name}.${key}`, define.members[key])));
                 }
             );
             return kindofJoinExpression(list, $expression("&&"));
