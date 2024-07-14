@@ -149,11 +149,11 @@ export module Types
     ({
         "$ref": isString,
     });
-    export interface AlphaType
+    export interface Alpha
     {
         $type: string;
     }
-    export interface AlphaDefine extends AlphaType
+    export interface AlphaDefine extends Alpha
     {
         export?: boolean;
     }
@@ -177,10 +177,15 @@ export module Types
             }
         )
     )(value);
+    export interface Literal extends Alpha
+    {
+        $type: "literal";
+        literal: Jsonable;
+    }
     export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
-        value: Jsonable;
+        value: Literal | Refer;
     }
     export const isValueDefine = (value: unknown): value is ValueDefine => isSpecificObject<ValueDefine>
     (
