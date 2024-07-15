@@ -129,7 +129,7 @@ export module Types
     export interface TypeSchema
     {
         $ref: typeof schema;
-        defines: { [key: string]: Exclude<Define, TypeofDefine>; };
+        defines: { [key: string]: Exclude<Define, Typeof>; };
         options: TypeOptions;
     }
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
@@ -157,183 +157,137 @@ export module Types
     {
         export?: boolean;
     }
-    export const getAlphaDefineSpecification = <T extends AlphaDefine>($type: T["$type"]) =>
-    ({
-        export: makeOptionalKeyTypeGuard(isBoolean),
-        "$type": isJust($type),
-    });
     export interface ModuleDefine extends AlphaDefine
     {
         $type: "module";
         members: { [key: string]: Define; };
     }
     export const isModuleDefine = (value: unknown): value is ModuleDefine => isSpecificObject<ModuleDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<ModuleDefine>("module"),
-            {
-                "members": isDictionaryObject(isDefine),
-            }
-        )
-    )(value);
+    ({
+        export: makeOptionalKeyTypeGuard(isBoolean),
+        $type: isJust("module"),
+        members: isDictionaryObject(isDefine),
+    })
+    (value);
     export interface Literal extends Alpha
     {
         $type: "literal";
         literal: Jsonable;
     }
     export const isLiteral = (value: unknown): value is Literal => isSpecificObject<Literal>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<Literal>("literal"),
-            {
-                "literal": isJsonable,
-            },
-        )
-    )(value);
+    ({
+        $type: isJust("literal"),
+        literal: isJsonable,
+    })
+    (value);
     export interface ValueDefine extends AlphaDefine
     {
         $type: "value";
         value: Literal | Refer;
     }
     export const isValueDefine = (value: unknown): value is ValueDefine => isSpecificObject<ValueDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<ValueDefine>("value"),
-            {
-                "value": isOr(isLiteral, isRefer),
-            },
-        )
-    )(value);
-    export interface TypeofDefine extends AlphaDefine
+    ({
+        export: makeOptionalKeyTypeGuard(isBoolean),
+        $type: isJust("value"),
+        value: isOr(isLiteral, isRefer),
+    })
+    (value);
+    export interface Typeof extends Alpha
     {
         $type: "typeof";
         value: ValueDefine | Refer;
     }
-    export const isTypeofDefine = (value: unknown): value is TypeofDefine => isSpecificObject<TypeofDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<TypeofDefine>("typeof"),
-            {
-                "value": isOr(isValueDefine, isRefer),
-            },
-        )
-    )(value);
-    export const PrimitiveTypeMembers = ["undefined", "boolean", "number", "string"] as const;
-    export type PrimitiveType = typeof PrimitiveTypeMembers[number];
-    export const isPrimitiveType = isEnum(PrimitiveTypeMembers);
-    export interface PrimitiveTypeDefine extends AlphaDefine
+    export const isTypeofDefine = (value: unknown): value is Typeof => isSpecificObject<Typeof>
+    ({
+        $type: isJust("typeof"),
+        value: isOr(isValueDefine, isRefer),
+    })(value);
+    export const PrimitiveTypeEnumMembers = ["undefined", "boolean", "number", "string"] as const;
+    export type PrimitiveTypeEnum = typeof PrimitiveTypeEnumMembers[number];
+    export const isPrimitiveTypeEnum = isEnum(PrimitiveTypeEnumMembers);
+    export interface PrimitiveType extends Alpha
     {
         $type: "primitive-type";
-        define: PrimitiveType;
+        type: PrimitiveTypeEnum;
     }
-    export const isPrimitiveTypeDefine = (value: unknown): value is PrimitiveTypeDefine => isSpecificObject<PrimitiveTypeDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<PrimitiveTypeDefine>("primitive-type"),
-            {
-                "define": isPrimitiveType,
-            }
-        )
-    )(value);
+    export const isPrimitiveType = (value: unknown): value is PrimitiveType => isSpecificObject<PrimitiveType>
+    ({
+        $type: isJust("primitive-type"),
+        type: isPrimitiveTypeEnum,
+    })
+    (value);
     export interface TypeDefine extends AlphaDefine
     {
         $type: "type";
         define: TypeOrInterfaceOrRefer;
     }
     export const isTypeDefine = (value: unknown): value is TypeDefine => isSpecificObject<TypeDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<TypeDefine>("type"),
-            {
-                "define": isTypeOrInterfaceOrRefer,
-            }
-        )
-    )(value);
+    ({
+        export: makeOptionalKeyTypeGuard(isBoolean),
+        $type: isJust("type"),
+        define: isTypeOrInterfaceOrRefer,
+    })
+    (value);
     export interface InterfaceDefine extends AlphaDefine
     {
         $type: "interface";
         members: { [key: string]: TypeOrInterfaceOrRefer; };
     }
     export const isInterfaceDefine = (value: unknown): value is InterfaceDefine => isSpecificObject<InterfaceDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<InterfaceDefine>("interface"),
-            {
-                "members": isDictionaryObject(isTypeOrInterfaceOrRefer),
-            }
-        )
-    )(value);
-    export interface DictionaryDefine extends AlphaDefine
+    ({
+        export: makeOptionalKeyTypeGuard(isBoolean),
+        $type: isJust("interface"),
+        members: isDictionaryObject(isTypeOrInterfaceOrRefer),
+    })
+    (value);
+    export interface Dictionary extends Alpha
     {
         $type: "dictionary";
         members: TypeOrInterfaceOrRefer;
     }
-    export const isDictionaryDefine = (value: unknown): value is DictionaryDefine => isSpecificObject<DictionaryDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<DictionaryDefine>("dictionary"),
-            {
-                "members": isTypeOrInterfaceOrRefer,
-            }
-        )
-    )(value);
-    export interface ArrayDefine extends AlphaDefine
+    export const isDictionary = (value: unknown): value is Dictionary => isSpecificObject<Dictionary>
+    ({
+        $type: isJust("dictionary"),
+        members: isTypeOrInterfaceOrRefer,
+    })
+    (value);
+    export interface ArrayDefine extends Alpha
     {
         $type: "array";
         items: TypeOrInterfaceOrRefer;
     }
     export const isArrayDefine = (value: unknown): value is ArrayDefine => isSpecificObject<ArrayDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<ArrayDefine>("array"),
-            {
-                "items": isTypeOrInterfaceOrRefer,
-            }
-        )
-    )(value);
-    export interface OrDefine extends AlphaDefine
+    ({
+        $type: isJust("array"),
+        items: isTypeOrInterfaceOrRefer,
+    })
+    (value);
+    export interface OrDefine extends Alpha
     {
         $type: "or";
         types: TypeOrInterfaceOrRefer[];
     }
     export const isOrDefine = (value: unknown): value is OrDefine => isSpecificObject<OrDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<OrDefine>("or"),
-            {
-                "types": isArray(isTypeOrInterfaceOrRefer),
-            }
-        )
-    )(value);
-    export interface AndDefine extends AlphaDefine
+    ({
+        $type: isJust("or"),
+        types: isArray(isTypeOrInterfaceOrRefer),
+    })
+    (value);
+    export interface AndDefine extends Alpha
     {
         $type: "and";
         types: TypeOrInterfaceOrRefer[];
     }
     export const isAndDefine = (value: unknown): value is AndDefine => isSpecificObject<AndDefine>
-    (
-        Object.assign
-        (
-            getAlphaDefineSpecification<AndDefine>("and"),
-            {
-                "types": isArray(isTypeOrInterfaceOrRefer),
-            }
-        )
-    )(value);
-    export type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | TypeofDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
+    ({
+        $type: isJust("and"),
+        types: isArray(isTypeOrInterfaceOrRefer),
+    })
+    (value);
+    export type TypeOrInterface = PrimitiveType | TypeDefine | Typeof | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
     export type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
     export type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
-    export const isTypeOrInterface = isOr(isPrimitiveTypeDefine, isTypeDefine, isTypeofDefine, isInterfaceDefine, isArrayDefine, isOrDefine, isAndDefine);
+    export const isTypeOrInterface = isOr(isPrimitiveType, isTypeDefine, isTypeofDefine, isInterfaceDefine, isArrayDefine, isOrDefine, isAndDefine);
     export type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
     export const isTypeOrInterfaceOrRefer = isOr(isTypeOrInterface, isRefer);
     export type Define = ModuleDefine | ValueDefine | TypeOrInterface;

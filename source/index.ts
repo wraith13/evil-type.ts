@@ -116,7 +116,7 @@ export module Build
         //define: [$expression(JSON.stringify(define.value)), $expression("as"), $expression("const")],
         validator: (name: string) => Validator.buildValueValidatorExpression(name, define.value),
     });
-    export const makePrimitiveTypeBuilder = (define: Types.PrimitiveTypeDefine): Builder =>
+    export const makePrimitiveTypeBuilder = (define: Types.PrimitiveType): Builder =>
     ({
         declarator: $expression("const"),
         //define: [$expression(JSON.stringify(define.define))],
@@ -175,7 +175,7 @@ export module Build
         declarator: $expression("module"),
         //define: Define.buildDefineModuleCore(define),
     });
-    export const getBuilder = (define: Exclude<Types.Define, Types.TypeofDefine>): Builder =>
+    export const getBuilder = (define: Exclude<Types.Define, Types.Typeof>): Builder =>
     {
         switch(define.$type)
         {
@@ -197,7 +197,7 @@ export module Build
             return makeModuleBuilder(define);
         }
     };
-    export const getValidator = (define: Exclude<Types.Define, Types.ModuleDefine | Types.TypeofDefine>) =>
+    export const getValidator = (define: Exclude<Types.Define, Types.ModuleDefine | Types.Typeof>) =>
         getBuilder(define).validator as Required<Builder>["validator"];
     export module Define
     {
@@ -208,9 +208,9 @@ export module Build
             buildDefineLine("const", name, value);
         //export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
         //    Validator.buildValidatorLine("const", name, value);
-        export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeDefine) =>
-            $expression(value.define);
-        export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeDefine): CodeLine =>
+        export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveType) =>
+            $expression(value.type);
+        export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveType): CodeLine =>
             buildDefineLine("type", name, value);
         export const enParenthesis = <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) =>
             [ $expression("("), ...expressions, $expression(")"), ];
@@ -296,7 +296,7 @@ export module Build
             const lines = buildDefineModuleCore(value);
             return $block(header, lines);
         };
-        export const buildDefine = (name: string, define: Exclude<Types.Define, Types.TypeofDefine>): CodeEntry =>
+        export const buildDefine = (name: string, define: Exclude<Types.Define, Types.Typeof>): CodeEntry =>
         {
             switch(define.$type)
             {
