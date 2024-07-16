@@ -84,56 +84,68 @@ var Types;
     Types.isTypeSchema = function (value) {
         return Types.isSpecificObject({
             "$ref": Types.isJust(Types.schema),
-            "defines": Types.isDictionaryObject(Types.isDefine),
+            "defines": Types.isDictionaryObject(Types.isDefinition),
             "options": Types.isTypeOptions
         })(value);
     };
-    Types.isRefer = Types.isSpecificObject({
+    Types.isReferElement = Types.isSpecificObject({
         "$ref": Types.isString,
     });
-    Types.getAlphaDefineSpecification = function ($type) {
-        return ({
-            export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
-            "$type": Types.isJust($type),
-        });
-    };
-    Types.isModuleDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("module"), {
-        "members": Types.isDictionaryObject(Types.isDefine),
-    }))(value); };
-    Types.isValueDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("value"), {
-        "value": Types.isJsonable,
-    }))(value); };
-    Types.isTypeofDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("typeof"), {
-        "value": Types.isOr(Types.isValueDefine, Types.isRefer),
-    }))(value); };
-    Types.PrimitiveTypeMembers = ["undefined", "boolean", "number", "string"];
-    Types.isPrimitiveType = Types.isEnum(Types.PrimitiveTypeMembers);
-    Types.isPrimitiveTypeDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("primitive-type"), {
-        "define": Types.isPrimitiveType,
-    }))(value); };
-    Types.isTypeDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("type"), {
-        "define": Types.isTypeOrInterfaceOrRefer,
-    }))(value); };
-    Types.isInterfaceDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("interface"), {
-        "members": Types.isDictionaryObject(Types.isTypeOrInterfaceOrRefer),
-    }))(value); };
-    Types.isDictionaryDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("dictionary"), {
-        "members": Types.isTypeOrInterfaceOrRefer,
-    }))(value); };
-    Types.isArrayDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("array"), {
-        "items": Types.isTypeOrInterfaceOrRefer,
-    }))(value); };
-    Types.isOrDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("or"), {
-        "types": Types.isArray(Types.isTypeOrInterfaceOrRefer),
-    }))(value); };
-    Types.isAndDefine = function (value) { return Types.isSpecificObject(Object.assign(Types.getAlphaDefineSpecification("and"), {
-        "types": Types.isArray(Types.isTypeOrInterfaceOrRefer),
-    }))(value); };
-    Types.isTypeOrInterface = Types.isOr(Types.isPrimitiveTypeDefine, Types.isTypeDefine, Types.isInterfaceDefine, Types.isArrayDefine, Types.isOrDefine, Types.isAndDefine);
-    Types.isTypeOrInterfaceOrRefer = Types.isOr(Types.isTypeOrInterface, Types.isRefer);
-    Types.isDefine = Types.isOr(Types.isModuleDefine, Types.isValueDefine, Types.isTypeOrInterface);
+    Types.isModuleDefinition = function (value) { return Types.isSpecificObject({
+        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
+        $type: Types.isJust("module"),
+        members: Types.isDictionaryObject(Types.isDefinition),
+    })(value); };
+    Types.isLiteralElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("literal"),
+        literal: Types.isJsonable,
+    })(value); };
+    Types.isValueDefinition = function (value) { return Types.isSpecificObject({
+        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
+        $type: Types.isJust("value"),
+        value: Types.isOr(Types.isLiteralElement, Types.isReferElement),
+    })(value); };
+    Types.isTypeofElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("typeof"),
+        value: Types.isReferElement,
+    })(value); };
+    Types.PrimitiveTypeEnumMembers = ["undefined", "boolean", "number", "string"];
+    Types.isPrimitiveTypeEnum = Types.isEnum(Types.PrimitiveTypeEnumMembers);
+    Types.isPrimitiveTypeElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("primitive-type"),
+        type: Types.isPrimitiveTypeEnum,
+    })(value); };
+    Types.isTypeDefinition = function (value) { return Types.isSpecificObject({
+        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
+        $type: Types.isJust("type"),
+        define: Types.isTypeOrRefer,
+    })(value); };
+    Types.isInterfaceDefinition = function (value) { return Types.isSpecificObject({
+        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
+        $type: Types.isJust("interface"),
+        members: Types.isDictionaryObject(Types.isTypeOrRefer),
+    })(value); };
+    Types.isDictionaryElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("dictionary"),
+        members: Types.isTypeOrRefer,
+    })(value); };
+    Types.isArrayElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("array"),
+        items: Types.isTypeOrRefer,
+    })(value); };
+    Types.isOrElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("or"),
+        types: Types.isArray(Types.isTypeOrRefer),
+    })(value); };
+    Types.isAndElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("and"),
+        types: Types.isArray(Types.isTypeOrRefer),
+    })(value); };
+    Types.isType = Types.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isTypeofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement);
+    Types.isTypeOrRefer = Types.isOr(Types.isType, Types.isReferElement);
+    Types.isDefinition = Types.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);
     Types.isDefineOrRefer = function (value) {
-        return Types.isDefine(value) || Types.isRefer(value);
+        return Types.isDefinition(value) || Types.isReferElement(value);
     };
 })(Types || (exports.Types = Types = {}));
 //# sourceMappingURL=types.js.map

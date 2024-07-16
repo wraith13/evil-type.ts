@@ -222,6 +222,11 @@ export module Build
                 return [ $expression(define.$ref), ];
             }
             else
+            if (Types.isLiteralElement(define))
+            {
+                return buildInlineDefineLiteral(define);
+            }
+            else
             if (Types.isTypeofElement(define))
             {
                 return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat(buildInlineDefine(define.value));
@@ -231,7 +236,7 @@ export module Build
                 switch(define.$type)
                 {
                 case "value":
-                    return buildInlineDefineLiteral(define);
+                    return buildInlineDefine(define.value);
                 case "primitive-type":
                     return [ buildInlineDefinePrimitiveType(define), ];
                 case "type":

@@ -63,89 +63,92 @@ export declare namespace Types {
     interface TypeSchema {
         $ref: typeof schema;
         defines: {
-            [key: string]: Exclude<Define, TypeofDefine>;
+            [key: string]: Definition;
         };
         options: TypeOptions;
     }
     const isTypeSchema: (value: unknown) => value is TypeSchema;
     type FilePath = string;
-    interface Refer {
+    interface ReferElement {
         $ref: string;
     }
-    const isRefer: (value: unknown) => value is Refer;
-    interface AlphaDefine {
-        export?: boolean;
+    const isReferElement: (value: unknown) => value is ReferElement;
+    interface AlphaElement {
         $type: string;
     }
-    const getAlphaDefineSpecification: <T extends AlphaDefine>($type: T["$type"]) => {
-        export: OptionalKeyTypeGuard<boolean>;
-        $type: (value: unknown) => value is T["$type"];
-    };
-    interface ModuleDefine extends AlphaDefine {
+    interface AlphaDefinition extends AlphaElement {
+        export?: boolean;
+    }
+    interface ModuleDefinition extends AlphaDefinition {
         $type: "module";
         members: {
-            [key: string]: Define;
+            [key: string]: Definition;
         };
     }
-    const isModuleDefine: (value: unknown) => value is ModuleDefine;
-    interface ValueDefine extends AlphaDefine {
+    const isModuleDefinition: (value: unknown) => value is ModuleDefinition;
+    interface LiteralElement extends AlphaElement {
+        $type: "literal";
+        literal: Jsonable;
+    }
+    const isLiteralElement: (value: unknown) => value is LiteralElement;
+    interface ValueDefinition extends AlphaDefinition {
         $type: "value";
-        value: Jsonable;
+        value: LiteralElement | ReferElement;
     }
-    const isValueDefine: (value: unknown) => value is ValueDefine;
-    interface TypeofDefine extends AlphaDefine {
+    const isValueDefinition: (value: unknown) => value is ValueDefinition;
+    interface TypeofElement extends AlphaElement {
         $type: "typeof";
-        value: ValueDefine | Refer;
+        value: ReferElement;
     }
-    const isTypeofDefine: (value: unknown) => value is TypeofDefine;
-    const PrimitiveTypeMembers: readonly ["undefined", "boolean", "number", "string"];
-    type PrimitiveType = typeof PrimitiveTypeMembers[number];
-    const isPrimitiveType: (value: unknown) => value is "string" | "number" | "boolean" | "undefined";
-    interface PrimitiveTypeDefine extends AlphaDefine {
+    const isTypeofElement: (value: unknown) => value is TypeofElement;
+    const PrimitiveTypeEnumMembers: readonly ["undefined", "boolean", "number", "string"];
+    type PrimitiveTypeEnum = typeof PrimitiveTypeEnumMembers[number];
+    const isPrimitiveTypeEnum: (value: unknown) => value is "string" | "number" | "boolean" | "undefined";
+    interface PrimitiveTypeElement extends AlphaElement {
         $type: "primitive-type";
-        define: PrimitiveType;
+        type: PrimitiveTypeEnum;
     }
-    const isPrimitiveTypeDefine: (value: unknown) => value is PrimitiveTypeDefine;
-    interface TypeDefine extends AlphaDefine {
+    const isPrimitiveTypeElement: (value: unknown) => value is PrimitiveTypeElement;
+    interface TypeDefinition extends AlphaDefinition {
         $type: "type";
         define: TypeOrInterfaceOrRefer;
     }
-    const isTypeDefine: (value: unknown) => value is TypeDefine;
-    interface InterfaceDefine extends AlphaDefine {
+    const isTypeDefinition: (value: unknown) => value is TypeDefinition;
+    interface InterfaceDefinition extends AlphaDefinition {
         $type: "interface";
         members: {
             [key: string]: TypeOrInterfaceOrRefer;
         };
     }
-    const isInterfaceDefine: (value: unknown) => value is InterfaceDefine;
-    interface DictionaryDefine extends AlphaDefine {
+    const isInterfaceDefinition: (value: unknown) => value is InterfaceDefinition;
+    interface DictionaryElement extends AlphaElement {
         $type: "dictionary";
         members: TypeOrInterfaceOrRefer;
     }
-    const isDictionaryDefine: (value: unknown) => value is DictionaryDefine;
-    interface ArrayDefine extends AlphaDefine {
+    const isDictionaryElement: (value: unknown) => value is DictionaryElement;
+    interface ArrayElement extends AlphaElement {
         $type: "array";
         items: TypeOrInterfaceOrRefer;
     }
-    const isArrayDefine: (value: unknown) => value is ArrayDefine;
-    interface OrDefine extends AlphaDefine {
+    const isArrayElement: (value: unknown) => value is ArrayElement;
+    interface OrElement extends AlphaElement {
         $type: "or";
         types: TypeOrInterfaceOrRefer[];
     }
-    const isOrDefine: (value: unknown) => value is OrDefine;
-    interface AndDefine extends AlphaDefine {
+    const isOrElement: (value: unknown) => value is OrElement;
+    interface AndElement extends AlphaElement {
         $type: "and";
         types: TypeOrInterfaceOrRefer[];
     }
-    const isAndDefine: (value: unknown) => value is AndDefine;
-    type TypeOrInterface = PrimitiveTypeDefine | TypeDefine | TypeofDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
-    type ValueOrTypeOfInterface = ValueDefine | TypeOrInterface;
-    type ValueOrTypeOfInterfaceOrRefer = ValueOrTypeOfInterface | Refer;
-    const isTypeOrInterface: (value: unknown) => value is PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
-    type TypeOrInterfaceOrRefer = TypeOrInterface | Refer;
-    const isTypeOrInterfaceOrRefer: (value: unknown) => value is PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine | Refer;
-    type Define = ModuleDefine | ValueDefine | TypeOrInterface;
-    const isDefine: (value: unknown) => value is ModuleDefine | ValueDefine | PrimitiveTypeDefine | TypeDefine | InterfaceDefine | ArrayDefine | OrDefine | AndDefine;
-    type DefineOrRefer = Define | Refer;
+    const isAndElement: (value: unknown) => value is AndElement;
+    type Type = PrimitiveTypeElement | TypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement;
+    type ValueOrType = ValueDefinition | Type | LiteralElement;
+    type ValueOrTypeOfRefer = ValueOrType | ReferElement;
+    const isType: (value: unknown) => value is TypeDefinition | InterfaceDefinition | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
+    type TypeOrInterfaceOrRefer = Type | ReferElement;
+    const isTypeOrRefer: (value: unknown) => value is TypeDefinition | InterfaceDefinition | ReferElement | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
+    type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    const isDefinition: (value: unknown) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    type DefineOrRefer = Definition | ReferElement;
     const isDefineOrRefer: (value: unknown) => value is DefineOrRefer;
 }
