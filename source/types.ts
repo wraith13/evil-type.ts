@@ -285,13 +285,13 @@ export module Types
     })
     (value);
     export type Type = PrimitiveTypeElement | TypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement;
-    export type ValueOrType = ValueDefinition | Type;
+    export type ValueOrType = ValueDefinition | Type | LiteralElement;
     export type ValueOrTypeOfRefer = ValueOrType | ReferElement;
     export const isType = isOr(isPrimitiveTypeElement, isTypeDefinition, isTypeofElement, isInterfaceDefinition, isArrayElement, isOrElement, isAndElement);
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
     export const isTypeOrRefer = isOr(isType, isReferElement);
-    export type Definition = ModuleDefinition | ValueDefinition | Type;
-    export const isDefinition = isOr(isModuleDefinition, isValueDefinition, isType);
+    export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    export const isDefinition = isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition);
     export type DefineOrRefer = Definition | ReferElement;
     export const isDefineOrRefer = (value: unknown): value is DefineOrRefer =>
         isDefinition(value) || isReferElement(value);
