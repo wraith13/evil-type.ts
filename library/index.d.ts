@@ -31,7 +31,7 @@ export declare namespace Build {
         export?: boolean;
     } | {}) => CodeExpression[];
     namespace Define {
-        const buildDefineLine: (declarator: string, name: string, define: Types.ValueOrType) => CodeLine;
+        const buildDefineLine: (declarator: string, name: string, define: Types.TypeOrValue) => CodeLine;
         const buildInlineDefineLiteral: (define: Types.LiteralElement) => CodeExpression[];
         const buildDefineValue: (name: string, value: Types.ValueDefinition) => CodeLine;
         const buildInlineDefinePrimitiveType: (value: Types.PrimitiveTypeElement) => CodeExpression;
@@ -47,17 +47,17 @@ export declare namespace Build {
         const buildDefineModuleCore: (value: Types.ModuleDefinition) => CodeEntry[];
         const buildDefineModule: (name: string, value: Types.ModuleDefinition) => CodeBlock;
         const buildDefine: (name: string, define: Types.Definition) => CodeEntry;
-        const buildInlineDefine: (define: Types.ValueOrTypeOfRefer) => (CodeExpression | CodeInlineBlock)[];
+        const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {
         const buildLiterarlValidatorExpression: (name: string, value: Types.Jsonable) => CodeExpression[];
         const buildInlineLiteralValidator: (define: Types.LiteralElement) => CodeExpression;
         const buildValidatorLine: (declarator: string, name: string, define: Types.Type) => CodeExpression[];
         const buildValidatorName: (name: string) => string;
-        const buildValidatorExpression: (name: string, define: Types.ValueOrTypeOfRefer) => CodeInlineEntry[];
+        const buildValidatorExpression: (name: string, define: Types.TypeOrValueOfRefer) => CodeInlineEntry[];
         const buildInterfaceValidator: (name: string, define: Types.InterfaceDefinition) => CodeExpression[];
-        const buildInlineValidator: (name: string, define: Types.Type) => CodeInlineEntry[];
-        const buildValidator: (name: string, define: Types.Type) => CodeLine;
+        const buildInlineValidator: (name: string, define: Types.TypeOrValue) => CodeInlineEntry[];
+        const buildValidator: (name: string, define: Types.TypeOrValue) => CodeLine;
     }
 }
 export declare namespace Format {

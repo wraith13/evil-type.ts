@@ -142,6 +142,7 @@ var Types;
         types: Types.isArray(Types.isTypeOrRefer),
     })(value); };
     Types.isType = Types.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isTypeofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement);
+    Types.isTypeOrValue = Types.isOr(Types.isType, Types.isValueDefinition, Types.isLiteralElement);
     Types.isTypeOrRefer = Types.isOr(Types.isType, Types.isReferElement);
     Types.isDefinition = Types.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);
     Types.isDefineOrRefer = function (value) {

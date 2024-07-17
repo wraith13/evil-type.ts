@@ -289,7 +289,7 @@ var Build;
         };
         Validator.buildInlineValidator = function (name, define) {
             return __spreadArray([
-                (0, exports.$expression)("(value: unknown): value is ".concat(name, " =>"))
+                (0, exports.$expression)("(value: unknown): value is ".concat(types_1.Types.isValueDefinition(define) ? "typeof " + name : name, " =>"))
             ], Validator.buildValidatorExpression("value", define), true);
         };
         Validator.buildValidator = function (name, define) { return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
@@ -370,7 +370,7 @@ try {
             .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); });
         console.log(JSON.stringify(defines, null, 4));
         var validators = removeNullFilter(Object.entries(typeSource.defines)
-            .map(function (i) { return types_1.Types.isType(i[1]) ? Build.Validator.buildValidator(i[0], i[1]) : null; })
+            .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })
             .filter(function (i) { return null !== i; }));
         console.log(JSON.stringify(validators, null, 4));
         var result = Format.text(typeSource.options, 0, __spreadArray(__spreadArray([], defines, true), validators, true));

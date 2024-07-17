@@ -106,7 +106,7 @@ export module Build
         ("export" in define && (define.export ?? true)) ? [$expression("export")]: [];
     export module Define
     {
-        export const buildDefineLine = (declarator: string, name: string, define: Types.ValueOrType): CodeLine =>
+        export const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrValue): CodeLine =>
             $line(buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define))]));
         export const buildInlineDefineLiteral = (define: Types.LiteralElement) => [$expression(JSON.stringify(define.literal)), $expression("as"), $expression("const")];
         export const buildDefineValue = (name: string, value: Types.ValueDefinition): CodeLine =>
@@ -215,7 +215,7 @@ export module Build
                 return buildDefineLine("const", name, define);
             }
         };
-        export const buildInlineDefine = (define: Types.ValueOrTypeOfRefer): (CodeExpression | CodeInlineBlock)[] =>
+        export const buildInlineDefine = (define: Types.TypeOrValueOfRefer): (CodeExpression | CodeInlineBlock)[] =>
         {
             if (Types.isReferElement(define))
             {
@@ -298,7 +298,7 @@ export module Build
             buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define))]);
         export const buildValidatorName = (name: string) =>
             Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).filter(i => "" !== i).join(".");
-        export const buildValidatorExpression = (name: string, define: Types.ValueOrTypeOfRefer): CodeInlineEntry[] =>
+        export const buildValidatorExpression = (name: string, define: Types.TypeOrValueOfRefer): CodeInlineEntry[] =>
         {
             if (Types.isReferElement(define))
             {
@@ -364,19 +364,19 @@ export module Build
             );
             return kindofJoinExpression(list, $expression("&&"));
         };
-        export const buildInlineValidator = (name: string, define: Types.Type) =>
+        export const buildInlineValidator = (name: string, define: Types.TypeOrValue) =>
         [
-            $expression(`(value: unknown): value is ${name} =>`),
+            $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
-        export const buildValidator = (name: string, define: Types.Type): CodeLine => $line
+        export const buildValidator = (name: string, define: Types.TypeOrValue): CodeLine => $line
         ([
             ...buildExport(define),
             $expression("const"),
             $expression(buildValidatorName(name)),
             ...buildInlineValidator(name, define),
         ]);
-    }
+        }
 }
 export module Format
 {
@@ -457,7 +457,7 @@ try
         const validators = removeNullFilter
         (
             Object.entries(typeSource.defines)
-                .map(i => Types.isType(i[1]) ? Build.Validator.buildValidator(i[0], i[1]): null)
+                .map(i => Types.isModuleDefinition(i[1]) ? null:  Build.Validator.buildValidator(i[0], i[1]))
                 .filter(i => null !== i)
         );
         console.log(JSON.stringify(validators, null, 4));
