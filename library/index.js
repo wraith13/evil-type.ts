@@ -294,7 +294,8 @@ var Build;
         };
         Validator.buildValidator = function (name, define) { return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
             (0, exports.$expression)("const"),
-            (0, exports.$expression)(Validator.buildValidatorName(name))
+            (0, exports.$expression)(Validator.buildValidatorName(name)),
+            (0, exports.$expression)("=")
         ], false), Validator.buildInlineValidator(name, define), true)); };
     })(Validator = Build.Validator || (Build.Validator = {}));
 })(Build || (exports.Build = Build = {}));

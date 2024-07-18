@@ -374,6 +374,7 @@ export module Build
             ...buildExport(define),
             $expression("const"),
             $expression(buildValidatorName(name)),
+            $expression("="),
             ...buildInlineValidator(name, define),
         ]);
         }
