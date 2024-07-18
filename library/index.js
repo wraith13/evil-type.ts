@@ -314,7 +314,7 @@ var Format;
     Format.tokens = function (code) {
         switch (code.$code) {
             case "inline-block":
-                return code.lines.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return a.concat(b); }, []);
+                return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return a.concat(b); }, []), true), ["}",], false);
             case "line":
                 return code.expressions.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return a.concat(b); }, []);
             case "expression":
@@ -328,7 +328,7 @@ var Format;
             + Format.getReturnCode(options);
     };
     Format.inlineBlock = function (options, indentDepth, code) {
-        return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.text(options, indentDepth + 1, i); }), true), ["}"], false).join(" ");
+        return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.text(options, indentDepth + 1, i); }), true), ["}",], false).join(" ");
     };
     Format.block = function (options, indentDepth, code) {
         var _a;

@@ -394,7 +394,7 @@ export module Format
         switch(code.$code)
         {
         case "inline-block":
-            return code.lines.map(i => tokens(i)).reduce((a, b) => a.concat(b), []);
+            return [ "{", ...code.lines.map(i => tokens(i)).reduce((a, b) => a.concat(b), []), "}", ];
         case "line":
             return code.expressions.map(i => tokens(i)).reduce((a, b) => a.concat(b), []);
         case "expression":
@@ -407,7 +407,7 @@ export module Format
         +";"
         +getReturnCode(options);
     export const inlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
-        [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)), "}" ].join(" ");
+        [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)), "}", ].join(" ");
     export const block = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
     {
         const currentIndent = buildIndent(options, indentDepth);
