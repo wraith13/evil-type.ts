@@ -261,26 +261,37 @@ export module Build
             {
                 if (Array.isArray(value))
                 {
-                    let list: CodeExpression[] = [];
+                    const list: CodeExpression[] = [];
                     list.push($expression(`Array.isArray(${name})`));
+                    list.push($expression("&&"));
                     list.push($expression(`${value.length} <= ${name}.length`));
-                    value.forEach((i, ix) => list = list.concat(buildLiterarlValidatorExpression(`${name}[${ix}]`, i)));
-                    return kindofJoinExpression(list, $expression("&&"));
+                    value.forEach
+                    (
+                        (i, ix) =>
+                        {
+                            list.push($expression("&&"));
+                            list.push(...buildLiterarlValidatorExpression(`${name}[${ix}]`, i));
+                        }
+                    );
+                    return list;
                 }
                 else
                 {
                     const list: CodeExpression[] = [];
                     list.push($expression(`null !== ${name}`));
+                    list.push($expression("&&"));
                     list.push($expression(`"object" === typeof ${name}`));
                     Object.keys(value).forEach
                     (
                         key =>
                         {
+                            list.push($expression("&&"));
                             list.push($expression(`"${key}" in ${name}`));
+                            list.push($expression("&&"));
                             list.push(...buildLiterarlValidatorExpression(`${name}.${key}`, value[key]));
                         }
                     );
-                    return kindofJoinExpression(list, $expression("&&"));
+                    return list;
                 }
             }
             if (undefined === value)
@@ -365,7 +376,6 @@ export module Build
                     list.push(...convertToExpression(buildValidatorExpression(`${name}.${key}`, define.members[key])));
                 }
             );
-            //return kindofJoinExpression(list, $expression("&&"));
             return list;
         };
         export const buildInlineValidator = (name: string, define: Types.TypeOrValue) =>

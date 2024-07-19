@@ -209,19 +209,26 @@ var Build;
                 if (Array.isArray(value)) {
                     var list_1 = [];
                     list_1.push((0, exports.$expression)("Array.isArray(".concat(name, ")")));
+                    list_1.push((0, exports.$expression)("&&"));
                     list_1.push((0, exports.$expression)("".concat(value.length, " <= ").concat(name, ".length")));
-                    value.forEach(function (i, ix) { return list_1 = list_1.concat(Validator.buildLiterarlValidatorExpression("".concat(name, "[").concat(ix, "]"), i)); });
-                    return kindofJoinExpression(list_1, (0, exports.$expression)("&&"));
+                    value.forEach(function (i, ix) {
+                        list_1.push((0, exports.$expression)("&&"));
+                        list_1.push.apply(list_1, Validator.buildLiterarlValidatorExpression("".concat(name, "[").concat(ix, "]"), i));
+                    });
+                    return list_1;
                 }
                 else {
                     var list_2 = [];
                     list_2.push((0, exports.$expression)("null !== ".concat(name)));
+                    list_2.push((0, exports.$expression)("&&"));
                     list_2.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
                     Object.keys(value).forEach(function (key) {
+                        list_2.push((0, exports.$expression)("&&"));
                         list_2.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
+                        list_2.push((0, exports.$expression)("&&"));
                         list_2.push.apply(list_2, Validator.buildLiterarlValidatorExpression("".concat(name, ".").concat(key), value[key]));
                     });
-                    return kindofJoinExpression(list_2, (0, exports.$expression)("&&"));
+                    return list_2;
                 }
             }
             if (undefined === value) {
@@ -288,7 +295,6 @@ var Build;
                 list.push((0, exports.$expression)("&&"));
                 list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), define.members[key])));
             });
-            //return kindofJoinExpression(list, $expression("&&"));
             return list;
         };
         Validator.buildInlineValidator = function (name, define) {
