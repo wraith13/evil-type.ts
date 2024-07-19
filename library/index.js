@@ -280,12 +280,16 @@ var Build;
         Validator.buildInterfaceValidator = function (name, define) {
             var list = [];
             list.push((0, exports.$expression)("null !== ".concat(name)));
+            list.push((0, exports.$expression)("&&"));
             list.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
             Object.keys(define.members).forEach(function (key) {
+                list.push((0, exports.$expression)("&&"));
                 list.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
+                list.push((0, exports.$expression)("&&"));
                 list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), define.members[key])));
             });
-            return kindofJoinExpression(list, (0, exports.$expression)("&&"));
+            //return kindofJoinExpression(list, $expression("&&"));
+            return list;
         };
         Validator.buildInlineValidator = function (name, define) {
             return __spreadArray([

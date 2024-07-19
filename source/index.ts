@@ -353,16 +353,20 @@ export module Build
         {
             const list: CodeExpression[] = [];
             list.push($expression(`null !== ${name}`));
+            list.push($expression("&&"));
             list.push($expression(`"object" === typeof ${name}`));
             Object.keys(define.members).forEach
             (
                 key =>
                 {
+                    list.push($expression("&&"));
                     list.push($expression(`"${key}" in ${name}`));
+                    list.push($expression("&&"));
                     list.push(...convertToExpression(buildValidatorExpression(`${name}.${key}`, define.members[key])));
                 }
             );
-            return kindofJoinExpression(list, $expression("&&"));
+            //return kindofJoinExpression(list, $expression("&&"));
+            return list;
         };
         export const buildInlineValidator = (name: string, define: Types.TypeOrValue) =>
         [
