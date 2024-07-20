@@ -39,7 +39,21 @@
             "$type": "interface",
             "members":
             {
-
+                "indentUnit":
+                {
+                    "$type": "or",
+                    "types":
+                    [
+                        {
+                            "$type": "primitive-type",
+                            "type": "number"
+                        },
+                        {
+                            "$type": "literal",
+                            "literal": "\t"
+                        }
+                    ]
+                }
             }
         }
     },

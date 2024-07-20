@@ -141,13 +141,13 @@ export declare namespace Types {
         types: TypeOrInterfaceOrRefer[];
     }
     const isAndElement: (value: unknown) => value is AndElement;
-    type Type = PrimitiveTypeElement | TypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement;
-    const isType: (value: unknown) => value is TypeDefinition | InterfaceDefinition | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
-    type TypeOrValue = Type | ValueDefinition | LiteralElement;
+    type Type = PrimitiveTypeElement | TypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    const isType: (value: unknown) => value is TypeDefinition | InterfaceDefinition | LiteralElement | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
+    type TypeOrValue = Type | ValueDefinition;
     const isTypeOrValue: (value: unknown) => value is ValueDefinition | TypeDefinition | InterfaceDefinition | LiteralElement | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     type TypeOrInterfaceOrRefer = Type | ReferElement;
-    const isTypeOrRefer: (value: unknown) => value is TypeDefinition | InterfaceDefinition | ReferElement | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
+    const isTypeOrRefer: (value: unknown) => value is TypeDefinition | InterfaceDefinition | ReferElement | LiteralElement | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
     type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
     const isDefinition: (value: unknown) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
     type DefineOrRefer = Definition | ReferElement;

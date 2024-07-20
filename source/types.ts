@@ -284,10 +284,10 @@ export module Types
         types: isArray(isTypeOrRefer),
     })
     (value);
-    export type Type = PrimitiveTypeElement | TypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement;
-    export const isType = isOr(isPrimitiveTypeElement, isTypeDefinition, isTypeofElement, isInterfaceDefinition, isArrayElement, isOrElement, isAndElement);
-    export type TypeOrValue = Type | ValueDefinition | LiteralElement;
-    export const isTypeOrValue = isOr(isType, isValueDefinition, isLiteralElement);
+    export type Type = PrimitiveTypeElement | TypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    export const isType = isOr(isPrimitiveTypeElement, isTypeDefinition, isTypeofElement, isInterfaceDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement);
+    export type TypeOrValue = Type | ValueDefinition;
+    export const isTypeOrValue = isOr(isType, isValueDefinition);
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
     export const isTypeOrRefer = isOr(isType, isReferElement);
