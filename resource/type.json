@@ -53,7 +53,31 @@
                             "literal": "\t"
                         }
                     ]
+                },
+                "indentStyle":
+                {
+                    "$ref": "IndentStyleType"
                 }
+            }
+        },
+        "IndentStyleType":
+        {
+            "export": true,
+            "$type": "type",
+            "define":
+            {
+                "$type": "or",
+                "types":
+                [
+                    {
+                        "$type": "literal",
+                        "literal": "allman"
+                    },
+                    {
+                        "$type": "literal",
+                        "literal": "egyptian"
+                    }
+                ]
             }
         }
     },

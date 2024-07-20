@@ -31,14 +31,13 @@ export declare namespace Build {
         export?: boolean;
     } | {}) => CodeExpression[];
     namespace Define {
-        const buildDefineLine: (declarator: string, name: string, define: Types.TypeOrValue) => CodeLine;
+        const buildDefineLine: (declarator: string, name: string, define: Types.TypeOrValue, postEpressions?: CodeExpression[]) => CodeLine;
         const buildInlineDefineLiteral: (define: Types.LiteralElement) => CodeExpression[];
-        const buildDefineValue: (name: string, value: Types.ValueDefinition) => CodeLine;
         const buildInlineDefinePrimitiveType: (value: Types.PrimitiveTypeElement) => CodeExpression;
         const buildDefinePrimitiveType: (name: string, value: Types.PrimitiveTypeElement) => CodeLine;
-        const enParenthesis: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | T[number])[];
+        const enParenthesis: <T extends CodeInlineEntry>(expressions: T[]) => (CodeExpression | T)[];
         const isNeedParenthesis: (expressions: (CodeExpression | CodeInlineBlock)[]) => boolean;
-        const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => T | (CodeExpression | T[number])[];
+        const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | CodeInlineBlock)[];
         const buildInlineDefineArray: (value: Types.ArrayElement) => CodeExpression[];
         const buildInlineDefineAnd: (value: Types.AndElement) => CodeExpression[];
         const buildInlineDefineOr: (value: Types.OrElement) => CodeExpression[];

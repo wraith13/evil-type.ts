@@ -76,15 +76,11 @@ var Build;
     Build.buildExport = function (define) { var _a; return ("export" in define && ((_a = define.export) !== null && _a !== void 0 ? _a : true)) ? [(0, exports.$expression)("export")] : []; };
     var Define;
     (function (Define) {
-        Define.buildDefineLine = function (declarator, name, define) {
-            return (0, exports.$line)(Build.buildExport(define).concat(__spreadArray([(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], (0, exports.convertToExpression)(Define.buildInlineDefine(define)), true)));
+        Define.buildDefineLine = function (declarator, name, define, postEpressions) {
+            if (postEpressions === void 0) { postEpressions = []; }
+            return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Define.buildInlineDefine(define)), true), postEpressions, true));
         };
-        Define.buildInlineDefineLiteral = function (define) { return [(0, exports.$expression)(JSON.stringify(define.literal)), (0, exports.$expression)("as"), (0, exports.$expression)("const")]; };
-        Define.buildDefineValue = function (name, value) {
-            return Define.buildDefineLine("const", name, value);
-        };
-        //export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
-        //    Validator.buildValidatorLine("const", name, value);
+        Define.buildInlineDefineLiteral = function (define) { return [(0, exports.$expression)(JSON.stringify(define.literal))]; };
         Define.buildInlineDefinePrimitiveType = function (value) {
             return (0, exports.$expression)(value.type);
         };
@@ -169,7 +165,7 @@ var Build;
                 case "type":
                     return Define.buildDefineLine("type", name, define);
                 case "value":
-                    return Define.buildDefineLine("const", name, define);
+                    return Define.buildDefineLine("const", name, define, [(0, exports.$expression)("as"), (0, exports.$expression)("const"),]);
             }
         };
         Define.buildInlineDefine = function (define) {
@@ -261,7 +257,7 @@ var Build;
                     case "value":
                         return Validator.buildValidatorExpression(name, define.value);
                     case "primitive-type":
-                        return [(0, exports.$expression)("\"".concat(define.$type, "\" === typeof ").concat(name)),];
+                        return [(0, exports.$expression)("\"".concat(define.type, "\" === typeof ").concat(name)),];
                     case "type":
                         return Validator.buildValidatorExpression(name, define.define);
                     case "array":
@@ -276,7 +272,9 @@ var Build;
                             (0, exports.$expression)(")")
                         ], false);
                     case "and":
-                        return kindofJoinExpression(define.types.map(function (i) { return Validator.buildValidatorExpression(name, i); }), (0, exports.$expression)("&&"));
+                        return kindofJoinExpression(define.types.map(function (i) { return types_1.Types.isObject(i) ?
+                            Define.enParenthesis(Validator.buildValidatorExpression(name, i)) :
+                            Validator.buildValidatorExpression(name, i); }), (0, exports.$expression)("&&"));
                     case "or":
                         return kindofJoinExpression(define.types.map(function (i) { return Validator.buildValidatorExpression(name, i); }), (0, exports.$expression)("||"));
                     case "interface":
@@ -293,7 +291,14 @@ var Build;
                 list.push((0, exports.$expression)("&&"));
                 list.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
                 list.push((0, exports.$expression)("&&"));
-                list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), define.members[key])));
+                var value = define.members[key];
+                var current = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), value));
+                if (types_1.Types.isOrElement(value)) {
+                    list.push.apply(list, Define.enParenthesis(current));
+                }
+                else {
+                    list.push.apply(list, current);
+                }
             });
             return list;
         };

@@ -106,18 +106,14 @@ export module Build
         ("export" in define && (define.export ?? true)) ? [$expression("export")]: [];
     export module Define
     {
-        export const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrValue): CodeLine =>
-            $line(buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define))]));
-        export const buildInlineDefineLiteral = (define: Types.LiteralElement) => [$expression(JSON.stringify(define.literal)), $expression("as"), $expression("const")];
-        export const buildDefineValue = (name: string, value: Types.ValueDefinition): CodeLine =>
-            buildDefineLine("const", name, value);
-        //export const buildValueValidator = (name: string, value: Types.ValueDefine) =>
-        //    Validator.buildValidatorLine("const", name, value);
+        export const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
+            $line([...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define)), ...postEpressions]);
+        export const buildInlineDefineLiteral = (define: Types.LiteralElement) => [$expression(JSON.stringify(define.literal))];
         export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeElement) =>
             $expression(value.type);
         export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeElement): CodeLine =>
             buildDefineLine("type", name, value);
-        export const enParenthesis = <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) =>
+        export const enParenthesis = <T extends CodeInlineEntry>(expressions: T[]) =>
             [ $expression("("), ...expressions, $expression(")"), ];
         export const isNeedParenthesis = (expressions: (CodeExpression | CodeInlineBlock)[]) =>
         {
@@ -212,7 +208,7 @@ export module Build
             case "type":
                 return buildDefineLine("type", name, define);
             case "value":
-                return buildDefineLine("const", name, define);
+                return buildDefineLine("const", name, define, [ $expression("as"), $expression("const"), ]);
             }
         };
         export const buildInlineDefine = (define: Types.TypeOrValueOfRefer): (CodeExpression | CodeInlineBlock)[] =>
@@ -329,7 +325,7 @@ export module Build
                 case "value":
                     return buildValidatorExpression(name, define.value);
                 case "primitive-type":
-                    return [ $expression(`"${define.$type}" === typeof ${name}`), ];
+                    return [ $expression(`"${define.type}" === typeof ${name}`), ];
                 case "type":
                     return buildValidatorExpression(name, define.define);
                 case "array":
@@ -346,7 +342,12 @@ export module Build
                 case "and":
                     return kindofJoinExpression
                     (
-                        define.types.map(i => buildValidatorExpression(name, i)),
+                        define.types.map
+                        (
+                            i => Types.isObject(i) ?
+                                Define.enParenthesis(buildValidatorExpression(name, i)):
+                                buildValidatorExpression(name, i)
+                        ),
                         $expression("&&")
                     );
                 case "or":
@@ -373,7 +374,16 @@ export module Build
                     list.push($expression("&&"));
                     list.push($expression(`"${key}" in ${name}`));
                     list.push($expression("&&"));
-                    list.push(...convertToExpression(buildValidatorExpression(`${name}.${key}`, define.members[key])));
+                    const value = define.members[key];
+                    const current = convertToExpression(buildValidatorExpression(`${name}.${key}`, value));
+                    if (Types.isOrElement(value))
+                    {
+                        list.push(...Define.enParenthesis(current));
+                    }
+                    else
+                    {
+                        list.push(...current);
+                    }
                 }
             );
             return list;
