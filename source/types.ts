@@ -228,6 +228,18 @@ export module Types
         define: isTypeOrRefer,
     })
     (value);
+    export interface EnumTypeDefinition extends AlphaDefinition
+    {
+        $type: "enum-type";
+        members: (number | string)[];
+    }
+    export const isEnumTypeDefinition = (value: unknown): value is EnumTypeDefinition => isSpecificObject<EnumTypeDefinition>
+    ({
+        export: makeOptionalKeyTypeGuard(isBoolean),
+        $type: isJust("enum-type"),
+        members: isArray(isOr(isNumber, isString)),
+    })
+    (value);
     export interface InterfaceDefinition extends AlphaDefinition
     {
         $type: "interface";

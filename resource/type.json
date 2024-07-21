@@ -57,6 +57,10 @@
                 "indentStyle":
                 {
                     "$ref": "IndentStyleType"
+                },
+                "validatorOption":
+                {
+                    "$ref": "ValidatorOptionType"
                 }
             }
         },
@@ -76,6 +80,28 @@
                     {
                         "$type": "literal",
                         "literal": "egyptian"
+                    }
+                ]
+            }
+        },
+        "ValidatorOptionType": {
+            "export": true,
+            "$type": "type",
+            "define": {
+                "$type": "or",
+                "types":
+                [
+                    {
+                        "$type": "literal",
+                        "literal": "none"
+                    },
+                    {
+                        "$type": "literal",
+                        "literal": "simple"
+                    },
+                    {
+                        "$type": "literal",
+                        "literal": "full"
                     }
                 ]
             }
