@@ -162,6 +162,8 @@ export module Build
         };
         export const enParenthesisIfNeed = <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) =>
             isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
+        export const buildInlineDefineEnum = (value: Types.EnumTypeDefinition) =>
+            kindofJoinExpression(value.members.map(i => $expression(`${i}`)), $expression("|"));
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
             [ $expression(buildInlineDefine(value.items) +"[]"), ];
         export const buildInlineDefineAnd = (value: Types.AndElement) =>
@@ -207,6 +209,8 @@ export module Build
                 return buildDefineModule(name, define);
             case "type":
                 return buildDefineLine("type", name, define);
+            case "enum-type":
+                return buildDefineLine("type", name, define);
             case "value":
                 return buildDefineLine("const", name, define, [ $expression("as"), $expression("const"), ]);
             }
@@ -237,6 +241,8 @@ export module Build
                     return [ buildInlineDefinePrimitiveType(define), ];
                 case "type":
                     return buildInlineDefine(define.define);
+                case "enum-type":
+                    return buildInlineDefineEnum(define);
                 case "array":
                     return buildInlineDefineArray(define);
                 case "and":
@@ -328,6 +334,8 @@ export module Build
                     return [ $expression(`"${define.type}" === typeof ${name}`), ];
                 case "type":
                     return buildValidatorExpression(name, define.define);
+                case "enum-type":
+                    return [$expression(`${JSON.stringify(define.members)}.includes(${name})`)];
                 case "array":
                     return [
                         $expression(`Array.isArray(${name})`),

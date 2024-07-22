@@ -125,6 +125,9 @@ var Build;
         Define.enParenthesisIfNeed = function (expressions) {
             return Define.isNeedParenthesis(expressions) ? Define.enParenthesis(expressions) : expressions;
         };
+        Define.buildInlineDefineEnum = function (value) {
+            return kindofJoinExpression(value.members.map(function (i) { return (0, exports.$expression)("".concat(i)); }), (0, exports.$expression)("|"));
+        };
         Define.buildInlineDefineArray = function (value) {
             return [(0, exports.$expression)(Define.buildInlineDefine(value.items) + "[]"),];
         };
@@ -164,6 +167,8 @@ var Build;
                     return Define.buildDefineModule(name, define);
                 case "type":
                     return Define.buildDefineLine("type", name, define);
+                case "enum-type":
+                    return Define.buildDefineLine("type", name, define);
                 case "value":
                     return Define.buildDefineLine("const", name, define, [(0, exports.$expression)("as"), (0, exports.$expression)("const"),]);
             }
@@ -186,6 +191,8 @@ var Build;
                         return [Define.buildInlineDefinePrimitiveType(define),];
                     case "type":
                         return Define.buildInlineDefine(define.define);
+                    case "enum-type":
+                        return Define.buildInlineDefineEnum(define);
                     case "array":
                         return Define.buildInlineDefineArray(define);
                     case "and":
@@ -260,6 +267,8 @@ var Build;
                         return [(0, exports.$expression)("\"".concat(define.type, "\" === typeof ").concat(name)),];
                     case "type":
                         return Validator.buildValidatorExpression(name, define.define);
+                    case "enum-type":
+                        return [(0, exports.$expression)("".concat(JSON.stringify(define.members), ".includes(").concat(name, ")"))];
                     case "array":
                         return __spreadArray(__spreadArray([
                             (0, exports.$expression)("Array.isArray(".concat(name, ")")),

@@ -38,6 +38,7 @@ export declare namespace Build {
         const enParenthesis: <T extends CodeInlineEntry>(expressions: T[]) => (CodeExpression | T)[];
         const isNeedParenthesis: (expressions: (CodeExpression | CodeInlineBlock)[]) => boolean;
         const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | CodeInlineBlock)[];
+        const buildInlineDefineEnum: (value: Types.EnumTypeDefinition) => CodeExpression[];
         const buildInlineDefineArray: (value: Types.ArrayElement) => CodeExpression[];
         const buildInlineDefineAnd: (value: Types.AndElement) => CodeExpression[];
         const buildInlineDefineOr: (value: Types.OrElement) => CodeExpression[];

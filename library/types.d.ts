@@ -114,6 +114,11 @@ export declare namespace Types {
         define: TypeOrInterfaceOrRefer;
     }
     const isTypeDefinition: (value: unknown) => value is TypeDefinition;
+    interface EnumTypeDefinition extends AlphaDefinition {
+        $type: "enum-type";
+        members: (number | string)[];
+    }
+    const isEnumTypeDefinition: (value: unknown) => value is EnumTypeDefinition;
     interface InterfaceDefinition extends AlphaDefinition {
         $type: "interface";
         members: {
@@ -141,15 +146,15 @@ export declare namespace Types {
         types: TypeOrInterfaceOrRefer[];
     }
     const isAndElement: (value: unknown) => value is AndElement;
-    type Type = PrimitiveTypeElement | TypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     const isType: (value: unknown) => value is TypeDefinition | InterfaceDefinition | LiteralElement | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValue = Type | ValueDefinition;
     const isTypeOrValue: (value: unknown) => value is ValueDefinition | TypeDefinition | InterfaceDefinition | LiteralElement | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     type TypeOrInterfaceOrRefer = Type | ReferElement;
     const isTypeOrRefer: (value: unknown) => value is TypeDefinition | InterfaceDefinition | ReferElement | LiteralElement | TypeofElement | PrimitiveTypeElement | ArrayElement | OrElement | AndElement;
-    type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
-    const isDefinition: (value: unknown) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | EnumTypeDefinition | InterfaceDefinition;
+    const isDefinition: (value: unknown) => value is ModuleDefinition | ValueDefinition | TypeDefinition | EnumTypeDefinition | InterfaceDefinition;
     type DefineOrRefer = Definition | ReferElement;
     const isDefineOrRefer: (value: unknown) => value is DefineOrRefer;
 }

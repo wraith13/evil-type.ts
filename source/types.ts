@@ -1,3 +1,5 @@
+import exp from "constants";
+
 export module Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
@@ -296,15 +298,15 @@ export module Types
         types: isArray(isTypeOrRefer),
     })
     (value);
-    export type Type = PrimitiveTypeElement | TypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeDefinition | TypeofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     export const isType = isOr(isPrimitiveTypeElement, isTypeDefinition, isTypeofElement, isInterfaceDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement);
     export type TypeOrValue = Type | ValueDefinition;
     export const isTypeOrValue = isOr(isType, isValueDefinition);
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
     export const isTypeOrRefer = isOr(isType, isReferElement);
-    export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
-    export const isDefinition = isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition);
+    export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | EnumTypeDefinition | InterfaceDefinition;
+    export const isDefinition = isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isEnumTypeDefinition, isInterfaceDefinition);
     export type DefineOrRefer = Definition | ReferElement;
     export const isDefineOrRefer = (value: unknown): value is DefineOrRefer =>
         isDefinition(value) || isReferElement(value);

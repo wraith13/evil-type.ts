@@ -1,49 +1,40 @@
 {
     "$ref": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#",
-    "defines":
-    {
-        "schema":
-        {
+    "defines": {
+        "schema": {
             "export": true,
             "$type": "value",
-            "value":
-            {
+            "value": {
                 "$type": "literal",
                 "literal": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#"
             }
         },
-        "TypeSchema":
-        {
+        "TypeSchema": {
             "export": true,
             "$type": "interface",
-            "members":
-            {
-                "$ref":
-                {
+            "members": {
+                "$ref": {
                     "$type": "typeof",
-                    "value": { "$ref": "schema" }
-                },
-                "defines":
-                {
-                    "$type": "interface",
-                    "members":
-                    {
+                    "value": {
+                        "$ref": "schema"
                     }
                 },
-                "options": { "$ref": "TypeOptions" }
+                "defines": {
+                    "$type": "interface",
+                    "members": {}
+                },
+                "options": {
+                    "$ref": "TypeOptions"
+                }
             }
         },
-        "TypeOptions":
-        {
+        "TypeOptions": {
             "export": true,
             "$type": "interface",
-            "members":
-            {
-                "indentUnit":
-                {
+            "members": {
+                "indentUnit": {
                     "$type": "or",
-                    "types":
-                    [
+                    "types": [
                         {
                             "$type": "primitive-type",
                             "type": "number"
@@ -54,61 +45,33 @@
                         }
                     ]
                 },
-                "indentStyle":
-                {
+                "indentStyle": {
                     "$ref": "IndentStyleType"
                 },
-                "validatorOption":
-                {
+                "validatorOption": {
                     "$ref": "ValidatorOptionType"
                 }
             }
         },
-        "IndentStyleType":
-        {
+        "IndentStyleType": {
             "export": true,
-            "$type": "type",
-            "define":
-            {
-                "$type": "or",
-                "types":
-                [
-                    {
-                        "$type": "literal",
-                        "literal": "allman"
-                    },
-                    {
-                        "$type": "literal",
-                        "literal": "egyptian"
-                    }
-                ]
-            }
+            "$type": "enum-type",
+            "members": [
+                "allman",
+                "egyptian"
+            ]
         },
         "ValidatorOptionType": {
             "export": true,
-            "$type": "type",
-            "define": {
-                "$type": "or",
-                "types":
-                [
-                    {
-                        "$type": "literal",
-                        "literal": "none"
-                    },
-                    {
-                        "$type": "literal",
-                        "literal": "simple"
-                    },
-                    {
-                        "$type": "literal",
-                        "literal": "full"
-                    }
-                ]
-            }
+            "$type": "enum-type",
+            "members": [
+                "none",
+                "simple",
+                "full"
+            ]
         }
     },
-    "options":
-    {
+    "options": {
         "indentUnit": 4,
         "indentStyle": "allman",
         "validatorOption": "full"
