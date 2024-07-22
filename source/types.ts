@@ -233,13 +233,13 @@ export module Types
     export interface EnumTypeDefinition extends AlphaDefinition
     {
         $type: "enum-type";
-        members: (number | string)[];
+        members: (number | string)[] | ReferElement;
     }
     export const isEnumTypeDefinition = (value: unknown): value is EnumTypeDefinition => isSpecificObject<EnumTypeDefinition>
     ({
         export: makeOptionalKeyTypeGuard(isBoolean),
         $type: isJust("enum-type"),
-        members: isArray(isOr(isNumber, isString)),
+        members: isOr(isArray(isOr(isNumber, isString)), isReferElement),
     })
     (value);
     export interface InterfaceDefinition extends AlphaDefinition

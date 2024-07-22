@@ -53,13 +53,21 @@
                 }
             }
         },
-        "IndentStyleType": {
+        "indentStyleTypeMember":
+        {
             "export": true,
-            "$type": "enum-type",
-            "members": [
+            "$type": "value",
+            "value": [
                 "allman",
                 "egyptian"
             ]
+        },
+        "IndentStyleType": {
+            "export": true,
+            "$type": "enum-type",
+            "members": {
+                "$ref": "indentStyleTypeMember"
+            }
         },
         "ValidatorOptionType": {
             "export": true,
