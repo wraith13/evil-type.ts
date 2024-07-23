@@ -167,8 +167,6 @@ var Build;
                     return Define.buildDefineModule(name, define);
                 case "type":
                     return Define.buildDefineLine("type", name, define);
-                case "enum-type":
-                    return Define.buildDefineLine("type", name, define);
                 case "value":
                     return Define.buildDefineLine("const", name, define, [(0, exports.$expression)("as"), (0, exports.$expression)("const"),]);
             }
@@ -177,14 +175,14 @@ var Build;
             if (types_1.Types.isReferElement(define)) {
                 return [(0, exports.$expression)(define.$ref),];
             }
-            else if (types_1.Types.isLiteralElement(define)) {
-                return Define.buildInlineDefineLiteral(define);
-            }
-            else if (types_1.Types.isTypeofElement(define)) {
-                return [(0, exports.$expression)("typeof")].concat(Define.buildInlineDefine(define.value));
-            }
             else {
                 switch (define.$type) {
+                    case "literal":
+                        return Define.buildInlineDefineLiteral(define);
+                    case "typeof":
+                        return [(0, exports.$expression)("typeof")].concat(Define.buildInlineDefine(define.value));
+                    case "itemof":
+                        return [(0, exports.$expression)("typeof")].concat([(0, exports.$expression)("".concat(define.value, "[number]"))]);
                     case "value":
                         return Define.buildInlineDefine(define.value);
                     case "primitive-type":
@@ -254,13 +252,14 @@ var Build;
             if (types_1.Types.isReferElement(define)) {
                 return [(0, exports.$expression)("".concat(Validator.buildValidatorName(define.$ref), "(").concat(name, ")"))];
             }
-            else if (types_1.Types.isTypeofElement(define)) {
-                return Validator.buildValidatorExpression(name, define.value);
-            }
             else {
                 switch (define.$type) {
                     case "literal":
                         return Validator.buildLiterarlValidatorExpression(name, define.literal);
+                    case "typeof":
+                        return Validator.buildValidatorExpression(name, define.value);
+                    case "itemof":
+                        return [(0, exports.$expression)("".concat(define.value.$ref, ".includes(").concat(name, ")"))];
                     case "value":
                         return Validator.buildValidatorExpression(name, define.value);
                     case "primitive-type":

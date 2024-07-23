@@ -162,7 +162,7 @@ export module Build
         };
         export const enParenthesisIfNeed = <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) =>
             isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
-        export const buildInlineDefineEnum = (value: Types.EnumTypeDefinition) =>
+        export const buildInlineDefineEnum = (value: Types.EnumTypeElement) =>
             kindofJoinExpression(value.members.map(i => $expression(`${i}`)), $expression("|"));
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
             [ $expression(buildInlineDefine(value.items) +"[]"), ];
@@ -209,8 +209,6 @@ export module Build
                 return buildDefineModule(name, define);
             case "type":
                 return buildDefineLine("type", name, define);
-            case "enum-type":
-                return buildDefineLine("type", name, define);
             case "value":
                 return buildDefineLine("const", name, define, [ $expression("as"), $expression("const"), ]);
             }
@@ -222,19 +220,15 @@ export module Build
                 return [ $expression(define.$ref), ];
             }
             else
-            if (Types.isLiteralElement(define))
-            {
-                return buildInlineDefineLiteral(define);
-            }
-            else
-            if (Types.isTypeofElement(define))
-            {
-                return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat(buildInlineDefine(define.value));
-            }
-            else
             {
                 switch(define.$type)
                 {
+                case "literal":
+                    return buildInlineDefineLiteral(define);
+                case "typeof":
+                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat(buildInlineDefine(define.value));
+                case "itemof":
+                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat([$expression(`${define.value}[number]`)]);
                 case "value":
                     return buildInlineDefine(define.value);
                 case "primitive-type":
@@ -318,16 +312,15 @@ export module Build
                 return [$expression(`${buildValidatorName(define.$ref)}(${name})`)];
             }
             else
-            if (Types.isTypeofElement(define))
-            {
-                return buildValidatorExpression(name, define.value);
-            }
-            else
             {
                 switch(define.$type)
                 {
                 case "literal":
                     return buildLiterarlValidatorExpression(name, define.literal);
+                case "typeof":
+                    return buildValidatorExpression(name, define.value);
+                case "itemof":
+                    return [$expression(`${define.value.$ref}.includes(${name})`)];
                 case "value":
                     return buildValidatorExpression(name, define.value);
                 case "primitive-type":

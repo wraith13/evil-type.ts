@@ -96,6 +96,12 @@ var Types;
         $type: Types.isJust("module"),
         members: Types.isDictionaryObject(Types.isDefinition),
     })(value); };
+    Types.PrimitiveTypeEnumMembers = ["undefined", "boolean", "number", "string"];
+    Types.isPrimitiveTypeEnum = Types.isEnum(Types.PrimitiveTypeEnumMembers);
+    Types.isPrimitiveTypeElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("primitive-type"),
+        type: Types.isPrimitiveTypeEnum,
+    })(value); };
     Types.isLiteralElement = function (value) { return Types.isSpecificObject({
         $type: Types.isJust("literal"),
         literal: Types.isJsonable,
@@ -109,19 +115,16 @@ var Types;
         $type: Types.isJust("typeof"),
         value: Types.isReferElement,
     })(value); };
-    Types.PrimitiveTypeEnumMembers = ["undefined", "boolean", "number", "string"];
-    Types.isPrimitiveTypeEnum = Types.isEnum(Types.PrimitiveTypeEnumMembers);
-    Types.isPrimitiveTypeElement = function (value) { return Types.isSpecificObject({
-        $type: Types.isJust("primitive-type"),
-        type: Types.isPrimitiveTypeEnum,
+    Types.isItemofElement = function (value) { return Types.isSpecificObject({
+        $type: Types.isJust("itemof"),
+        value: Types.isReferElement,
     })(value); };
     Types.isTypeDefinition = function (value) { return Types.isSpecificObject({
         export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
         $type: Types.isJust("type"),
         define: Types.isTypeOrRefer,
     })(value); };
-    Types.isEnumTypeDefinition = function (value) { return Types.isSpecificObject({
-        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
+    Types.isEnumTypeElement = function (value) { return Types.isSpecificObject({
         $type: Types.isJust("enum-type"),
         members: Types.isArray(Types.isOr(Types.isNumber, Types.isString)),
     })(value); };
@@ -149,7 +152,7 @@ var Types;
     Types.isType = Types.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isTypeofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
     Types.isTypeOrValue = Types.isOr(Types.isType, Types.isValueDefinition);
     Types.isTypeOrRefer = Types.isOr(Types.isType, Types.isReferElement);
-    Types.isDefinition = Types.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isEnumTypeDefinition, Types.isInterfaceDefinition);
+    Types.isDefinition = Types.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);
     Types.isDefineOrRefer = function (value) {
         return Types.isDefinition(value) || Types.isReferElement(value);
     };
