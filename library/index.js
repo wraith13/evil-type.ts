@@ -180,9 +180,9 @@ var Build;
                     case "literal":
                         return Define.buildInlineDefineLiteral(define);
                     case "typeof":
-                        return [(0, exports.$expression)("typeof")].concat(Define.buildInlineDefine(define.value));
+                        return __spreadArray([(0, exports.$expression)("typeof")], Define.buildInlineDefine(define.value), true);
                     case "itemof":
-                        return [(0, exports.$expression)("typeof")].concat([(0, exports.$expression)("".concat(define.value.$ref, "[number]"))]);
+                        return [(0, exports.$expression)("typeof"), (0, exports.$expression)("".concat(define.value.$ref, "[number]"))];
                     case "value":
                         return Define.buildInlineDefine(define.value);
                     case "primitive-type":
@@ -243,7 +243,7 @@ var Build;
             return (0, exports.$expression)("(value: unknown): value is ".concat(Define.buildInlineDefineLiteral(define), " => ").concat(Validator.buildLiterarlValidatorExpression("value", define.literal), ";"));
         };
         Validator.buildValidatorLine = function (declarator, name, define) {
-            return Build.buildExport(define).concat(__spreadArray([(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], (0, exports.convertToExpression)(Validator.buildInlineValidator(name, define)), true));
+            return __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Validator.buildInlineValidator(name, define)), true);
         };
         Validator.buildValidatorName = function (name) {
             return text_1.Text.getNameSpace(name).split(".").concat(["is".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name)))]).filter(function (i) { return "" !== i; }).join(".");

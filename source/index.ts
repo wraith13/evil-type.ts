@@ -226,9 +226,9 @@ export module Build
                 case "literal":
                     return buildInlineDefineLiteral(define);
                 case "typeof":
-                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat(buildInlineDefine(define.value));
+                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), ...buildInlineDefine(define.value) ];
                 case "itemof":
-                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat([$expression(`${define.value.$ref}[number]`)]);
+                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), $expression(`${define.value.$ref}[number]`)];
                 case "value":
                     return buildInlineDefine(define.value);
                 case "primitive-type":
@@ -302,7 +302,7 @@ export module Build
         export const buildInlineLiteralValidator = (define: Types.LiteralElement) =>
             $expression(`(value: unknown): value is ${Define.buildInlineDefineLiteral(define)} => ${buildLiterarlValidatorExpression("value", define.literal)};`);
         export const buildValidatorLine = (declarator: string, name: string, define: Types.Type): CodeExpression[] =>
-            buildExport(define).concat([$expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define))]);
+            [...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define))];
         export const buildValidatorName = (name: string) =>
             Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).filter(i => "" !== i).join(".");
         export const buildValidatorExpression = (name: string, define: Types.TypeOrValueOfRefer): CodeInlineEntry[] =>
