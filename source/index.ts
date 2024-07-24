@@ -228,7 +228,7 @@ export module Build
                 case "typeof":
                     return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat(buildInlineDefine(define.value));
                 case "itemof":
-                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat([$expression(`${define.value}[number]`)]);
+                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof") ].concat([$expression(`${define.value.$ref}[number]`)]);
                 case "value":
                     return buildInlineDefine(define.value);
                 case "primitive-type":

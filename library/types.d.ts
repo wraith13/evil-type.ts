@@ -152,12 +152,12 @@ export declare namespace Types {
     }
     const isAndElement: (value: unknown) => value is AndElement;
     type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
-    const isType: (value: unknown) => value is TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ArrayElement | OrElement | AndElement;
+    const isType: (value: unknown) => value is TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValue = Type | ValueDefinition;
-    const isTypeOrValue: (value: unknown) => value is ValueDefinition | TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ArrayElement | OrElement | AndElement;
+    const isTypeOrValue: (value: unknown) => value is ValueDefinition | TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     type TypeOrInterfaceOrRefer = Type | ReferElement;
-    const isTypeOrRefer: (value: unknown) => value is TypeDefinition | InterfaceDefinition | ReferElement | PrimitiveTypeElement | LiteralElement | TypeofElement | ArrayElement | OrElement | AndElement;
+    const isTypeOrRefer: (value: unknown) => value is TypeDefinition | InterfaceDefinition | ReferElement | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
     type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
     const isDefinition: (value: unknown) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
     type DefineOrRefer = Definition | ReferElement;

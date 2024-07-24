@@ -74,6 +74,18 @@
                     "$ref": "indentStyleTypeMember"
                 }
             }
+        },
+        "ValidatorOptionType": {
+            "export": true,
+            "$type": "type",
+            "define": {
+                "$type": "enum-type",
+                "members": [
+                    "none",
+                    "simple",
+                    "full"
+                ]
+            }
         }
     },
     "options": {

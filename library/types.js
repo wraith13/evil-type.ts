@@ -149,7 +149,7 @@ var Types;
         $type: Types.isJust("and"),
         types: Types.isArray(Types.isTypeOrRefer),
     })(value); };
-    Types.isType = Types.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isTypeofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
+    Types.isType = Types.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
     Types.isTypeOrValue = Types.isOr(Types.isType, Types.isValueDefinition);
     Types.isTypeOrRefer = Types.isOr(Types.isType, Types.isReferElement);
     Types.isDefinition = Types.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);

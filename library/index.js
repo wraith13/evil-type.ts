@@ -182,7 +182,7 @@ var Build;
                     case "typeof":
                         return [(0, exports.$expression)("typeof")].concat(Define.buildInlineDefine(define.value));
                     case "itemof":
-                        return [(0, exports.$expression)("typeof")].concat([(0, exports.$expression)("".concat(define.value, "[number]"))]);
+                        return [(0, exports.$expression)("typeof")].concat([(0, exports.$expression)("".concat(define.value.$ref, "[number]"))]);
                     case "value":
                         return Define.buildInlineDefine(define.value);
                     case "primitive-type":

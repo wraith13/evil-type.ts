@@ -306,7 +306,7 @@ export module Types
     })
     (value);
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
-    export const isType = isOr(isPrimitiveTypeElement, isTypeDefinition, isTypeofElement, isInterfaceDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement);
+    export const isType = isOr(isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement);
     export type TypeOrValue = Type | ValueDefinition;
     export const isTypeOrValue = isOr(isType, isValueDefinition);
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
