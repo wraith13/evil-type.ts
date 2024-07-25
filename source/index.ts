@@ -163,7 +163,7 @@ export module Build
         export const enParenthesisIfNeed = <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) =>
             isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
         export const buildInlineDefineEnum = (value: Types.EnumTypeElement) =>
-            kindofJoinExpression(value.members.map(i => $expression(`${i}`)), $expression("|"));
+            kindofJoinExpression(value.members.map(i => $expression(JSON.stringify(i))), $expression("|"));
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
             [ $expression(buildInlineDefine(value.items) +"[]"), ];
         export const buildInlineDefineAnd = (value: Types.AndElement) =>

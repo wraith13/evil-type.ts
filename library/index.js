@@ -126,7 +126,7 @@ var Build;
             return Define.isNeedParenthesis(expressions) ? Define.enParenthesis(expressions) : expressions;
         };
         Define.buildInlineDefineEnum = function (value) {
-            return kindofJoinExpression(value.members.map(function (i) { return (0, exports.$expression)("".concat(i)); }), (0, exports.$expression)("|"));
+            return kindofJoinExpression(value.members.map(function (i) { return (0, exports.$expression)(JSON.stringify(i)); }), (0, exports.$expression)("|"));
         };
         Define.buildInlineDefineArray = function (value) {
             return [(0, exports.$expression)(Define.buildInlineDefine(value.items) + "[]"),];
