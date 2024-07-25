@@ -259,7 +259,7 @@ var Build;
                     case "typeof":
                         return Validator.buildValidatorExpression(name, define.value);
                     case "itemof":
-                        return [(0, exports.$expression)("".concat(define.value.$ref, ".includes(").concat(name, ")")),];
+                        return [(0, exports.$expression)("".concat(define.value.$ref, ".includes(").concat(name, " as any)")),];
                     case "value":
                         return Validator.buildValidatorExpression(name, define.value);
                     case "primitive-type":
@@ -267,7 +267,7 @@ var Build;
                     case "type":
                         return Validator.buildValidatorExpression(name, define.define);
                     case "enum-type":
-                        return [(0, exports.$expression)("".concat(JSON.stringify(define.members), ".includes(").concat(name, ")")),];
+                        return [(0, exports.$expression)("".concat(JSON.stringify(define.members), ".includes(").concat(name, " as any)")),];
                     case "array":
                         return __spreadArray(__spreadArray([
                             (0, exports.$expression)("Array.isArray(".concat(name, ")")),

@@ -320,7 +320,7 @@ export module Build
                 case "typeof":
                     return buildValidatorExpression(name, define.value);
                 case "itemof":
-                    return [ $expression(`${define.value.$ref}.includes(${name})`), ];
+                    return [ $expression(`${define.value.$ref}.includes(${name} as any)`), ];
                 case "value":
                     return buildValidatorExpression(name, define.value);
                 case "primitive-type":
@@ -328,7 +328,7 @@ export module Build
                 case "type":
                     return buildValidatorExpression(name, define.define);
                 case "enum-type":
-                    return [ $expression(`${JSON.stringify(define.members)}.includes(${name})`), ];
+                    return [ $expression(`${JSON.stringify(define.members)}.includes(${name} as any)`), ];
                 case "array":
                     return [
                         $expression(`Array.isArray(${name})`),
