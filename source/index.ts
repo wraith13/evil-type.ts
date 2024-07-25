@@ -107,7 +107,7 @@ export module Build
     export module Define
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
-            $line([...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define)), ...postEpressions]);
+            $line([ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define)), ...postEpressions, ]);
         export const buildInlineDefineLiteral = (define: Types.LiteralElement) => [$expression(JSON.stringify(define.literal))];
         export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeElement) =>
             $expression(value.type);
@@ -177,9 +177,9 @@ export module Build
         );
         export const buildDefineInterface = (name: string, value: Types.InterfaceDefinition): CodeBlock =>
         {
-            const header = buildExport(value).concat(["interface", name].filter(i => null !== i).map(i => $expression(i)));
+            const header = [ ...buildExport(value), ...["interface", name].filter(i => null !== i).map(i => $expression(i)), ];
             const lines = Object.keys(value.members)
-                .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]));
+                .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(value.members[name]), ]));
             return $block(header, lines);
         };
         export const buildDefineModuleCore = (value: Types.ModuleDefinition): CodeEntry[] =>
@@ -191,11 +191,11 @@ export module Build
                     Types.isType(i[1]) ? <CodeEntry[]>[buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]), ]:
                     [] // Types.isValueDefine(i[1])
             )
-            .reduce((a, b) => a.concat(b), []),
+            .reduce((a, b) => [ ...a, ...b, ], []),
         ];
         export const buildDefineModule = (name: string, value: Types.ModuleDefinition): CodeBlock =>
         {
-            const header = buildExport(value).concat([$expression("module"), $expression(name)]);
+            const header = [...buildExport(value), $expression("module"), $expression(name), ];
             const lines = buildDefineModuleCore(value);
             return $block(header, lines);
         };
@@ -226,9 +226,9 @@ export module Build
                 case "literal":
                     return buildInlineDefineLiteral(define);
                 case "typeof":
-                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), ...buildInlineDefine(define.value) ];
+                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), ...buildInlineDefine(define.value), ];
                 case "itemof":
-                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), $expression(`${define.value.$ref}[number]`)];
+                    return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), $expression(`${define.value.$ref}[number]`), ];
                 case "value":
                     return buildInlineDefine(define.value);
                 case "primitive-type":
@@ -302,14 +302,14 @@ export module Build
         export const buildInlineLiteralValidator = (define: Types.LiteralElement) =>
             $expression(`(value: unknown): value is ${Define.buildInlineDefineLiteral(define)} => ${buildLiterarlValidatorExpression("value", define.literal)};`);
         export const buildValidatorLine = (declarator: string, name: string, define: Types.Type): CodeExpression[] =>
-            [...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define))];
+            [ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define)), ];
         export const buildValidatorName = (name: string) =>
-            Text.getNameSpace(name).split(".").concat([`is${Text.toUpperCamelCase(Text.getNameBody(name))}`]).filter(i => "" !== i).join(".");
+            [ ...Text.getNameSpace(name).split("."), `is${Text.toUpperCamelCase(Text.getNameBody(name))}`, ].filter(i => "" !== i).join(".");
         export const buildValidatorExpression = (name: string, define: Types.TypeOrValueOfRefer): CodeInlineEntry[] =>
         {
             if (Types.isReferElement(define))
             {
-                return [$expression(`${buildValidatorName(define.$ref)}(${name})`)];
+                return [ $expression(`${buildValidatorName(define.$ref)}(${name})`), ];
             }
             else
             {
@@ -320,7 +320,7 @@ export module Build
                 case "typeof":
                     return buildValidatorExpression(name, define.value);
                 case "itemof":
-                    return [$expression(`${define.value.$ref}.includes(${name})`)];
+                    return [ $expression(`${define.value.$ref}.includes(${name})`), ];
                 case "value":
                     return buildValidatorExpression(name, define.value);
                 case "primitive-type":
@@ -328,7 +328,7 @@ export module Build
                 case "type":
                     return buildValidatorExpression(name, define.define);
                 case "enum-type":
-                    return [$expression(`${JSON.stringify(define.members)}.includes(${name})`)];
+                    return [ $expression(`${JSON.stringify(define.members)}.includes(${name})`), ];
                 case "array":
                     return [
                         $expression(`Array.isArray(${name})`),
@@ -419,16 +419,16 @@ export module Format
         switch(code.$code)
         {
         case "inline-block":
-            return [ "{", ...code.lines.map(i => tokens(i)).reduce((a, b) => a.concat(b), []), "}", ];
+            return [ "{", ...code.lines.map(i => tokens(i)).reduce((a, b) => [ ...a, ...b, ], []), "}", ];
         case "line":
-            return code.expressions.map(i => tokens(i)).reduce((a, b) => a.concat(b), []);
+            return code.expressions.map(i => tokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
         case "expression":
-            return [ code.expression ];
+            return [ code.expression, ];
         }
     };
     export const line = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
         buildIndent(options, indentDepth)
-        +code.expressions.map(i => tokens(i)).reduce((a, b) => a.concat(b), []).join(" ")
+        +code.expressions.map(i => tokens(i)).reduce((a, b) => [ ...a, ...b, ], []).join(" ")
         +";"
         +getReturnCode(options);
     export const inlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>

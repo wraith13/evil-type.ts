@@ -140,7 +140,7 @@ var Build;
         Define.buildDefineInlineInterface = function (value) { return (0, exports.$iblock)(Object.keys(value.members)
             .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); })); };
         Define.buildDefineInterface = function (name, value) {
-            var header = Build.buildExport(value).concat(["interface", name].filter(function (i) { return null !== i; }).map(function (i) { return (0, exports.$expression)(i); }));
+            var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), ["interface", name].filter(function (i) { return null !== i; }).map(function (i) { return (0, exports.$expression)(i); }), true);
             var lines = Object.keys(value.members)
                 .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); });
             return (0, exports.$block)(header, lines);
@@ -152,10 +152,10 @@ var Build;
                         [];
             } // Types.isValueDefine(i[1])
             )
-                .reduce(function (a, b) { return a.concat(b); }, []), true);
+                .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true);
         };
         Define.buildDefineModule = function (name, value) {
-            var header = Build.buildExport(value).concat([(0, exports.$expression)("module"), (0, exports.$expression)(name)]);
+            var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("module"), (0, exports.$expression)(name),], false);
             var lines = Define.buildDefineModuleCore(value);
             return (0, exports.$block)(header, lines);
         };
@@ -182,7 +182,7 @@ var Build;
                     case "typeof":
                         return __spreadArray([(0, exports.$expression)("typeof")], Define.buildInlineDefine(define.value), true);
                     case "itemof":
-                        return [(0, exports.$expression)("typeof"), (0, exports.$expression)("".concat(define.value.$ref, "[number]"))];
+                        return [(0, exports.$expression)("typeof"), (0, exports.$expression)("".concat(define.value.$ref, "[number]")),];
                     case "value":
                         return Define.buildInlineDefine(define.value);
                     case "primitive-type":
@@ -246,11 +246,11 @@ var Build;
             return __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Validator.buildInlineValidator(name, define)), true);
         };
         Validator.buildValidatorName = function (name) {
-            return text_1.Text.getNameSpace(name).split(".").concat(["is".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name)))]).filter(function (i) { return "" !== i; }).join(".");
+            return __spreadArray(__spreadArray([], text_1.Text.getNameSpace(name).split("."), true), ["is".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name))),], false).filter(function (i) { return "" !== i; }).join(".");
         };
         Validator.buildValidatorExpression = function (name, define) {
             if (types_1.Types.isReferElement(define)) {
-                return [(0, exports.$expression)("".concat(Validator.buildValidatorName(define.$ref), "(").concat(name, ")"))];
+                return [(0, exports.$expression)("".concat(Validator.buildValidatorName(define.$ref), "(").concat(name, ")")),];
             }
             else {
                 switch (define.$type) {
@@ -259,7 +259,7 @@ var Build;
                     case "typeof":
                         return Validator.buildValidatorExpression(name, define.value);
                     case "itemof":
-                        return [(0, exports.$expression)("".concat(define.value.$ref, ".includes(").concat(name, ")"))];
+                        return [(0, exports.$expression)("".concat(define.value.$ref, ".includes(").concat(name, ")")),];
                     case "value":
                         return Validator.buildValidatorExpression(name, define.value);
                     case "primitive-type":
@@ -267,7 +267,7 @@ var Build;
                     case "type":
                         return Validator.buildValidatorExpression(name, define.define);
                     case "enum-type":
-                        return [(0, exports.$expression)("".concat(JSON.stringify(define.members), ".includes(").concat(name, ")"))];
+                        return [(0, exports.$expression)("".concat(JSON.stringify(define.members), ".includes(").concat(name, ")")),];
                     case "array":
                         return __spreadArray(__spreadArray([
                             (0, exports.$expression)("Array.isArray(".concat(name, ")")),
@@ -337,16 +337,16 @@ var Format;
     Format.tokens = function (code) {
         switch (code.$code) {
             case "inline-block":
-                return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return a.concat(b); }, []), true), ["}",], false);
+                return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true), ["}",], false);
             case "line":
-                return code.expressions.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return a.concat(b); }, []);
+                return code.expressions.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
             case "expression":
-                return [code.expression];
+                return [code.expression,];
         }
     };
     Format.line = function (options, indentDepth, code) {
         return Format.buildIndent(options, indentDepth)
-            + code.expressions.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return a.concat(b); }, []).join(" ")
+            + code.expressions.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []).join(" ")
             + ";"
             + Format.getReturnCode(options);
     };
