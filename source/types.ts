@@ -1,17 +1,6 @@
 export module Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
-    export interface TypeError
-    {
-        path: string;
-        requiredType: string;
-        actualValue: string;
-    }
-    export interface TypeErrorListener
-    {
-        currentPath: string;
-        errors: TypeError[];
-    }
     export type JsonableValue = null | boolean | number | string;
     export const isJsonableValue = (value: unknown): value is JsonableValue =>
         null === value ||
