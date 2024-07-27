@@ -11,7 +11,7 @@ export module TypeError
         path: string;
         errors: Entry[];
     }
-    export const next = (name: string, listner: Listener | undefined): Listener | undefined =>
+    export const next = (name: string | number, listner: Listener | undefined): Listener | undefined =>
         listner ?
         {
             path: makePath(listner.path, name),
@@ -22,4 +22,17 @@ export module TypeError
         "string" === name ?
                     `${path}.${name}`:
                     `${path}[${name}]`;
+    export const raiseError = <T extends boolean>(listner: Listener | undefined, requiredType: string, actualValue: string): false =>
+    {
+        if (listner)
+        {
+            listner.errors.push
+            ({
+                path: listner.path,
+                requiredType,
+                actualValue,
+            });
+        }
+        return false;
+    }
 }
