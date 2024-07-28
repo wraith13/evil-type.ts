@@ -1,25 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Types = void 0;
+var jsonable_1 = require("./jsonable");
 var Types;
 (function (Types) {
     Types.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
-    Types.isJsonableValue = function (value) {
-        return null === value ||
-            "boolean" === typeof value ||
-            "number" === typeof value ||
-            "string" === typeof value;
-    };
-    Types.isJsonableObject = function (value) {
-        return null !== value &&
-            "object" === typeof value &&
-            Object.values(value).filter(function (v) { return !Types.isJsonable(v); }).length <= 0;
-    };
-    Types.isJsonable = function (value) {
-        return Types.isJsonableValue(value) ||
-            (Array.isArray(value) && value.filter(function (v) { return !Types.isJsonable(v); }).length <= 0) ||
-            Types.isJsonableObject(value);
-    };
     Types.isJust = function (target) { return function (value) { return target === value; }; };
     Types.isUndefined = Types.isJust(undefined);
     Types.isNull = Types.isJust(null);
@@ -104,7 +89,7 @@ var Types;
     })(value); };
     Types.isLiteralElement = function (value) { return Types.isSpecificObject({
         $type: Types.isJust("literal"),
-        literal: Types.isJsonable,
+        literal: jsonable_1.Jsonable.isJsonable,
     })(value); };
     Types.isValueDefinition = function (value) { return Types.isSpecificObject({
         export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),

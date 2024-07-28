@@ -35,4 +35,6 @@ export module TypeError
         }
         return false;
     }
+    export const valueToString = (value: unknown) =>
+        undefined === value ? "undefined": JSON.stringify(value);
 }

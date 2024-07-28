@@ -1,3 +1,4 @@
+import { Jsonable } from "./jsonable";
 import { Types } from "./types";
 interface Code {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
@@ -50,7 +51,7 @@ export declare namespace Build {
         const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {
-        const buildLiterarlValidatorExpression: (name: string, value: Types.Jsonable) => CodeExpression[];
+        const buildLiterarlValidatorExpression: (name: string, value: Jsonable.Jsonable) => CodeExpression[];
         const buildInlineLiteralValidator: (define: Types.LiteralElement) => CodeExpression;
         const buildValidatorLine: (declarator: string, name: string, define: Types.Type) => CodeExpression[];
         const buildValidatorName: (name: string) => string;

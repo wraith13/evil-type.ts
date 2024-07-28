@@ -1,26 +1,7 @@
+import { Jsonable } from "./jsonable";
 export module Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
-    export type JsonableValue = null | boolean | number | string;
-    export const isJsonableValue = (value: unknown): value is JsonableValue =>
-        null === value ||
-        "boolean" === typeof value ||
-        "number" === typeof value ||
-        "string" === typeof value;
-    export interface JsonableObject
-    {
-        [key: string]: Jsonable;
-    }
-    export const isJsonableObject = (value: unknown): value is JsonableObject =>
-        null !== value &&
-        "object" === typeof value &&
-        Object.values(value).filter(v => ! isJsonable(v)).length <= 0;
-    export type Jsonable = JsonableValue | Jsonable[] | JsonableObject;
-    export const isJsonable = (value: unknown): value is Jsonable =>
-        isJsonableValue(value) ||
-        (Array.isArray(value) && value.filter(v => ! isJsonable(v)).length <= 0) ||
-        isJsonableObject(value);
-    export type JsonablePartial<Target> = { [key in keyof Target]?: Target[key] } & JsonableObject;
     export const isJust = <T>(target: T) => (value: unknown): value is T => target === value;
     export const isUndefined = isJust(undefined);
     export const isNull = isJust(null);
@@ -186,12 +167,12 @@ export module Types
     export interface LiteralElement extends AlphaElement
     {
         $type: "literal";
-        literal: Jsonable;
+        literal: Jsonable.Jsonable;
     }
     export const isLiteralElement = (value: unknown): value is LiteralElement => isSpecificObject<LiteralElement>
     ({
         $type: isJust("literal"),
-        literal: isJsonable,
+        literal: Jsonable.isJsonable,
     })
     (value);
     export interface ValueDefinition extends AlphaDefinition

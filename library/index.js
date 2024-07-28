@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Format = exports.Build = exports.$block = exports.$iblock = exports.$line = exports.$expression = exports.convertToExpression = void 0;
 var startAt = new Date();
 var fs_1 = __importDefault(require("fs"));
+var jsonable_1 = require("./jsonable");
 var types_1 = require("./types");
 var text_1 = require("./text");
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
@@ -388,7 +389,7 @@ try {
     var fget = function (path) { return fs_1.default.readFileSync(path, { encoding: "utf-8" }); };
     console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     var rawSource = fget(jsonPath);
-    var typeSource = JSON.parse(rawSource);
+    var typeSource = jsonable_1.Jsonable.parse(rawSource);
     if (types_1.Types.isTypeSchema(typeSource)) {
         var defines = Object.entries(typeSource.defines)
             .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); });

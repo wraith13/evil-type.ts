@@ -1,6 +1,7 @@
 'use strict';
 const startAt = new Date();
 import fs from "fs";
+import { Jsonable } from "./jsonable";
 import { Types } from "./types";
 import { Text } from "./text";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
@@ -251,7 +252,7 @@ export module Build
     }
     export module Validator
     {
-        export const buildLiterarlValidatorExpression = (name: string, value: Types.Jsonable): CodeExpression[] =>
+        export const buildLiterarlValidatorExpression = (name: string, value: Jsonable.Jsonable): CodeExpression[] =>
         {
             if (null !== value && "object" === typeof value)
             {
@@ -474,7 +475,7 @@ try
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     const rawSource = fget(jsonPath);
-    const typeSource = JSON.parse(rawSource);
+    const typeSource = Jsonable.parse(rawSource);
     if (Types.isTypeSchema(typeSource))
     {
         const defines = Object.entries(typeSource.defines)

@@ -1,16 +1,6 @@
+import { Jsonable } from "./jsonable";
 export declare namespace Types {
     const schema: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
-    type JsonableValue = null | boolean | number | string;
-    const isJsonableValue: (value: unknown) => value is JsonableValue;
-    interface JsonableObject {
-        [key: string]: Jsonable;
-    }
-    const isJsonableObject: (value: unknown) => value is JsonableObject;
-    type Jsonable = JsonableValue | Jsonable[] | JsonableObject;
-    const isJsonable: (value: unknown) => value is Jsonable;
-    type JsonablePartial<Target> = {
-        [key in keyof Target]?: Target[key];
-    } & JsonableObject;
     const isJust: <T>(target: T) => (value: unknown) => value is T;
     const isUndefined: (value: unknown) => value is undefined;
     const isNull: (value: unknown) => value is null;
@@ -96,7 +86,7 @@ export declare namespace Types {
     const isPrimitiveTypeElement: (value: unknown) => value is PrimitiveTypeElement;
     interface LiteralElement extends AlphaElement {
         $type: "literal";
-        literal: Jsonable;
+        literal: Jsonable.Jsonable;
     }
     const isLiteralElement: (value: unknown) => value is LiteralElement;
     interface ValueDefinition extends AlphaDefinition {
