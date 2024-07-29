@@ -17,7 +17,7 @@ export module Jsonable
     export const isJsonableObject = (value: unknown): value is JsonableObject =>
         null !== value &&
         "object" === typeof value &&
-        Object.values(value).filter(v => ! isJsonable(v)).length <= 0;
+        ! Object.values(value).some(v => ! isJsonable(v));
     export type Jsonable = JsonableValue | JsonableArray | JsonableObject;
     export const isJsonable = (value: unknown): value is Jsonable =>
         isJsonableValue(value) ||

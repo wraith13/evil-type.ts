@@ -16,7 +16,7 @@ var Jsonable;
     Jsonable.isJsonableObject = function (value) {
         return null !== value &&
             "object" === typeof value &&
-            Object.values(value).filter(function (v) { return !Jsonable.isJsonable(v); }).length <= 0;
+            !Object.values(value).some(function (v) { return !Jsonable.isJsonable(v); });
     };
     Jsonable.isJsonable = function (value) {
         return Jsonable.isJsonableValue(value) ||
