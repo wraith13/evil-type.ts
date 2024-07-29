@@ -9,6 +9,10 @@ var Jsonable;
             "number" === typeof value ||
             "string" === typeof value;
     };
+    Jsonable.isJsonableArray = function (value) {
+        return Array.isArray(value) &&
+            !value.some(function (v) { return !Jsonable.isJsonable(v); });
+    };
     Jsonable.isJsonableObject = function (value) {
         return null !== value &&
             "object" === typeof value &&
@@ -16,7 +20,7 @@ var Jsonable;
     };
     Jsonable.isJsonable = function (value) {
         return Jsonable.isJsonableValue(value) ||
-            (Array.isArray(value) && value.filter(function (v) { return !Jsonable.isJsonable(v); }).length <= 0) ||
+            Jsonable.isJsonableArray(value) ||
             Jsonable.isJsonableObject(value);
     };
     Jsonable.parse = function (json) { return JSON.parse(json); };
