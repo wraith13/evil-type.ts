@@ -11,12 +11,12 @@ var Jsonable;
     };
     Jsonable.isJsonableArray = function (value) {
         return Array.isArray(value) &&
-            value.every(function (v) { return Jsonable.isJsonable(v); });
+            value.every(Jsonable.isJsonable);
     };
     Jsonable.isJsonableObject = function (value) {
         return null !== value &&
             "object" === typeof value &&
-            Object.values(value).every(function (v) { return Jsonable.isJsonable(v); });
+            Object.values(value).every(Jsonable.isJsonable);
     };
     Jsonable.isJsonable = function (value) {
         return Jsonable.isJsonableValue(value) ||

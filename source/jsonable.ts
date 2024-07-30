@@ -9,7 +9,7 @@ export module Jsonable
     export type JsonableArray = Jsonable[];
     export const isJsonableArray = (value: unknown): value is JsonableArray =>
         Array.isArray(value) &&
-        value.every(v => isJsonable(v));
+        value.every(isJsonable);
     export interface JsonableObject
     {
         [key: string]: Jsonable;
@@ -17,7 +17,7 @@ export module Jsonable
     export const isJsonableObject = (value: unknown): value is JsonableObject =>
         null !== value &&
         "object" === typeof value &&
-        Object.values(value).every(v => isJsonable(v));
+        Object.values(value).every(isJsonable);
     export type Jsonable = JsonableValue | JsonableArray | JsonableObject;
     export const isJsonable = (value: unknown): value is Jsonable =>
         isJsonableValue(value) ||
@@ -25,5 +25,5 @@ export module Jsonable
         isJsonableObject(value);
     export const parse = (json: string): Jsonable => JSON.parse(json);
     export const stringify = (value: Jsonable): string => JSON.stringify(value);
-    export type JsonablePartial<Target> = { [key in keyof Target]?: Target[key] } & JsonableObject;
+    export type JsonablePartial<Target extends JsonableObject> = { [key in keyof Target]?: Target[key] } & JsonableObject;
 }

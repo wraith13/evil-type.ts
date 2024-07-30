@@ -11,7 +11,7 @@ export declare namespace Jsonable {
     const isJsonable: (value: unknown) => value is Jsonable;
     const parse: (json: string) => Jsonable;
     const stringify: (value: Jsonable) => string;
-    type JsonablePartial<Target> = {
+    type JsonablePartial<Target extends JsonableObject> = {
         [key in keyof Target]?: Target[key];
     } & JsonableObject;
 }
