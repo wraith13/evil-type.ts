@@ -1,8 +1,10 @@
 import { Jsonable } from "./jsonable";
+import { TypeError } from "./typeerror"
 export module Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
-    export const isJust = <T>(target: T) => (value: unknown): value is T => target === value;
+    export const isJust = <T>(target: T) => (value: unknown, listner?: TypeError.Listener): value is T =>
+        target === value || (undefined !== listner && TypeError.raiseError(listner, TypeError.valueToString(target), value));
     export const isUndefined = isJust(undefined);
     export const isNull = isJust(null);
     export const isBoolean = (value: unknown): value is boolean => "boolean" === typeof value;
@@ -52,7 +54,7 @@ export module Types
         { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) } &
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
-    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown): value is ObjectType =>
+    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypeError.Listener): value is ObjectType =>
         isObject(value) &&
         Object.entries(memberValidator).filter
         (
@@ -113,14 +115,14 @@ export module Types
         defines: { [key: string]: Definition; };
         options: TypeOptions;
     }
-    export const isTypeSchema = (value: unknown): value is TypeSchema =>
+    export const isTypeSchema = (value: unknown, listner?: TypeError.Listener): value is TypeSchema =>
         isSpecificObject<TypeSchema>
         ({
             "$ref": isJust(schema),
             "defines": isDictionaryObject(isDefinition),
             "options": isTypeOptions
         })
-        (value);
+        (value, listner);
     export type FilePath = string;
     export interface ReferElement
     {

@@ -27,17 +27,14 @@ export module TypeError
         "string" === name ?
                     `${path}.${name}`:
                     `${path}[${name}]`;
-    export const raiseError = <T extends boolean>(listner: Listener | undefined, requiredType: string, actualValue: string): false =>
+    export const raiseError = (listner: Listener, requiredType: string, actualValue: unknown) =>
     {
-        if (listner)
-        {
-            listner.errors.push
-            ({
-                path: listner.path,
-                requiredType,
-                actualValue,
-            });
-        }
+        listner.errors.push
+        ({
+            path: listner.path,
+            requiredType,
+            actualValue: valueToString(actualValue),
+        });
         return false;
     }
     export const valueToString = (value: unknown) =>
