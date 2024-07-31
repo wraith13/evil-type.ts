@@ -11,7 +11,12 @@ export module TypeError
         path: string;
         errors: Entry[];
     }
-    export const next = (name: string | number, listner: Listener | undefined): Listener | undefined =>
+    export const makeListener = (path: string = ""): Listener =>
+    ({
+        path,
+        errors: [],
+    });
+    export const nextListener = (name: string | number, listner: Listener | undefined): Listener | undefined =>
         listner ?
         {
             path: makePath(listner.path, name),
