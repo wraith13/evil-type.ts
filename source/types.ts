@@ -19,9 +19,9 @@ export module Types
     export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener): value is T =>
         list.includes(value as T) || (undefined !== listner && TypeError.raiseError(listner, list.map(i => TypeError.valueToString(i)).join(" | "), value));
     export const isArray = <T>(isType: (value: unknown) => value is T) => (value: unknown): value is T[] =>
-        Array.isArray(value) && value.filter(i => ! isType(i)).length <= 0;
+        Array.isArray(value) && value.every(i => isType(i));
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown) => value is T[K]) }) =>
-        (value: unknown): value is T[number] => 0 < isTypeList.filter(i => i(value)).length;
+        (value: unknown): value is T[number] => isTypeList.some(i => i(value));
     export interface OptionalKeyTypeGuard<T>
     {
         $type: "optional-type-guard";
@@ -61,17 +61,14 @@ export module Types
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypeError.Listener): value is ObjectType =>
         isObject(value) &&
-        Object.entries(memberValidator).filter
+        Object.entries(memberValidator).every
         (
-            kv => !
-            (
-                kv[0].endsWith("?") ?
-                    isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown) => boolean):
-                    isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown) => boolean)
-            )
-        ).length <= 0;
+            kv => kv[0].endsWith("?") ?
+                isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown) => boolean):
+                isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown) => boolean)
+        );
     export const isDictionaryObject = <MemberType>(isType: ((m: unknown) => m is MemberType)) => (value: unknown): value is { [key: string]: MemberType } =>
-        isObject(value) && Object.values(value).filter(i => ! isType(i)).length <= 0;
+        isObject(value) && Object.values(value).every(i => isType(i));
     export const ValidatorOptionTypeMembers = [ "none", "simple", "full", ] as const;
     export type ValidatorOptionType = typeof ValidatorOptionTypeMembers[number];
     export const isValidatorOptionType = isEnum(ValidatorOptionTypeMembers);
@@ -97,15 +94,12 @@ export module Types
     // export type BuildInterface<T extends { [key: string]: (value: unknown) => value is any}> = { -readonly [key in keyof T]: GuardType<T[key]>; };
     // export const isSpecificObjectX = <T extends { [key: string]: (value: unknown) => value is any}>(memberSpecification: { [key: string]: ((v: unknown) => boolean) }) => (value: unknown): value is BuildInterface<T> =>
     //     isObject(value) &&
-    //     Object.entries(memberSpecification).filter
+    //     Object.entries(memberSpecification).every
     //     (
-    //         kv => !
-    //         (
-    //             kv[0].endsWith("?") ?
+    //         kv => kv[0].endsWith("?") ?
     //                 isMemberTypeOrUndefined<BuildInterface<T>>(value, kv[0].slice(0, -1) as keyof BuildInterface<T>, kv[1]):
     //                 isMemberType<BuildInterface<T>>(value, kv[0] as keyof BuildInterface<T>, kv[1])
-    //         )
-    //     ).length <= 0;
+    //     );
     // export const TypeOptionsTypeSource =
     // {
     //     indentUnit: isOr(isNumber, isJust("\t" as const)),
