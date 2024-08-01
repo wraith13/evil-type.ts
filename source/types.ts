@@ -7,12 +7,17 @@ export module Types
         target === value || (undefined !== listner && TypeError.raiseError(listner, TypeError.valueToString(target), value));
     export const isUndefined = isJust(undefined);
     export const isNull = isJust(null);
-    export const isBoolean = (value: unknown): value is boolean => "boolean" === typeof value;
-    export const isNumber = (value: unknown): value is number => "number" === typeof value;
-    export const isString = (value: unknown): value is string => "string" === typeof value;
+    export const isBoolean = (value: unknown, listner?: TypeError.Listener): value is boolean =>
+        "boolean" === typeof value || (undefined !== listner && TypeError.raiseError(listner, "boolean", value));
+    export const isNumber = (value: unknown, listner?: TypeError.Listener): value is number =>
+        "number" === typeof value || (undefined !== listner && TypeError.raiseError(listner, "number", value));
+    export const isString = (value: unknown, listner?: TypeError.Listener): value is string =>
+        "string" === typeof value || (undefined !== listner && TypeError.raiseError(listner, "string", value));
     export type ActualObject = Exclude<object, null>;
-    export const isObject = (value: unknown): value is ActualObject => null !== value && "object" === typeof value;
-    export const isEnum = <T>(list: readonly T[]) => (value: unknown): value is T => list.includes(value as T);
+    export const isObject = (value: unknown, listner?: TypeError.Listener): value is ActualObject =>
+        (null !== value && "object" === typeof value) || (undefined !== listner && TypeError.raiseError(listner, "object", value));
+    export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener): value is T =>
+        list.includes(value as T) || (undefined !== listner && TypeError.raiseError(listner, list.map(i => TypeError.valueToString(i)).join(" | "), value));
     export const isArray = <T>(isType: (value: unknown) => value is T) => (value: unknown): value is T[] =>
         Array.isArray(value) && value.filter(i => ! isType(i)).length <= 0;
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown) => value is T[K]) }) =>
