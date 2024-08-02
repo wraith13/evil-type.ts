@@ -70,7 +70,7 @@ type CodeInlineEntry = CodeExpression | CodeLine | CodeInlineBlock;
 //     null !== value &&
 //     "object" === typeof value &&
 //     "$code" in value && "line" === value.$code &&
-//     "expressions" in value && Array.isArray(value.expressions) && value.expressions.filter(i => ! isCodeExpression(i)).length <= 0;
+//     "expressions" in value && Array.isArray(value.expressions) && value.expressions.every(i => isCodeExpression(i));
 interface CodeInlineBlock extends Code
 {
     $code: "inline-block";
@@ -82,7 +82,7 @@ interface CodeInlineBlock extends Code
 //     "object" === typeof value &&
 //     "$code" in value && "inline-block" === value.$code &&
 //     ! ("header" in value) &&
-//     "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
+//     "lines" in value && Array.isArray(value.lines) && value.lines.every(i => isCodeLine(i));
 interface CodeBlock extends Code
 {
     $code: "block";
@@ -93,8 +93,8 @@ interface CodeBlock extends Code
 //     null !== value &&
 //     "object" === typeof value &&
 //     "$code" in value && "block" === value.$code &&
-//     "header" in value && Array.isArray(value.header) && value.header.filter(i => ! isCodeExpression(i)).length <= 0 &&
-//     "lines" in value && Array.isArray(value.lines) && value.lines.filter(i => ! isCodeLine(i)).length <= 0;
+//     "header" in value && Array.isArray(value.header) && value.header.every(i => isCodeExpression(i)) &&
+//     "lines" in value && Array.isArray(value.lines) && value.lines.every(i => isCodeLine(i));
 type CodeEntry = CodeInlineBlock | CodeLine | CodeBlock;
 export const $expression = (expression: CodeExpression["expression"]): CodeExpression => ({ $code: "expression", expression, });
 export const $line = (expressions: CodeLine["expressions"]): CodeLine => ({ $code: "line", expressions, });
