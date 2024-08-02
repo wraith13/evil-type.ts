@@ -25,7 +25,7 @@ export module Types
     export interface OptionalKeyTypeGuard<T>
     {
         $type: "optional-type-guard";
-        isType: (value: unknown) => value is T;
+        isType: (value: unknown, listner?: TypeError.Listener) => value is T;
     }
     export const sss: OptionalKeyTypeGuard<number> =
     {
@@ -43,12 +43,12 @@ export module Types
         $type: "optional-type-guard",
         isType,
     });
-    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean) | OptionalKeyTypeGuard<unknown>): boolean =>
+    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener): boolean =>
         isOptionalKeyTypeGuard(isType) ?
-            (! (member in value) || isType.isType((value as ObjectType)[member])):
-            (member in value && isType((value as ObjectType)[member]));
-    export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown) => boolean)): boolean =>
-        ! (member in value) || isType((value as ObjectType)[member]);
+            (! (member in value) || isType.isType((value as ObjectType)[member], listner)):
+            (member in value && isType((value as ObjectType)[member], listner));
+    export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean), listner?: TypeError.Listener): boolean =>
+        ! (member in value) || isType((value as ObjectType)[member], listner);
     export type OptionalKeys<T> =
         { [K in keyof T]: T extends Record<K, T[K]> ? never : K } extends { [_ in keyof T]: infer U }
         ? U : never;
@@ -64,8 +64,8 @@ export module Types
         Object.entries(memberValidator).every
         (
             kv => kv[0].endsWith("?") ?
-                isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown) => boolean):
-                isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown) => boolean)
+                isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, listner):
+                isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, listner)
         );
     export const isDictionaryObject = <MemberType>(isType: ((m: unknown) => m is MemberType)) => (value: unknown): value is { [key: string]: MemberType } =>
         isObject(value) && Object.values(value).every(i => isType(i));
