@@ -36,7 +36,8 @@ export module Types
         isSpecificObject<OptionalKeyTypeGuard<unknown>>
         ({
             $type: isJust("optional-type-guard"),
-            isType: (value: unknown, listner?: TypeError.Listener): value is ((v: unknown, listner?: TypeError.Listener) => v is unknown) => "function" === typeof value,
+            isType: (value: unknown, listner?: TypeError.Listener): value is ((v: unknown, listner?: TypeError.Listener) => v is unknown) =>
+                "function" === typeof value && (undefined !== listner && TypeError.raiseError(listner, "function", value)),
         })(value, listner);
     export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T): OptionalKeyTypeGuard<T> =>
     ({
@@ -60,15 +61,16 @@ export module Types
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypeError.Listener): value is ObjectType =>
-        isObject(value) &&
+        isObject(value, listner) &&
         Object.entries(memberValidator).every
         (
             kv => kv[0].endsWith("?") ?
-                isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, listner):
-                isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, listner)
+                isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, TypeError.nextListener(kv[0], listner)):
+                isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, TypeError.nextListener(kv[0], listner))
         );
-    export const isDictionaryObject = <MemberType>(isType: ((m: unknown) => m is MemberType)) => (value: unknown): value is { [key: string]: MemberType } =>
-        isObject(value) && Object.values(value).every(i => isType(i));
+    export const isDictionaryObject = <MemberType>(isType: ((m: unknown, listner?: TypeError.Listener) => m is MemberType)) => (value: unknown, listner?: TypeError.Listener): value is { [key: string]: MemberType } =>
+        isObject(value, listner) &&
+        Object.entries(value).every(kv => isType(kv[1], TypeError.nextListener(kv[0], listner)));
     export const ValidatorOptionTypeMembers = [ "none", "simple", "full", ] as const;
     export type ValidatorOptionType = typeof ValidatorOptionTypeMembers[number];
     export const isValidatorOptionType = isEnum(ValidatorOptionTypeMembers);
@@ -298,5 +300,5 @@ export module Types
     export const isDefinition = isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition);
     export type DefineOrRefer = Definition | ReferElement;
     export const isDefineOrRefer = (value: unknown, listner?: TypeError.Listener): value is DefineOrRefer =>
-        isDefinition(value) || isReferElement(value);
+        isDefinition(value, listner) || isReferElement(value, listner);
 }
