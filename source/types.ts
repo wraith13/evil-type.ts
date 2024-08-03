@@ -18,10 +18,10 @@ export module Types
         (null !== value && "object" === typeof value) || (undefined !== listner && TypeError.raiseError(listner, "object", value));
     export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener): value is T =>
         list.includes(value as T) || (undefined !== listner && TypeError.raiseError(listner, list.map(i => TypeError.valueToString(i)).join(" | "), value));
-    export const isArray = <T>(isType: (value: unknown) => value is T) => (value: unknown): value is T[] =>
-        Array.isArray(value) && value.every(i => isType(i));
-    export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown) => value is T[K]) }) =>
-        (value: unknown): value is T[number] => isTypeList.some(i => i(value));
+    export const isArray = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener): value is T[] =>
+        Array.isArray(value) && value.every(i => isType(i, listner));
+    export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
+        (value: unknown, listner?: TypeError.Listener): value is T[number] => isTypeList.some(i => i(value, listner));
     export interface OptionalKeyTypeGuard<T>
     {
         $type: "optional-type-guard";
@@ -32,13 +32,13 @@ export module Types
         $type: "optional-type-guard",
         isType: isNumber,
     }
-    export const isOptionalKeyTypeGuard = (value: unknown): value is OptionalKeyTypeGuard<unknown> =>
+    export const isOptionalKeyTypeGuard = (value: unknown, listner?: TypeError.Listener): value is OptionalKeyTypeGuard<unknown> =>
         isSpecificObject<OptionalKeyTypeGuard<unknown>>
         ({
             $type: isJust("optional-type-guard"),
-            isType: (value: unknown): value is ((v: unknown) => v is unknown) => "function" === typeof value,
-        })(value);
-    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown) => value is T): OptionalKeyTypeGuard<T> =>
+            isType: (value: unknown, listner?: TypeError.Listener): value is ((v: unknown, listner?: TypeError.Listener) => v is unknown) => "function" === typeof value,
+        })(value, listner);
+    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T): OptionalKeyTypeGuard<T> =>
     ({
         $type: "optional-type-guard",
         isType,
@@ -144,13 +144,13 @@ export module Types
         $type: "module";
         members: { [key: string]: Definition; };
     }
-    export const isModuleDefinition = (value: unknown): value is ModuleDefinition => isSpecificObject<ModuleDefinition>
+    export const isModuleDefinition = (value: unknown, listner?: TypeError.Listener): value is ModuleDefinition => isSpecificObject<ModuleDefinition>
     ({
         export: makeOptionalKeyTypeGuard(isBoolean),
         $type: isJust("module"),
         members: isDictionaryObject(isDefinition),
     })
-    (value);
+    (value, listner);
     export const PrimitiveTypeEnumMembers = ["undefined", "boolean", "number", "string"] as const;
     export type PrimitiveTypeEnum = typeof PrimitiveTypeEnumMembers[number];
     export const isPrimitiveTypeEnum = isEnum(PrimitiveTypeEnumMembers);
@@ -159,134 +159,134 @@ export module Types
         $type: "primitive-type";
         type: PrimitiveTypeEnum;
     }
-    export const isPrimitiveTypeElement = (value: unknown): value is PrimitiveTypeElement => isSpecificObject<PrimitiveTypeElement>
+    export const isPrimitiveTypeElement = (value: unknown, listner?: TypeError.Listener): value is PrimitiveTypeElement => isSpecificObject<PrimitiveTypeElement>
     ({
         $type: isJust("primitive-type"),
         type: isPrimitiveTypeEnum,
     })
-    (value);
+    (value, listner);
     export interface LiteralElement extends AlphaElement
     {
         $type: "literal";
         literal: Jsonable.Jsonable;
     }
-    export const isLiteralElement = (value: unknown): value is LiteralElement => isSpecificObject<LiteralElement>
+    export const isLiteralElement = (value: unknown, listner?: TypeError.Listener): value is LiteralElement => isSpecificObject<LiteralElement>
     ({
         $type: isJust("literal"),
         literal: Jsonable.isJsonable,
     })
-    (value);
+    (value, listner);
     export interface ValueDefinition extends AlphaDefinition
     {
         $type: "value";
         value: LiteralElement | ReferElement;
     }
-    export const isValueDefinition = (value: unknown): value is ValueDefinition => isSpecificObject<ValueDefinition>
+    export const isValueDefinition = (value: unknown, listner?: TypeError.Listener): value is ValueDefinition => isSpecificObject<ValueDefinition>
     ({
         export: makeOptionalKeyTypeGuard(isBoolean),
         $type: isJust("value"),
         value: isOr(isLiteralElement, isReferElement),
     })
-    (value);
+    (value, listner);
     export interface TypeofElement extends AlphaElement
     {
         $type: "typeof";
         value: ReferElement;
     }
-    export const isTypeofElement = (value: unknown): value is TypeofElement => isSpecificObject<TypeofElement>
+    export const isTypeofElement = (value: unknown, listner?: TypeError.Listener): value is TypeofElement => isSpecificObject<TypeofElement>
     ({
         $type: isJust("typeof"),
         value: isReferElement,
-    })(value);
+    })(value, listner);
     export interface ItemofElement extends AlphaElement
     {
         $type: "itemof";
         value: ReferElement;
     }
-    export const isItemofElement = (value: unknown): value is ItemofElement => isSpecificObject<ItemofElement>
+    export const isItemofElement = (value: unknown, listner?: TypeError.Listener): value is ItemofElement => isSpecificObject<ItemofElement>
     ({
         $type: isJust("itemof"),
         value: isReferElement,
-    })(value);
+    })(value, listner);
     export interface TypeDefinition extends AlphaDefinition
     {
         $type: "type";
         define: TypeOrInterfaceOrRefer;
     }
-    export const isTypeDefinition = (value: unknown): value is TypeDefinition => isSpecificObject<TypeDefinition>
+    export const isTypeDefinition = (value: unknown, listner?: TypeError.Listener): value is TypeDefinition => isSpecificObject<TypeDefinition>
     ({
         export: makeOptionalKeyTypeGuard(isBoolean),
         $type: isJust("type"),
         define: isTypeOrRefer,
     })
-    (value);
+    (value, listner);
     export interface EnumTypeElement extends AlphaElement
     {
         $type: "enum-type";
         members: (number | string)[];
     }
-    export const isEnumTypeElement = (value: unknown): value is EnumTypeElement => isSpecificObject<EnumTypeElement>
+    export const isEnumTypeElement = (value: unknown, listner?: TypeError.Listener): value is EnumTypeElement => isSpecificObject<EnumTypeElement>
     ({
         $type: isJust("enum-type"),
         members: isArray(isOr(isNumber, isString)),
     })
-    (value);
+    (value, listner);
     export interface InterfaceDefinition extends AlphaDefinition
     {
         $type: "interface";
         members: { [key: string]: TypeOrInterfaceOrRefer; };
     }
-    export const isInterfaceDefinition = (value: unknown): value is InterfaceDefinition => isSpecificObject<InterfaceDefinition>
+    export const isInterfaceDefinition = (value: unknown, listner?: TypeError.Listener): value is InterfaceDefinition => isSpecificObject<InterfaceDefinition>
     ({
         export: makeOptionalKeyTypeGuard(isBoolean),
         $type: isJust("interface"),
         members: isDictionaryObject(isTypeOrRefer),
     })
-    (value);
+    (value, listner);
     export interface DictionaryElement extends AlphaElement
     {
         $type: "dictionary";
         members: TypeOrInterfaceOrRefer;
     }
-    export const isDictionaryElement = (value: unknown): value is DictionaryElement => isSpecificObject<DictionaryElement>
+    export const isDictionaryElement = (value: unknown, listner?: TypeError.Listener): value is DictionaryElement => isSpecificObject<DictionaryElement>
     ({
         $type: isJust("dictionary"),
         members: isTypeOrRefer,
     })
-    (value);
+    (value, listner);
     export interface ArrayElement extends AlphaElement
     {
         $type: "array";
         items: TypeOrInterfaceOrRefer;
     }
-    export const isArrayElement = (value: unknown): value is ArrayElement => isSpecificObject<ArrayElement>
+    export const isArrayElement = (value: unknown, listner?: TypeError.Listener): value is ArrayElement => isSpecificObject<ArrayElement>
     ({
         $type: isJust("array"),
         items: isTypeOrRefer,
     })
-    (value);
+    (value, listner);
     export interface OrElement extends AlphaElement
     {
         $type: "or";
         types: TypeOrInterfaceOrRefer[];
     }
-    export const isOrElement = (value: unknown): value is OrElement => isSpecificObject<OrElement>
+    export const isOrElement = (value: unknown, listner?: TypeError.Listener): value is OrElement => isSpecificObject<OrElement>
     ({
         $type: isJust("or"),
         types: isArray(isTypeOrRefer),
     })
-    (value);
+    (value, listner);
     export interface AndElement extends AlphaElement
     {
         $type: "and";
         types: TypeOrInterfaceOrRefer[];
     }
-    export const isAndElement = (value: unknown): value is AndElement => isSpecificObject<AndElement>
+    export const isAndElement = (value: unknown, listner?: TypeError.Listener): value is AndElement => isSpecificObject<AndElement>
     ({
         $type: isJust("and"),
         types: isArray(isTypeOrRefer),
     })
-    (value);
+    (value, listner);
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     export const isType = isOr(isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement);
     export type TypeOrValue = Type | ValueDefinition;
@@ -297,6 +297,6 @@ export module Types
     export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
     export const isDefinition = isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition);
     export type DefineOrRefer = Definition | ReferElement;
-    export const isDefineOrRefer = (value: unknown): value is DefineOrRefer =>
+    export const isDefineOrRefer = (value: unknown, listner?: TypeError.Listener): value is DefineOrRefer =>
         isDefinition(value) || isReferElement(value);
 }
