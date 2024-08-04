@@ -21,7 +21,23 @@ export module Types
     export const isArray = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener): value is T[] =>
         Array.isArray(value) && value.every(i => isType(i, listner));
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
-        (value: unknown, listner?: TypeError.Listener): value is T[number] => isTypeList.some(i => i(value, listner));
+        (value: unknown, listner?: TypeError.Listener): value is T[number] =>
+        {
+            if (listner)
+            {
+                const transactionListner = TypeError.makeListener(listner.path);
+                const result = isTypeList.some(i => i(value, transactionListner));
+                if ( ! result)
+                {
+                    TypeError.raiseError(listner, "__OR__NYI__", value);
+                }
+                return result;
+            }
+            else
+            {
+                return isTypeList.some(i => i(value));
+            }
+        }
     export interface OptionalKeyTypeGuard<T>
     {
         $type: "optional-type-guard";
@@ -299,6 +315,5 @@ export module Types
     export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
     export const isDefinition = isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition);
     export type DefineOrRefer = Definition | ReferElement;
-    export const isDefineOrRefer = (value: unknown, listner?: TypeError.Listener): value is DefineOrRefer =>
-        isDefinition(value, listner) || isReferElement(value, listner);
+    export const isDefineOrRefer = isOr(isDefinition, isReferElement);
 }

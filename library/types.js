@@ -2,36 +2,63 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Types = void 0;
 var jsonable_1 = require("./jsonable");
+var typeerror_1 = require("./typeerror");
 var Types;
 (function (Types) {
     Types.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
-    Types.isJust = function (target) { return function (value) { return target === value; }; };
+    Types.isJust = function (target) { return function (value, listner) {
+        return target === value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, typeerror_1.TypeError.valueToString(target), value));
+    }; };
     Types.isUndefined = Types.isJust(undefined);
     Types.isNull = Types.isJust(null);
-    Types.isBoolean = function (value) { return "boolean" === typeof value; };
-    Types.isNumber = function (value) { return "number" === typeof value; };
-    Types.isString = function (value) { return "string" === typeof value; };
-    Types.isObject = function (value) { return null !== value && "object" === typeof value; };
-    Types.isEnum = function (list) { return function (value) { return list.includes(value); }; };
-    Types.isArray = function (isType) { return function (value) {
-        return Array.isArray(value) && value.filter(function (i) { return !isType(i); }).length <= 0;
+    Types.isBoolean = function (value, listner) {
+        return "boolean" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "boolean", value));
+    };
+    Types.isNumber = function (value, listner) {
+        return "number" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "number", value));
+    };
+    Types.isString = function (value, listner) {
+        return "string" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "string", value));
+    };
+    Types.isObject = function (value, listner) {
+        return (null !== value && "object" === typeof value) || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "object", value));
+    };
+    Types.isEnum = function (list) { return function (value, listner) {
+        return list.includes(value) || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, list.map(function (i) { return typeerror_1.TypeError.valueToString(i); }).join(" | "), value));
+    }; };
+    Types.isArray = function (isType) { return function (value, listner) {
+        return Array.isArray(value) && value.every(function (i) { return isType(i, listner); });
     }; };
     Types.isOr = function () {
         var isTypeList = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             isTypeList[_i] = arguments[_i];
         }
-        return function (value) { return 0 < isTypeList.filter(function (i) { return i(value); }).length; };
+        return function (value, listner) {
+            if (listner) {
+                var transactionListner_1 = typeerror_1.TypeError.makeListener(listner.path);
+                var result = isTypeList.some(function (i) { return i(value, transactionListner_1); });
+                if (!result) {
+                    typeerror_1.TypeError.raiseError(listner, "__OR__NYI__", value);
+                }
+                return result;
+            }
+            else {
+                return isTypeList.some(function (i) { return i(value); });
+            }
+        };
     };
     Types.sss = {
         $type: "optional-type-guard",
         isType: Types.isNumber,
     };
-    Types.isOptionalKeyTypeGuard = function (value) {
+    Types.isOptionalKeyTypeGuard = function (value, listner) {
         return Types.isSpecificObject({
             $type: Types.isJust("optional-type-guard"),
-            isType: function (value) { return "function" === typeof value; },
-        })(value);
+            isType: function (value, listner) {
+                return "function" === typeof value && (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "function", value));
+            },
+        })(value, listner);
     };
     Types.makeOptionalKeyTypeGuard = function (isType) {
         return ({
@@ -39,23 +66,24 @@ var Types;
             isType: isType,
         });
     };
-    Types.isMemberType = function (value, member, isType) {
+    Types.isMemberType = function (value, member, isType, listner) {
         return Types.isOptionalKeyTypeGuard(isType) ?
-            (!(member in value) || isType.isType(value[member])) :
-            (member in value && isType(value[member]));
+            (!(member in value) || isType.isType(value[member], listner)) :
+            (member in value && isType(value[member], listner));
     };
-    Types.isMemberTypeOrUndefined = function (value, member, isType) {
-        return !(member in value) || isType(value[member]);
+    Types.isMemberTypeOrUndefined = function (value, member, isType, listner) {
+        return !(member in value) || isType(value[member], listner);
     };
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
-    Types.isSpecificObject = function (memberValidator) { return function (value) {
-        return Types.isObject(value) &&
-            Object.entries(memberValidator).filter(function (kv) { return !(kv[0].endsWith("?") ?
-                Types.isMemberTypeOrUndefined(value, kv[0].slice(0, -1), kv[1]) :
-                Types.isMemberType(value, kv[0], kv[1])); }).length <= 0;
+    Types.isSpecificObject = function (memberValidator) { return function (value, listner) {
+        return Types.isObject(value, listner) &&
+            Object.entries(memberValidator).every(function (kv) { return kv[0].endsWith("?") ?
+                Types.isMemberTypeOrUndefined(value, kv[0].slice(0, -1), kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)) :
+                Types.isMemberType(value, kv[0], kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); });
     }; };
-    Types.isDictionaryObject = function (isType) { return function (value) {
-        return Types.isObject(value) && Object.values(value).filter(function (i) { return !isType(i); }).length <= 0;
+    Types.isDictionaryObject = function (isType) { return function (value, listner) {
+        return Types.isObject(value, listner) &&
+            Object.entries(value).every(function (kv) { return isType(kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); });
     }; };
     Types.ValidatorOptionTypeMembers = ["none", "simple", "full",];
     Types.isValidatorOptionType = Types.isEnum(Types.ValidatorOptionTypeMembers);
@@ -66,80 +94,78 @@ var Types;
         "indentStyle": Types.isIndentStyleType,
         "validatorOption": Types.isValidatorOptionType,
     });
-    Types.isTypeSchema = function (value) {
+    Types.isTypeSchema = function (value, listner) {
         return Types.isSpecificObject({
             "$ref": Types.isJust(Types.schema),
             "defines": Types.isDictionaryObject(Types.isDefinition),
             "options": Types.isTypeOptions
-        })(value);
+        })(value, listner);
     };
     Types.isReferElement = Types.isSpecificObject({
         "$ref": Types.isString,
     });
-    Types.isModuleDefinition = function (value) { return Types.isSpecificObject({
+    Types.isModuleDefinition = function (value, listner) { return Types.isSpecificObject({
         export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
         $type: Types.isJust("module"),
         members: Types.isDictionaryObject(Types.isDefinition),
-    })(value); };
+    })(value, listner); };
     Types.PrimitiveTypeEnumMembers = ["undefined", "boolean", "number", "string"];
     Types.isPrimitiveTypeEnum = Types.isEnum(Types.PrimitiveTypeEnumMembers);
-    Types.isPrimitiveTypeElement = function (value) { return Types.isSpecificObject({
+    Types.isPrimitiveTypeElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("primitive-type"),
         type: Types.isPrimitiveTypeEnum,
-    })(value); };
-    Types.isLiteralElement = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isLiteralElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("literal"),
         literal: jsonable_1.Jsonable.isJsonable,
-    })(value); };
-    Types.isValueDefinition = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isValueDefinition = function (value, listner) { return Types.isSpecificObject({
         export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
         $type: Types.isJust("value"),
         value: Types.isOr(Types.isLiteralElement, Types.isReferElement),
-    })(value); };
-    Types.isTypeofElement = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isTypeofElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("typeof"),
         value: Types.isReferElement,
-    })(value); };
-    Types.isItemofElement = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isItemofElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("itemof"),
         value: Types.isReferElement,
-    })(value); };
-    Types.isTypeDefinition = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isTypeDefinition = function (value, listner) { return Types.isSpecificObject({
         export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
         $type: Types.isJust("type"),
         define: Types.isTypeOrRefer,
-    })(value); };
-    Types.isEnumTypeElement = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isEnumTypeElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("enum-type"),
         members: Types.isArray(Types.isOr(Types.isNumber, Types.isString)),
-    })(value); };
-    Types.isInterfaceDefinition = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isInterfaceDefinition = function (value, listner) { return Types.isSpecificObject({
         export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
         $type: Types.isJust("interface"),
         members: Types.isDictionaryObject(Types.isTypeOrRefer),
-    })(value); };
-    Types.isDictionaryElement = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isDictionaryElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("dictionary"),
         members: Types.isTypeOrRefer,
-    })(value); };
-    Types.isArrayElement = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isArrayElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("array"),
         items: Types.isTypeOrRefer,
-    })(value); };
-    Types.isOrElement = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isOrElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("or"),
         types: Types.isArray(Types.isTypeOrRefer),
-    })(value); };
-    Types.isAndElement = function (value) { return Types.isSpecificObject({
+    })(value, listner); };
+    Types.isAndElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("and"),
         types: Types.isArray(Types.isTypeOrRefer),
-    })(value); };
+    })(value, listner); };
     Types.isType = Types.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
     Types.isTypeOrValue = Types.isOr(Types.isType, Types.isValueDefinition);
     Types.isTypeOrRefer = Types.isOr(Types.isType, Types.isReferElement);
     Types.isDefinition = Types.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);
-    Types.isDefineOrRefer = function (value) {
-        return Types.isDefinition(value) || Types.isReferElement(value);
-    };
+    Types.isDefineOrRefer = Types.isOr(Types.isDefinition, Types.isReferElement);
 })(Types || (exports.Types = Types = {}));
 //# sourceMappingURL=types.js.map
