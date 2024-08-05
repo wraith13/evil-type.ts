@@ -29,6 +29,15 @@ var Types;
     Types.isArray = function (isType) { return function (value, listner) {
         return Array.isArray(value) && value.every(function (i) { return isType(i, listner); });
     }; };
+    Types.makeOrTypeNameFromIsTypeList = function () {
+        var isTypeList = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            isTypeList[_i] = arguments[_i];
+        }
+        var transactionListner = typeerror_1.TypeError.makeListener();
+        isTypeList.some(function (i) { return i(undefined, transactionListner); });
+        return transactionListner.errors.map(function (i) { return i.requiredType; }).join(" | ");
+    };
     Types.isOr = function () {
         var isTypeList = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -39,7 +48,7 @@ var Types;
                 var transactionListner_1 = typeerror_1.TypeError.makeListener(listner.path);
                 var result = isTypeList.some(function (i) { return i(value, transactionListner_1); });
                 if (!result) {
-                    typeerror_1.TypeError.raiseError(listner, "__OR__NYI__", value);
+                    typeerror_1.TypeError.raiseError(listner, Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList), value);
                 }
                 return result;
             }

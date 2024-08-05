@@ -20,6 +20,12 @@ export module Types
         list.includes(value as T) || (undefined !== listner && TypeError.raiseError(listner, list.map(i => TypeError.valueToString(i)).join(" | "), value));
     export const isArray = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener): value is T[] =>
         Array.isArray(value) && value.every(i => isType(i, listner));
+    export const makeOrTypeNameFromIsTypeList = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
+    {
+        const transactionListner = TypeError.makeListener();
+        isTypeList.some(i => i(undefined, transactionListner));
+        return transactionListner.errors.map(i => i.requiredType).join(" | ");
+    };
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
         (value: unknown, listner?: TypeError.Listener): value is T[number] =>
         {
@@ -29,7 +35,7 @@ export module Types
                 const result = isTypeList.some(i => i(value, transactionListner));
                 if ( ! result)
                 {
-                    TypeError.raiseError(listner, "__OR__NYI__", value);
+                    TypeError.raiseError(listner, makeOrTypeNameFromIsTypeList(...isTypeList), value);
                 }
                 return result;
             }
