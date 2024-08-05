@@ -36,6 +36,7 @@ export module Types
                 if ( ! result)
                 {
                     TypeError.raiseError(listner, makeOrTypeNameFromIsTypeList(...isTypeList), value);
+                    listner.errors.push(...transactionListner.errors.filter(i => listner.path != i.path));
                 }
                 return result;
             }

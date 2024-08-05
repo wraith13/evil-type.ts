@@ -44,11 +44,13 @@ var Types;
             isTypeList[_i] = arguments[_i];
         }
         return function (value, listner) {
+            var _a;
             if (listner) {
                 var transactionListner_1 = typeerror_1.TypeError.makeListener(listner.path);
                 var result = isTypeList.some(function (i) { return i(value, transactionListner_1); });
                 if (!result) {
                     typeerror_1.TypeError.raiseError(listner, Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList), value);
+                    (_a = listner.errors).push.apply(_a, transactionListner_1.errors.filter(function (i) { return listner.path != i.path; }));
                 }
                 return result;
             }
