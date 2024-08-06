@@ -16,6 +16,7 @@ exports.Format = exports.Build = exports.$block = exports.$iblock = exports.$lin
 var startAt = new Date();
 var fs_1 = __importDefault(require("fs"));
 var jsonable_1 = require("./jsonable");
+var typeerror_1 = require("./typeerror");
 var types_1 = require("./types");
 var text_1 = require("./text");
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
@@ -390,7 +391,8 @@ try {
     console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     var rawSource = fget(jsonPath);
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
-    if (types_1.Types.isTypeSchema(typeSource)) {
+    var errorListner = typeerror_1.TypeError.makeListener(jsonPath);
+    if (types_1.Types.isTypeSchema(typeSource, errorListner)) {
         var defines = Object.entries(typeSource.defines)
             .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); });
         console.log(JSON.stringify(defines, null, 4));
@@ -403,6 +405,7 @@ try {
     }
     else {
         console.error("Invalid TypeSchema", rawSource);
+        errorListner.errors.forEach(function (i) { return console.error(JSON.stringify(i)); });
     }
 }
 catch (error) {

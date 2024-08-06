@@ -18,7 +18,6 @@ export declare namespace Types {
         $type: "optional-type-guard";
         isType: (value: unknown, listner?: TypeError.Listener) => value is T;
     }
-    const sss: OptionalKeyTypeGuard<number>;
     const isOptionalKeyTypeGuard: (value: unknown, listner?: TypeError.Listener) => value is OptionalKeyTypeGuard<unknown>;
     const makeOptionalKeyTypeGuard: <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => OptionalKeyTypeGuard<T>;
     const isMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, isType: OptionalKeyTypeGuard<unknown> | ((v: unknown, listner?: TypeError.Listener) => boolean), listner?: TypeError.Listener) => boolean;

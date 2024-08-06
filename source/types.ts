@@ -50,17 +50,12 @@ export module Types
         $type: "optional-type-guard";
         isType: (value: unknown, listner?: TypeError.Listener) => value is T;
     }
-    export const sss: OptionalKeyTypeGuard<number> =
-    {
-        $type: "optional-type-guard",
-        isType: isNumber,
-    }
     export const isOptionalKeyTypeGuard = (value: unknown, listner?: TypeError.Listener): value is OptionalKeyTypeGuard<unknown> =>
         isSpecificObject<OptionalKeyTypeGuard<unknown>>
         ({
             $type: isJust("optional-type-guard"),
             isType: (value: unknown, listner?: TypeError.Listener): value is ((v: unknown, listner?: TypeError.Listener) => v is unknown) =>
-                "function" === typeof value && (undefined !== listner && TypeError.raiseError(listner, "function", value)),
+                "function" === typeof value || (undefined !== listner && TypeError.raiseError(listner, "function", value)),
         })(value, listner);
     export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T): OptionalKeyTypeGuard<T> =>
     ({

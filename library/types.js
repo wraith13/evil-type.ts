@@ -59,15 +59,11 @@ var Types;
             }
         };
     };
-    Types.sss = {
-        $type: "optional-type-guard",
-        isType: Types.isNumber,
-    };
     Types.isOptionalKeyTypeGuard = function (value, listner) {
         return Types.isSpecificObject({
             $type: Types.isJust("optional-type-guard"),
             isType: function (value, listner) {
-                return "function" === typeof value && (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "function", value));
+                return "function" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "function", value));
             },
         })(value, listner);
     };
