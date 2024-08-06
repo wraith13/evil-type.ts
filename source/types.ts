@@ -1,5 +1,5 @@
 import { Jsonable } from "./jsonable";
-import { TypeError } from "./typeerror"
+import { TypeError } from "./typeerror";
 export module Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;

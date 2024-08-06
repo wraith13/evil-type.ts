@@ -2,6 +2,7 @@
 const startAt = new Date();
 import fs from "fs";
 import { Jsonable } from "./jsonable";
+import { TypeError } from "./typeerror";
 import { Types } from "./types";
 import { Text } from "./text";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
@@ -476,7 +477,8 @@ try
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     const rawSource = fget(jsonPath);
     const typeSource = Jsonable.parse(rawSource);
-    if (Types.isTypeSchema(typeSource))
+    const errorListner = TypeError.makeListener(jsonPath);
+    if (Types.isTypeSchema(typeSource, errorListner))
     {
         const defines = Object.entries(typeSource.defines)
             .map(i => Build.Define.buildDefine(i[0], i[1]));
@@ -494,6 +496,7 @@ try
     else
     {
         console.error("Invalid TypeSchema", rawSource);
+        errorListner.errors.forEach(i => console.error(JSON.stringify(i)));
     }
 }
 catch(error)
