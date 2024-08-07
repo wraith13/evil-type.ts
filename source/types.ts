@@ -29,19 +29,67 @@ export module Types
             .reduce((a, b) => [...a, ...b], [])
             .filter((i, ix, list) => ix === list.indexOf(i));
     };
+    export const getBestMatchErrors = (listeners: TypeError.Listener[]) =>
+        [...listeners].sort
+        (
+            (a, b) =>
+            {
+                const av = Math.max(...a.errors.map(i => i.path.length));
+                const bv = Math.max(...b.errors.map(i => i.path.length));
+                if (av < bv)
+                {
+                    return 1;
+                }
+                else
+                if (bv < av)
+                {
+                    return -1;
+                }
+                else
+                {
+                    const av2 = a.errors.length;
+                    const bv2 = b.errors.length;
+                    if (av2 < bv2)
+                    {
+                        return -1;
+                    }
+                    else
+                    if (bv2 < av2)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+            }
+        )[0];
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
         (value: unknown, listner?: TypeError.Listener): value is T[number] =>
         {
             if (listner)
             {
-                const transactionListner = TypeError.makeListener(listner.path);
-                const result = isTypeList.some(i => i(value, transactionListner));
+                const resultList = isTypeList.map
+                (
+                    i =>
+                    {
+                        const transactionListner = TypeError.makeListener(listner.path);
+                        const result =
+                        {
+                            transactionListner,
+                            result: i(value, transactionListner),
+                        }
+                        return result;
+                    }
+                );
+                const result = resultList.some(i => i.result);
                 if ( ! result)
                 {
                     const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
                     if (isObject(value) && requiredType.includes("object"))
                     {
-                        listner.errors.push(...transactionListner.errors.filter(i => listner.path != i.path));
+                        listner.errors.push(...getBestMatchErrors(resultList.map(i => i.transactionListner)).errors);
                     }
                     else
                     {

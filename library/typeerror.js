@@ -19,7 +19,7 @@ var TypeError;
             undefined;
     };
     TypeError.makePath = function (path, name) {
-        return "string" === name ?
+        return "string" === typeof name ?
             "".concat(path, ".").concat(name) :
             "".concat(path, "[").concat(name, "]");
     };

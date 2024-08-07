@@ -40,7 +40,7 @@
                             "type": "number"
                         },
                         {
-                            "$type": "literalx",
+                            "$type": "literal",
                             "literal": "\t"
                         }
                     ]

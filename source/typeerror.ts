@@ -24,7 +24,7 @@ export module TypeError
         }:
         undefined;
     export const makePath = (path: string, name: string | number) =>
-        "string" === name ?
+        "string" === typeof name ?
                     `${path}.${name}`:
                     `${path}[${name}]`;
     export const raiseError = (listner: Listener, requiredType: string, actualValue: unknown) =>

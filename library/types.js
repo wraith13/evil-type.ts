@@ -50,6 +50,31 @@ var Types;
             .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
             .filter(function (i, ix, list) { return ix === list.indexOf(i); });
     };
+    Types.getBestMatchErrors = function (listeners) {
+        return __spreadArray([], listeners, true).sort(function (a, b) {
+            var av = Math.max.apply(Math, a.errors.map(function (i) { return i.path.length; }));
+            var bv = Math.max.apply(Math, b.errors.map(function (i) { return i.path.length; }));
+            if (av < bv) {
+                return 1;
+            }
+            else if (bv < av) {
+                return -1;
+            }
+            else {
+                var av2 = a.errors.length;
+                var bv2 = b.errors.length;
+                if (av2 < bv2) {
+                    return -1;
+                }
+                else if (bv2 < av2) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            }
+        })[0];
+    };
     Types.isOr = function () {
         var isTypeList = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -58,12 +83,19 @@ var Types;
         return function (value, listner) {
             var _a;
             if (listner) {
-                var transactionListner_1 = typeerror_1.TypeError.makeListener(listner.path);
-                var result = isTypeList.some(function (i) { return i(value, transactionListner_1); });
+                var resultList = isTypeList.map(function (i) {
+                    var transactionListner = typeerror_1.TypeError.makeListener(listner.path);
+                    var result = {
+                        transactionListner: transactionListner,
+                        result: i(value, transactionListner),
+                    };
+                    return result;
+                });
+                var result = resultList.some(function (i) { return i.result; });
                 if (!result) {
                     var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
                     if (Types.isObject(value) && requiredType.includes("object")) {
-                        (_a = listner.errors).push.apply(_a, transactionListner_1.errors.filter(function (i) { return listner.path != i.path; }));
+                        (_a = listner.errors).push.apply(_a, Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).errors);
                     }
                     else {
                         typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
