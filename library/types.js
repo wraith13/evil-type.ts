@@ -1,4 +1,13 @@
 "use strict";
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Types = void 0;
 var jsonable_1 = require("./jsonable");
@@ -36,7 +45,10 @@ var Types;
         }
         var transactionListner = typeerror_1.TypeError.makeListener();
         isTypeList.some(function (i) { return i(undefined, transactionListner); });
-        return transactionListner.errors.map(function (i) { return i.requiredType; }).join(" | ");
+        return transactionListner.errors
+            .map(function (i) { return i.requiredType.split(" | "); })
+            .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
+            .filter(function (i, ix, list) { return ix === list.indexOf(i); });
     };
     Types.isOr = function () {
         var isTypeList = [];
@@ -49,8 +61,13 @@ var Types;
                 var transactionListner_1 = typeerror_1.TypeError.makeListener(listner.path);
                 var result = isTypeList.some(function (i) { return i(value, transactionListner_1); });
                 if (!result) {
-                    typeerror_1.TypeError.raiseError(listner, Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList), value);
-                    (_a = listner.errors).push.apply(_a, transactionListner_1.errors.filter(function (i) { return listner.path != i.path; }));
+                    var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
+                    if (Types.isObject(value) && requiredType.includes("object")) {
+                        (_a = listner.errors).push.apply(_a, transactionListner_1.errors.filter(function (i) { return listner.path != i.path; }));
+                    }
+                    else {
+                        typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
+                    }
                 }
                 return result;
             }

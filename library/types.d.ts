@@ -12,7 +12,7 @@ export declare namespace Types {
     const isObject: (value: unknown, listner?: TypeError.Listener) => value is object;
     const isEnum: <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener) => value is T;
     const isArray: <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener) => value is T[];
-    const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypeError.Listener) => value is T[K]; }) => string;
+    const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypeError.Listener) => value is T[K]; }) => string[];
     const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypeError.Listener) => value is T[K]; }) => (value: unknown, listner?: TypeError.Listener) => value is T[number];
     interface OptionalKeyTypeGuard<T> {
         $type: "optional-type-guard";

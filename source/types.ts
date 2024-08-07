@@ -24,7 +24,10 @@ export module Types
     {
         const transactionListner = TypeError.makeListener();
         isTypeList.some(i => i(undefined, transactionListner));
-        return transactionListner.errors.map(i => i.requiredType).join(" | ");
+        return transactionListner.errors
+            .map(i => i.requiredType.split(" | "))
+            .reduce((a, b) => [...a, ...b], [])
+            .filter((i, ix, list) => ix === list.indexOf(i));
     };
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
         (value: unknown, listner?: TypeError.Listener): value is T[number] =>
@@ -35,8 +38,15 @@ export module Types
                 const result = isTypeList.some(i => i(value, transactionListner));
                 if ( ! result)
                 {
-                    TypeError.raiseError(listner, makeOrTypeNameFromIsTypeList(...isTypeList), value);
-                    listner.errors.push(...transactionListner.errors.filter(i => listner.path != i.path));
+                    const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
+                    if (isObject(value) && requiredType.includes("object"))
+                    {
+                        listner.errors.push(...transactionListner.errors.filter(i => listner.path != i.path));
+                    }
+                    else
+                    {
+                        TypeError.raiseError(listner, requiredType.join(" | "), value);
+                    }
                 }
                 return result;
             }
