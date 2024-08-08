@@ -19,7 +19,16 @@ export module Types
     export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener): value is T =>
         list.includes(value as T) || (undefined !== listner && TypeError.raiseError(listner, list.map(i => TypeError.valueToString(i)).join(" | "), value));
     export const isArray = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener): value is T[] =>
-        Array.isArray(value) && value.every(i => isType(i, listner));
+    {
+        if (Array.isArray(value))
+        {
+            return value.every(i => isType(i, listner));
+        }
+        else
+        {
+            return undefined !== listner && TypeError.raiseError(listner, "array", value);
+        }
+    };
     export const makeOrTypeNameFromIsTypeList = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
     {
         const transactionListner = TypeError.makeListener();
@@ -87,7 +96,7 @@ export module Types
                 if ( ! result)
                 {
                     const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
-                    if (isObject(value) && requiredType.includes("object"))
+                    if ((isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array")))
                     {
                         listner.errors.push(...getBestMatchErrors(resultList.map(i => i.transactionListner)).errors);
                     }

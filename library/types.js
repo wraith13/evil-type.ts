@@ -36,7 +36,12 @@ var Types;
         return list.includes(value) || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, list.map(function (i) { return typeerror_1.TypeError.valueToString(i); }).join(" | "), value));
     }; };
     Types.isArray = function (isType) { return function (value, listner) {
-        return Array.isArray(value) && value.every(function (i) { return isType(i, listner); });
+        if (Array.isArray(value)) {
+            return value.every(function (i) { return isType(i, listner); });
+        }
+        else {
+            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "array", value);
+        }
     }; };
     Types.makeOrTypeNameFromIsTypeList = function () {
         var isTypeList = [];
@@ -94,7 +99,7 @@ var Types;
                 var result = resultList.some(function (i) { return i.result; });
                 if (!result) {
                     var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
-                    if (Types.isObject(value) && requiredType.includes("object")) {
+                    if ((Types.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
                         (_a = listner.errors).push.apply(_a, Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).errors);
                     }
                     else {
