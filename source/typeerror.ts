@@ -27,6 +27,8 @@ export module TypeError
         "string" === typeof name ?
                     `${path}.${name}`:
                     `${path}[${name}]`;
+    export const getPathDepth = (path: string) =>
+        path.split(".").length + path.split("[").length -2;
     export const raiseError = (listner: Listener, requiredType: string, actualValue: unknown) =>
     {
         listner.errors.push

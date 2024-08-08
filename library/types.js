@@ -52,8 +52,8 @@ var Types;
     };
     Types.getBestMatchErrors = function (listeners) {
         return __spreadArray([], listeners, true).sort(function (a, b) {
-            var av = Math.max.apply(Math, a.errors.map(function (i) { return i.path.length; }));
-            var bv = Math.max.apply(Math, b.errors.map(function (i) { return i.path.length; }));
+            var av = Math.max.apply(Math, a.errors.map(function (i) { return typeerror_1.TypeError.getPathDepth(i.path); }));
+            var bv = Math.max.apply(Math, b.errors.map(function (i) { return typeerror_1.TypeError.getPathDepth(i.path); }));
             if (av < bv) {
                 return 1;
             }

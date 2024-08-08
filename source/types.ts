@@ -34,8 +34,8 @@ export module Types
         (
             (a, b) =>
             {
-                const av = Math.max(...a.errors.map(i => i.path.length));
-                const bv = Math.max(...b.errors.map(i => i.path.length));
+                const av = Math.max(...a.errors.map(i => TypeError.getPathDepth(i.path)));
+                const bv = Math.max(...b.errors.map(i => TypeError.getPathDepth(i.path)));
                 if (av < bv)
                 {
                     return 1;

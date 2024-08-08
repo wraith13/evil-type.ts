@@ -23,6 +23,9 @@ var TypeError;
             "".concat(path, ".").concat(name) :
             "".concat(path, "[").concat(name, "]");
     };
+    TypeError.getPathDepth = function (path) {
+        return path.split(".").length + path.split("[").length - 2;
+    };
     TypeError.raiseError = function (listner, requiredType, actualValue) {
         listner.errors.push({
             path: listner.path,
