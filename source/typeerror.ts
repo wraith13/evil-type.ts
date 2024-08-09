@@ -29,12 +29,21 @@ export module TypeError
                     `${path}[${name}]`;
     export const getPathDepth = (path: string) =>
         path.split(".").length + path.split("[").length -2;
-    export const raiseError = (listner: Listener, requiredType: string, actualValue: unknown) =>
+    export const getType = (isType: ((v: unknown, listner?: TypeError.Listener) => boolean)) =>
+    {
+        const transactionListner = makeListener();
+        isType(undefined, transactionListner);
+        return transactionListner.errors
+            .map(i => i.requiredType.split(" | "))
+            .reduce((a, b) => [...a, ...b], [])
+            .filter((i, ix, list) => ix === list.indexOf(i));
+    };
+    export const raiseError = (listner: Listener, requiredType: string | ((v: unknown, listner?: TypeError.Listener) => boolean), actualValue: unknown) =>
     {
         listner.errors.push
         ({
             path: listner.path,
-            requiredType,
+            requiredType: "string" === typeof requiredType ? requiredType: getType(requiredType).join(" | "),
             actualValue: valueToString(actualValue),
         });
         return false;

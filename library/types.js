@@ -37,7 +37,7 @@ var Types;
     }; };
     Types.isArray = function (isType) { return function (value, listner) {
         if (Array.isArray(value)) {
-            return value.every(function (i) { return isType(i, listner); });
+            return value.map(function (i) { return isType(i, listner); }).every(function (i) { return i; });
         }
         else {
             return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "array", value);
@@ -48,37 +48,40 @@ var Types;
         for (var _i = 0; _i < arguments.length; _i++) {
             isTypeList[_i] = arguments[_i];
         }
-        var transactionListner = typeerror_1.TypeError.makeListener();
-        isTypeList.some(function (i) { return i(undefined, transactionListner); });
-        return transactionListner.errors
-            .map(function (i) { return i.requiredType.split(" | "); })
+        return isTypeList.map(function (i) { return typeerror_1.TypeError.getType(i); })
             .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
             .filter(function (i, ix, list) { return ix === list.indexOf(i); });
     };
     Types.getBestMatchErrors = function (listeners) {
-        return __spreadArray([], listeners, true).sort(function (a, b) {
-            var av = Math.max.apply(Math, a.errors.map(function (i) { return typeerror_1.TypeError.getPathDepth(i.path); }));
-            var bv = Math.max.apply(Math, b.errors.map(function (i) { return typeerror_1.TypeError.getPathDepth(i.path); }));
-            if (av < bv) {
+        return listeners.map(function (listener) {
+            return ({
+                listener: listener,
+                depth: Math.max.apply(Math, listener.errors.map(function (i) { return typeerror_1.TypeError.getPathDepth(i.path); })),
+                length: listener.errors.length,
+            });
+        })
+            .sort(function (a, b) {
+            if (a.depth < b.depth) {
                 return 1;
             }
-            else if (bv < av) {
+            else if (b.depth < a.depth) {
                 return -1;
             }
             else {
-                var av2 = a.errors.length;
-                var bv2 = b.errors.length;
-                if (av2 < bv2) {
+                if (a.length < b.length) {
                     return -1;
                 }
-                else if (bv2 < av2) {
+                else if (b.length < a.length) {
                     return 1;
                 }
                 else {
                     return 0;
                 }
             }
-        })[0];
+        })
+            .filter(function (i, _ix, list) { return i.depth === list[0].depth && i.length === list[0].length; })
+            // .filter((i, _ix, list) => i.depth === list[0].depth)
+            .map(function (i) { return i.listener; });
     };
     Types.isOr = function () {
         var isTypeList = [];
@@ -100,7 +103,7 @@ var Types;
                 if (!result) {
                     var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
                     if ((Types.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
-                        (_a = listner.errors).push.apply(_a, Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).errors);
+                        (_a = listner.errors).push.apply(_a, Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }));
                     }
                     else {
                         typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
@@ -130,7 +133,7 @@ var Types;
     Types.isMemberType = function (value, member, isType, listner) {
         return Types.isOptionalKeyTypeGuard(isType) ?
             (!(member in value) || isType.isType(value[member], listner)) :
-            (member in value && isType(value[member], listner));
+            ((member in value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, isType, undefined))) && isType(value[member], listner));
     };
     Types.isMemberTypeOrUndefined = function (value, member, isType, listner) {
         return !(member in value) || isType(value[member], listner);
@@ -138,13 +141,14 @@ var Types;
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     Types.isSpecificObject = function (memberValidator) { return function (value, listner) {
         return Types.isObject(value, listner) &&
-            Object.entries(memberValidator).every(function (kv) { return kv[0].endsWith("?") ?
+            Object.entries(memberValidator).map(function (kv) { return kv[0].endsWith("?") ?
                 Types.isMemberTypeOrUndefined(value, kv[0].slice(0, -1), kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)) :
-                Types.isMemberType(value, kv[0], kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); });
+                Types.isMemberType(value, kv[0], kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); })
+                .every(function (i) { return i; });
     }; };
     Types.isDictionaryObject = function (isType) { return function (value, listner) {
         return Types.isObject(value, listner) &&
-            Object.entries(value).every(function (kv) { return isType(kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); });
+            Object.entries(value).map(function (kv) { return isType(kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
     }; };
     Types.ValidatorOptionTypeMembers = ["none", "simple", "full",];
     Types.isValidatorOptionType = Types.isEnum(Types.ValidatorOptionTypeMembers);
