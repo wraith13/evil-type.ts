@@ -1,26 +1,33 @@
 export module TypeError
 {
-    export interface Entry
+    export interface MatchResult
     {
+        result: "match";
+        path: string;
+    }
+    export interface ErrorResult
+    {
+        result: "error";
         path: string;
         requiredType: string;
         actualValue: string;
     }
+    export type Result = MatchResult | ErrorResult;
     export interface Listener
     {
         path: string;
-        errors: Entry[];
+        results: Result[];
     }
     export const makeListener = (path: string = ""): Listener =>
     ({
         path,
-        errors: [],
+        results: [],
     });
     export const nextListener = (name: string | number, listner: Listener | undefined): Listener | undefined =>
         listner ?
         {
             path: makePath(listner.path, name),
-            errors: listner.errors,
+            results: listner.results,
         }:
         undefined;
     export const makePath = (path: string, name: string | number) =>
@@ -33,15 +40,17 @@ export module TypeError
     {
         const transactionListner = makeListener();
         isType(undefined, transactionListner);
-        return transactionListner.errors
+        return transactionListner.results
+            .filter(i => "error" === i.result)
             .map(i => i.requiredType.split(" | "))
             .reduce((a, b) => [...a, ...b], [])
             .filter((i, ix, list) => ix === list.indexOf(i));
     };
     export const raiseError = (listner: Listener, requiredType: string | ((v: unknown, listner?: TypeError.Listener) => boolean), actualValue: unknown) =>
     {
-        listner.errors.push
+        listner.results.push
         ({
+            result: "error",
             path: listner.path,
             requiredType: "string" === typeof requiredType ? requiredType: getType(requiredType).join(" | "),
             actualValue: valueToString(actualValue),
