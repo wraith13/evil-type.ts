@@ -39,8 +39,8 @@ export module Types
             listener =>
             ({
                 listener,
-                depth: Math.max(...listener.results.map(i => TypeError.getPathDepth(i.path))),
-                length: listener.results.length,
+                depth: Math.max(...listener.errors.map(i => TypeError.getPathDepth(i.path))),
+                length: listener.errors.length,
             })
         )
         .sort
@@ -101,7 +101,7 @@ export module Types
                     const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
                     if ((isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array")))
                     {
-                        listner.results.push(...getBestMatchErrors(resultList.map(i => i.transactionListner)).map(i => i.results).reduce((a, b) => [...a, ...b]));
+                        listner.errors.push(...getBestMatchErrors(resultList.map(i => i.transactionListner)).map(i => i.errors).reduce((a, b) => [...a, ...b]));
                     }
                     else
                     {

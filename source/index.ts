@@ -496,7 +496,7 @@ try
     else
     {
         console.error("Invalid TypeSchema", rawSource);
-        errorListner.results.forEach(i => console.error(JSON.stringify(i)));
+        errorListner.errors.forEach(i => console.error(JSON.stringify(i)));
     }
 }
 catch(error)

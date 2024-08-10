@@ -1,33 +1,29 @@
 export module TypeError
 {
-    export interface MatchResult
+    export interface Error
     {
-        result: "match";
-        path: string;
-    }
-    export interface ErrorResult
-    {
-        result: "error";
         path: string;
         requiredType: string;
         actualValue: string;
     }
-    export type Result = MatchResult | ErrorResult;
     export interface Listener
     {
         path: string;
-        results: Result[];
+        matchRate: { [path: string]: number; };
+        errors: Error[];
     }
     export const makeListener = (path: string = ""): Listener =>
     ({
         path,
-        results: [],
+        matchRate: { },
+        errors: [],
     });
     export const nextListener = (name: string | number, listner: Listener | undefined): Listener | undefined =>
         listner ?
         {
             path: makePath(listner.path, name),
-            results: listner.results,
+            matchRate: listner.matchRate,
+            errors: listner.errors,
         }:
         undefined;
     export const makePath = (path: string, name: string | number) =>
@@ -40,17 +36,15 @@ export module TypeError
     {
         const transactionListner = makeListener();
         isType(undefined, transactionListner);
-        return transactionListner.results
-            .filter(i => "error" === i.result)
+        return transactionListner.errors
             .map(i => i.requiredType.split(" | "))
             .reduce((a, b) => [...a, ...b], [])
             .filter((i, ix, list) => ix === list.indexOf(i));
     };
     export const raiseError = (listner: Listener, requiredType: string | ((v: unknown, listner?: TypeError.Listener) => boolean), actualValue: unknown) =>
     {
-        listner.results.push
+        listner.errors.push
         ({
-            result: "error",
             path: listner.path,
             requiredType: "string" === typeof requiredType ? requiredType: getType(requiredType).join(" | "),
             actualValue: valueToString(actualValue),
