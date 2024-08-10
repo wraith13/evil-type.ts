@@ -41,8 +41,18 @@ export module TypeError
             .reduce((a, b) => [...a, ...b], [])
             .filter((i, ix, list) => ix === list.indexOf(i));
     };
+    export const setMatchRate = (listner: Listener | undefined, matchRate: number) =>
+    {
+        if (listner)
+        {
+            listner.matchRate[listner.path] = matchRate;
+        }
+        return 1.0 <= matchRate;
+    };
+    export const setMatch = (listner: Listener | undefined) => setMatchRate(listner, 1.0);
     export const raiseError = (listner: Listener, requiredType: string | ((v: unknown, listner?: TypeError.Listener) => boolean), actualValue: unknown) =>
     {
+        setMatchRate(listner, 0.0);
         listner.errors.push
         ({
             path: listner.path,
