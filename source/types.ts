@@ -4,20 +4,20 @@ export module Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
     export const isJust = <T>(target: T) => (value: unknown, listner?: TypeError.Listener): value is T =>
-        target === value || (undefined !== listner && TypeError.raiseError(listner, TypeError.valueToString(target), value));
+        TypeError.withErrorHandling(target === value, listner, () => TypeError.valueToString(target), value);
     export const isUndefined = isJust(undefined);
     export const isNull = isJust(null);
     export const isBoolean = (value: unknown, listner?: TypeError.Listener): value is boolean =>
-        "boolean" === typeof value || (undefined !== listner && TypeError.raiseError(listner, "boolean", value));
+        TypeError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
     export const isNumber = (value: unknown, listner?: TypeError.Listener): value is number =>
-        "number" === typeof value || (undefined !== listner && TypeError.raiseError(listner, "number", value));
+        TypeError.withErrorHandling("number" === typeof value, listner, "number", value);
     export const isString = (value: unknown, listner?: TypeError.Listener): value is string =>
-        "string" === typeof value || (undefined !== listner && TypeError.raiseError(listner, "string", value));
+        TypeError.withErrorHandling("string" === typeof value, listner, "string", value);
     export type ActualObject = Exclude<object, null>;
     export const isObject = (value: unknown, listner?: TypeError.Listener): value is ActualObject =>
-        (null !== value && "object" === typeof value) || (undefined !== listner && TypeError.raiseError(listner, "object", value));
+        TypeError.withErrorHandling(null !== value && "object" === typeof value, listner, "object", value);
     export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener): value is T =>
-        list.includes(value as T) || (undefined !== listner && TypeError.raiseError(listner, list.map(i => TypeError.valueToString(i)).join(" | "), value));
+        TypeError.withErrorHandling(list.includes(value as T), listner, () => list.map(i => TypeError.valueToString(i)).join(" | "), value);
     export const isArray = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener): value is T[] =>
     {
         if (Array.isArray(value))
@@ -135,7 +135,7 @@ export module Types
     export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener): boolean =>
         isOptionalKeyTypeGuard(isType) ?
             (! (member in value) || isType.isType((value as ObjectType)[member], listner)):
-            ((member in value || (undefined !== listner && TypeError.raiseError(listner, isType, undefined))) && isType((value as ObjectType)[member], listner));
+            isType((value as ObjectType)[member], listner);
     export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean), listner?: TypeError.Listener): boolean =>
         ! (member in value) || isType((value as ObjectType)[member], listner);
     export type OptionalKeys<T> =

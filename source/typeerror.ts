@@ -49,18 +49,43 @@ export module TypeError
         }
         return 1.0 <= matchRate;
     };
+    export const getMatchRate = (listner: Listener, path: string = listner.path) =>
+    {
+        if (path in listner.matchRate)
+        {
+            return listner.matchRate[path];
+        }
+        const depth = getPathDepth(path);
+        const childrenKeys = Object.keys(listner.matchRate).filter(i => 0 === i.indexOf(path) && getPathDepth(i) +1 === depth);
+        return listner.matchRate[path] = childrenKeys.map(i => listner.matchRate[i]).reduce((a, b) => a +b, 0.0) /childrenKeys.length;
+    };
     export const setMatch = (listner: Listener | undefined) => setMatchRate(listner, 1.0);
-    export const raiseError = (listner: Listener, requiredType: string | ((v: unknown, listner?: TypeError.Listener) => boolean), actualValue: unknown) =>
+    export const raiseError = (listner: Listener, requiredType: string | (() => string), actualValue: unknown) =>
     {
         setMatchRate(listner, 0.0);
         listner.errors.push
         ({
             path: listner.path,
-            requiredType: "string" === typeof requiredType ? requiredType: getType(requiredType).join(" | "),
+            requiredType: "string" === typeof requiredType ? requiredType: requiredType(),
             actualValue: valueToString(actualValue),
         });
         return false;
     }
     export const valueToString = (value: unknown) =>
         undefined === value ? "undefined": JSON.stringify(value);
+    export const withErrorHandling = (isMatchType: boolean, listner: Listener | undefined, requiredType: string | (() => string), actualValue: unknown) =>
+    {
+        if (listner)
+        {
+            if (isMatchType)
+            {
+                setMatch(listner);
+            }
+            else
+            {
+                raiseError(listner, requiredType, actualValue);
+            }
+        }
+        return isMatchType;
+    };
 }
