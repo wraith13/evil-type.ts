@@ -22,7 +22,20 @@ export module Types
     {
         if (Array.isArray(value))
         {
-            return value.map(i => isType(i, listner)).every(i => i);
+            const result = value.map(i => isType(i, listner)).every(i => i);
+            if (listner)
+            {
+                if (result)
+                {
+                    TypeError.setMatch(listner);
+                }
+                else
+                {
+                    // 計算させる事でキャッシュ(set)させる
+                    TypeError.getMatchRate(listner);
+                }
+            }
+            return result;
         }
         else
         {
