@@ -52,42 +52,29 @@ export module Types
             listener =>
             ({
                 listener,
-                depth: Math.max(...listener.errors.map(i => TypeError.getPathDepth(i.path))),
-                length: listener.errors.length,
+                matchRate: TypeError.getMatchRate(listener),
             })
         )
         .sort
         (
             (a, b) =>
             {
-                if (a.depth < b.depth)
+                if (a.matchRate < b.matchRate)
                 {
                     return 1;
                 }
                 else
-                if (b.depth < a.depth)
+                if (b.matchRate < a.matchRate)
                 {
                     return -1;
                 }
                 else
                 {
-                    if (a.length < b.length)
-                    {
-                        return -1;
-                    }
-                    else
-                    if (b.length < a.length)
-                    {
-                        return 1;
-                    }
-                    else
-                    {
-                        return 0;
-                    }
+                    return 0;
                 }
             }
         )
-        .filter((i, _ix, list) => i.depth === list[0].depth && i.length === list[0].length)
+        .filter((i, _ix, list) => i.matchRate === list[0].matchRate)
         // .filter((i, _ix, list) => i.depth === list[0].depth)
         .map(i => i.listener);
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
