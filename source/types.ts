@@ -15,7 +15,7 @@ export module Types
         TypeError.withErrorHandling("string" === typeof value, listner, "string", value);
     export type ActualObject = Exclude<object, null>;
     export const isObject = (value: unknown, listner?: TypeError.Listener): value is ActualObject =>
-        TypeError.withErrorHandling(null !== value && "object" === typeof value, listner, "object", value);
+        TypeError.withErrorHandling(null !== value && "object" === typeof value && ! Array.isArray(value), listner, "object", value);
     export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener): value is T =>
         TypeError.withErrorHandling(list.includes(value as T), listner, () => list.map(i => TypeError.valueToString(i)).join(" | "), value);
     export const isArray = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener): value is T[] =>
