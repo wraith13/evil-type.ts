@@ -42,6 +42,8 @@ export module Types
             return undefined !== listner && TypeError.raiseError(listner, "array", value);
         }
     };
+    export const isJsonable = (value: unknown, listner?: TypeError.Listener): value is Jsonable.Jsonable =>
+        TypeError.withErrorHandling(Jsonable.isJsonable(value), listner, "jsonable", value);
     export const makeOrTypeNameFromIsTypeList = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
         isTypeList.map(i => TypeError.getType(i))
             .reduce((a, b) => [...a, ...b], [])
@@ -100,7 +102,12 @@ export module Types
                     const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
                     if ((isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array")))
                     {
-                        listner.errors.push(...getBestMatchErrors(resultList.map(i => i.transactionListner)).map(i => i.errors).reduce((a, b) => [...a, ...b], []));
+                        const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner)).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
+                        listner.errors.push(...bestMatchErrors);
+                        if (bestMatchErrors.length <= 0)
+                        {
+                            console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
+                        }
                     }
                     else
                     {
@@ -305,7 +312,7 @@ export module Types
     export const isLiteralElement = (value: unknown, listner?: TypeError.Listener): value is LiteralElement => isSpecificObject<LiteralElement>
     ({
         $type: isJust("literal"),
-        literal: Jsonable.isJsonable,
+        literal: isJsonable,
     })
     (value, listner);
     export interface ValueDefinition extends AlphaDefinition

@@ -53,6 +53,9 @@ var Types;
             return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "array", value);
         }
     }; };
+    Types.isJsonable = function (value, listner) {
+        return typeerror_1.TypeError.withErrorHandling(jsonable_1.Jsonable.isJsonable(value), listner, "jsonable", value);
+    };
     Types.makeOrTypeNameFromIsTypeList = function () {
         var isTypeList = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -103,7 +106,11 @@ var Types;
                 if (!result) {
                     var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
                     if ((Types.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
-                        (_a = listner.errors).push.apply(_a, Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []));
+                        var bestMatchErrors = Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                        (_a = listner.errors).push.apply(_a, bestMatchErrors);
+                        if (bestMatchErrors.length <= 0) {
+                            console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
+                        }
                     }
                     else {
                         typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
@@ -210,7 +217,7 @@ var Types;
     })(value, listner); };
     Types.isLiteralElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("literal"),
-        literal: jsonable_1.Jsonable.isJsonable,
+        literal: Types.isJsonable,
     })(value, listner); };
     Types.isValueDefinition = function (value, listner) { return Types.isSpecificObject({
         export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),

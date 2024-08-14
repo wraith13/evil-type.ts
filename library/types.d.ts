@@ -12,6 +12,7 @@ export declare namespace Types {
     const isObject: (value: unknown) => value is object;
     const isEnum: <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener) => value is T;
     const isArray: <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener) => value is T[];
+    const isJsonable: (value: unknown, listner?: TypeError.Listener) => value is Jsonable.Jsonable;
     const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypeError.Listener) => value is T[K]; }) => string[];
     const getBestMatchErrors: (listeners: TypeError.Listener[]) => TypeError.Listener[];
     const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypeError.Listener) => value is T[K]; }) => (value: unknown, listner?: TypeError.Listener) => value is T[number];

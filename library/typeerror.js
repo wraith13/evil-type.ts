@@ -61,15 +61,6 @@ var TypeError;
         var length = childrenKeys.length;
         var sum = childrenKeys.map(function (i) { return listner.matchRate[i]; }).reduce(function (a, b) { return a + b; }, 0.0);
         var result = 0 < length ? sum / length : 1.0;
-        if (isNaN(result)) {
-            console.log({
-                path: listner.path,
-                depth: depth,
-                sum: sum,
-                registry: childrenKeys.map(function (i) { return ({ path: i, matchRate: listner.matchRate[i], }); }),
-                length: childrenKeys.length,
-            });
-        }
         return listner.matchRate[path] = result;
     };
     TypeError.setMatch = function (listner) { return TypeError.setMatchRate(listner, 1.0); };
