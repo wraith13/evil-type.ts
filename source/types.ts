@@ -14,8 +14,8 @@ export module Types
     export const isString = (value: unknown, listner?: TypeError.Listener): value is string =>
         TypeError.withErrorHandling("string" === typeof value, listner, "string", value);
     export type ActualObject = Exclude<object, null>;
-    export const isObject = (value: unknown, listner?: TypeError.Listener): value is ActualObject =>
-        TypeError.withErrorHandling(null !== value && "object" === typeof value && ! Array.isArray(value), listner, "object", value);
+    export const isObject = (value: unknown): value is ActualObject =>
+        null !== value && "object" === typeof value && ! Array.isArray(value);
     export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener): value is T =>
         TypeError.withErrorHandling(list.includes(value as T), listner, () => list.map(i => TypeError.valueToString(i)).join(" | "), value);
     export const isArray = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener): value is T[] =>
@@ -75,7 +75,6 @@ export module Types
             }
         )
         .filter((i, _ix, list) => i.matchRate === list[0].matchRate)
-        // .filter((i, _ix, list) => i.depth === list[0].depth)
         .map(i => i.listener);
     export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
         (value: unknown, listner?: TypeError.Listener): value is T[number] =>
@@ -101,7 +100,7 @@ export module Types
                     const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
                     if ((isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array")))
                     {
-                        listner.errors.push(...getBestMatchErrors(resultList.map(i => i.transactionListner)).map(i => i.errors).reduce((a, b) => [...a, ...b]));
+                        listner.errors.push(...getBestMatchErrors(resultList.map(i => i.transactionListner)).map(i => i.errors).reduce((a, b) => [...a, ...b], []));
                     }
                     else
                     {
@@ -149,17 +148,59 @@ export module Types
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypeError.Listener): value is ObjectType =>
-        isObject(value, listner) &&
-        Object.entries(memberValidator).map
-        (
-            kv => kv[0].endsWith("?") ?
-                isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, TypeError.nextListener(kv[0], listner)):
-                isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, TypeError.nextListener(kv[0], listner))
-        )
-        .every(i => i);
+    {
+        if (isObject(value))
+        {
+            const result = Object.entries(memberValidator).map
+            (
+                kv => kv[0].endsWith("?") ?
+                    isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, TypeError.nextListener(kv[0], listner)):
+                    isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, TypeError.nextListener(kv[0], listner))
+            )
+            .every(i => i);
+            if (listner)
+            {
+                if (result)
+                {
+                    TypeError.setMatch(listner);
+                }
+                else
+                {
+                    // 計算させる事でキャッシュ(set)させる
+                    TypeError.getMatchRate(listner);
+                }
+            }
+            return result;
+        }
+        else
+        {
+            return undefined !== listner && TypeError.raiseError(listner, "object", value);
+        }
+    }
     export const isDictionaryObject = <MemberType>(isType: ((m: unknown, listner?: TypeError.Listener) => m is MemberType)) => (value: unknown, listner?: TypeError.Listener): value is { [key: string]: MemberType } =>
-        isObject(value, listner) &&
-        Object.entries(value).map(kv => isType(kv[1], TypeError.nextListener(kv[0], listner))).every(i => i);
+    {
+        if (isObject(value))
+        {
+            const result = Object.entries(value).map(kv => isType(kv[1], TypeError.nextListener(kv[0], listner))).every(i => i);
+            if (listner)
+            {
+                if (result)
+                {
+                    TypeError.setMatch(listner);
+                }
+                else
+                {
+                    // 計算させる事でキャッシュ(set)させる
+                    TypeError.getMatchRate(listner);
+                }
+            }
+            return result;
+        }
+        else
+        {
+            return undefined !== listner && TypeError.raiseError(listner, "object", value);
+        }
+    }
     export const ValidatorOptionTypeMembers = [ "none", "simple", "full", ] as const;
     export type ValidatorOptionType = typeof ValidatorOptionTypeMembers[number];
     export const isValidatorOptionType = isEnum(ValidatorOptionTypeMembers);

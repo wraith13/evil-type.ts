@@ -16,6 +16,7 @@ var TypeError;
         if (path === void 0) { path = ""; }
         return ({
             path: path,
+            matchRate: {},
             errors: [],
         });
     };
@@ -23,6 +24,7 @@ var TypeError;
         return listner ?
             {
                 path: TypeError.makePath(listner.path, name),
+                matchRate: listner.matchRate,
                 errors: listner.errors,
             } :
             undefined;
@@ -43,16 +45,56 @@ var TypeError;
             .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
             .filter(function (i, ix, list) { return ix === list.indexOf(i); });
     };
+    TypeError.setMatchRate = function (listner, matchRate) {
+        if (listner) {
+            listner.matchRate[listner.path] = matchRate;
+        }
+        return 1.0 <= matchRate;
+    };
+    TypeError.getMatchRate = function (listner, path) {
+        if (path === void 0) { path = listner.path; }
+        if (path in listner.matchRate) {
+            return listner.matchRate[path];
+        }
+        var depth = TypeError.getPathDepth(path);
+        var childrenKeys = Object.keys(listner.matchRate).filter(function (i) { return 0 === i.indexOf(path) && TypeError.getPathDepth(i) === depth + 1; });
+        var length = childrenKeys.length;
+        var sum = childrenKeys.map(function (i) { return listner.matchRate[i]; }).reduce(function (a, b) { return a + b; }, 0.0);
+        var result = 0 < length ? sum / length : 1.0;
+        if (isNaN(result)) {
+            console.log({
+                path: listner.path,
+                depth: depth,
+                sum: sum,
+                registry: childrenKeys.map(function (i) { return ({ path: i, matchRate: listner.matchRate[i], }); }),
+                length: childrenKeys.length,
+            });
+        }
+        return listner.matchRate[path] = result;
+    };
+    TypeError.setMatch = function (listner) { return TypeError.setMatchRate(listner, 1.0); };
     TypeError.raiseError = function (listner, requiredType, actualValue) {
+        TypeError.setMatchRate(listner, 0.0);
         listner.errors.push({
             path: listner.path,
-            requiredType: "string" === typeof requiredType ? requiredType : TypeError.getType(requiredType).join(" | "),
+            requiredType: "string" === typeof requiredType ? requiredType : requiredType(),
             actualValue: TypeError.valueToString(actualValue),
         });
         return false;
     };
     TypeError.valueToString = function (value) {
         return undefined === value ? "undefined" : JSON.stringify(value);
+    };
+    TypeError.withErrorHandling = function (isMatchType, listner, requiredType, actualValue) {
+        if (listner) {
+            if (isMatchType) {
+                TypeError.setMatch(listner);
+            }
+            else {
+                TypeError.raiseError(listner, requiredType, actualValue);
+            }
+        }
+        return isMatchType;
     };
 })(TypeError || (exports.TypeError = TypeError = {}));
 //# sourceMappingURL=typeerror.js.map

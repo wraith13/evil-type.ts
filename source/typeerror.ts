@@ -16,7 +16,7 @@ export module TypeError
     ({
         path,
         matchRate: { },
-        errors: [],
+        errors: [ ],
     });
     export const nextListener = (name: string | number, listner: Listener | undefined): Listener | undefined =>
         listner ?
@@ -56,8 +56,11 @@ export module TypeError
             return listner.matchRate[path];
         }
         const depth = getPathDepth(path);
-        const childrenKeys = Object.keys(listner.matchRate).filter(i => 0 === i.indexOf(path) && getPathDepth(i) +1 === depth);
-        return listner.matchRate[path] = childrenKeys.map(i => listner.matchRate[i]).reduce((a, b) => a +b, 0.0) /childrenKeys.length;
+        const childrenKeys = Object.keys(listner.matchRate).filter(i => 0 === i.indexOf(path) && getPathDepth(i) === depth +1);
+        const length = childrenKeys.length;
+        const sum = childrenKeys.map(i => listner.matchRate[i]).reduce((a, b) => a +b, 0.0);
+        const result = 0 < length ? sum /length: 1.0;
+        return listner.matchRate[path] = result;
     };
     export const setMatch = (listner: Listener | undefined) => setMatchRate(listner, 1.0);
     export const raiseError = (listner: Listener, requiredType: string | (() => string), actualValue: unknown) =>

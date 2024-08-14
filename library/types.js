@@ -16,28 +16,38 @@ var Types;
 (function (Types) {
     Types.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
     Types.isJust = function (target) { return function (value, listner) {
-        return target === value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, typeerror_1.TypeError.valueToString(target), value));
+        return typeerror_1.TypeError.withErrorHandling(target === value, listner, function () { return typeerror_1.TypeError.valueToString(target); }, value);
     }; };
     Types.isUndefined = Types.isJust(undefined);
     Types.isNull = Types.isJust(null);
     Types.isBoolean = function (value, listner) {
-        return "boolean" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "boolean", value));
+        return typeerror_1.TypeError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
     };
     Types.isNumber = function (value, listner) {
-        return "number" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "number", value));
+        return typeerror_1.TypeError.withErrorHandling("number" === typeof value, listner, "number", value);
     };
     Types.isString = function (value, listner) {
-        return "string" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "string", value));
+        return typeerror_1.TypeError.withErrorHandling("string" === typeof value, listner, "string", value);
     };
-    Types.isObject = function (value, listner) {
-        return (null !== value && "object" === typeof value) || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "object", value));
+    Types.isObject = function (value) {
+        return null !== value && "object" === typeof value && !Array.isArray(value);
     };
     Types.isEnum = function (list) { return function (value, listner) {
-        return list.includes(value) || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, list.map(function (i) { return typeerror_1.TypeError.valueToString(i); }).join(" | "), value));
+        return typeerror_1.TypeError.withErrorHandling(list.includes(value), listner, function () { return list.map(function (i) { return typeerror_1.TypeError.valueToString(i); }).join(" | "); }, value);
     }; };
     Types.isArray = function (isType) { return function (value, listner) {
         if (Array.isArray(value)) {
-            return value.map(function (i) { return isType(i, listner); }).every(function (i) { return i; });
+            var result = value.map(function (i) { return isType(i, listner); }).every(function (i) { return i; });
+            if (listner) {
+                if (result) {
+                    typeerror_1.TypeError.setMatch(listner);
+                }
+                else {
+                    // 計算させる事でキャッシュ(set)させる
+                    typeerror_1.TypeError.getMatchRate(listner);
+                }
+            }
+            return result;
         }
         else {
             return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "array", value);
@@ -56,31 +66,21 @@ var Types;
         return listeners.map(function (listener) {
             return ({
                 listener: listener,
-                depth: Math.max.apply(Math, listener.errors.map(function (i) { return typeerror_1.TypeError.getPathDepth(i.path); })),
-                length: listener.errors.length,
+                matchRate: typeerror_1.TypeError.getMatchRate(listener),
             });
         })
             .sort(function (a, b) {
-            if (a.depth < b.depth) {
+            if (a.matchRate < b.matchRate) {
                 return 1;
             }
-            else if (b.depth < a.depth) {
+            else if (b.matchRate < a.matchRate) {
                 return -1;
             }
             else {
-                if (a.length < b.length) {
-                    return -1;
-                }
-                else if (b.length < a.length) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
+                return 0;
             }
         })
-            .filter(function (i, _ix, list) { return i.depth === list[0].depth && i.length === list[0].length; })
-            // .filter((i, _ix, list) => i.depth === list[0].depth)
+            .filter(function (i, _ix, list) { return i.matchRate === list[0].matchRate; })
             .map(function (i) { return i.listener; });
     };
     Types.isOr = function () {
@@ -103,7 +103,7 @@ var Types;
                 if (!result) {
                     var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
                     if ((Types.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
-                        (_a = listner.errors).push.apply(_a, Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }));
+                        (_a = listner.errors).push.apply(_a, Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []));
                     }
                     else {
                         typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
@@ -133,22 +133,50 @@ var Types;
     Types.isMemberType = function (value, member, isType, listner) {
         return Types.isOptionalKeyTypeGuard(isType) ?
             (!(member in value) || isType.isType(value[member], listner)) :
-            ((member in value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, isType, undefined))) && isType(value[member], listner));
+            isType(value[member], listner);
     };
     Types.isMemberTypeOrUndefined = function (value, member, isType, listner) {
         return !(member in value) || isType(value[member], listner);
     };
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     Types.isSpecificObject = function (memberValidator) { return function (value, listner) {
-        return Types.isObject(value, listner) &&
-            Object.entries(memberValidator).map(function (kv) { return kv[0].endsWith("?") ?
+        if (Types.isObject(value)) {
+            var result = Object.entries(memberValidator).map(function (kv) { return kv[0].endsWith("?") ?
                 Types.isMemberTypeOrUndefined(value, kv[0].slice(0, -1), kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)) :
                 Types.isMemberType(value, kv[0], kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); })
                 .every(function (i) { return i; });
+            if (listner) {
+                if (result) {
+                    typeerror_1.TypeError.setMatch(listner);
+                }
+                else {
+                    // 計算させる事でキャッシュ(set)させる
+                    typeerror_1.TypeError.getMatchRate(listner);
+                }
+            }
+            return result;
+        }
+        else {
+            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "object", value);
+        }
     }; };
     Types.isDictionaryObject = function (isType) { return function (value, listner) {
-        return Types.isObject(value, listner) &&
-            Object.entries(value).map(function (kv) { return isType(kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
+        if (Types.isObject(value)) {
+            var result = Object.entries(value).map(function (kv) { return isType(kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
+            if (listner) {
+                if (result) {
+                    typeerror_1.TypeError.setMatch(listner);
+                }
+                else {
+                    // 計算させる事でキャッシュ(set)させる
+                    typeerror_1.TypeError.getMatchRate(listner);
+                }
+            }
+            return result;
+        }
+        else {
+            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "object", value);
+        }
     }; };
     Types.ValidatorOptionTypeMembers = ["none", "simple", "full",];
     Types.isValidatorOptionType = Types.isEnum(Types.ValidatorOptionTypeMembers);
