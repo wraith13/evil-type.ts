@@ -31,8 +31,7 @@ export module Types
                 }
                 else
                 {
-                    // 計算させる事でキャッシュ(set)させる
-                    TypeError.getMatchRate(listner);
+                    TypeError.calculateMatchRate(listner);
                 }
             }
             return result;
@@ -102,17 +101,26 @@ export module Types
                     const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
                     if ((isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array")))
                     {
-                        const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner)).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                        listner.errors.push(...bestMatchErrors);
-                        if (bestMatchErrors.length <= 0)
+                        const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner));
+                        const errors = bestMatchErrors.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
+                        listner.errors.push(...errors);
+                        if (errors.length <= 0)
                         {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
+                        }
+                        if (bestMatchErrors.length <= 0)
+                        {
+                            TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
                         }
                     }
                     else
                     {
                         TypeError.raiseError(listner, requiredType.join(" | "), value);
                     }
+                }
+                else
+                {
+                    TypeError.setMatch(listner);
                 }
                 return result;
             }
@@ -173,8 +181,7 @@ export module Types
                 }
                 else
                 {
-                    // 計算させる事でキャッシュ(set)させる
-                    TypeError.getMatchRate(listner);
+                    TypeError.calculateMatchRate(listner);
                 }
             }
             return result;
@@ -197,8 +204,7 @@ export module Types
                 }
                 else
                 {
-                    // 計算させる事でキャッシュ(set)させる
-                    TypeError.getMatchRate(listner);
+                    TypeError.calculateMatchRate(listner);
                 }
             }
             return result;

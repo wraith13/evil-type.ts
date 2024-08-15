@@ -56,11 +56,18 @@ var TypeError;
         if (path in listner.matchRate) {
             return listner.matchRate[path];
         }
+        return TypeError.calculateMatchRate(listner, path);
+    };
+    TypeError.calculateMatchRate = function (listner, path) {
+        if (path === void 0) { path = listner.path; }
         var depth = TypeError.getPathDepth(path);
         var childrenKeys = Object.keys(listner.matchRate).filter(function (i) { return 0 === i.indexOf(path) && TypeError.getPathDepth(i) === depth + 1; });
         var length = childrenKeys.length;
         var sum = childrenKeys.map(function (i) { return listner.matchRate[i]; }).reduce(function (a, b) { return a + b; }, 0.0);
         var result = 0 < length ? sum / length : 1.0;
+        if (1.0 <= result) {
+            console.error("🦋 FIXME: \"MatchWithErrors\": " + JSON.stringify({ sum: sum, length: length, result: result, listner: listner }));
+        }
         return listner.matchRate[path] = result;
     };
     TypeError.setMatch = function (listner) { return TypeError.setMatchRate(listner, 1.0); };

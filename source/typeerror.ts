@@ -55,11 +55,19 @@ export module TypeError
         {
             return listner.matchRate[path];
         }
+        return calculateMatchRate(listner, path);
+    };
+    export const calculateMatchRate = (listner: Listener, path: string = listner.path) =>
+    {
         const depth = getPathDepth(path);
         const childrenKeys = Object.keys(listner.matchRate).filter(i => 0 === i.indexOf(path) && getPathDepth(i) === depth +1);
         const length = childrenKeys.length;
         const sum = childrenKeys.map(i => listner.matchRate[i]).reduce((a, b) => a +b, 0.0);
         const result = 0 < length ? sum /length: 1.0;
+        if (1.0 <= result)
+        {
+            console.error("🦋 FIXME: \"MatchWithErrors\": " +JSON.stringify({ sum, length, result, listner}));
+        }
         return listner.matchRate[path] = result;
     };
     export const setMatch = (listner: Listener | undefined) => setMatchRate(listner, 1.0);

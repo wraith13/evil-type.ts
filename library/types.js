@@ -43,8 +43,7 @@ var Types;
                     typeerror_1.TypeError.setMatch(listner);
                 }
                 else {
-                    // 計算させる事でキャッシュ(set)させる
-                    typeerror_1.TypeError.getMatchRate(listner);
+                    typeerror_1.TypeError.calculateMatchRate(listner);
                 }
             }
             return result;
@@ -106,15 +105,22 @@ var Types;
                 if (!result) {
                     var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
                     if ((Types.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
-                        var bestMatchErrors = Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; })).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                        (_a = listner.errors).push.apply(_a, bestMatchErrors);
-                        if (bestMatchErrors.length <= 0) {
+                        var bestMatchErrors = Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; }));
+                        var errors = bestMatchErrors.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                        (_a = listner.errors).push.apply(_a, errors);
+                        if (errors.length <= 0) {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
+                        }
+                        if (bestMatchErrors.length <= 0) {
+                            typeerror_1.TypeError.setMatchRate(listner, typeerror_1.TypeError.getMatchRate(bestMatchErrors[0]));
                         }
                     }
                     else {
                         typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
                     }
+                }
+                else {
+                    typeerror_1.TypeError.setMatch(listner);
                 }
                 return result;
             }
@@ -157,8 +163,7 @@ var Types;
                     typeerror_1.TypeError.setMatch(listner);
                 }
                 else {
-                    // 計算させる事でキャッシュ(set)させる
-                    typeerror_1.TypeError.getMatchRate(listner);
+                    typeerror_1.TypeError.calculateMatchRate(listner);
                 }
             }
             return result;
@@ -175,8 +180,7 @@ var Types;
                     typeerror_1.TypeError.setMatch(listner);
                 }
                 else {
-                    // 計算させる事でキャッシュ(set)させる
-                    typeerror_1.TypeError.getMatchRate(listner);
+                    typeerror_1.TypeError.calculateMatchRate(listner);
                 }
             }
             return result;

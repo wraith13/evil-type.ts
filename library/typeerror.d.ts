@@ -18,6 +18,7 @@ export declare namespace TypeError {
     const getType: (isType: (v: unknown, listner?: TypeError.Listener) => boolean) => string[];
     const setMatchRate: (listner: Listener | undefined, matchRate: number) => boolean;
     const getMatchRate: (listner: Listener, path?: string) => number;
+    const calculateMatchRate: (listner: Listener, path?: string) => number;
     const setMatch: (listner: Listener | undefined) => boolean;
     const raiseError: (listner: Listener, requiredType: string | (() => string), actualValue: unknown) => boolean;
     const valueToString: (value: unknown) => string;
