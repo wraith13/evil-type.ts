@@ -79,9 +79,9 @@ export declare namespace Types {
         };
     }
     const isModuleDefinition: (value: unknown, listner?: TypeError.Listener) => value is ModuleDefinition;
-    const PrimitiveTypeEnumMembers: readonly ["undefined", "boolean", "number", "string"];
+    const PrimitiveTypeEnumMembers: readonly ["null", "boolean", "number", "string"];
     type PrimitiveTypeEnum = typeof PrimitiveTypeEnumMembers[number];
-    const isPrimitiveTypeEnum: (value: unknown, listner?: TypeError.Listener) => value is "string" | "number" | "boolean" | "undefined";
+    const isPrimitiveTypeEnum: (value: unknown, listner?: TypeError.Listener) => value is "string" | "number" | "boolean" | "null";
     interface PrimitiveTypeElement extends AlphaElement {
         $type: "primitive-type";
         type: PrimitiveTypeEnum;

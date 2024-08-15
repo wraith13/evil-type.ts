@@ -209,7 +209,7 @@ var Types;
         $type: Types.isJust("module"),
         members: Types.isDictionaryObject(Types.isDefinition),
     })(value, listner); };
-    Types.PrimitiveTypeEnumMembers = ["undefined", "boolean", "number", "string"];
+    Types.PrimitiveTypeEnumMembers = ["null", "boolean", "number", "string"];
     Types.isPrimitiveTypeEnum = Types.isEnum(Types.PrimitiveTypeEnumMembers);
     Types.isPrimitiveTypeElement = function (value, listner) { return Types.isSpecificObject({
         $type: Types.isJust("primitive-type"),

@@ -290,7 +290,7 @@ export module Types
         members: isDictionaryObject(isDefinition),
     })
     (value, listner);
-    export const PrimitiveTypeEnumMembers = ["undefined", "boolean", "number", "string"] as const;
+    export const PrimitiveTypeEnumMembers = ["null", "boolean", "number", "string"] as const;
     export type PrimitiveTypeEnum = typeof PrimitiveTypeEnumMembers[number];
     export const isPrimitiveTypeEnum = isEnum(PrimitiveTypeEnumMembers);
     export interface PrimitiveTypeElement extends AlphaElement

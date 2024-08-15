@@ -404,8 +404,10 @@ try {
         console.log(result);
     }
     else {
-        console.error("Invalid TypeSchema", rawSource);
-        errorListner.errors.forEach(function (i) { return console.error(JSON.stringify(i)); });
+        console.error("🚫 Invalid TypeSchema");
+        //errorListner.errors.forEach(i => console.error(JSON.stringify(i)));
+        console.error(errorListner.errors);
+        console.error(errorListner.matchRate);
     }
 }
 catch (error) {
