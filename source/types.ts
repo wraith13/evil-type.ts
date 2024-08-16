@@ -95,10 +95,12 @@ export module Types
                         return result;
                     }
                 );
-                const result = resultList.some(i => i.result);
+                const success = resultList.filter(i => i.result)[0];
+                const result = Boolean(success);
                 if (result)
                 {
                     TypeError.setMatch(listner);
+                    Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                 }
                 else
                 {
@@ -112,7 +114,7 @@ export module Types
                         {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
                         }
-                        if (bestMatchErrors.length <= 0)
+                        if (0 < bestMatchErrors.length)
                         {
                             Object.entries(bestMatchErrors[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                             //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
@@ -149,10 +151,10 @@ export module Types
     });
     export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener): boolean =>
         isOptionalKeyTypeGuard(isType) ?
-            (( ! (member in value) && TypeError.setMatch(listner)) || isType.isType((value as ObjectType)[member], listner)):
+            ( ! (member in value) || isType.isType((value as ObjectType)[member], listner)):
             isType((value as ObjectType)[member], listner);
     export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean), listner?: TypeError.Listener): boolean =>
-        ( ! (member in value) && TypeError.setMatch(listner)) || isType((value as ObjectType)[member], listner);
+        ! (member in value) || isType((value as ObjectType)[member], listner);
     export type OptionalKeys<T> =
         { [K in keyof T]: T extends Record<K, T[K]> ? never : K } extends { [_ in keyof T]: infer U }
         ? U : never;

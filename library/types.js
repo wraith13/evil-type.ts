@@ -100,9 +100,11 @@ var Types;
                     };
                     return result;
                 });
-                var result = resultList.some(function (i) { return i.result; });
+                var success = resultList.filter(function (i) { return i.result; })[0];
+                var result = Boolean(success);
                 if (result) {
                     typeerror_1.TypeError.setMatch(listner);
+                    Object.entries(success.transactionListner.matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
                 }
                 else {
                     var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
@@ -113,7 +115,7 @@ var Types;
                         if (errors.length <= 0) {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
                         }
-                        if (bestMatchErrors.length <= 0) {
+                        if (0 < bestMatchErrors.length) {
                             Object.entries(bestMatchErrors[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
                             //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
                         }
@@ -145,11 +147,11 @@ var Types;
     };
     Types.isMemberType = function (value, member, isType, listner) {
         return Types.isOptionalKeyTypeGuard(isType) ?
-            ((!(member in value) && typeerror_1.TypeError.setMatch(listner)) || isType.isType(value[member], listner)) :
+            (!(member in value) || isType.isType(value[member], listner)) :
             isType(value[member], listner);
     };
     Types.isMemberTypeOrUndefined = function (value, member, isType, listner) {
-        return (!(member in value) && typeerror_1.TypeError.setMatch(listner)) || isType(value[member], listner);
+        return !(member in value) || isType(value[member], listner);
     };
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     Types.isSpecificObject = function (memberValidator) { return function (value, listner) {
