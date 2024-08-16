@@ -96,31 +96,32 @@ export module Types
                     }
                 );
                 const result = resultList.some(i => i.result);
-                if ( ! result)
+                if (result)
+                {
+                    TypeError.setMatch(listner);
+                }
+                else
                 {
                     const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
                     if ((isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array")))
                     {
                         const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner));
                         const errors = bestMatchErrors.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                        listner.errors.push(...errors);
+                        TypeError.aggregateErros(listner, errors);
                         if (errors.length <= 0)
                         {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
                         }
                         if (bestMatchErrors.length <= 0)
                         {
-                            TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
+                            Object.entries(bestMatchErrors[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
+                            //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
                         }
                     }
                     else
                     {
                         TypeError.raiseError(listner, requiredType.join(" | "), value);
                     }
-                }
-                else
-                {
-                    TypeError.setMatch(listner);
                 }
                 return result;
             }
@@ -148,10 +149,10 @@ export module Types
     });
     export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener): boolean =>
         isOptionalKeyTypeGuard(isType) ?
-            (! (member in value) || isType.isType((value as ObjectType)[member], listner)):
+            (( ! (member in value) && TypeError.setMatch(listner)) || isType.isType((value as ObjectType)[member], listner)):
             isType((value as ObjectType)[member], listner);
     export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean), listner?: TypeError.Listener): boolean =>
-        ! (member in value) || isType((value as ObjectType)[member], listner);
+        ( ! (member in value) && TypeError.setMatch(listner)) || isType((value as ObjectType)[member], listner);
     export type OptionalKeys<T> =
         { [K in keyof T]: T extends Record<K, T[K]> ? never : K } extends { [_ in keyof T]: infer U }
         ? U : never;

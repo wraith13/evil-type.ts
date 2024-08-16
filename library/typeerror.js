@@ -74,11 +74,24 @@ var TypeError;
     TypeError.raiseError = function (listner, requiredType, actualValue) {
         TypeError.setMatchRate(listner, 0.0);
         listner.errors.push({
+            type: "solid",
             path: listner.path,
             requiredType: "string" === typeof requiredType ? requiredType : requiredType(),
             actualValue: TypeError.valueToString(actualValue),
         });
         return false;
+    };
+    TypeError.aggregateErros = function (listner, errors) {
+        var _a;
+        var paths = errors.map(function (i) { return i.path; }).filter(function (i, ix, list) { return ix === list.indexOf(i); });
+        (_a = listner.errors).push.apply(_a, paths.map(function (path) {
+            return ({
+                type: "fragment",
+                path: path,
+                requiredType: errors.filter(function (i) { return i.path === path; }).map(function (i) { return i.requiredType; }).join(" | "),
+                actualValue: errors.filter(function (i) { return i.path === path; }).map(function (i) { return i.actualValue; })[0],
+            });
+        }));
     };
     TypeError.valueToString = function (value) {
         return undefined === value ? "undefined" : JSON.stringify(value);

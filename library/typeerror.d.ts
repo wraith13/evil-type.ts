@@ -1,5 +1,6 @@
 export declare namespace TypeError {
     interface Error {
+        type: "solid" | "fragment";
         path: string;
         requiredType: string;
         actualValue: string;
@@ -21,6 +22,7 @@ export declare namespace TypeError {
     const calculateMatchRate: (listner: Listener, path?: string) => number;
     const setMatch: (listner: Listener | undefined) => boolean;
     const raiseError: (listner: Listener, requiredType: string | (() => string), actualValue: unknown) => boolean;
+    const aggregateErros: (listner: Listener, errors: Error[]) => void;
     const valueToString: (value: unknown) => string;
     const withErrorHandling: (isMatchType: boolean, listner: Listener | undefined, requiredType: string | (() => string), actualValue: unknown) => boolean;
 }

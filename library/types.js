@@ -91,7 +91,6 @@ var Types;
             isTypeList[_i] = arguments[_i];
         }
         return function (value, listner) {
-            var _a;
             if (listner) {
                 var resultList = isTypeList.map(function (i) {
                     var transactionListner = typeerror_1.TypeError.makeListener(listner.path);
@@ -102,25 +101,26 @@ var Types;
                     return result;
                 });
                 var result = resultList.some(function (i) { return i.result; });
-                if (!result) {
+                if (result) {
+                    typeerror_1.TypeError.setMatch(listner);
+                }
+                else {
                     var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
                     if ((Types.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
                         var bestMatchErrors = Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; }));
                         var errors = bestMatchErrors.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                        (_a = listner.errors).push.apply(_a, errors);
+                        typeerror_1.TypeError.aggregateErros(listner, errors);
                         if (errors.length <= 0) {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
                         }
                         if (bestMatchErrors.length <= 0) {
-                            typeerror_1.TypeError.setMatchRate(listner, typeerror_1.TypeError.getMatchRate(bestMatchErrors[0]));
+                            Object.entries(bestMatchErrors[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
+                            //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
                         }
                     }
                     else {
                         typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
                     }
-                }
-                else {
-                    typeerror_1.TypeError.setMatch(listner);
                 }
                 return result;
             }
@@ -145,11 +145,11 @@ var Types;
     };
     Types.isMemberType = function (value, member, isType, listner) {
         return Types.isOptionalKeyTypeGuard(isType) ?
-            (!(member in value) || isType.isType(value[member], listner)) :
+            ((!(member in value) && typeerror_1.TypeError.setMatch(listner)) || isType.isType(value[member], listner)) :
             isType(value[member], listner);
     };
     Types.isMemberTypeOrUndefined = function (value, member, isType, listner) {
-        return !(member in value) || isType(value[member], listner);
+        return (!(member in value) && typeerror_1.TypeError.setMatch(listner)) || isType(value[member], listner);
     };
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     Types.isSpecificObject = function (memberValidator) { return function (value, listner) {

@@ -2,6 +2,7 @@ export module TypeError
 {
     export interface Error
     {
+        type: "solid" | "fragment";
         path: string;
         requiredType: string;
         actualValue: string;
@@ -76,12 +77,30 @@ export module TypeError
         setMatchRate(listner, 0.0);
         listner.errors.push
         ({
+            type: "solid",
             path: listner.path,
             requiredType: "string" === typeof requiredType ? requiredType: requiredType(),
             actualValue: valueToString(actualValue),
         });
         return false;
-    }
+    };
+    export const aggregateErros = (listner: Listener, errors: Error[]) =>
+    {
+        const paths = errors.map(i => i.path).filter((i, ix, list) => ix === list.indexOf(i));
+        listner.errors.push
+        (
+            ...paths.map
+            (
+                path =>
+                ({
+                    type: "fragment" as const,
+                    path,
+                    requiredType: errors.filter(i => i.path === path).map(i => i.requiredType).join(" | "),
+                    actualValue: errors.filter(i => i.path === path).map(i => i.actualValue)[0],
+                })
+            )
+        );
+    };
     export const valueToString = (value: unknown) =>
         undefined === value ? "undefined": JSON.stringify(value);
     export const withErrorHandling = (isMatchType: boolean, listner: Listener | undefined, requiredType: string | (() => string), actualValue: unknown) =>
