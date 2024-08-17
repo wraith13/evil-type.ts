@@ -84,7 +84,7 @@ export module TypeError
         });
         return false;
     };
-    export const aggregateErros = (listner: Listener, errors: Error[]) =>
+    export const aggregateErros = (listner: Listener, modulus: number, errors: Error[], fullErrors: Error[]) =>
     {
         const paths = errors.map(i => i.path).filter((i, ix, list) => ix === list.indexOf(i));
         listner.errors.push
@@ -93,9 +93,17 @@ export module TypeError
             (
                 path =>
                 ({
-                    type: "fragment" as const,
+                    type: modulus <= fullErrors.filter(i => "solid" === i.type && i.path === path).length ?
+                        "solid" as const:
+                        "fragment" as const,
                     path,
-                    requiredType: errors.filter(i => i.path === path).map(i => i.requiredType).join(" | "),
+                    requiredType: errors
+                        .filter(i => i.path === path)
+                        .map(i => i.requiredType)
+                        .map(i => i.split(" | "))
+                        .reduce((a, b) => [...a, ...b], [])
+                        .filter((i, ix, list) => ix === list.indexOf(i))
+                        .join(" | "),
                     actualValue: errors.filter(i => i.path === path).map(i => i.actualValue)[0],
                 })
             )

@@ -109,7 +109,8 @@ export module Types
                     {
                         const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner));
                         const errors = bestMatchErrors.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                        TypeError.aggregateErros(listner, errors);
+                        const fullErrors = resultList.map(i => i.transactionListner).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
+                        TypeError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
                         if (errors.length <= 0)
                         {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
@@ -122,7 +123,12 @@ export module Types
                     }
                     else
                     {
-                        TypeError.raiseError(listner, requiredType.join(" | "), value);
+                        TypeError.raiseError
+                        (
+                            listner,
+                            requiredType.join(" | "),
+                            value
+                        );
                     }
                 }
                 return result;

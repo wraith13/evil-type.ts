@@ -111,7 +111,8 @@ var Types;
                     if ((Types.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
                         var bestMatchErrors = Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; }));
                         var errors = bestMatchErrors.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                        typeerror_1.TypeError.aggregateErros(listner, errors);
+                        var fullErrors = resultList.map(function (i) { return i.transactionListner; }).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                        typeerror_1.TypeError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
                         if (errors.length <= 0) {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
                         }

@@ -81,14 +81,22 @@ var TypeError;
         });
         return false;
     };
-    TypeError.aggregateErros = function (listner, errors) {
+    TypeError.aggregateErros = function (listner, modulus, errors, fullErrors) {
         var _a;
         var paths = errors.map(function (i) { return i.path; }).filter(function (i, ix, list) { return ix === list.indexOf(i); });
         (_a = listner.errors).push.apply(_a, paths.map(function (path) {
             return ({
-                type: "fragment",
+                type: modulus <= fullErrors.filter(function (i) { return "solid" === i.type && i.path === path; }).length ?
+                    "solid" :
+                    "fragment",
                 path: path,
-                requiredType: errors.filter(function (i) { return i.path === path; }).map(function (i) { return i.requiredType; }).join(" | "),
+                requiredType: errors
+                    .filter(function (i) { return i.path === path; })
+                    .map(function (i) { return i.requiredType; })
+                    .map(function (i) { return i.split(" | "); })
+                    .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
+                    .filter(function (i, ix, list) { return ix === list.indexOf(i); })
+                    .join(" | "),
                 actualValue: errors.filter(function (i) { return i.path === path; }).map(function (i) { return i.actualValue; })[0],
             });
         }));
