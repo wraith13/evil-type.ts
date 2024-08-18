@@ -146,20 +146,34 @@ var Types;
             isType: isType,
         });
     };
+    Types.isOptionalMemberType = function (value, member, optionalTypeGuard, listner) {
+        var result = !(member in value) || optionalTypeGuard.isType(value[member], listner);
+        if (!result && listner) {
+            var error = listner.errors.filter(function (i) { return i.path === listner.path; })[0];
+            if (error) {
+                error.requiredType = "never | " + error.requiredType;
+            }
+            else {
+                listner.errors.filter(function (i) { return 0 === i.path.indexOf(listner.path) && "fragment" !== i.type; }).forEach(function (i) { return i.type = "fragment"; });
+                listner.errors.push({
+                    type: "fragment",
+                    path: listner.path,
+                    requiredType: "never",
+                    actualValue: typeerror_1.TypeError.valueToString(value[member]),
+                });
+            }
+        }
+        return result;
+    };
     Types.isMemberType = function (value, member, isType, listner) {
         return Types.isOptionalKeyTypeGuard(isType) ?
-            (!(member in value) || isType.isType(value[member], listner)) :
+            Types.isOptionalMemberType(value, member, isType, listner) :
             isType(value[member], listner);
-    };
-    Types.isMemberTypeOrUndefined = function (value, member, isType, listner) {
-        return !(member in value) || isType(value[member], listner);
     };
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     Types.isSpecificObject = function (memberValidator) { return function (value, listner) {
         if (Types.isObject(value)) {
-            var result = Object.entries(memberValidator).map(function (kv) { return kv[0].endsWith("?") ?
-                Types.isMemberTypeOrUndefined(value, kv[0].slice(0, -1), kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)) :
-                Types.isMemberType(value, kv[0], kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); })
+            var result = Object.entries(memberValidator).map(function (kv) { return Types.isMemberType(value, kv[0], kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); })
                 .every(function (i) { return i; });
             if (listner) {
                 if (result) {

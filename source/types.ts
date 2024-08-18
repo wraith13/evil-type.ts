@@ -155,12 +155,34 @@ export module Types
         $type: "optional-type-guard",
         isType,
     });
+    export const isOptionalMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener): boolean =>
+    {
+        const result = ! (member in value) || optionalTypeGuard.isType((value as ObjectType)[member], listner);
+        if ( ! result && listner)
+        {
+            const error = listner.errors.filter(i => i.path === listner.path)[0];
+            if (error)
+            {
+                error.requiredType = "never | " + error.requiredType;
+            }
+            else
+            {
+                listner.errors.filter(i => 0 === i.path.indexOf(listner.path) && "fragment" !== i.type).forEach(i => i.type = "fragment");
+                listner.errors.push
+                ({
+                    type: "fragment",
+                    path: listner.path,
+                    requiredType: "never",
+                    actualValue: TypeError.valueToString((value as ObjectType)[member]),
+                });
+            }
+        }
+        return result;
+    };
     export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener): boolean =>
         isOptionalKeyTypeGuard(isType) ?
-            ( ! (member in value) || isType.isType((value as ObjectType)[member], listner)):
+            isOptionalMemberType(value, member, isType,listner):
             isType((value as ObjectType)[member], listner);
-    export const isMemberTypeOrUndefined = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean), listner?: TypeError.Listener): boolean =>
-        ! (member in value) || isType((value as ObjectType)[member], listner);
     export type OptionalKeys<T> =
         { [K in keyof T]: T extends Record<K, T[K]> ? never : K } extends { [_ in keyof T]: infer U }
         ? U : never;
@@ -177,9 +199,13 @@ export module Types
         {
             const result = Object.entries(memberValidator).map
             (
-                kv => kv[0].endsWith("?") ?
-                    isMemberTypeOrUndefined<ObjectType>(value, kv[0].slice(0, -1) as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, TypeError.nextListener(kv[0], listner)):
-                    isMemberType<ObjectType>(value, kv[0] as keyof ObjectType, kv[1] as (v: unknown, listner?: TypeError.Listener) => boolean, TypeError.nextListener(kv[0], listner))
+                kv => isMemberType<ObjectType>
+                (
+                    value,
+                    kv[0] as keyof ObjectType,
+                    kv[1] as ((v: unknown, listner?: TypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>,
+                    TypeError.nextListener(kv[0], listner)
+                )
             )
             .every(i => i);
             if (listner)

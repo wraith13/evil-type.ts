@@ -22,8 +22,8 @@ export declare namespace Types {
     }
     const isOptionalKeyTypeGuard: (value: unknown, listner?: TypeError.Listener) => value is OptionalKeyTypeGuard<unknown>;
     const makeOptionalKeyTypeGuard: <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => OptionalKeyTypeGuard<T>;
+    const isOptionalMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener) => boolean;
     const isMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, isType: OptionalKeyTypeGuard<unknown> | ((v: unknown, listner?: TypeError.Listener) => boolean), listner?: TypeError.Listener) => boolean;
-    const isMemberTypeOrUndefined: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, isType: (v: unknown, listner?: TypeError.Listener) => boolean, listner?: TypeError.Listener) => boolean;
     type OptionalKeys<T> = {
         [K in keyof T]: T extends Record<K, T[K]> ? never : K;
     } extends {
