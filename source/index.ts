@@ -496,9 +496,7 @@ try
     else
     {
         console.error("🚫 Invalid TypeSchema");
-        //errorListner.errors.forEach(i => console.error(JSON.stringify(i)));
-        console.error(errorListner.errors);
-        console.error(errorListner.matchRate);
+        console.error(errorListner);
     }
 }
 catch(error)
