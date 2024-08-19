@@ -3,6 +3,7 @@ const startAt = new Date();
 import fs from "fs";
 import { Jsonable } from "./jsonable";
 import { TypeError } from "./typeerror";
+import { TypesPrime } from "./types-prime";
 import { Types } from "./types";
 import { Text } from "./text";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
@@ -347,7 +348,7 @@ export module Build
                     (
                         define.types.map
                         (
-                            i => Types.isObject(i) ?
+                            i => TypesPrime.isObject(i) ?
                                 Define.enParenthesis(buildValidatorExpression(name, i)):
                                 buildValidatorExpression(name, i)
                         ),

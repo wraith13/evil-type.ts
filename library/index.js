@@ -17,6 +17,7 @@ var startAt = new Date();
 var fs_1 = __importDefault(require("fs"));
 var jsonable_1 = require("./jsonable");
 var typeerror_1 = require("./typeerror");
+var types_prime_1 = require("./types-prime");
 var types_1 = require("./types");
 var text_1 = require("./text");
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
@@ -282,7 +283,7 @@ var Build;
                             (0, exports.$expression)(")")
                         ], false);
                     case "and":
-                        return kindofJoinExpression(define.types.map(function (i) { return types_1.Types.isObject(i) ?
+                        return kindofJoinExpression(define.types.map(function (i) { return types_prime_1.TypesPrime.isObject(i) ?
                             Define.enParenthesis(Validator.buildValidatorExpression(name, i)) :
                             Validator.buildValidatorExpression(name, i); }), (0, exports.$expression)("&&"));
                     case "or":

@@ -1,292 +1,91 @@
 "use strict";
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Types = void 0;
-var jsonable_1 = require("./jsonable");
-var typeerror_1 = require("./typeerror");
+var types_prime_1 = require("./types-prime");
 var Types;
 (function (Types) {
     Types.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
-    Types.isJust = function (target) { return function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling(target === value, listner, function () { return typeerror_1.TypeError.valueToString(target); }, value);
-    }; };
-    Types.isUndefined = Types.isJust(undefined);
-    Types.isNull = Types.isJust(null);
-    Types.isBoolean = function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
-    };
-    Types.isNumber = function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling("number" === typeof value, listner, "number", value);
-    };
-    Types.isString = function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling("string" === typeof value, listner, "string", value);
-    };
-    Types.isObject = function (value) {
-        return null !== value && "object" === typeof value && !Array.isArray(value);
-    };
-    Types.isEnum = function (list) { return function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling(list.includes(value), listner, function () { return list.map(function (i) { return typeerror_1.TypeError.valueToString(i); }).join(" | "); }, value);
-    }; };
-    Types.isArray = function (isType) { return function (value, listner) {
-        if (Array.isArray(value)) {
-            var result = value.map(function (i) { return isType(i, listner); }).every(function (i) { return i; });
-            if (listner) {
-                if (result) {
-                    typeerror_1.TypeError.setMatch(listner);
-                }
-                else {
-                    typeerror_1.TypeError.calculateMatchRate(listner);
-                }
-            }
-            return result;
-        }
-        else {
-            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "array", value);
-        }
-    }; };
-    Types.isJsonable = function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling(jsonable_1.Jsonable.isJsonable(value), listner, "jsonable", value);
-    };
-    Types.makeOrTypeNameFromIsTypeList = function () {
-        var isTypeList = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            isTypeList[_i] = arguments[_i];
-        }
-        return isTypeList.map(function (i) { return typeerror_1.TypeError.getType(i); })
-            .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
-            .filter(function (i, ix, list) { return ix === list.indexOf(i); });
-    };
-    Types.getBestMatchErrors = function (listeners) {
-        return listeners.map(function (listener) {
-            return ({
-                listener: listener,
-                matchRate: typeerror_1.TypeError.getMatchRate(listener),
-            });
-        })
-            .sort(function (a, b) {
-            if (a.matchRate < b.matchRate) {
-                return 1;
-            }
-            else if (b.matchRate < a.matchRate) {
-                return -1;
-            }
-            else {
-                return 0;
-            }
-        })
-            .filter(function (i, _ix, list) { return i.matchRate === list[0].matchRate; })
-            .map(function (i) { return i.listener; });
-    };
-    Types.isOr = function () {
-        var isTypeList = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            isTypeList[_i] = arguments[_i];
-        }
-        return function (value, listner) {
-            if (listner) {
-                var resultList = isTypeList.map(function (i) {
-                    var transactionListner = typeerror_1.TypeError.makeListener(listner.path);
-                    var result = {
-                        transactionListner: transactionListner,
-                        result: i(value, transactionListner),
-                    };
-                    return result;
-                });
-                var success = resultList.filter(function (i) { return i.result; })[0];
-                var result = Boolean(success);
-                if (result) {
-                    typeerror_1.TypeError.setMatch(listner);
-                    Object.entries(success.transactionListner.matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
-                }
-                else {
-                    var requiredType = Types.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
-                    if ((Types.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
-                        var bestMatchErrors = Types.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; }));
-                        var errors = bestMatchErrors.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                        var fullErrors = resultList.map(function (i) { return i.transactionListner; }).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                        typeerror_1.TypeError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
-                        if (errors.length <= 0) {
-                            console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
-                        }
-                        if (0 < bestMatchErrors.length) {
-                            Object.entries(bestMatchErrors[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
-                            //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
-                        }
-                    }
-                    else {
-                        typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
-                    }
-                }
-                return result;
-            }
-            else {
-                return isTypeList.some(function (i) { return i(value); });
-            }
-        };
-    };
-    Types.isOptionalKeyTypeGuard = function (value, listner) {
-        return Types.isSpecificObject({
-            $type: Types.isJust("optional-type-guard"),
-            isType: function (value, listner) {
-                return "function" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "function", value));
-            },
-        })(value, listner);
-    };
-    Types.makeOptionalKeyTypeGuard = function (isType) {
-        return ({
-            $type: "optional-type-guard",
-            isType: isType,
-        });
-    };
-    Types.isOptionalMemberType = function (value, member, optionalTypeGuard, listner) {
-        var result = !(member in value) || optionalTypeGuard.isType(value[member], listner);
-        if (!result && listner) {
-            var error = listner.errors.filter(function (i) { return i.path === listner.path; })[0];
-            if (error) {
-                error.requiredType = "never | " + error.requiredType;
-            }
-            else {
-                listner.errors.filter(function (i) { return 0 === i.path.indexOf(listner.path) && "fragment" !== i.type; }).forEach(function (i) { return i.type = "fragment"; });
-                listner.errors.push({
-                    type: "fragment",
-                    path: listner.path,
-                    requiredType: "never",
-                    actualValue: typeerror_1.TypeError.valueToString(value[member]),
-                });
-            }
-        }
-        return result;
-    };
-    Types.isMemberType = function (value, member, isType, listner) {
-        return Types.isOptionalKeyTypeGuard(isType) ?
-            Types.isOptionalMemberType(value, member, isType, listner) :
-            isType(value[member], listner);
-    };
-    // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
-    Types.isSpecificObject = function (memberValidator) { return function (value, listner) {
-        if (Types.isObject(value)) {
-            var result = Object.entries(memberValidator).map(function (kv) { return Types.isMemberType(value, kv[0], kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); })
-                .every(function (i) { return i; });
-            if (listner) {
-                if (result) {
-                    typeerror_1.TypeError.setMatch(listner);
-                }
-                else {
-                    typeerror_1.TypeError.calculateMatchRate(listner);
-                }
-            }
-            return result;
-        }
-        else {
-            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "object", value);
-        }
-    }; };
-    Types.isDictionaryObject = function (isType) { return function (value, listner) {
-        if (Types.isObject(value)) {
-            var result = Object.entries(value).map(function (kv) { return isType(kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
-            if (listner) {
-                if (result) {
-                    typeerror_1.TypeError.setMatch(listner);
-                }
-                else {
-                    typeerror_1.TypeError.calculateMatchRate(listner);
-                }
-            }
-            return result;
-        }
-        else {
-            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "object", value);
-        }
-    }; };
     Types.ValidatorOptionTypeMembers = ["none", "simple", "full",];
-    Types.isValidatorOptionType = Types.isEnum(Types.ValidatorOptionTypeMembers);
+    Types.isValidatorOptionType = types_prime_1.TypesPrime.isEnum(Types.ValidatorOptionTypeMembers);
     Types.IndentStyleMembers = ["allman", "egyptian",];
-    Types.isIndentStyleType = Types.isEnum(Types.IndentStyleMembers);
-    Types.isTypeOptions = Types.isSpecificObject({
-        "indentUnit": Types.isOr(Types.isNumber, Types.isJust("\t")),
+    Types.isIndentStyleType = types_prime_1.TypesPrime.isEnum(Types.IndentStyleMembers);
+    Types.isTypeOptions = types_prime_1.TypesPrime.isSpecificObject({
+        "indentUnit": types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNumber, types_prime_1.TypesPrime.isJust("\t")),
         "indentStyle": Types.isIndentStyleType,
         "validatorOption": Types.isValidatorOptionType,
     });
     Types.isTypeSchema = function (value, listner) {
-        return Types.isSpecificObject({
-            "$ref": Types.isJust(Types.schema),
-            "defines": Types.isDictionaryObject(Types.isDefinition),
+        return types_prime_1.TypesPrime.isSpecificObject({
+            "$ref": types_prime_1.TypesPrime.isJust(Types.schema),
+            "defines": types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
             "options": Types.isTypeOptions
         })(value, listner);
     };
-    Types.isReferElement = Types.isSpecificObject({
-        "$ref": Types.isString,
+    Types.isReferElement = types_prime_1.TypesPrime.isSpecificObject({
+        "$ref": types_prime_1.TypesPrime.isString,
     });
-    Types.isModuleDefinition = function (value, listner) { return Types.isSpecificObject({
-        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
-        $type: Types.isJust("module"),
-        members: Types.isDictionaryObject(Types.isDefinition),
+    Types.isModuleDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        export: types_prime_1.TypesPrime.makeOptionalKeyTypeGuard(types_prime_1.TypesPrime.isBoolean),
+        $type: types_prime_1.TypesPrime.isJust("module"),
+        members: types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
     })(value, listner); };
     Types.PrimitiveTypeEnumMembers = ["null", "boolean", "number", "string"];
-    Types.isPrimitiveTypeEnum = Types.isEnum(Types.PrimitiveTypeEnumMembers);
-    Types.isPrimitiveTypeElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("primitive-type"),
+    Types.isPrimitiveTypeEnum = types_prime_1.TypesPrime.isEnum(Types.PrimitiveTypeEnumMembers);
+    Types.isPrimitiveTypeElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("primitive-type"),
         type: Types.isPrimitiveTypeEnum,
     })(value, listner); };
-    Types.isLiteralElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("literal"),
-        literal: Types.isJsonable,
+    Types.isLiteralElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("literal"),
+        literal: types_prime_1.TypesPrime.isJsonable,
     })(value, listner); };
-    Types.isValueDefinition = function (value, listner) { return Types.isSpecificObject({
-        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
-        $type: Types.isJust("value"),
-        value: Types.isOr(Types.isLiteralElement, Types.isReferElement),
+    Types.isValueDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        export: types_prime_1.TypesPrime.makeOptionalKeyTypeGuard(types_prime_1.TypesPrime.isBoolean),
+        $type: types_prime_1.TypesPrime.isJust("value"),
+        value: types_prime_1.TypesPrime.isOr(Types.isLiteralElement, Types.isReferElement),
     })(value, listner); };
-    Types.isTypeofElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("typeof"),
+    Types.isTypeofElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("typeof"),
         value: Types.isReferElement,
     })(value, listner); };
-    Types.isItemofElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("itemof"),
+    Types.isItemofElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("itemof"),
         value: Types.isReferElement,
     })(value, listner); };
-    Types.isTypeDefinition = function (value, listner) { return Types.isSpecificObject({
-        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
-        $type: Types.isJust("type"),
+    Types.isTypeDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        export: types_prime_1.TypesPrime.makeOptionalKeyTypeGuard(types_prime_1.TypesPrime.isBoolean),
+        $type: types_prime_1.TypesPrime.isJust("type"),
         define: Types.isTypeOrRefer,
     })(value, listner); };
-    Types.isEnumTypeElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("enum-type"),
-        members: Types.isArray(Types.isOr(Types.isNumber, Types.isString)),
+    Types.isEnumTypeElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("enum-type"),
+        members: types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNumber, types_prime_1.TypesPrime.isString)),
     })(value, listner); };
-    Types.isInterfaceDefinition = function (value, listner) { return Types.isSpecificObject({
-        export: Types.makeOptionalKeyTypeGuard(Types.isBoolean),
-        $type: Types.isJust("interface"),
-        members: Types.isDictionaryObject(Types.isTypeOrRefer),
+    Types.isInterfaceDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        export: types_prime_1.TypesPrime.makeOptionalKeyTypeGuard(types_prime_1.TypesPrime.isBoolean),
+        $type: types_prime_1.TypesPrime.isJust("interface"),
+        members: types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer),
     })(value, listner); };
-    Types.isDictionaryElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("dictionary"),
+    Types.isDictionaryElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("dictionary"),
         members: Types.isTypeOrRefer,
     })(value, listner); };
-    Types.isArrayElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("array"),
+    Types.isArrayElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("array"),
         items: Types.isTypeOrRefer,
     })(value, listner); };
-    Types.isOrElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("or"),
-        types: Types.isArray(Types.isTypeOrRefer),
+    Types.isOrElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("or"),
+        types: types_prime_1.TypesPrime.isArray(Types.isTypeOrRefer),
     })(value, listner); };
-    Types.isAndElement = function (value, listner) { return Types.isSpecificObject({
-        $type: Types.isJust("and"),
-        types: Types.isArray(Types.isTypeOrRefer),
+    Types.isAndElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("and"),
+        types: types_prime_1.TypesPrime.isArray(Types.isTypeOrRefer),
     })(value, listner); };
-    Types.isType = Types.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
-    Types.isTypeOrValue = Types.isOr(Types.isType, Types.isValueDefinition);
-    Types.isTypeOrRefer = Types.isOr(Types.isType, Types.isReferElement);
-    Types.isDefinition = Types.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);
-    Types.isDefineOrRefer = Types.isOr(Types.isDefinition, Types.isReferElement);
+    Types.isType = types_prime_1.TypesPrime.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
+    Types.isTypeOrValue = types_prime_1.TypesPrime.isOr(Types.isType, Types.isValueDefinition);
+    Types.isTypeOrRefer = types_prime_1.TypesPrime.isOr(Types.isType, Types.isReferElement);
+    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);
+    Types.isDefineOrRefer = types_prime_1.TypesPrime.isOr(Types.isDefinition, Types.isReferElement);
 })(Types || (exports.Types = Types = {}));
 //# sourceMappingURL=types.js.map

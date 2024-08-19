@@ -2,57 +2,18 @@ import { Jsonable } from "./jsonable";
 import { TypeError } from "./typeerror";
 export declare namespace Types {
     const schema: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
-    const isJust: <T>(target: T) => (value: unknown, listner?: TypeError.Listener) => value is T;
-    const isUndefined: (value: unknown, listner?: TypeError.Listener) => value is undefined;
-    const isNull: (value: unknown, listner?: TypeError.Listener) => value is null;
-    const isBoolean: (value: unknown, listner?: TypeError.Listener) => value is boolean;
-    const isNumber: (value: unknown, listner?: TypeError.Listener) => value is number;
-    const isString: (value: unknown, listner?: TypeError.Listener) => value is string;
-    type ActualObject = Exclude<object, null>;
-    const isObject: (value: unknown) => value is object;
-    const isEnum: <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener) => value is T;
-    const isArray: <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener) => value is T[];
-    const isJsonable: (value: unknown, listner?: TypeError.Listener) => value is Jsonable.Jsonable;
-    const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypeError.Listener) => value is T[K]; }) => string[];
-    const getBestMatchErrors: (listeners: TypeError.Listener[]) => TypeError.Listener[];
-    const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypeError.Listener) => value is T[K]; }) => (value: unknown, listner?: TypeError.Listener) => value is T[number];
-    interface OptionalKeyTypeGuard<T> {
-        $type: "optional-type-guard";
-        isType: (value: unknown, listner?: TypeError.Listener) => value is T;
-    }
-    const isOptionalKeyTypeGuard: (value: unknown, listner?: TypeError.Listener) => value is OptionalKeyTypeGuard<unknown>;
-    const makeOptionalKeyTypeGuard: <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => OptionalKeyTypeGuard<T>;
-    const isOptionalMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener) => boolean;
-    const isMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, isType: OptionalKeyTypeGuard<unknown> | ((v: unknown, listner?: TypeError.Listener) => boolean), listner?: TypeError.Listener) => boolean;
-    type OptionalKeys<T> = {
-        [K in keyof T]: T extends Record<K, T[K]> ? never : K;
-    } extends {
-        [_ in keyof T]: infer U;
-    } ? U : never;
-    type OptionalType<T> = Required<Pick<T, OptionalKeys<T>>>;
-    type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
-    type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
-    type ObjectValidator<ObjectType> = {
-        [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]);
-    } & {
-        [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
-    };
-    const isSpecificObject: <ObjectType extends object>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypeError.Listener) => value is ObjectType;
-    const isDictionaryObject: <MemberType>(isType: (m: unknown, listner?: TypeError.Listener) => m is MemberType) => (value: unknown, listner?: TypeError.Listener) => value is {
-        [key: string]: MemberType;
-    };
     const ValidatorOptionTypeMembers: readonly ["none", "simple", "full"];
     type ValidatorOptionType = typeof ValidatorOptionTypeMembers[number];
-    const isValidatorOptionType: (value: unknown, listner?: TypeError.Listener) => value is "none" | "simple" | "full";
+    const isValidatorOptionType: (value: unknown, listner?: TypeError.Listener | undefined) => value is "none" | "simple" | "full";
     const IndentStyleMembers: readonly ["allman", "egyptian"];
     type IndentStyleType = typeof IndentStyleMembers[number];
-    const isIndentStyleType: (value: unknown, listner?: TypeError.Listener) => value is "allman" | "egyptian";
+    const isIndentStyleType: (value: unknown, listner?: TypeError.Listener | undefined) => value is "allman" | "egyptian";
     interface TypeOptions {
         indentUnit: number | "\t";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
     }
-    const isTypeOptions: (value: unknown, listner?: TypeError.Listener) => value is TypeOptions;
+    const isTypeOptions: (value: unknown, listner?: TypeError.Listener | undefined) => value is TypeOptions;
     interface TypeSchema {
         $ref: typeof schema;
         defines: {
@@ -65,7 +26,7 @@ export declare namespace Types {
     interface ReferElement {
         $ref: string;
     }
-    const isReferElement: (value: unknown, listner?: TypeError.Listener) => value is ReferElement;
+    const isReferElement: (value: unknown, listner?: TypeError.Listener | undefined) => value is ReferElement;
     interface AlphaElement {
         $type: string;
     }
@@ -81,7 +42,7 @@ export declare namespace Types {
     const isModuleDefinition: (value: unknown, listner?: TypeError.Listener) => value is ModuleDefinition;
     const PrimitiveTypeEnumMembers: readonly ["null", "boolean", "number", "string"];
     type PrimitiveTypeEnum = typeof PrimitiveTypeEnumMembers[number];
-    const isPrimitiveTypeEnum: (value: unknown, listner?: TypeError.Listener) => value is "string" | "number" | "boolean" | "null";
+    const isPrimitiveTypeEnum: (value: unknown, listner?: TypeError.Listener | undefined) => value is "string" | "number" | "boolean" | "null";
     interface PrimitiveTypeElement extends AlphaElement {
         $type: "primitive-type";
         type: PrimitiveTypeEnum;
@@ -145,14 +106,14 @@ export declare namespace Types {
     }
     const isAndElement: (value: unknown, listner?: TypeError.Listener) => value is AndElement;
     type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
-    const isType: (value: unknown, listner?: TypeError.Listener) => value is TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
+    const isType: (value: unknown, listner?: TypeError.Listener | undefined) => value is TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValue = Type | ValueDefinition;
-    const isTypeOrValue: (value: unknown, listner?: TypeError.Listener) => value is ValueDefinition | TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
+    const isTypeOrValue: (value: unknown, listner?: TypeError.Listener | undefined) => value is ValueDefinition | TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     type TypeOrInterfaceOrRefer = Type | ReferElement;
-    const isTypeOrRefer: (value: unknown, listner?: TypeError.Listener) => value is TypeDefinition | InterfaceDefinition | ReferElement | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
+    const isTypeOrRefer: (value: unknown, listner?: TypeError.Listener | undefined) => value is TypeDefinition | InterfaceDefinition | ReferElement | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
     type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
-    const isDefinition: (value: unknown, listner?: TypeError.Listener) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    const isDefinition: (value: unknown, listner?: TypeError.Listener | undefined) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
     type DefineOrRefer = Definition | ReferElement;
-    const isDefineOrRefer: (value: unknown, listner?: TypeError.Listener) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | ReferElement;
+    const isDefineOrRefer: (value: unknown, listner?: TypeError.Listener | undefined) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | ReferElement;
 }
