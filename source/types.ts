@@ -150,13 +150,13 @@ export module Types
     export interface InterfaceDefinition extends AlphaDefinition
     {
         $type: "interface";
-        members: { [key: string]: TypeOrInterfaceOrRefer; };
+        members: { [key: string]: TypeOrInterfaceOrRefer; } | DictionaryElement;
     }
     export const isInterfaceDefinition = (value: unknown, listner?: TypesError.Listener): value is InterfaceDefinition => TypesPrime.isSpecificObject<InterfaceDefinition>
     ({
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("interface"),
-        members: TypesPrime.isDictionaryObject(isTypeOrRefer),
+        members: TypesPrime.isOr(TypesPrime.isDictionaryObject(isTypeOrRefer), isDictionaryElement),
     })
     (value, listner);
     export interface DictionaryElement extends AlphaElement
@@ -203,7 +203,7 @@ export module Types
         types: TypesPrime.isArray(isTypeOrRefer),
     })
     (value, listner);
-    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
     export const isType = TypesPrime.isOr(isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement);
     export type TypeOrValue = Type | ValueDefinition;
     export const isTypeOrValue = TypesPrime.isOr(isType, isValueDefinition);

@@ -169,6 +169,8 @@ export module Build
             kindofJoinExpression(value.members.map(i => $expression(JSON.stringify(i))), $expression("|"));
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
             [ $expression(buildInlineDefine(value.items) +"[]"), ];
+        export const buildInlineDefineDictionary = (value: Types.DictionaryElement) =>
+            [ $expression("[key: string]:"), $expression(buildInlineDefine(value.valueType) +";"), $expression("}")];
         export const buildInlineDefineAnd = (value: Types.AndElement) =>
             kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("&"));
         export const buildInlineDefineOr = (value: Types.OrElement) =>
@@ -248,6 +250,8 @@ export module Build
                     return buildInlineDefineOr(define);
                 case "interface":
                     return [ buildDefineInlineInterface(define), ];
+                case "dictionary":
+                    return buildInlineDefineDictionary(define);
                 }
             }
         };
