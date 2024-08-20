@@ -1,5 +1,5 @@
 import { Jsonable } from "./jsonable";
-import { TypeError } from "./typeerror";
+import { TypesError } from "./types-error";
 import { TypesPrime } from "./types-prime";
 export module Types
 {
@@ -28,7 +28,7 @@ export module Types
         defines: { [key: string]: Definition; };
         options: TypeOptions;
     }
-    export const isTypeSchema = (value: unknown, listner?: TypeError.Listener): value is TypeSchema =>
+    export const isTypeSchema = (value: unknown, listner?: TypesError.Listener): value is TypeSchema =>
         TypesPrime.isSpecificObject<TypeSchema>
         ({
             "$ref": TypesPrime.isJust(schema),
@@ -58,9 +58,9 @@ export module Types
         $type: "module";
         members: { [key: string]: Definition; };
     }
-    export const isModuleDefinition = (value: unknown, listner?: TypeError.Listener): value is ModuleDefinition => TypesPrime.isSpecificObject<ModuleDefinition>
+    export const isModuleDefinition = (value: unknown, listner?: TypesError.Listener): value is ModuleDefinition => TypesPrime.isSpecificObject<ModuleDefinition>
     ({
-        export: TypesPrime.makeOptionalKeyTypeGuard(TypesPrime.isBoolean),
+        export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("module"),
         members: TypesPrime.isDictionaryObject(isDefinition),
     })
@@ -73,7 +73,7 @@ export module Types
         $type: "primitive-type";
         type: PrimitiveTypeEnum;
     }
-    export const isPrimitiveTypeElement = (value: unknown, listner?: TypeError.Listener): value is PrimitiveTypeElement => TypesPrime.isSpecificObject<PrimitiveTypeElement>
+    export const isPrimitiveTypeElement = (value: unknown, listner?: TypesError.Listener): value is PrimitiveTypeElement => TypesPrime.isSpecificObject<PrimitiveTypeElement>
     ({
         $type: TypesPrime.isJust("primitive-type"),
         type: isPrimitiveTypeEnum,
@@ -84,7 +84,7 @@ export module Types
         $type: "literal";
         literal: Jsonable.Jsonable;
     }
-    export const isLiteralElement = (value: unknown, listner?: TypeError.Listener): value is LiteralElement => TypesPrime.isSpecificObject<LiteralElement>
+    export const isLiteralElement = (value: unknown, listner?: TypesError.Listener): value is LiteralElement => TypesPrime.isSpecificObject<LiteralElement>
     ({
         $type: TypesPrime.isJust("literal"),
         literal: TypesPrime.isJsonable,
@@ -94,12 +94,14 @@ export module Types
     {
         $type: "value";
         value: LiteralElement | ReferElement;
+        validator?: boolean;
     }
-    export const isValueDefinition = (value: unknown, listner?: TypeError.Listener): value is ValueDefinition => TypesPrime.isSpecificObject<ValueDefinition>
+    export const isValueDefinition = (value: unknown, listner?: TypesError.Listener): value is ValueDefinition => TypesPrime.isSpecificObject<ValueDefinition>
     ({
-        export: TypesPrime.makeOptionalKeyTypeGuard(TypesPrime.isBoolean),
+        export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("value"),
         value: TypesPrime.isOr(isLiteralElement, isReferElement),
+        validator: TypesPrime.isOptional(TypesPrime.isBoolean),
     })
     (value, listner);
     export interface TypeofElement extends AlphaElement
@@ -107,7 +109,7 @@ export module Types
         $type: "typeof";
         value: ReferElement;
     }
-    export const isTypeofElement = (value: unknown, listner?: TypeError.Listener): value is TypeofElement => TypesPrime.isSpecificObject<TypeofElement>
+    export const isTypeofElement = (value: unknown, listner?: TypesError.Listener): value is TypeofElement => TypesPrime.isSpecificObject<TypeofElement>
     ({
         $type: TypesPrime.isJust("typeof"),
         value: isReferElement,
@@ -117,7 +119,7 @@ export module Types
         $type: "itemof";
         value: ReferElement;
     }
-    export const isItemofElement = (value: unknown, listner?: TypeError.Listener): value is ItemofElement => TypesPrime.isSpecificObject<ItemofElement>
+    export const isItemofElement = (value: unknown, listner?: TypesError.Listener): value is ItemofElement => TypesPrime.isSpecificObject<ItemofElement>
     ({
         $type: TypesPrime.isJust("itemof"),
         value: isReferElement,
@@ -127,9 +129,9 @@ export module Types
         $type: "type";
         define: TypeOrInterfaceOrRefer;
     }
-    export const isTypeDefinition = (value: unknown, listner?: TypeError.Listener): value is TypeDefinition => TypesPrime.isSpecificObject<TypeDefinition>
+    export const isTypeDefinition = (value: unknown, listner?: TypesError.Listener): value is TypeDefinition => TypesPrime.isSpecificObject<TypeDefinition>
     ({
-        export: TypesPrime.makeOptionalKeyTypeGuard(TypesPrime.isBoolean),
+        export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("type"),
         define: isTypeOrRefer,
     })
@@ -139,7 +141,7 @@ export module Types
         $type: "enum-type";
         members: (number | string)[];
     }
-    export const isEnumTypeElement = (value: unknown, listner?: TypeError.Listener): value is EnumTypeElement => TypesPrime.isSpecificObject<EnumTypeElement>
+    export const isEnumTypeElement = (value: unknown, listner?: TypesError.Listener): value is EnumTypeElement => TypesPrime.isSpecificObject<EnumTypeElement>
     ({
         $type: TypesPrime.isJust("enum-type"),
         members: TypesPrime.isArray(TypesPrime.isOr(TypesPrime.isNumber, TypesPrime.isString)),
@@ -150,9 +152,9 @@ export module Types
         $type: "interface";
         members: { [key: string]: TypeOrInterfaceOrRefer; };
     }
-    export const isInterfaceDefinition = (value: unknown, listner?: TypeError.Listener): value is InterfaceDefinition => TypesPrime.isSpecificObject<InterfaceDefinition>
+    export const isInterfaceDefinition = (value: unknown, listner?: TypesError.Listener): value is InterfaceDefinition => TypesPrime.isSpecificObject<InterfaceDefinition>
     ({
-        export: TypesPrime.makeOptionalKeyTypeGuard(TypesPrime.isBoolean),
+        export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("interface"),
         members: TypesPrime.isDictionaryObject(isTypeOrRefer),
     })
@@ -162,7 +164,7 @@ export module Types
         $type: "dictionary";
         members: TypeOrInterfaceOrRefer;
     }
-    export const isDictionaryElement = (value: unknown, listner?: TypeError.Listener): value is DictionaryElement => TypesPrime.isSpecificObject<DictionaryElement>
+    export const isDictionaryElement = (value: unknown, listner?: TypesError.Listener): value is DictionaryElement => TypesPrime.isSpecificObject<DictionaryElement>
     ({
         $type: TypesPrime.isJust("dictionary"),
         members: isTypeOrRefer,
@@ -173,7 +175,7 @@ export module Types
         $type: "array";
         items: TypeOrInterfaceOrRefer;
     }
-    export const isArrayElement = (value: unknown, listner?: TypeError.Listener): value is ArrayElement => TypesPrime.isSpecificObject<ArrayElement>
+    export const isArrayElement = (value: unknown, listner?: TypesError.Listener): value is ArrayElement => TypesPrime.isSpecificObject<ArrayElement>
     ({
         $type: TypesPrime.isJust("array"),
         items: isTypeOrRefer,
@@ -184,7 +186,7 @@ export module Types
         $type: "or";
         types: TypeOrInterfaceOrRefer[];
     }
-    export const isOrElement = (value: unknown, listner?: TypeError.Listener): value is OrElement => TypesPrime.isSpecificObject<OrElement>
+    export const isOrElement = (value: unknown, listner?: TypesError.Listener): value is OrElement => TypesPrime.isSpecificObject<OrElement>
     ({
         $type: TypesPrime.isJust("or"),
         types: TypesPrime.isArray(isTypeOrRefer),
@@ -195,7 +197,7 @@ export module Types
         $type: "and";
         types: TypeOrInterfaceOrRefer[];
     }
-    export const isAndElement = (value: unknown, listner?: TypeError.Listener): value is AndElement => TypesPrime.isSpecificObject<AndElement>
+    export const isAndElement = (value: unknown, listner?: TypesError.Listener): value is AndElement => TypesPrime.isSpecificObject<AndElement>
     ({
         $type: TypesPrime.isJust("and"),
         types: TypesPrime.isArray(isTypeOrRefer),

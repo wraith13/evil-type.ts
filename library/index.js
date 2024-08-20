@@ -16,7 +16,7 @@ exports.Format = exports.Build = exports.$block = exports.$iblock = exports.$lin
 var startAt = new Date();
 var fs_1 = __importDefault(require("fs"));
 var jsonable_1 = require("./jsonable");
-var typeerror_1 = require("./typeerror");
+var types_error_1 = require("./types-error");
 var types_prime_1 = require("./types-prime");
 var types_1 = require("./types");
 var text_1 = require("./text");
@@ -151,7 +151,7 @@ var Build;
         Define.buildDefineModuleCore = function (value) {
             return __spreadArray([], Object.entries(value.members).map(function (i) {
                 return types_1.Types.isModuleDefinition(i[1]) ? [Define.buildDefine(i[0], i[1])] :
-                    types_1.Types.isType(i[1]) ? [Define.buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]),] :
+                    types_1.Types.isType(i[1]) && !Build.Validator.isValidatorTarget(i[1]) ? [Define.buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]),] :
                         [];
             } // Types.isValueDefine(i[1])
             )
@@ -318,6 +318,9 @@ var Build;
                 (0, exports.$expression)("(value: unknown): value is ".concat(types_1.Types.isValueDefinition(define) ? "typeof " + name : name, " =>"))
             ], Validator.buildValidatorExpression("value", define), true);
         };
+        Validator.isValidatorTarget = function (define) {
+            return !(types_1.Types.isValueDefinition(define) && false === define.validator);
+        };
         Validator.buildValidator = function (name, define) { return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
             (0, exports.$expression)("const"),
             (0, exports.$expression)(Validator.buildValidatorName(name)),
@@ -392,13 +395,13 @@ try {
     console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     var rawSource = fget(jsonPath);
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
-    var errorListner = typeerror_1.TypeError.makeListener(jsonPath);
+    var errorListner = types_error_1.TypesError.makeListener(jsonPath);
     if (types_1.Types.isTypeSchema(typeSource, errorListner)) {
         var defines = Object.entries(typeSource.defines)
             .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); });
         console.log(JSON.stringify(defines, null, 4));
         var validators = removeNullFilter(Object.entries(typeSource.defines)
-            .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })
+            .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })
             .filter(function (i) { return null !== i; }));
         console.log(JSON.stringify(validators, null, 4));
         var result = Format.text(typeSource.options, 0, __spreadArray(__spreadArray([], defines, true), validators, true));

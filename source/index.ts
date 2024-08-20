@@ -2,7 +2,7 @@
 const startAt = new Date();
 import fs from "fs";
 import { Jsonable } from "./jsonable";
-import { TypeError } from "./typeerror";
+import { TypesError } from "./types-error";
 import { TypesPrime } from "./types-prime";
 import { Types } from "./types";
 import { Text } from "./text";
@@ -191,7 +191,7 @@ export module Build
             (
                 i =>
                     Types.isModuleDefinition(i[1]) ? <CodeEntry[]>[buildDefine(i[0], i[1])]:
-                    Types.isType(i[1]) ? <CodeEntry[]>[buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]), ]:
+                    Types.isType(i[1]) && ! Build.Validator.isValidatorTarget(i[1]) ? <CodeEntry[]>[buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]), ]:
                     [] // Types.isValueDefine(i[1])
             )
             .reduce((a, b) => [ ...a, ...b, ], []),
@@ -397,6 +397,8 @@ export module Build
             $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
+        export const isValidatorTarget = (define: Types.TypeOrValue) =>
+            ! (Types.isValueDefinition(define) && false === define.validator);
         export const buildValidator = (name: string, define: Types.TypeOrValue): CodeLine => $line
         ([
             ...buildExport(define),
@@ -405,7 +407,7 @@ export module Build
             $expression("="),
             ...buildInlineValidator(name, define),
         ]);
-        }
+    }
 }
 export module Format
 {
@@ -478,7 +480,7 @@ try
     console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     const rawSource = fget(jsonPath);
     const typeSource = Jsonable.parse(rawSource);
-    const errorListner = TypeError.makeListener(jsonPath);
+    const errorListner = TypesError.makeListener(jsonPath);
     if (Types.isTypeSchema(typeSource, errorListner))
     {
         const defines = Object.entries(typeSource.defines)
@@ -487,7 +489,7 @@ try
         const validators = removeNullFilter
         (
             Object.entries(typeSource.defines)
-                .map(i => Types.isModuleDefinition(i[1]) ? null:  Build.Validator.buildValidator(i[0], i[1]))
+                .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? null: Build.Validator.buildValidator(i[0], i[1]))
                 .filter(i => null !== i)
         );
         console.log(JSON.stringify(validators, null, 4));

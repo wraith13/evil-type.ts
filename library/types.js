@@ -25,7 +25,7 @@ var Types;
         "$ref": types_prime_1.TypesPrime.isString,
     });
     Types.isModuleDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
-        export: types_prime_1.TypesPrime.makeOptionalKeyTypeGuard(types_prime_1.TypesPrime.isBoolean),
+        export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("module"),
         members: types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
     })(value, listner); };
@@ -40,9 +40,10 @@ var Types;
         literal: types_prime_1.TypesPrime.isJsonable,
     })(value, listner); };
     Types.isValueDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
-        export: types_prime_1.TypesPrime.makeOptionalKeyTypeGuard(types_prime_1.TypesPrime.isBoolean),
+        export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("value"),
         value: types_prime_1.TypesPrime.isOr(Types.isLiteralElement, Types.isReferElement),
+        validator: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
     })(value, listner); };
     Types.isTypeofElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         $type: types_prime_1.TypesPrime.isJust("typeof"),
@@ -53,7 +54,7 @@ var Types;
         value: Types.isReferElement,
     })(value, listner); };
     Types.isTypeDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
-        export: types_prime_1.TypesPrime.makeOptionalKeyTypeGuard(types_prime_1.TypesPrime.isBoolean),
+        export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("type"),
         define: Types.isTypeOrRefer,
     })(value, listner); };
@@ -62,7 +63,7 @@ var Types;
         members: types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNumber, types_prime_1.TypesPrime.isString)),
     })(value, listner); };
     Types.isInterfaceDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
-        export: types_prime_1.TypesPrime.makeOptionalKeyTypeGuard(types_prime_1.TypesPrime.isBoolean),
+        export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("interface"),
         members: types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer),
     })(value, listner); };

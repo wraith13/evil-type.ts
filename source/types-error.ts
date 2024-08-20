@@ -1,4 +1,4 @@
-export module TypeError
+export module TypesError
 {
     export interface Error
     {
@@ -33,7 +33,7 @@ export module TypeError
                     `${path}[${name}]`;
     export const getPathDepth = (path: string) =>
         path.split(".").length + path.split("[").length -2;
-    export const getType = (isType: ((v: unknown, listner?: TypeError.Listener) => boolean)) =>
+    export const getType = (isType: ((v: unknown, listner?: TypesError.Listener) => boolean)) =>
     {
         const transactionListner = makeListener();
         isType(undefined, transactionListner);

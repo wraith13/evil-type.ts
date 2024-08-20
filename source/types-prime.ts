@@ -1,23 +1,23 @@
 import { Jsonable } from "./jsonable";
-import { TypeError } from "./typeerror";
+import { TypesError } from "./types-error";
 export module TypesPrime
 {
-    export const isJust = <T>(target: T) => (value: unknown, listner?: TypeError.Listener): value is T =>
-        TypeError.withErrorHandling(target === value, listner, () => TypeError.valueToString(target), value);
+    export const isJust = <T>(target: T) => (value: unknown, listner?: TypesError.Listener): value is T =>
+        TypesError.withErrorHandling(target === value, listner, () => TypesError.valueToString(target), value);
     export const isUndefined = isJust(undefined);
     export const isNull = isJust(null);
-    export const isBoolean = (value: unknown, listner?: TypeError.Listener): value is boolean =>
-        TypeError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
-    export const isNumber = (value: unknown, listner?: TypeError.Listener): value is number =>
-        TypeError.withErrorHandling("number" === typeof value, listner, "number", value);
-    export const isString = (value: unknown, listner?: TypeError.Listener): value is string =>
-        TypeError.withErrorHandling("string" === typeof value, listner, "string", value);
+    export const isBoolean = (value: unknown, listner?: TypesError.Listener): value is boolean =>
+        TypesError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
+    export const isNumber = (value: unknown, listner?: TypesError.Listener): value is number =>
+        TypesError.withErrorHandling("number" === typeof value, listner, "number", value);
+    export const isString = (value: unknown, listner?: TypesError.Listener): value is string =>
+        TypesError.withErrorHandling("string" === typeof value, listner, "string", value);
     export type ActualObject = Exclude<object, null>;
     export const isObject = (value: unknown): value is ActualObject =>
         null !== value && "object" === typeof value && ! Array.isArray(value);
-    export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypeError.Listener): value is T =>
-        TypeError.withErrorHandling(list.includes(value as T), listner, () => list.map(i => TypeError.valueToString(i)).join(" | "), value);
-    export const isArray = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T) => (value: unknown, listner?: TypeError.Listener): value is T[] =>
+    export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypesError.Listener): value is T =>
+        TypesError.withErrorHandling(list.includes(value as T), listner, () => list.map(i => TypesError.valueToString(i)).join(" | "), value);
+    export const isArray = <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T) => (value: unknown, listner?: TypesError.Listener): value is T[] =>
     {
         if (Array.isArray(value))
         {
@@ -26,33 +26,33 @@ export module TypesPrime
             {
                 if (result)
                 {
-                    TypeError.setMatch(listner);
+                    TypesError.setMatch(listner);
                 }
                 else
                 {
-                    TypeError.calculateMatchRate(listner);
+                    TypesError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else
         {
-            return undefined !== listner && TypeError.raiseError(listner, "array", value);
+            return undefined !== listner && TypesError.raiseError(listner, "array", value);
         }
     };
-    export const isJsonable = (value: unknown, listner?: TypeError.Listener): value is Jsonable.Jsonable =>
-        TypeError.withErrorHandling(Jsonable.isJsonable(value), listner, "jsonable", value);
-    export const makeOrTypeNameFromIsTypeList = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
-        isTypeList.map(i => TypeError.getType(i))
+    export const isJsonable = (value: unknown, listner?: TypesError.Listener): value is Jsonable.Jsonable =>
+        TypesError.withErrorHandling(Jsonable.isJsonable(value), listner, "jsonable", value);
+    export const makeOrTypeNameFromIsTypeList = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]) }) =>
+        isTypeList.map(i => TypesError.getType(i))
             .reduce((a, b) => [...a, ...b], [])
             .filter((i, ix, list) => ix === list.indexOf(i));
-    export const getBestMatchErrors = (listeners: TypeError.Listener[]) =>
+    export const getBestMatchErrors = (listeners: TypesError.Listener[]) =>
         listeners.map
         (
             listener =>
             ({
                 listener,
-                matchRate: TypeError.getMatchRate(listener),
+                matchRate: TypesError.getMatchRate(listener),
             })
         )
         .sort
@@ -76,8 +76,8 @@ export module TypesPrime
         )
         .filter((i, _ix, list) => i.matchRate === list[0].matchRate)
         .map(i => i.listener);
-    export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypeError.Listener) => value is T[K]) }) =>
-        (value: unknown, listner?: TypeError.Listener): value is T[number] =>
+    export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]) }) =>
+        (value: unknown, listner?: TypesError.Listener): value is T[number] =>
         {
             if (listner)
             {
@@ -85,7 +85,7 @@ export module TypesPrime
                 (
                     i =>
                     {
-                        const transactionListner = TypeError.makeListener(listner.path);
+                        const transactionListner = TypesError.makeListener(listner.path);
                         const result =
                         {
                             transactionListner,
@@ -98,7 +98,7 @@ export module TypesPrime
                 const result = Boolean(success);
                 if (result)
                 {
-                    TypeError.setMatch(listner);
+                    TypesError.setMatch(listner);
                     Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                 }
                 else
@@ -109,7 +109,7 @@ export module TypesPrime
                         const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner));
                         const errors = bestMatchErrors.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
                         const fullErrors = resultList.map(i => i.transactionListner).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                        TypeError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
+                        TypesError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
                         if (errors.length <= 0)
                         {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
@@ -122,7 +122,7 @@ export module TypesPrime
                     }
                     else
                     {
-                        TypeError.raiseError
+                        TypesError.raiseError
                         (
                             listner,
                             requiredType.join(" | "),
@@ -140,21 +140,22 @@ export module TypesPrime
     export interface OptionalKeyTypeGuard<T>
     {
         $type: "optional-type-guard";
-        isType: (value: unknown, listner?: TypeError.Listener) => value is T;
+        isType: (value: unknown, listner?: TypesError.Listener) => value is T;
     }
-    export const isOptionalKeyTypeGuard = (value: unknown, listner?: TypeError.Listener): value is OptionalKeyTypeGuard<unknown> =>
+    export const isOptionalKeyTypeGuard = (value: unknown, listner?: TypesError.Listener): value is OptionalKeyTypeGuard<unknown> =>
         isSpecificObject<OptionalKeyTypeGuard<unknown>>
         ({
             $type: isJust("optional-type-guard"),
-            isType: (value: unknown, listner?: TypeError.Listener): value is ((v: unknown, listner?: TypeError.Listener) => v is unknown) =>
-                "function" === typeof value || (undefined !== listner && TypeError.raiseError(listner, "function", value)),
+            isType: (value: unknown, listner?: TypesError.Listener): value is ((v: unknown, listner?: TypesError.Listener) => v is unknown) =>
+                "function" === typeof value || (undefined !== listner && TypesError.raiseError(listner, "function", value)),
         })(value, listner);
-    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown, listner?: TypeError.Listener) => value is T): OptionalKeyTypeGuard<T> =>
+    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T): OptionalKeyTypeGuard<T> =>
     ({
         $type: "optional-type-guard",
         isType,
     });
-    export const isOptionalMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener): boolean =>
+    export const isOptional = makeOptionalKeyTypeGuard;
+    export const isOptionalMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener): boolean =>
     {
         const result = ! (member in value) || optionalTypeGuard.isType((value as ObjectType)[member], listner);
         if ( ! result && listner)
@@ -172,13 +173,13 @@ export module TypesPrime
                     type: "fragment",
                     path: listner.path,
                     requiredType: "never",
-                    actualValue: TypeError.valueToString((value as ObjectType)[member]),
+                    actualValue: TypesError.valueToString((value as ObjectType)[member]),
                 });
             }
         }
         return result;
     };
-    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypeError.Listener): boolean =>
+    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypesError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener): boolean =>
         isOptionalKeyTypeGuard(isType) ?
             isOptionalMemberType(value, member, isType,listner):
             isType((value as ObjectType)[member], listner);
@@ -192,7 +193,7 @@ export module TypesPrime
         { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) } &
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
-    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypeError.Listener): value is ObjectType =>
+    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypesError.Listener): value is ObjectType =>
     {
         if (isObject(value))
         {
@@ -202,8 +203,8 @@ export module TypesPrime
                 (
                     value,
                     kv[0] as keyof ObjectType,
-                    kv[1] as ((v: unknown, listner?: TypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>,
-                    TypeError.nextListener(kv[0], listner)
+                    kv[1] as ((v: unknown, listner?: TypesError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>,
+                    TypesError.nextListener(kv[0], listner)
                 )
             )
             .every(i => i);
@@ -211,41 +212,41 @@ export module TypesPrime
             {
                 if (result)
                 {
-                    TypeError.setMatch(listner);
+                    TypesError.setMatch(listner);
                 }
                 else
                 {
-                    TypeError.calculateMatchRate(listner);
+                    TypesError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else
         {
-            return undefined !== listner && TypeError.raiseError(listner, "object", value);
+            return undefined !== listner && TypesError.raiseError(listner, "object", value);
         }
     }
-    export const isDictionaryObject = <MemberType>(isType: ((m: unknown, listner?: TypeError.Listener) => m is MemberType)) => (value: unknown, listner?: TypeError.Listener): value is { [key: string]: MemberType } =>
+    export const isDictionaryObject = <MemberType>(isType: ((m: unknown, listner?: TypesError.Listener) => m is MemberType)) => (value: unknown, listner?: TypesError.Listener): value is { [key: string]: MemberType } =>
     {
         if (isObject(value))
         {
-            const result = Object.entries(value).map(kv => isType(kv[1], TypeError.nextListener(kv[0], listner))).every(i => i);
+            const result = Object.entries(value).map(kv => isType(kv[1], TypesError.nextListener(kv[0], listner))).every(i => i);
             if (listner)
             {
                 if (result)
                 {
-                    TypeError.setMatch(listner);
+                    TypesError.setMatch(listner);
                 }
                 else
                 {
-                    TypeError.calculateMatchRate(listner);
+                    TypesError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else
         {
-            return undefined !== listner && TypeError.raiseError(listner, "object", value);
+            return undefined !== listner && TypesError.raiseError(listner, "object", value);
         }
     }
     // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。

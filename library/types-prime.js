@@ -11,55 +11,55 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TypesPrime = void 0;
 var jsonable_1 = require("./jsonable");
-var typeerror_1 = require("./typeerror");
+var types_error_1 = require("./types-error");
 var TypesPrime;
 (function (TypesPrime) {
     TypesPrime.isJust = function (target) { return function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling(target === value, listner, function () { return typeerror_1.TypeError.valueToString(target); }, value);
+        return types_error_1.TypesError.withErrorHandling(target === value, listner, function () { return types_error_1.TypesError.valueToString(target); }, value);
     }; };
     TypesPrime.isUndefined = TypesPrime.isJust(undefined);
     TypesPrime.isNull = TypesPrime.isJust(null);
     TypesPrime.isBoolean = function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
+        return types_error_1.TypesError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
     };
     TypesPrime.isNumber = function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling("number" === typeof value, listner, "number", value);
+        return types_error_1.TypesError.withErrorHandling("number" === typeof value, listner, "number", value);
     };
     TypesPrime.isString = function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling("string" === typeof value, listner, "string", value);
+        return types_error_1.TypesError.withErrorHandling("string" === typeof value, listner, "string", value);
     };
     TypesPrime.isObject = function (value) {
         return null !== value && "object" === typeof value && !Array.isArray(value);
     };
     TypesPrime.isEnum = function (list) { return function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling(list.includes(value), listner, function () { return list.map(function (i) { return typeerror_1.TypeError.valueToString(i); }).join(" | "); }, value);
+        return types_error_1.TypesError.withErrorHandling(list.includes(value), listner, function () { return list.map(function (i) { return types_error_1.TypesError.valueToString(i); }).join(" | "); }, value);
     }; };
     TypesPrime.isArray = function (isType) { return function (value, listner) {
         if (Array.isArray(value)) {
             var result = value.map(function (i) { return isType(i, listner); }).every(function (i) { return i; });
             if (listner) {
                 if (result) {
-                    typeerror_1.TypeError.setMatch(listner);
+                    types_error_1.TypesError.setMatch(listner);
                 }
                 else {
-                    typeerror_1.TypeError.calculateMatchRate(listner);
+                    types_error_1.TypesError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else {
-            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "array", value);
+            return undefined !== listner && types_error_1.TypesError.raiseError(listner, "array", value);
         }
     }; };
     TypesPrime.isJsonable = function (value, listner) {
-        return typeerror_1.TypeError.withErrorHandling(jsonable_1.Jsonable.isJsonable(value), listner, "jsonable", value);
+        return types_error_1.TypesError.withErrorHandling(jsonable_1.Jsonable.isJsonable(value), listner, "jsonable", value);
     };
     TypesPrime.makeOrTypeNameFromIsTypeList = function () {
         var isTypeList = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             isTypeList[_i] = arguments[_i];
         }
-        return isTypeList.map(function (i) { return typeerror_1.TypeError.getType(i); })
+        return isTypeList.map(function (i) { return types_error_1.TypesError.getType(i); })
             .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
             .filter(function (i, ix, list) { return ix === list.indexOf(i); });
     };
@@ -67,7 +67,7 @@ var TypesPrime;
         return listeners.map(function (listener) {
             return ({
                 listener: listener,
-                matchRate: typeerror_1.TypeError.getMatchRate(listener),
+                matchRate: types_error_1.TypesError.getMatchRate(listener),
             });
         })
             .sort(function (a, b) {
@@ -92,7 +92,7 @@ var TypesPrime;
         return function (value, listner) {
             if (listner) {
                 var resultList = isTypeList.map(function (i) {
-                    var transactionListner = typeerror_1.TypeError.makeListener(listner.path);
+                    var transactionListner = types_error_1.TypesError.makeListener(listner.path);
                     var result = {
                         transactionListner: transactionListner,
                         result: i(value, transactionListner),
@@ -102,7 +102,7 @@ var TypesPrime;
                 var success = resultList.filter(function (i) { return i.result; })[0];
                 var result = Boolean(success);
                 if (result) {
-                    typeerror_1.TypeError.setMatch(listner);
+                    types_error_1.TypesError.setMatch(listner);
                     Object.entries(success.transactionListner.matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
                 }
                 else {
@@ -111,7 +111,7 @@ var TypesPrime;
                         var bestMatchErrors = TypesPrime.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; }));
                         var errors = bestMatchErrors.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
                         var fullErrors = resultList.map(function (i) { return i.transactionListner; }).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                        typeerror_1.TypeError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
+                        types_error_1.TypesError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
                         if (errors.length <= 0) {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
                         }
@@ -121,7 +121,7 @@ var TypesPrime;
                         }
                     }
                     else {
-                        typeerror_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
+                        types_error_1.TypesError.raiseError(listner, requiredType.join(" | "), value);
                     }
                 }
                 return result;
@@ -135,7 +135,7 @@ var TypesPrime;
         return TypesPrime.isSpecificObject({
             $type: TypesPrime.isJust("optional-type-guard"),
             isType: function (value, listner) {
-                return "function" === typeof value || (undefined !== listner && typeerror_1.TypeError.raiseError(listner, "function", value));
+                return "function" === typeof value || (undefined !== listner && types_error_1.TypesError.raiseError(listner, "function", value));
             },
         })(value, listner);
     };
@@ -145,6 +145,7 @@ var TypesPrime;
             isType: isType,
         });
     };
+    TypesPrime.isOptional = TypesPrime.makeOptionalKeyTypeGuard;
     TypesPrime.isOptionalMemberType = function (value, member, optionalTypeGuard, listner) {
         var result = !(member in value) || optionalTypeGuard.isType(value[member], listner);
         if (!result && listner) {
@@ -158,7 +159,7 @@ var TypesPrime;
                     type: "fragment",
                     path: listner.path,
                     requiredType: "never",
-                    actualValue: typeerror_1.TypeError.valueToString(value[member]),
+                    actualValue: types_error_1.TypesError.valueToString(value[member]),
                 });
             }
         }
@@ -172,37 +173,37 @@ var TypesPrime;
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     TypesPrime.isSpecificObject = function (memberValidator) { return function (value, listner) {
         if (TypesPrime.isObject(value)) {
-            var result = Object.entries(memberValidator).map(function (kv) { return TypesPrime.isMemberType(value, kv[0], kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); })
+            var result = Object.entries(memberValidator).map(function (kv) { return TypesPrime.isMemberType(value, kv[0], kv[1], types_error_1.TypesError.nextListener(kv[0], listner)); })
                 .every(function (i) { return i; });
             if (listner) {
                 if (result) {
-                    typeerror_1.TypeError.setMatch(listner);
+                    types_error_1.TypesError.setMatch(listner);
                 }
                 else {
-                    typeerror_1.TypeError.calculateMatchRate(listner);
+                    types_error_1.TypesError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else {
-            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "object", value);
+            return undefined !== listner && types_error_1.TypesError.raiseError(listner, "object", value);
         }
     }; };
     TypesPrime.isDictionaryObject = function (isType) { return function (value, listner) {
         if (TypesPrime.isObject(value)) {
-            var result = Object.entries(value).map(function (kv) { return isType(kv[1], typeerror_1.TypeError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
+            var result = Object.entries(value).map(function (kv) { return isType(kv[1], types_error_1.TypesError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
             if (listner) {
                 if (result) {
-                    typeerror_1.TypeError.setMatch(listner);
+                    types_error_1.TypesError.setMatch(listner);
                 }
                 else {
-                    typeerror_1.TypeError.calculateMatchRate(listner);
+                    types_error_1.TypesError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else {
-            return undefined !== listner && typeerror_1.TypeError.raiseError(listner, "object", value);
+            return undefined !== listner && types_error_1.TypesError.raiseError(listner, "object", value);
         }
     }; };
     // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。

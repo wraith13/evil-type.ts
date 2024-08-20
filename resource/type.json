@@ -63,7 +63,8 @@
                     "allman",
                     "egyptian"
                 ]
-            }
+            },
+            "validator": false
         },
         "IndentStyleType": {
             "export": true,
