@@ -427,11 +427,11 @@ export module Build
 export module Format
 {
 // data:code(object) to data:output(text)
-    export const buildIndent = (options: Types.TypeOptions, indentDepth: number) =>
+    export const buildIndent = (options: Types.OutputOptions, indentDepth: number) =>
         Array.from({ length: indentDepth, })
         .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): options.indentUnit)
         .join("");
-    export const getReturnCode = (_options: Types.TypeOptions) => "\n";
+    export const getReturnCode = (_options: Types.OutputOptions) => "\n";
     export const expressions = (code: CodeExpression[]): string =>
         code.map(i => i.expression).join(" ");
     export const tokens = (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock): string[] =>
@@ -446,14 +446,14 @@ export module Format
             return [ code.expression, ];
         }
     };
-    export const line = (options: Types.TypeOptions, indentDepth: number, code: CodeLine): string =>
+    export const line = (options: Types.OutputOptions, indentDepth: number, code: CodeLine): string =>
         buildIndent(options, indentDepth)
         +code.expressions.map(i => tokens(i)).reduce((a, b) => [ ...a, ...b, ], []).join(" ")
         +";"
         +getReturnCode(options);
-    export const inlineBlock = (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock): string =>
+    export const inlineBlock = (options: Types.OutputOptions, indentDepth: number, code: CodeInlineBlock): string =>
         [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)), "}", ].join(" ");
-    export const block = (options: Types.TypeOptions, indentDepth: number, code: CodeBlock): string =>
+    export const block = (options: Types.OutputOptions, indentDepth: number, code: CodeBlock): string =>
     {
         const currentIndent = buildIndent(options, indentDepth);
         const returnCode = getReturnCode(options);
@@ -467,7 +467,7 @@ export module Format
         result += currentIndent +"}" +returnCode;
         return result;
     }
-    export const text = (options: Types.TypeOptions, indentDepth: number, code: CodeExpression | CodeEntry | CodeEntry[]): string =>
+    export const text = (options: Types.OutputOptions, indentDepth: number, code: CodeExpression | CodeEntry | CodeEntry[]): string =>
     {
         if (Array.isArray(code))
         {

@@ -8,18 +8,18 @@ export declare namespace Types {
     const IndentStyleMembers: readonly ["allman", "egyptian"];
     type IndentStyleType = typeof IndentStyleMembers[number];
     const isIndentStyleType: (value: unknown, listner?: TypesError.Listener | undefined) => value is "allman" | "egyptian";
-    interface TypeOptions {
+    interface OutputOptions {
         indentUnit: number | "\t";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
     }
-    const isTypeOptions: (value: unknown, listner?: TypesError.Listener | undefined) => value is TypeOptions;
+    const isTypeOptions: (value: unknown, listner?: TypesError.Listener | undefined) => value is OutputOptions;
     interface TypeSchema {
         $ref: typeof schema;
         defines: {
             [key: string]: Definition;
         };
-        options: TypeOptions;
+        options: OutputOptions;
     }
     const isTypeSchema: (value: unknown, listner?: TypesError.Listener) => value is TypeSchema;
     type FilePath = string;

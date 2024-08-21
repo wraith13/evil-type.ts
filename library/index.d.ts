@@ -64,13 +64,13 @@ export declare namespace Build {
     }
 }
 export declare namespace Format {
-    const buildIndent: (options: Types.TypeOptions, indentDepth: number) => string;
-    const getReturnCode: (_options: Types.TypeOptions) => string;
+    const buildIndent: (options: Types.OutputOptions, indentDepth: number) => string;
+    const getReturnCode: (_options: Types.OutputOptions) => string;
     const expressions: (code: CodeExpression[]) => string;
     const tokens: (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock) => string[];
-    const line: (options: Types.TypeOptions, indentDepth: number, code: CodeLine) => string;
-    const inlineBlock: (options: Types.TypeOptions, indentDepth: number, code: CodeInlineBlock) => string;
-    const block: (options: Types.TypeOptions, indentDepth: number, code: CodeBlock) => string;
-    const text: (options: Types.TypeOptions, indentDepth: number, code: CodeExpression | CodeEntry | CodeEntry[]) => string;
+    const line: (options: Types.OutputOptions, indentDepth: number, code: CodeLine) => string;
+    const inlineBlock: (options: Types.OutputOptions, indentDepth: number, code: CodeInlineBlock) => string;
+    const block: (options: Types.OutputOptions, indentDepth: number, code: CodeBlock) => string;
+    const text: (options: Types.OutputOptions, indentDepth: number, code: CodeExpression | CodeEntry | CodeEntry[]) => string;
 }
 export {};

@@ -10,13 +10,13 @@ export module Types
     export const IndentStyleMembers = [ "allman", "egyptian", ] as const;
     export type IndentStyleType = typeof IndentStyleMembers[number];
     export const isIndentStyleType = TypesPrime.isEnum(IndentStyleMembers);
-    export interface TypeOptions
+    export interface OutputOptions
     {
         indentUnit: number | "\t";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
     }
-    export const isTypeOptions = TypesPrime.isSpecificObject<TypeOptions>
+    export const isTypeOptions = TypesPrime.isSpecificObject<OutputOptions>
     ({
         "indentUnit": TypesPrime.isOr(TypesPrime.isNumber, TypesPrime.isJust("\t" as const)),
         "indentStyle": isIndentStyleType,
@@ -26,7 +26,7 @@ export module Types
     {
         $ref: typeof schema;
         defines: { [key: string]: Definition; };
-        options: TypeOptions;
+        options: OutputOptions;
     }
     export const isTypeSchema = (value: unknown, listner?: TypesError.Listener): value is TypeSchema =>
         TypesPrime.isSpecificObject<TypeSchema>

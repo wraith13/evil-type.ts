@@ -26,11 +26,11 @@
                     }
                 },
                 "options": {
-                    "$ref": "TypeOptions"
+                    "$ref": "OutputOptions"
                 }
             }
         },
-        "TypeOptions": {
+        "OutputOptions": {
             "export": true,
             "$type": "interface",
             "members": {
@@ -87,6 +87,27 @@
                     "none",
                     "simple",
                     "full"
+                ]
+            }
+        },
+        "Definition": {
+            "export": true,
+            "$type": "type",
+            "define": {
+                "$type": "or",
+                "types": [
+                    {
+                        "$ref": "ModuleDefinition"
+                    },
+                    {
+                        "$ref": "ValueDefinition"
+                    },
+                    {
+                        "$ref": "TypeDefinition"
+                    },
+                    {
+                        "$ref": "InterfaceDefinition"
+                    }
                 ]
             }
         }
