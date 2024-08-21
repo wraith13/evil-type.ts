@@ -170,7 +170,7 @@ export module Build
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
             [ $expression(buildInlineDefine(value.items) +"[]"), ];
         export const buildInlineDefineDictionary = (value: Types.DictionaryElement) =>
-            [ $expression("[key: string]:"), $expression(buildInlineDefine(value.valueType) +";"), $expression("}")];
+            $iblock([ $line([ $expression("[key: string]:"), ...buildInlineDefine(value.valueType), ]) ]);
         export const buildInlineDefineAnd = (value: Types.AndElement) =>
             kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("&"));
         export const buildInlineDefineOr = (value: Types.OrElement) =>
@@ -251,7 +251,7 @@ export module Build
                 case "interface":
                     return [ buildDefineInlineInterface(define), ];
                 case "dictionary":
-                    return buildInlineDefineDictionary(define);
+                    return [ buildInlineDefineDictionary(define), ];
                 }
             }
         };
@@ -340,8 +340,7 @@ export module Build
                     return [
                         $expression(`Array.isArray(${name})`),
                         $expression("&&"),
-                        $expression("!"),
-                        $expression(`${name}.some(`),
+                        $expression(`${name}.every(`),
                         $expression("i"),
                         $expression("=>"),
                         ...buildValidatorExpression("i", define.items),
@@ -366,6 +365,18 @@ export module Build
                     );
                 case "interface":
                     return buildInterfaceValidator(name, define);
+                case "dictionary":
+                    return [
+                        $expression(`null !== ${name}`),
+                        $expression("&&"),
+                        $expression(`"object" === typeof ${name}`),
+                        $expression("&&"),
+                        $expression(`Object.values(${name}).every(`),
+                        $expression("i"),
+                        $expression("=>"),
+                        ...buildValidatorExpression("i", define.valueType),
+                        $expression(")")
+                    ];
                 }
             }
         };

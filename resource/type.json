@@ -20,8 +20,10 @@
                     }
                 },
                 "defines": {
-                    "$type": "interface",
-                    "members": {}
+                    "$type": "dictionary",
+                    "valueType": {
+                        "$ref": "Definition"
+                    }
                 },
                 "options": {
                     "$ref": "TypeOptions"

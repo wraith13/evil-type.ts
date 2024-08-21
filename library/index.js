@@ -134,6 +134,9 @@ var Build;
         Define.buildInlineDefineArray = function (value) {
             return [(0, exports.$expression)(Define.buildInlineDefine(value.items) + "[]"),];
         };
+        Define.buildInlineDefineDictionary = function (value) {
+            return (0, exports.$iblock)([(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(value.valueType), true))]);
+        };
         Define.buildInlineDefineAnd = function (value) {
             return kindofJoinExpression(value.types.map(function (i) { return Define.enParenthesisIfNeed(Define.buildInlineDefine(i)); }), (0, exports.$expression)("&"));
         };
@@ -202,6 +205,8 @@ var Build;
                         return Define.buildInlineDefineOr(define);
                     case "interface":
                         return [Define.buildDefineInlineInterface(define),];
+                    case "dictionary":
+                        return [Define.buildInlineDefineDictionary(define),];
                 }
             }
         };
@@ -275,8 +280,7 @@ var Build;
                         return __spreadArray(__spreadArray([
                             (0, exports.$expression)("Array.isArray(".concat(name, ")")),
                             (0, exports.$expression)("&&"),
-                            (0, exports.$expression)("!"),
-                            (0, exports.$expression)("".concat(name, ".some(")),
+                            (0, exports.$expression)("".concat(name, ".every(")),
                             (0, exports.$expression)("i"),
                             (0, exports.$expression)("=>")
                         ], Validator.buildValidatorExpression("i", define.items), true), [
@@ -290,6 +294,18 @@ var Build;
                         return kindofJoinExpression(define.types.map(function (i) { return Validator.buildValidatorExpression(name, i); }), (0, exports.$expression)("||"));
                     case "interface":
                         return Validator.buildInterfaceValidator(name, define);
+                    case "dictionary":
+                        return __spreadArray(__spreadArray([
+                            (0, exports.$expression)("null !== ".concat(name)),
+                            (0, exports.$expression)("&&"),
+                            (0, exports.$expression)("\"object\" === typeof ".concat(name)),
+                            (0, exports.$expression)("&&"),
+                            (0, exports.$expression)("Object.values(".concat(name, ").every(")),
+                            (0, exports.$expression)("i"),
+                            (0, exports.$expression)("=>")
+                        ], Validator.buildValidatorExpression("i", define.valueType), true), [
+                            (0, exports.$expression)(")")
+                        ], false);
                 }
             }
         };

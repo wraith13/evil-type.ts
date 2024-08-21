@@ -69,7 +69,7 @@ var Types;
     })(value, listner); };
     Types.isDictionaryElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         $type: types_prime_1.TypesPrime.isJust("dictionary"),
-        members: Types.isTypeOrRefer,
+        valueType: Types.isTypeOrRefer,
     })(value, listner); };
     Types.isArrayElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         $type: types_prime_1.TypesPrime.isJust("array"),
@@ -83,7 +83,7 @@ var Types;
         $type: types_prime_1.TypesPrime.isJust("and"),
         types: types_prime_1.TypesPrime.isArray(Types.isTypeOrRefer),
     })(value, listner); };
-    Types.isType = types_prime_1.TypesPrime.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
+    Types.isType = types_prime_1.TypesPrime.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isDictionaryElement, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
     Types.isTypeOrValue = types_prime_1.TypesPrime.isOr(Types.isType, Types.isValueDefinition);
     Types.isTypeOrRefer = types_prime_1.TypesPrime.isOr(Types.isType, Types.isReferElement);
     Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);
