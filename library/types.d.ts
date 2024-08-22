@@ -12,8 +12,9 @@ export declare namespace Types {
         indentUnit: number | "\t";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
+        maxLineLength?: null | number;
     }
-    const isTypeOptions: (value: unknown, listner?: TypesError.Listener | undefined) => value is OutputOptions;
+    const isOutputOptions: (value: unknown, listner?: TypesError.Listener | undefined) => value is OutputOptions;
     interface TypeSchema {
         $ref: typeof schema;
         defines: {

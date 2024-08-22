@@ -15,12 +15,14 @@ export module Types
         indentUnit: number | "\t";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
+        maxLineLength?: null | number;
     }
-    export const isTypeOptions = TypesPrime.isSpecificObject<OutputOptions>
+    export const isOutputOptions = TypesPrime.isSpecificObject<OutputOptions>
     ({
         "indentUnit": TypesPrime.isOr(TypesPrime.isNumber, TypesPrime.isJust("\t" as const)),
         "indentStyle": isIndentStyleType,
         "validatorOption": isValidatorOptionType,
+        "maxLineLength": TypesPrime.isOptional(TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isNumber)),
     });
     export interface TypeSchema
     {
@@ -33,7 +35,7 @@ export module Types
         ({
             "$ref": TypesPrime.isJust(schema),
             "defines": TypesPrime.isDictionaryObject(isDefinition),
-            "options": isTypeOptions
+            "options": isOutputOptions
         })
         (value, listner);
     export type FilePath = string;

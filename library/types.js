@@ -9,16 +9,17 @@ var Types;
     Types.isValidatorOptionType = types_prime_1.TypesPrime.isEnum(Types.ValidatorOptionTypeMembers);
     Types.IndentStyleMembers = ["allman", "egyptian",];
     Types.isIndentStyleType = types_prime_1.TypesPrime.isEnum(Types.IndentStyleMembers);
-    Types.isTypeOptions = types_prime_1.TypesPrime.isSpecificObject({
+    Types.isOutputOptions = types_prime_1.TypesPrime.isSpecificObject({
         "indentUnit": types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNumber, types_prime_1.TypesPrime.isJust("\t")),
         "indentStyle": Types.isIndentStyleType,
         "validatorOption": Types.isValidatorOptionType,
+        "maxLineLength": types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNull, types_prime_1.TypesPrime.isNumber)),
     });
     Types.isTypeSchema = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject({
             "$ref": types_prime_1.TypesPrime.isJust(Types.schema),
             "defines": types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
-            "options": Types.isTypeOptions
+            "options": Types.isOutputOptions
         })(value, listner);
     };
     Types.isReferElement = types_prime_1.TypesPrime.isSpecificObject({

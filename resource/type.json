@@ -52,6 +52,19 @@
                 },
                 "validatorOption": {
                     "$ref": "ValidatorOptionType"
+                },
+                "maxLineLength?": {
+                    "$type": "or",
+                    "types": [
+                        {
+                            "$type": "primitive-type",
+                            "type": "null"
+                        },
+                        {
+                            "$type": "primitive-type",
+                            "type": "number"
+                        }
+                    ]
                 }
             }
         },
@@ -109,6 +122,20 @@
                         "$ref": "InterfaceDefinition"
                     }
                 ]
+            }
+        },
+        "ModuleDefinition": {
+            "export": true,
+            "$type": "interface",
+            "members": {
+                "export?": { "$type": "primitive-type", "type": "boolean" },
+                "$type": { "$type": "literal", "literal": "module" },
+                "members": {
+                    "$type": "dictionary",
+                    "valueType": {
+                        "$ref": "Definition"
+                    }
+                }
             }
         }
     },
