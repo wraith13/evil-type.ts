@@ -137,6 +137,35 @@
                     }
                 }
             }
+        },
+        "ValueDefinition": {
+            "export": true,
+            "$type": "interface",
+            "members": {
+                "export?": {
+                    "$type": "primitive-type",
+                    "type": "boolean"
+                },
+                "$type": {
+                    "$type": "literal",
+                    "literal": "value"
+                },
+                "value": {
+                    "$type": "or",
+                    "types": [
+                        {
+                            "$ref": "LiteralElement"
+                        },
+                        {
+                            "$ref": "ReferElement"
+                        }
+                    ]
+                },
+                "validator?": {
+                    "$type": "primitive-type",
+                    "type": "boolean"
+                }
+            }
         }
     },
     "options": {

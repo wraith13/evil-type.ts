@@ -20,6 +20,7 @@ const kindofJoinExpression = <T>(list: T[], separator: CodeExpression) =>
                 (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]),
             <CodeExpression[]>[]
         );
+const getPrimaryKeyName = (key: string) =>key.replace(/\?$/, "");
 interface Code
 {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
@@ -331,7 +332,14 @@ export module Build
                 case "value":
                     return buildValidatorExpression(name, define.value);
                 case "primitive-type":
-                    return [ $expression(`"${define.type}" === typeof ${name}`), ];
+                    return [
+                        $expression
+                        (
+                            "null" === define.type ?
+                                `"${define.type}" === ${name}`:
+                                `"${define.type}" === typeof ${name}`
+                        ),
+                    ];
                 case "type":
                     return buildValidatorExpression(name, define.define);
                 case "enum-type":
@@ -388,20 +396,29 @@ export module Build
             list.push($expression(`"object" === typeof ${name}`));
             Object.keys(define.members).forEach
             (
-                key =>
+                k =>
                 {
-                    list.push($expression("&&"));
-                    list.push($expression(`"${key}" in ${name}`));
-                    list.push($expression("&&"));
-                    const value = define.members[key];
-                    const current = convertToExpression(buildValidatorExpression(`${name}.${key}`, value));
-                    if (Types.isOrElement(value))
+                    const key = getPrimaryKeyName(k);
+                    const value = define.members[k];
+                    const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, value));
+                    const current = Types.isOrElement(value) ?
+                        Define.enParenthesis(base):
+                        base;
+                    if (k === key)
                     {
-                        list.push(...Define.enParenthesis(current));
+                        list.push($expression("&&"));
+                        list.push($expression(`"${key}" in ${name}`));
+                        list.push($expression("&&"));
+                        list.push(...current);
                     }
                     else
                     {
+                        list.push($expression("&&"));
+                        list.push($expression("("));
+                        list.push($expression(`! ("${key}" in ${name})`));
+                        list.push($expression("||"));
                         list.push(...current);
+                        list.push($expression(")"));
                     }
                 }
             );
@@ -500,14 +517,14 @@ try
     {
         const defines = Object.entries(typeSource.defines)
             .map(i => Build.Define.buildDefine(i[0], i[1]));
-        console.log(JSON.stringify(defines, null, 4));
+        //console.log(JSON.stringify(defines, null, 4));
         const validators = removeNullFilter
         (
             Object.entries(typeSource.defines)
                 .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? null: Build.Validator.buildValidator(i[0], i[1]))
                 .filter(i => null !== i)
         );
-        console.log(JSON.stringify(validators, null, 4));
+        //console.log(JSON.stringify(validators, null, 4));
         const result = Format.text(typeSource.options, 0, [...defines, ...validators]);
         console.log(result);
     }

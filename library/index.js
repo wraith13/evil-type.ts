@@ -32,6 +32,7 @@ var kindofJoinExpression = function (list, separator) {
         (Array.isArray(a) ? a : [a]).concat(Array.isArray(b) ? __spreadArray([], b, true) : [b]) :
         (Array.isArray(a) ? a : [a]).concat(Array.isArray(b) ? __spreadArray([separator], b, true) : [separator, b]); }, []);
 };
+var getPrimaryKeyName = function (key) { return key.replace(/\?$/, ""); };
 ;
 var isCodeExpression = function (value) {
     return null !== value &&
@@ -271,7 +272,11 @@ var Build;
                     case "value":
                         return Validator.buildValidatorExpression(name, define.value);
                     case "primitive-type":
-                        return [(0, exports.$expression)("\"".concat(define.type, "\" === typeof ").concat(name)),];
+                        return [
+                            (0, exports.$expression)("null" === define.type ?
+                                "\"".concat(define.type, "\" === ").concat(name) :
+                                "\"".concat(define.type, "\" === typeof ").concat(name)),
+                        ];
                     case "type":
                         return Validator.buildValidatorExpression(name, define.define);
                     case "enum-type":
@@ -314,17 +319,26 @@ var Build;
             list.push((0, exports.$expression)("null !== ".concat(name)));
             list.push((0, exports.$expression)("&&"));
             list.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
-            Object.keys(define.members).forEach(function (key) {
-                list.push((0, exports.$expression)("&&"));
-                list.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
-                list.push((0, exports.$expression)("&&"));
-                var value = define.members[key];
-                var current = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), value));
-                if (types_1.Types.isOrElement(value)) {
-                    list.push.apply(list, Define.enParenthesis(current));
+            Object.keys(define.members).forEach(function (k) {
+                var key = getPrimaryKeyName(k);
+                var value = define.members[k];
+                var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), value));
+                var current = types_1.Types.isOrElement(value) ?
+                    Define.enParenthesis(base) :
+                    base;
+                if (k === key) {
+                    list.push((0, exports.$expression)("&&"));
+                    list.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
+                    list.push((0, exports.$expression)("&&"));
+                    list.push.apply(list, current);
                 }
                 else {
+                    list.push((0, exports.$expression)("&&"));
+                    list.push((0, exports.$expression)("("));
+                    list.push((0, exports.$expression)("! (\"".concat(key, "\" in ").concat(name, ")")));
+                    list.push((0, exports.$expression)("||"));
                     list.push.apply(list, current);
+                    list.push((0, exports.$expression)(")"));
                 }
             });
             return list;
@@ -415,11 +429,11 @@ try {
     if (types_1.Types.isTypeSchema(typeSource, errorListner)) {
         var defines = Object.entries(typeSource.defines)
             .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); });
-        console.log(JSON.stringify(defines, null, 4));
+        //console.log(JSON.stringify(defines, null, 4));
         var validators = removeNullFilter(Object.entries(typeSource.defines)
             .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })
             .filter(function (i) { return null !== i; }));
-        console.log(JSON.stringify(validators, null, 4));
+        //console.log(JSON.stringify(validators, null, 4));
         var result = Format.text(typeSource.options, 0, __spreadArray(__spreadArray([], defines, true), validators, true));
         console.log(result);
     }
