@@ -166,6 +166,43 @@
                     "type": "boolean"
                 }
             }
+        },
+        "TypeDefinition": {
+            "export": true,
+            "$type": "interface",
+            "members": {
+                "export?": {
+                    "$type": "primitive-type",
+                    "type": "boolean"
+                },
+                "$type": {
+                    "$type": "literal",
+                    "literal": "type"
+                },
+                "define": {
+                    "$ref": "TypeOrInterfaceOrRefer"
+                }
+            }
+        },
+        "InterfaceDefinition": {
+            "export": true,
+            "$type": "interface",
+            "members": {
+                "export?": {
+                    "$type": "primitive-type",
+                    "type": "boolean"
+                },
+                "$type": {
+                    "$type": "literal",
+                    "literal": "interface"
+                },
+                "members": {
+                    "$type": "dictionary",
+                    "valueType": {
+                        "$ref": "TypeOrInterfaceOrRefer"
+                    }
+                }
+            }
         }
     },
     "options": {

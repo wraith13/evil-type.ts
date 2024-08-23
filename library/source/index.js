@@ -20,6 +20,7 @@ var types_error_1 = require("./types-error");
 var types_prime_1 = require("./types-prime");
 var types_1 = require("./types");
 var text_1 = require("./text");
+var config_json_1 = __importDefault(require("../resource/config.json"));
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
 var jsonPath = process.argv[2];
 console.log("\uD83D\uDE80 ".concat(jsonPath, " build start: ").concat(startAt));
@@ -361,6 +362,9 @@ var Build;
 var Format;
 (function (Format) {
     // data:code(object) to data:output(text)
+    Format.getMaxLineLength = function (options) {
+        return types_prime_1.TypesPrime.isUndefined(options.maxLineLength) ? config_json_1.default.maxLineLength : options.maxLineLength;
+    };
     Format.buildIndent = function (options, indentDepth) {
         return Array.from({ length: indentDepth, })
             .map(function (_) { return "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(function (_) { return " "; }).join("") : options.indentUnit; })

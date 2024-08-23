@@ -6,6 +6,7 @@ import { TypesError } from "./types-error";
 import { TypesPrime } from "./types-prime";
 import { Types } from "./types";
 import { Text } from "./text";
+import config from "../resource/config.json";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
@@ -444,6 +445,8 @@ export module Build
 export module Format
 {
 // data:code(object) to data:output(text)
+    export const getMaxLineLength = (options: Types.OutputOptions): null | number =>
+        TypesPrime.isUndefined(options.maxLineLength) ? config.maxLineLength: options.maxLineLength;
     export const buildIndent = (options: Types.OutputOptions, indentDepth: number) =>
         Array.from({ length: indentDepth, })
         .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): options.indentUnit)

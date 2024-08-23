@@ -64,6 +64,7 @@ export declare namespace Build {
     }
 }
 export declare namespace Format {
+    const getMaxLineLength: (options: Types.OutputOptions) => null | number;
     const buildIndent: (options: Types.OutputOptions, indentDepth: number) => string;
     const getReturnCode: (_options: Types.OutputOptions) => string;
     const expressions: (code: CodeExpression[]) => string;
