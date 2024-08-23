@@ -512,7 +512,6 @@ export module Format
 try
 {
     const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
-    console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     const rawSource = fget(jsonPath);
     const typeSource = Jsonable.parse(rawSource);
     const errorListner = TypesError.makeListener(jsonPath);
@@ -529,12 +528,21 @@ try
         );
         //console.log(JSON.stringify(validators, null, 4));
         const result = Format.text(typeSource.options, 0, [...defines, ...validators]);
-        console.log(result);
+        if (typeSource.options.outputFile)
+        {
+            fs.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
+        }
+        else
+        {
+            console.log(result);
+        }
+        console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     }
     else
     {
         console.error("🚫 Invalid TypeSchema");
         console.error(errorListner);
+        console.log(`🚫 ${jsonPath} build failed: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     }
 }
 catch(error)

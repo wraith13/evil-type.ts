@@ -9,6 +9,7 @@ export declare namespace Types {
     type IndentStyleType = typeof IndentStyleMembers[number];
     const isIndentStyleType: (value: unknown, listner?: TypesError.Listener | undefined) => value is "allman" | "egyptian";
     interface OutputOptions {
+        outputFile?: string;
         indentUnit: number | "\t";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;

@@ -34,6 +34,10 @@
             "export": true,
             "$type": "interface",
             "members": {
+                "outputFile?": {
+                    "$type": "primitive-type",
+                    "type": "string"
+                },
                 "indentUnit": {
                     "$type": "or",
                     "types": [
@@ -206,6 +210,7 @@
         }
     },
     "options": {
+        "outputFile": "./generated/types.ts",
         "indentUnit": 4,
         "indentStyle": "allman",
         "validatorOption": "full"

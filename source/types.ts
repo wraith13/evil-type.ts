@@ -12,6 +12,7 @@ export module Types
     export const isIndentStyleType = TypesPrime.isEnum(IndentStyleMembers);
     export interface OutputOptions
     {
+        outputFile?: string,
         indentUnit: number | "\t";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
@@ -19,6 +20,7 @@ export module Types
     }
     export const isOutputOptions = TypesPrime.isSpecificObject<OutputOptions>
     ({
+        "outputFile": TypesPrime.isOptional(TypesPrime.isString),
         "indentUnit": TypesPrime.isOr(TypesPrime.isNumber, TypesPrime.isJust("\t" as const)),
         "indentStyle": isIndentStyleType,
         "validatorOption": isValidatorOptionType,

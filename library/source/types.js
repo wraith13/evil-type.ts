@@ -10,6 +10,7 @@ var Types;
     Types.IndentStyleMembers = ["allman", "egyptian",];
     Types.isIndentStyleType = types_prime_1.TypesPrime.isEnum(Types.IndentStyleMembers);
     Types.isOutputOptions = types_prime_1.TypesPrime.isSpecificObject({
+        "outputFile": types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isString),
         "indentUnit": types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNumber, types_prime_1.TypesPrime.isJust("\t")),
         "indentStyle": Types.isIndentStyleType,
         "validatorOption": Types.isValidatorOptionType,

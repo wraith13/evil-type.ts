@@ -426,7 +426,6 @@ var Format;
 })(Format || (exports.Format = Format = {}));
 try {
     var fget = function (path) { return fs_1.default.readFileSync(path, { encoding: "utf-8" }); };
-    console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     var rawSource = fget(jsonPath);
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
     var errorListner = types_error_1.TypesError.makeListener(jsonPath);
@@ -439,11 +438,18 @@ try {
             .filter(function (i) { return null !== i; }));
         //console.log(JSON.stringify(validators, null, 4));
         var result = Format.text(typeSource.options, 0, __spreadArray(__spreadArray([], defines, true), validators, true));
-        console.log(result);
+        if (typeSource.options.outputFile) {
+            fs_1.default.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
+        }
+        else {
+            console.log(result);
+        }
+        console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     }
     else {
         console.error("🚫 Invalid TypeSchema");
         console.error(errorListner);
+        console.log("\uD83D\uDEAB ".concat(jsonPath, " build failed: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     }
 }
 catch (error) {
