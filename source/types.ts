@@ -154,12 +154,14 @@ export module Types
     export interface InterfaceDefinition extends AlphaDefinition
     {
         $type: "interface";
+        extends?: ReferElement[];
         members: { [key: string]: TypeOrInterfaceOrRefer; };
     }
     export const isInterfaceDefinition = (value: unknown, listner?: TypesError.Listener): value is InterfaceDefinition => TypesPrime.isSpecificObject<InterfaceDefinition>
     ({
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("interface"),
+        extends: TypesPrime.isOptional(TypesPrime.isArray(isReferElement)),
         members: TypesPrime.isDictionaryObject(isTypeOrRefer),
     })
     (value, listner);

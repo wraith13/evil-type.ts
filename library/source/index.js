@@ -33,7 +33,6 @@ var kindofJoinExpression = function (list, separator) {
         (Array.isArray(a) ? a : [a]).concat(Array.isArray(b) ? __spreadArray([], b, true) : [b]) :
         (Array.isArray(a) ? a : [a]).concat(Array.isArray(b) ? __spreadArray([separator], b, true) : [separator, b]); }, []);
 };
-var getPrimaryKeyName = function (key) { return key.replace(/\?$/, ""); };
 ;
 var isCodeExpression = function (value) {
     return null !== value &&
@@ -79,6 +78,9 @@ var Build;
 (function (Build) {
     // data:input(json) to data:code(object)
     Build.buildExport = function (define) { var _a; return ("export" in define && ((_a = define.export) !== null && _a !== void 0 ? _a : true)) ? [(0, exports.$expression)("export")] : []; };
+    Build.buildExtends = function (define) {
+        return undefined !== define.extends ? __spreadArray([(0, exports.$expression)("extends")], define.extends.map(function (i, ix, list) { return (0, exports.$expression)(ix < (list.length - 1) ? "".concat(i.$ref, ",") : "".concat(i.$ref)); }), true) : [];
+    };
     var Define;
     (function (Define) {
         Define.buildDefineLine = function (declarator, name, define, postEpressions) {
@@ -134,7 +136,7 @@ var Build;
             return kindofJoinExpression(value.members.map(function (i) { return (0, exports.$expression)(JSON.stringify(i)); }), (0, exports.$expression)("|"));
         };
         Define.buildInlineDefineArray = function (value) {
-            return [(0, exports.$expression)(Define.buildInlineDefine(value.items) + "[]"),];
+            return __spreadArray(__spreadArray([], Define.buildInlineDefine(value.items), true), [(0, exports.$expression)("[]"),], false);
         };
         Define.buildInlineDefineDictionary = function (value) {
             return (0, exports.$iblock)([(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(value.valueType), true))]);
@@ -148,7 +150,7 @@ var Build;
         Define.buildDefineInlineInterface = function (value) { return (0, exports.$iblock)(Object.keys(value.members)
             .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); })); };
         Define.buildDefineInterface = function (name, value) {
-            var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), ["interface", name].filter(function (i) { return null !== i; }).map(function (i) { return (0, exports.$expression)(i); }), true);
+            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(value), true), ["interface", name].map(function (i) { return (0, exports.$expression)(i); }), true), Build.buildExtends(value), true);
             var lines = Object.keys(value.members)
                 .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); });
             return (0, exports.$block)(header, lines);
@@ -156,8 +158,7 @@ var Build;
         Define.buildDefineModuleCore = function (members) {
             return __spreadArray(__spreadArray([], Object.entries(members)
                 .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); }), true), removeNullFilter(Object.entries(members)
-                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })
-                .filter(function (i) { return null !== i; })), true);
+                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })), true);
         };
         Define.buildDefineModule = function (name, value) {
             var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("module"), (0, exports.$expression)(name),], false);
@@ -314,11 +315,21 @@ var Build;
         };
         Validator.buildInterfaceValidator = function (name, define) {
             var list = [];
-            list.push((0, exports.$expression)("null !== ".concat(name)));
-            list.push((0, exports.$expression)("&&"));
-            list.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
+            if (undefined !== define.extends) {
+                define.extends.forEach(function (i, ix, _l) {
+                    if (0 < ix) {
+                        list.push((0, exports.$expression)("&&"));
+                    }
+                    list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression(name, i)));
+                });
+            }
+            else {
+                list.push((0, exports.$expression)("null !== ".concat(name)));
+                list.push((0, exports.$expression)("&&"));
+                list.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
+            }
             Object.keys(define.members).forEach(function (k) {
-                var key = getPrimaryKeyName(k);
+                var key = text_1.Text.getPrimaryKeyName(k);
                 var value = define.members[k];
                 var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), value));
                 var current = types_1.Types.isOrElement(value) ?

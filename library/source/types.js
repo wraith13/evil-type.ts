@@ -67,6 +67,7 @@ var Types;
     Types.isInterfaceDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("interface"),
+        extends: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isReferElement)),
         members: types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer),
     })(value, listner); };
     Types.isDictionaryElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({

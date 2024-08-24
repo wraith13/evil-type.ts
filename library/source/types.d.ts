@@ -83,6 +83,7 @@ export declare namespace Types {
     const isEnumTypeElement: (value: unknown, listner?: TypesError.Listener) => value is EnumTypeElement;
     interface InterfaceDefinition extends AlphaDefinition {
         $type: "interface";
+        extends?: ReferElement[];
         members: {
             [key: string]: TypeOrInterfaceOrRefer;
         };

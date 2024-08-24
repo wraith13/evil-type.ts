@@ -21,7 +21,6 @@ const kindofJoinExpression = <T>(list: T[], separator: CodeExpression) =>
                 (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]),
             <CodeExpression[]>[]
         );
-const getPrimaryKeyName = (key: string) =>key.replace(/\?$/, "");
 interface Code
 {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
@@ -109,6 +108,8 @@ export module Build
 // data:input(json) to data:code(object)
     export const buildExport = (define: { export?: boolean } | { }): CodeExpression[] =>
         ("export" in define && (define.export ?? true)) ? [$expression("export")]: [];
+    export const buildExtends = (define: Types.InterfaceDefinition): CodeExpression[] =>
+        undefined !== define.extends ? [$expression("extends"), ...define.extends.map((i, ix, list) => $expression(ix < (list.length -1) ? `${i.$ref},`: `${i.$ref}`))]: [];
     export module Define
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
@@ -170,7 +171,7 @@ export module Build
         export const buildInlineDefineEnum = (value: Types.EnumTypeElement) =>
             kindofJoinExpression(value.members.map(i => $expression(JSON.stringify(i))), $expression("|"));
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
-            [ $expression(buildInlineDefine(value.items) +"[]"), ];
+            [ ...buildInlineDefine(value.items), $expression("[]"), ];
         export const buildInlineDefineDictionary = (value: Types.DictionaryElement) =>
             $iblock([ $line([ $expression("[key: string]:"), ...buildInlineDefine(value.valueType), ]) ]);
         export const buildInlineDefineAnd = (value: Types.AndElement) =>
@@ -184,7 +185,7 @@ export module Build
         );
         export const buildDefineInterface = (name: string, value: Types.InterfaceDefinition): CodeBlock =>
         {
-            const header = [ ...buildExport(value), ...["interface", name].filter(i => null !== i).map(i => $expression(i)), ];
+            const header = [ ...buildExport(value), ...["interface", name].map(i => $expression(i)), ...buildExtends(value), ];
             const lines = Object.keys(value.members)
                 .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(value.members[name]), ]));
             return $block(header, lines);
@@ -197,7 +198,6 @@ export module Build
             (
                 Object.entries(members)
                     .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? null: Build.Validator.buildValidator(i[0], i[1]))
-                    .filter(i => null !== i)
             )
         ];
         export const buildDefineModule = (name: string, value: Types.ModuleDefinition): CodeBlock =>
@@ -392,14 +392,31 @@ export module Build
         export const buildInterfaceValidator = (name: string, define: Types.InterfaceDefinition): CodeExpression[] =>
         {
             const list: CodeExpression[] = [];
-            list.push($expression(`null !== ${name}`));
-            list.push($expression("&&"));
-            list.push($expression(`"object" === typeof ${name}`));
+            if (undefined !== define.extends)
+            {
+                define.extends.forEach
+                (
+                    (i, ix, _l) =>
+                    {
+                        if (0 < ix)
+                        {
+                            list.push($expression("&&"));
+                        }
+                        list.push(...convertToExpression(buildValidatorExpression(name, i)));
+                    }
+                )
+            }
+            else
+            {
+                list.push($expression(`null !== ${name}`));
+                list.push($expression("&&"));
+                list.push($expression(`"object" === typeof ${name}`));
+            }
             Object.keys(define.members).forEach
             (
                 k =>
                 {
-                    const key = getPrimaryKeyName(k);
+                    const key = Text.getPrimaryKeyName(k);
                     const value = define.members[k];
                     const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, value));
                     const current = Types.isOrElement(value) ?

@@ -31,6 +31,7 @@ export declare namespace Build {
     const buildExport: (define: {
         export?: boolean;
     } | {}) => CodeExpression[];
+    const buildExtends: (define: Types.InterfaceDefinition) => CodeExpression[];
     namespace Define {
         const buildDefineLine: (declarator: string, name: string, define: Types.TypeOrValue, postEpressions?: CodeExpression[]) => CodeLine;
         const buildInlineDefineLiteral: (define: Types.LiteralElement) => CodeExpression[];
@@ -40,7 +41,7 @@ export declare namespace Build {
         const isNeedParenthesis: (expressions: (CodeExpression | CodeInlineBlock)[]) => boolean;
         const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | CodeInlineBlock)[];
         const buildInlineDefineEnum: (value: Types.EnumTypeElement) => CodeExpression[];
-        const buildInlineDefineArray: (value: Types.ArrayElement) => CodeExpression[];
+        const buildInlineDefineArray: (value: Types.ArrayElement) => (CodeExpression | CodeInlineBlock)[];
         const buildInlineDefineDictionary: (value: Types.DictionaryElement) => CodeInlineBlock;
         const buildInlineDefineAnd: (value: Types.AndElement) => CodeExpression[];
         const buildInlineDefineOr: (value: Types.OrElement) => CodeExpression[];

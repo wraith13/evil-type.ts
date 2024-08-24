@@ -110,6 +110,29 @@
                         ]
                     }
                 },
+                "AlphaElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "members": {
+                        "$type": {
+                            "$type": "primitive-type",
+                            "type": "string"
+                        }
+                    }
+                },
+                "AlphaDefinition": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        { "$ref": "AlphaElement" }
+                    ],
+                    "members": {
+                        "export?": {
+                            "$type": "primitive-type",
+                            "type": "boolean"
+                        }
+                    }
+                },
                 "Definition": {
                     "export": true,
                     "$type": "type",
@@ -134,11 +157,12 @@
                 "ModuleDefinition": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaDefinition"
+                        }
+                    ],
                     "members": {
-                        "export?": {
-                            "$type": "primitive-type",
-                            "type": "boolean"
-                        },
                         "$type": {
                             "$type": "literal",
                             "literal": "module"
@@ -154,11 +178,12 @@
                 "ValueDefinition": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaDefinition"
+                        }
+                    ],
                     "members": {
-                        "export?": {
-                            "$type": "primitive-type",
-                            "type": "boolean"
-                        },
                         "$type": {
                             "$type": "literal",
                             "literal": "value"
@@ -183,11 +208,12 @@
                 "TypeDefinition": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaDefinition"
+                        }
+                    ],
                     "members": {
-                        "export?": {
-                            "$type": "primitive-type",
-                            "type": "boolean"
-                        },
                         "$type": {
                             "$type": "literal",
                             "literal": "type"
@@ -200,14 +226,21 @@
                 "InterfaceDefinition": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaDefinition"
+                        }
+                    ],
                     "members": {
-                        "export?": {
-                            "$type": "primitive-type",
-                            "type": "boolean"
-                        },
                         "$type": {
                             "$type": "literal",
                             "literal": "interface"
+                        },
+                        "extends?": {
+                            "$type": "array",
+                            "items": {
+                                "$ref": "ReferElement"
+                            }
                         },
                         "members": {
                             "$type": "dictionary",
