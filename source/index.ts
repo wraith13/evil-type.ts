@@ -189,21 +189,21 @@ export module Build
                 .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(value.members[name]), ]));
             return $block(header, lines);
         };
-        export const buildDefineModuleCore = (value: Types.ModuleDefinition): CodeEntry[] =>
+        export const buildDefineModuleCore = (members: { [key: string]: Types.Definition; }): CodeEntry[] =>
         [
-            ...Object.entries(value.members).map
+            ...Object.entries(members)
+                .map(i => Build.Define.buildDefine(i[0], i[1])),
+            ...removeNullFilter
             (
-                i =>
-                    Types.isModuleDefinition(i[1]) ? <CodeEntry[]>[buildDefine(i[0], i[1])]:
-                    Types.isType(i[1]) && ! Build.Validator.isValidatorTarget(i[1]) ? <CodeEntry[]>[buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]), ]:
-                    [] // Types.isValueDefine(i[1])
+                Object.entries(members)
+                    .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? null: Build.Validator.buildValidator(i[0], i[1]))
+                    .filter(i => null !== i)
             )
-            .reduce((a, b) => [ ...a, ...b, ], []),
         ];
         export const buildDefineModule = (name: string, value: Types.ModuleDefinition): CodeBlock =>
         {
             const header = [...buildExport(value), $expression("module"), $expression(name), ];
-            const lines = buildDefineModuleCore(value);
+            const lines = buildDefineModuleCore(value.members);
             return $block(header, lines);
         };
         export const buildDefine = (name: string, define: Types.Definition): CodeEntry =>
@@ -517,17 +517,8 @@ try
     const errorListner = TypesError.makeListener(jsonPath);
     if (Types.isTypeSchema(typeSource, errorListner))
     {
-        const defines = Object.entries(typeSource.defines)
-            .map(i => Build.Define.buildDefine(i[0], i[1]));
-        //console.log(JSON.stringify(defines, null, 4));
-        const validators = removeNullFilter
-        (
-            Object.entries(typeSource.defines)
-                .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? null: Build.Validator.buildValidator(i[0], i[1]))
-                .filter(i => null !== i)
-        );
-        //console.log(JSON.stringify(validators, null, 4));
-        const result = Format.text(typeSource.options, 0, [...defines, ...validators]);
+        const code = Build.Define.buildDefineModuleCore(typeSource.defines);
+        const result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile)
         {
             fs.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });

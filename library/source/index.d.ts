@@ -46,7 +46,9 @@ export declare namespace Build {
         const buildInlineDefineOr: (value: Types.OrElement) => CodeExpression[];
         const buildDefineInlineInterface: (value: Types.InterfaceDefinition) => CodeInlineBlock;
         const buildDefineInterface: (name: string, value: Types.InterfaceDefinition) => CodeBlock;
-        const buildDefineModuleCore: (value: Types.ModuleDefinition) => CodeEntry[];
+        const buildDefineModuleCore: (members: {
+            [key: string]: Types.Definition;
+        }) => CodeEntry[];
         const buildDefineModule: (name: string, value: Types.ModuleDefinition) => CodeBlock;
         const buildDefine: (name: string, define: Types.Definition) => CodeEntry;
         const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];

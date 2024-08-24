@@ -153,18 +153,15 @@ var Build;
                 .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); });
             return (0, exports.$block)(header, lines);
         };
-        Define.buildDefineModuleCore = function (value) {
-            return __spreadArray([], Object.entries(value.members).map(function (i) {
-                return types_1.Types.isModuleDefinition(i[1]) ? [Define.buildDefine(i[0], i[1])] :
-                    types_1.Types.isType(i[1]) && !Build.Validator.isValidatorTarget(i[1]) ? [Define.buildDefine(i[0], i[1]), Validator.buildValidator(i[0], i[1]),] :
-                        [];
-            } // Types.isValueDefine(i[1])
-            )
-                .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true);
+        Define.buildDefineModuleCore = function (members) {
+            return __spreadArray(__spreadArray([], Object.entries(members)
+                .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); }), true), removeNullFilter(Object.entries(members)
+                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })
+                .filter(function (i) { return null !== i; })), true);
         };
         Define.buildDefineModule = function (name, value) {
             var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("module"), (0, exports.$expression)(name),], false);
-            var lines = Define.buildDefineModuleCore(value);
+            var lines = Define.buildDefineModuleCore(value.members);
             return (0, exports.$block)(header, lines);
         };
         Define.buildDefine = function (name, define) {
@@ -430,14 +427,8 @@ try {
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
     var errorListner = types_error_1.TypesError.makeListener(jsonPath);
     if (types_1.Types.isTypeSchema(typeSource, errorListner)) {
-        var defines = Object.entries(typeSource.defines)
-            .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); });
-        //console.log(JSON.stringify(defines, null, 4));
-        var validators = removeNullFilter(Object.entries(typeSource.defines)
-            .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })
-            .filter(function (i) { return null !== i; }));
-        //console.log(JSON.stringify(validators, null, 4));
-        var result = Format.text(typeSource.options, 0, __spreadArray(__spreadArray([], defines, true), validators, true));
+        var code = Build.Define.buildDefineModuleCore(typeSource.defines);
+        var result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile) {
             fs_1.default.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
         }
