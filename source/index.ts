@@ -471,23 +471,37 @@ export module Format
     export const getReturnCode = (_options: Types.OutputOptions) => "\n";
     export const expressions = (code: CodeExpression[]): string =>
         code.map(i => i.expression).join(" ");
-    export const tokens = (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock): string[] =>
+    export const getTokens = (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock): string[] =>
     {
         switch(code.$code)
         {
         case "inline-block":
-            return [ "{", ...code.lines.map(i => tokens(i)).reduce((a, b) => [ ...a, ...b, ], []), "}", ];
+            return [ "{", ...code.lines.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []), "}", ];
         case "line":
-            return code.expressions.map(i => tokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
+            return code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
         case "expression":
             return [ code.expression, ];
         }
     };
     export const line = (options: Types.OutputOptions, indentDepth: number, code: CodeLine): string =>
-        buildIndent(options, indentDepth)
-        +code.expressions.map(i => tokens(i)).reduce((a, b) => [ ...a, ...b, ], []).join(" ")
-        +";"
-        +getReturnCode(options);
+    {
+        const tokens = code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
+        const indent = buildIndent(options, indentDepth);
+        const returnCode = getReturnCode(options);
+        let result = indent +tokens.join(" ") +";" +returnCode;
+        const maxLineLength = getMaxLineLength(options);
+        if (null !== maxLineLength && maxLineLength < result.length)
+        {
+            const nextIndent = buildIndent(options, indentDepth +1);
+            const separatorIndex = tokens.findIndex(i => i.endsWith(" =>"));
+            if (0 <= separatorIndex)
+            {
+                result = indent +tokens.filter((_i, ix) => ix <= separatorIndex).join(" ") +returnCode;
+                result += nextIndent +tokens.filter((_i, ix) => separatorIndex < ix).join(" ") +";" +returnCode;
+            }
+        }
+        return result;
+    };
     export const inlineBlock = (options: Types.OutputOptions, indentDepth: number, code: CodeInlineBlock): string =>
         [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)), "}", ].join(" ");
     export const block = (options: Types.OutputOptions, indentDepth: number, code: CodeBlock): string =>

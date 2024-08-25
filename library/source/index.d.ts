@@ -71,7 +71,7 @@ export declare namespace Format {
     const buildIndent: (options: Types.OutputOptions, indentDepth: number) => string;
     const getReturnCode: (_options: Types.OutputOptions) => string;
     const expressions: (code: CodeExpression[]) => string;
-    const tokens: (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock) => string[];
+    const getTokens: (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock) => string[];
     const line: (options: Types.OutputOptions, indentDepth: number, code: CodeLine) => string;
     const inlineBlock: (options: Types.OutputOptions, indentDepth: number, code: CodeInlineBlock) => string;
     const block: (options: Types.OutputOptions, indentDepth: number, code: CodeBlock) => string;

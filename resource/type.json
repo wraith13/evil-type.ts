@@ -249,6 +249,24 @@
                             }
                         }
                     }
+                },
+                "LiteralElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaElement"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "literal"
+                        },
+                        "literal": {
+                            "$ref": "Jsonable"
+                        }
+                    }
                 }
             }
         }

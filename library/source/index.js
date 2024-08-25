@@ -382,21 +382,31 @@ var Format;
     Format.expressions = function (code) {
         return code.map(function (i) { return i.expression; }).join(" ");
     };
-    Format.tokens = function (code) {
+    Format.getTokens = function (code) {
         switch (code.$code) {
             case "inline-block":
-                return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true), ["}",], false);
+                return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true), ["}",], false);
             case "line":
-                return code.expressions.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                return code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
             case "expression":
                 return [code.expression,];
         }
     };
     Format.line = function (options, indentDepth, code) {
-        return Format.buildIndent(options, indentDepth)
-            + code.expressions.map(function (i) { return Format.tokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []).join(" ")
-            + ";"
-            + Format.getReturnCode(options);
+        var tokens = code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+        var indent = Format.buildIndent(options, indentDepth);
+        var returnCode = Format.getReturnCode(options);
+        var result = indent + tokens.join(" ") + ";" + returnCode;
+        var maxLineLength = Format.getMaxLineLength(options);
+        if (null !== maxLineLength && maxLineLength < result.length) {
+            var nextIndent = Format.buildIndent(options, indentDepth + 1);
+            var separatorIndex_1 = tokens.findIndex(function (i) { return i.endsWith(" =>"); });
+            if (0 <= separatorIndex_1) {
+                result = indent + tokens.filter(function (_i, ix) { return ix <= separatorIndex_1; }).join(" ") + returnCode;
+                result += nextIndent + tokens.filter(function (_i, ix) { return separatorIndex_1 < ix; }).join(" ") + ";" + returnCode;
+            }
+        }
+        return result;
     };
     Format.inlineBlock = function (options, indentDepth, code) {
         return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.text(options, indentDepth + 1, i); }), true), ["}",], false).join(" ");
