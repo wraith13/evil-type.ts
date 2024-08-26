@@ -267,6 +267,16 @@
                             "$ref": "Jsonable"
                         }
                     }
+                },
+                "ReferElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "members": {
+                        "$ref": {
+                            "$type": "primitive-type",
+                            "type": "string"
+                        }
+                    }
                 }
             }
         }

@@ -54,6 +54,10 @@ export module Types
         $type: "literal";
         literal: Jsonable;
     }
+    export interface ReferElement
+    {
+        $ref: string;
+    }
     export const isSchema = (value: unknown): value is typeof schema =>
         "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" === value;
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
@@ -79,4 +83,6 @@ export module Types
         isAlphaDefinition(value) && "$type" in value && "interface" === value.$type && ( ! ("extends" in value) || Array.isArray(value.extends) && value.extends.every( i => isReferElement(i) ) ) && "members" in value && null !== value.members && "object" === typeof value.members && Object.values(value.members).every( i => isTypeOrInterfaceOrRefer(i) );
     export const isLiteralElement = (value: unknown): value is LiteralElement =>
         isAlphaElement(value) && "$type" in value && "literal" === value.$type && "literal" in value && isJsonable(value.literal);
+    export const isReferElement = (value: unknown): value is ReferElement =>
+        null !== value && "object" === typeof value && "$ref" in value && "string" === typeof value.$ref;
 }
