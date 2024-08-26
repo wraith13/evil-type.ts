@@ -250,6 +250,24 @@
                         }
                     }
                 },
+                "DictionaryElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaElement"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "dictionary"
+                        },
+                        "valueType": {
+                            "$ref": "TypeOrInterfaceOrRefer"
+                        }
+                    }
+                },
                 "LiteralElement": {
                     "export": true,
                     "$type": "interface",

@@ -497,7 +497,26 @@ export module Format
             if (0 <= separatorIndex)
             {
                 result = indent +tokens.filter((_i, ix) => ix <= separatorIndex).join(" ") +returnCode;
-                result += nextIndent +tokens.filter((_i, ix) => separatorIndex < ix).join(" ") +";" +returnCode;
+                let i = separatorIndex;
+                let buffer = "";
+                while(++i < tokens.length)
+                {
+                    if ("" === buffer)
+                    {
+                        buffer += nextIndent;
+                        buffer += tokens[i];
+                    }
+                    else
+                    {
+                        buffer += " " +tokens[i];
+                    }
+                    if (i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
+                    {
+                        result += buffer +returnCode;
+                        buffer = "";
+                    }
+                }
+                result += buffer +";" +returnCode;
             }
         }
         return result;

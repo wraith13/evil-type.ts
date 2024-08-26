@@ -403,7 +403,22 @@ var Format;
             var separatorIndex_1 = tokens.findIndex(function (i) { return i.endsWith(" =>"); });
             if (0 <= separatorIndex_1) {
                 result = indent + tokens.filter(function (_i, ix) { return ix <= separatorIndex_1; }).join(" ") + returnCode;
-                result += nextIndent + tokens.filter(function (_i, ix) { return separatorIndex_1 < ix; }).join(" ") + ";" + returnCode;
+                var i = separatorIndex_1;
+                var buffer = "";
+                while (++i < tokens.length) {
+                    if ("" === buffer) {
+                        buffer += nextIndent;
+                        buffer += tokens[i];
+                    }
+                    else {
+                        buffer += " " + tokens[i];
+                    }
+                    if (i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
+                        result += buffer + returnCode;
+                        buffer = "";
+                    }
+                }
+                result += buffer + ";" + returnCode;
             }
         }
         return result;
