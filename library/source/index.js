@@ -147,13 +147,27 @@ var Build;
         Define.buildInlineDefineOr = function (value) {
             return kindofJoinExpression(value.types.map(function (i) { return Define.enParenthesisIfNeed(Define.buildInlineDefine(i)); }), (0, exports.$expression)("|"));
         };
-        Define.buildDefineInlineInterface = function (value) { return (0, exports.$iblock)(Object.keys(value.members)
-            .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); })); };
+        Define.buildDefineInlineInterface = function (value) {
+            var members = value.members;
+            if (types_1.Types.isDictionaryElement(members)) {
+                return Define.buildInlineDefineDictionary(members);
+            }
+            else {
+                return (0, exports.$iblock)(Object.keys(members)
+                    .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(members[name]), true)); }));
+            }
+        };
         Define.buildDefineInterface = function (name, value) {
             var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(value), true), ["interface", name].map(function (i) { return (0, exports.$expression)(i); }), true), Build.buildExtends(value), true);
-            var lines = Object.keys(value.members)
-                .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); });
-            return (0, exports.$block)(header, lines);
+            var members = value.members;
+            if (types_1.Types.isDictionaryElement(members)) {
+                return (0, exports.$block)(header, [(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(members.valueType), true))]);
+            }
+            else {
+                var lines = Object.keys(members)
+                    .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(members[name]), true)); });
+                return (0, exports.$block)(header, lines);
+            }
         };
         Define.buildDefineModuleCore = function (members) {
             return __spreadArray(__spreadArray([], Object.entries(members)
@@ -315,6 +329,7 @@ var Build;
         };
         Validator.buildInterfaceValidator = function (name, define) {
             var list = [];
+            var members = define.members;
             if (undefined !== define.extends) {
                 define.extends.forEach(function (i, ix, _l) {
                     if (0 < ix) {
@@ -323,33 +338,45 @@ var Build;
                     list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression(name, i)));
                 });
             }
-            else {
-                list.push((0, exports.$expression)("null !== ".concat(name)));
-                list.push((0, exports.$expression)("&&"));
-                list.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
-            }
-            Object.keys(define.members).forEach(function (k) {
-                var key = text_1.Text.getPrimaryKeyName(k);
-                var value = define.members[k];
-                var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), value));
-                var current = types_1.Types.isOrElement(value) ?
-                    Define.enParenthesis(base) :
-                    base;
-                if (k === key) {
+            if (types_1.Types.isDictionaryElement(members)) {
+                if (undefined !== define.extends) {
                     list.push((0, exports.$expression)("&&"));
-                    list.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
-                    list.push((0, exports.$expression)("&&"));
-                    list.push.apply(list, current);
                 }
                 else {
-                    list.push((0, exports.$expression)("&&"));
-                    list.push((0, exports.$expression)("("));
-                    list.push((0, exports.$expression)("! (\"".concat(key, "\" in ").concat(name, ")")));
-                    list.push((0, exports.$expression)("||"));
-                    list.push.apply(list, current);
-                    list.push((0, exports.$expression)(")"));
                 }
-            });
+                list.push.apply(list, Validator.buildValidatorExpression(name, members));
+            }
+            else {
+                if (undefined !== define.extends) {
+                }
+                else {
+                    list.push((0, exports.$expression)("null !== ".concat(name)));
+                    list.push((0, exports.$expression)("&&"));
+                    list.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
+                }
+                Object.keys(members).forEach(function (k) {
+                    var key = text_1.Text.getPrimaryKeyName(k);
+                    var value = members[k];
+                    var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), value));
+                    var current = types_1.Types.isOrElement(value) ?
+                        Define.enParenthesis(base) :
+                        base;
+                    if (k === key) {
+                        list.push((0, exports.$expression)("&&"));
+                        list.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
+                        list.push((0, exports.$expression)("&&"));
+                        list.push.apply(list, current);
+                    }
+                    else {
+                        list.push((0, exports.$expression)("&&"));
+                        list.push((0, exports.$expression)("("));
+                        list.push((0, exports.$expression)("! (\"".concat(key, "\" in ").concat(name, ")")));
+                        list.push((0, exports.$expression)("||"));
+                        list.push.apply(list, current);
+                        list.push((0, exports.$expression)(")"));
+                    }
+                });
+            }
             return list;
         };
         Validator.buildInlineValidator = function (name, define) {

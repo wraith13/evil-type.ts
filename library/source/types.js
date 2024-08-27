@@ -68,7 +68,7 @@ var Types;
         export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("interface"),
         extends: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isReferElement)),
-        members: types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer),
+        members: types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer), Types.isDictionaryElement),
     })(value, listner); };
     Types.isDictionaryElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         $type: types_prime_1.TypesPrime.isJust("dictionary"),

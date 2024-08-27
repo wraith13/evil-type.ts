@@ -178,17 +178,36 @@ export module Build
             kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("&"));
         export const buildInlineDefineOr = (value: Types.OrElement) =>
             kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("|"));
-        export const buildDefineInlineInterface = (value: Types.InterfaceDefinition) => $iblock
-        (
-            Object.keys(value.members)
-                .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]))
-        );
+        export const buildDefineInlineInterface = (value: Types.InterfaceDefinition) =>
+        {
+            const members = value.members;
+            if (Types.isDictionaryElement(members))
+            {
+                return buildInlineDefineDictionary(members);
+            }
+            else
+            {
+                return $iblock
+                (
+                    Object.keys(members)
+                        .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(members[name])]))
+                );
+            }
+        };
         export const buildDefineInterface = (name: string, value: Types.InterfaceDefinition): CodeBlock =>
         {
             const header = [ ...buildExport(value), ...["interface", name].map(i => $expression(i)), ...buildExtends(value), ];
-            const lines = Object.keys(value.members)
-                .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(value.members[name]), ]));
-            return $block(header, lines);
+            const members = value.members;
+            if (Types.isDictionaryElement(members))
+            {
+                return $block(header, [ $line([ $expression("[key: string]:"), ...buildInlineDefine(members.valueType), ]) ]);
+            }
+            else
+            {
+                const lines = Object.keys(members)
+                    .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(members[name]), ]));
+                return $block(header, lines);
+            }
         };
         export const buildDefineModuleCore = (members: { [key: string]: Types.Definition; }): CodeEntry[] =>
         [
@@ -314,7 +333,7 @@ export module Build
             [ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define)), ];
         export const buildValidatorName = (name: string) =>
             [ ...Text.getNameSpace(name).split("."), `is${Text.toUpperCamelCase(Text.getNameBody(name))}`, ].filter(i => "" !== i).join(".");
-        export const buildValidatorExpression = (name: string, define: Types.TypeOrValueOfRefer): CodeInlineEntry[] =>
+        export const buildValidatorExpression = (name: string, define: Types.TypeOrValueOfRefer): CodeExpression[] =>
         {
             if (Types.isReferElement(define))
             {
@@ -392,6 +411,7 @@ export module Build
         export const buildInterfaceValidator = (name: string, define: Types.InterfaceDefinition): CodeExpression[] =>
         {
             const list: CodeExpression[] = [];
+            const members = define.members;
             if (undefined !== define.extends)
             {
                 define.extends.forEach
@@ -406,40 +426,57 @@ export module Build
                     }
                 )
             }
+            if (Types.isDictionaryElement(members))
+            {
+                if (undefined !== define.extends)
+                {
+                    list.push($expression("&&"));
+                }
+                else
+                {
+                }
+                list.push(...buildValidatorExpression(name, members));
+            }
             else
             {
-                list.push($expression(`null !== ${name}`));
-                list.push($expression("&&"));
-                list.push($expression(`"object" === typeof ${name}`));
-            }
-            Object.keys(define.members).forEach
-            (
-                k =>
+                if (undefined !== define.extends)
                 {
-                    const key = Text.getPrimaryKeyName(k);
-                    const value = define.members[k];
-                    const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, value));
-                    const current = Types.isOrElement(value) ?
-                        Define.enParenthesis(base):
-                        base;
-                    if (k === key)
-                    {
-                        list.push($expression("&&"));
-                        list.push($expression(`"${key}" in ${name}`));
-                        list.push($expression("&&"));
-                        list.push(...current);
-                    }
-                    else
-                    {
-                        list.push($expression("&&"));
-                        list.push($expression("("));
-                        list.push($expression(`! ("${key}" in ${name})`));
-                        list.push($expression("||"));
-                        list.push(...current);
-                        list.push($expression(")"));
-                    }
                 }
-            );
+                else
+                {
+                    list.push($expression(`null !== ${name}`));
+                    list.push($expression("&&"));
+                    list.push($expression(`"object" === typeof ${name}`));
+                }
+                Object.keys(members).forEach
+                (
+                    k =>
+                    {
+                        const key = Text.getPrimaryKeyName(k);
+                        const value = members[k];
+                        const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, value));
+                        const current = Types.isOrElement(value) ?
+                            Define.enParenthesis(base):
+                            base;
+                        if (k === key)
+                        {
+                            list.push($expression("&&"));
+                            list.push($expression(`"${key}" in ${name}`));
+                            list.push($expression("&&"));
+                            list.push(...current);
+                        }
+                        else
+                        {
+                            list.push($expression("&&"));
+                            list.push($expression("("));
+                            list.push($expression(`! ("${key}" in ${name})`));
+                            list.push($expression("||"));
+                            list.push(...current);
+                            list.push($expression(")"));
+                        }
+                    }
+                );
+            }
             return list;
         };
         export const buildInlineValidator = (name: string, define: Types.TypeOrValue) =>

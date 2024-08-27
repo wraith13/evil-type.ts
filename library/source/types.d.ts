@@ -86,7 +86,7 @@ export declare namespace Types {
         extends?: ReferElement[];
         members: {
             [key: string]: TypeOrInterfaceOrRefer;
-        };
+        } | DictionaryElement;
     }
     const isInterfaceDefinition: (value: unknown, listner?: TypesError.Listener) => value is InterfaceDefinition;
     interface DictionaryElement extends AlphaElement {

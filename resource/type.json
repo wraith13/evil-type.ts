@@ -110,6 +110,69 @@
                         ]
                     }
                 },
+                "JsonableValue": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "or",
+                        "types": [
+                            {
+                                "$type": "primitive-type",
+                                "type": "null"
+                            },
+                            {
+                                "$type": "primitive-type",
+                                "type": "boolean"
+                            },
+                            {
+                                "$type": "primitive-type",
+                                "type": "number"
+                            },
+                            {
+                                "$type": "primitive-type",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "JsonableArray": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "array",
+                        "items": {
+                            "$ref": "Jsonable"
+                        }
+                    }
+                },
+                "JsonableObject": {
+                    "export": true,
+                    "$type": "interface",
+                    "members": {
+                        "$type": "dictionary",
+                        "valueType": {
+                            "$ref": "Jsonable"
+                        }
+                    }
+                },
+                "Jsonable": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "or",
+                        "types": [
+                            {
+                                "$ref": "JsonableValue"
+                            },
+                            {
+                                "$ref": "JsonableArray"
+                            },
+                            {
+                                "$ref": "JsonableObject"
+                            }
+                        ]
+                    }
+                },
                 "AlphaElement": {
                     "export": true,
                     "$type": "interface",

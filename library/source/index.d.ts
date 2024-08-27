@@ -59,9 +59,9 @@ export declare namespace Build {
         const buildInlineLiteralValidator: (define: Types.LiteralElement) => CodeExpression;
         const buildValidatorLine: (declarator: string, name: string, define: Types.Type) => CodeExpression[];
         const buildValidatorName: (name: string) => string;
-        const buildValidatorExpression: (name: string, define: Types.TypeOrValueOfRefer) => CodeInlineEntry[];
+        const buildValidatorExpression: (name: string, define: Types.TypeOrValueOfRefer) => CodeExpression[];
         const buildInterfaceValidator: (name: string, define: Types.InterfaceDefinition) => CodeExpression[];
-        const buildInlineValidator: (name: string, define: Types.TypeOrValue) => CodeInlineEntry[];
+        const buildInlineValidator: (name: string, define: Types.TypeOrValue) => CodeExpression[];
         const isValidatorTarget: (define: Types.TypeOrValue) => boolean;
         const buildValidator: (name: string, define: Types.TypeOrValue) => CodeLine;
     }

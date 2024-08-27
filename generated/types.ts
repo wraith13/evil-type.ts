@@ -18,6 +18,13 @@ export module Types
     export const indentStyleTypeMember = ["allman","egyptian"] as const;
     export type IndentStyleType = typeof indentStyleTypeMember[number];
     export type ValidatorOptionType = "none" | "simple" | "full";
+    export type JsonableValue = null | boolean | number | string;
+    export type JsonableArray = Jsonable [];
+    export interface JsonableObject
+    {
+        [key: string]: Jsonable;
+    }
+    export type Jsonable = JsonableValue | JsonableArray | JsonableObject;
     export interface AlphaElement
     {
         $type: string;
@@ -75,6 +82,12 @@ export module Types
         "number" === typeof value.maxLineLength ) );
     export const isIndentStyleType = (value: unknown): value is IndentStyleType => indentStyleTypeMember.includes(value as any);
     export const isValidatorOptionType = (value: unknown): value is ValidatorOptionType => ["none","simple","full"].includes(value as any);
+    export const isJsonableValue = (value: unknown): value is JsonableValue =>
+        "null" === value || "boolean" === typeof value || "number" === typeof value || "string" === typeof value;
+    export const isJsonableArray = (value: unknown): value is JsonableArray => Array.isArray(value) && value.every( i => isJsonable(i) );
+    export const isJsonableObject = (value: unknown): value is JsonableObject =>
+        null !== value && "object" === typeof value && Object.values(value).every( i => isJsonable(i) );
+    export const isJsonable = (value: unknown): value is Jsonable => isJsonableValue(value) || isJsonableArray(value) || isJsonableObject(value);
     export const isAlphaElement = (value: unknown): value is AlphaElement =>
         null !== value && "object" === typeof value && "$type" in value && "string" === typeof value.$type;
     export const isAlphaDefinition = (value: unknown): value is AlphaDefinition =>
