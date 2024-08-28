@@ -8,7 +8,7 @@ export declare namespace TypesError {
     interface Listener {
         path: string;
         matchRate: {
-            [path: string]: number;
+            [path: string]: boolean | number;
         };
         errors: Error[];
     }
@@ -17,8 +17,8 @@ export declare namespace TypesError {
     const makePath: (path: string, name: string | number) => string;
     const getPathDepth: (path: string) => number;
     const getType: (isType: (v: unknown, listner?: TypesError.Listener) => boolean) => string[];
-    const setMatchRate: (listner: Listener | undefined, matchRate: number) => boolean;
-    const getMatchRate: (listner: Listener, path?: string) => number;
+    const setMatchRate: (listner: Listener | undefined, matchRate: boolean | number) => boolean;
+    const getMatchRate: (listner: Listener, path?: string) => number | boolean;
     const calculateMatchRate: (listner: Listener, path?: string) => number;
     const setMatch: (listner: Listener | undefined) => void;
     const raiseError: (listner: Listener, requiredType: string | (() => string), actualValue: unknown) => boolean;

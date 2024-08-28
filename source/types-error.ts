@@ -10,7 +10,7 @@ export module TypesError
     export interface Listener
     {
         path: string;
-        matchRate: { [path: string]: number; };
+        matchRate: { [path: string]: boolean | number; };
         errors: Error[];
     }
     export const makeListener = (path: string = ""): Listener =>
@@ -42,13 +42,13 @@ export module TypesError
             .reduce((a, b) => [...a, ...b], [])
             .filter((i, ix, list) => ix === list.indexOf(i));
     };
-    export const setMatchRate = (listner: Listener | undefined, matchRate: number) =>
+    export const setMatchRate = (listner: Listener | undefined, matchRate: boolean | number) =>
     {
         if (listner)
         {
             listner.matchRate[listner.path] = matchRate;
         }
-        return 1.0 <= matchRate;
+        return true === matchRate;
     };
     export const getMatchRate = (listner: Listener, path: string = listner.path) =>
     {
@@ -63,7 +63,7 @@ export module TypesError
         const depth = getPathDepth(path);
         const childrenKeys = Object.keys(listner.matchRate).filter(i => 0 === i.indexOf(path) && getPathDepth(i) === depth +1);
         const length = childrenKeys.length;
-        const sum = childrenKeys.map(i => listner.matchRate[i]).reduce((a, b) => a +b, 0.0);
+        const sum = childrenKeys.map(i => listner.matchRate[i]).map(i => "boolean" === typeof i ? (i ? 1: 0): i).reduce((a, b) => a +b, 0.0);
         const result = 0 < length ? sum /length: 1.0;
         if (1.0 <= result)
         {
@@ -77,16 +77,16 @@ export module TypesError
         {
             const paths = Object.keys(listner.matchRate)
                 .filter(path => 0 === path.indexOf(listner.path));
-            if (paths.every(path => 1.0 <= listner.matchRate[path]))
+            if (paths.every(path => true === listner.matchRate[path]))
             {
                 paths.forEach(path => delete listner.matchRate[path]);
             }
         }
-        setMatchRate(listner, 1.0);
+        setMatchRate(listner, true);
     };
     export const raiseError = (listner: Listener, requiredType: string | (() => string), actualValue: unknown) =>
     {
-        setMatchRate(listner, 0.0);
+        setMatchRate(listner, false);
         listner.errors.push
         ({
             type: "solid",

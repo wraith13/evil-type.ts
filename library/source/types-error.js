@@ -49,7 +49,7 @@ var TypesError;
         if (listner) {
             listner.matchRate[listner.path] = matchRate;
         }
-        return 1.0 <= matchRate;
+        return true === matchRate;
     };
     TypesError.getMatchRate = function (listner, path) {
         if (path === void 0) { path = listner.path; }
@@ -63,7 +63,7 @@ var TypesError;
         var depth = TypesError.getPathDepth(path);
         var childrenKeys = Object.keys(listner.matchRate).filter(function (i) { return 0 === i.indexOf(path) && TypesError.getPathDepth(i) === depth + 1; });
         var length = childrenKeys.length;
-        var sum = childrenKeys.map(function (i) { return listner.matchRate[i]; }).reduce(function (a, b) { return a + b; }, 0.0);
+        var sum = childrenKeys.map(function (i) { return listner.matchRate[i]; }).map(function (i) { return "boolean" === typeof i ? (i ? 1 : 0) : i; }).reduce(function (a, b) { return a + b; }, 0.0);
         var result = 0 < length ? sum / length : 1.0;
         if (1.0 <= result) {
             console.error("🦋 FIXME: \"MatchWithErrors\": " + JSON.stringify({ sum: sum, length: length, result: result, listner: listner }));
@@ -74,14 +74,14 @@ var TypesError;
         if (listner) {
             var paths = Object.keys(listner.matchRate)
                 .filter(function (path) { return 0 === path.indexOf(listner.path); });
-            if (paths.every(function (path) { return 1.0 <= listner.matchRate[path]; })) {
+            if (paths.every(function (path) { return true === listner.matchRate[path]; })) {
                 paths.forEach(function (path) { return delete listner.matchRate[path]; });
             }
         }
-        TypesError.setMatchRate(listner, 1.0);
+        TypesError.setMatchRate(listner, true);
     };
     TypesError.raiseError = function (listner, requiredType, actualValue) {
-        TypesError.setMatchRate(listner, 0.0);
+        TypesError.setMatchRate(listner, false);
         listner.errors.push({
             type: "solid",
             path: listner.path,
