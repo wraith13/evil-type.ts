@@ -71,7 +71,19 @@ export module TypesError
         }
         return listner.matchRate[path] = result;
     };
-    export const setMatch = (listner: Listener | undefined) => setMatchRate(listner, 1.0);
+    export const setMatch = (listner: Listener | undefined) =>
+    {
+        if (listner)
+        {
+            const paths = Object.keys(listner.matchRate)
+                .filter(path => 0 === path.indexOf(listner.path));
+            if (paths.every(path => 1.0 <= listner.matchRate[path]))
+            {
+                paths.forEach(path => delete listner.matchRate[path]);
+            }
+        }
+        setMatchRate(listner, 1.0);
+    };
     export const raiseError = (listner: Listener, requiredType: string | (() => string), actualValue: unknown) =>
     {
         setMatchRate(listner, 0.0);

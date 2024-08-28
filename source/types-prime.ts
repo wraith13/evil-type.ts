@@ -99,7 +99,7 @@ export module TypesPrime
                 if (result)
                 {
                     TypesError.setMatch(listner);
-                    Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
+                    //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                 }
                 else
                 {

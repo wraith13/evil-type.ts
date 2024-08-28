@@ -70,7 +70,16 @@ var TypesError;
         }
         return listner.matchRate[path] = result;
     };
-    TypesError.setMatch = function (listner) { return TypesError.setMatchRate(listner, 1.0); };
+    TypesError.setMatch = function (listner) {
+        if (listner) {
+            var paths = Object.keys(listner.matchRate)
+                .filter(function (path) { return 0 === path.indexOf(listner.path); });
+            if (paths.every(function (path) { return 1.0 <= listner.matchRate[path]; })) {
+                paths.forEach(function (path) { return delete listner.matchRate[path]; });
+            }
+        }
+        TypesError.setMatchRate(listner, 1.0);
+    };
     TypesError.raiseError = function (listner, requiredType, actualValue) {
         TypesError.setMatchRate(listner, 0.0);
         listner.errors.push({

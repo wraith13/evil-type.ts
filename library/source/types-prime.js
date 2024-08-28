@@ -103,7 +103,7 @@ var TypesPrime;
                 var result = Boolean(success);
                 if (result) {
                     types_error_1.TypesError.setMatch(listner);
-                    Object.entries(success.transactionListner.matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
+                    //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                 }
                 else {
                     var requiredType = TypesPrime.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);

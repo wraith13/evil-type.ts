@@ -20,7 +20,7 @@ export declare namespace TypesError {
     const setMatchRate: (listner: Listener | undefined, matchRate: number) => boolean;
     const getMatchRate: (listner: Listener, path?: string) => number;
     const calculateMatchRate: (listner: Listener, path?: string) => number;
-    const setMatch: (listner: Listener | undefined) => boolean;
+    const setMatch: (listner: Listener | undefined) => void;
     const raiseError: (listner: Listener, requiredType: string | (() => string), actualValue: unknown) => boolean;
     const aggregateErros: (listner: Listener, modulus: number, errors: Error[], fullErrors: Error[]) => void;
     const valueToString: (value: unknown) => string;
