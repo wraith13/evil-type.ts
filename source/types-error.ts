@@ -10,7 +10,7 @@ export module TypesError
     export interface Listener
     {
         path: string;
-        matchRate: { [path: string]: boolean | number; };
+        matchRate: { [path: string]: boolean | number; }; // true: matched, false: error, number: rate
         errors: Error[];
     }
     export const makeListener = (path: string = ""): Listener =>
@@ -42,13 +42,26 @@ export module TypesError
             .reduce((a, b) => [...a, ...b], [])
             .filter((i, ix, list) => ix === list.indexOf(i));
     };
+    export const isMtached = (matchRate: boolean | number) => true === matchRate;
+    export const matchRateToNumber = (matchRate: boolean | number): number =>
+    {
+        switch(matchRate)
+        {
+        case false:
+            return 0;
+        case true:
+            return 1;
+        default:
+            return matchRate;
+        }
+    }
     export const setMatchRate = (listner: Listener | undefined, matchRate: boolean | number) =>
     {
         if (listner)
         {
             listner.matchRate[listner.path] = matchRate;
         }
-        return true === matchRate;
+        return isMtached(matchRate);
     };
     export const getMatchRate = (listner: Listener, path: string = listner.path) =>
     {
@@ -66,7 +79,7 @@ export module TypesError
         const length = childrenKeys.length;
         const sum = childrenKeys
             .map(i => listner.matchRate[i])
-            .map(i => "boolean" === typeof i ? (i ? 1: 0): i)
+            .map(i => matchRateToNumber(i))
             .reduce((a, b) => a +b, 0.0);
         const result = 0 < length ? sum /length: true;
         if (true === result || 1.0 <= result)
@@ -81,7 +94,7 @@ export module TypesError
         {
             const paths = Object.keys(listner.matchRate)
                 .filter(path => 0 === path.indexOf(listner.path));
-            if (paths.every(path => true === listner.matchRate[path]))
+            if (paths.every(path => isMtached(listner.matchRate[path])))
             {
                 paths.forEach(path => delete listner.matchRate[path]);
             }

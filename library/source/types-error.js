@@ -45,11 +45,22 @@ var TypesError;
             .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
             .filter(function (i, ix, list) { return ix === list.indexOf(i); });
     };
+    TypesError.isMtached = function (matchRate) { return true === matchRate; };
+    TypesError.matchRateToNumber = function (matchRate) {
+        switch (matchRate) {
+            case false:
+                return 0;
+            case true:
+                return 1;
+            default:
+                return matchRate;
+        }
+    };
     TypesError.setMatchRate = function (listner, matchRate) {
         if (listner) {
             listner.matchRate[listner.path] = matchRate;
         }
-        return true === matchRate;
+        return TypesError.isMtached(matchRate);
     };
     TypesError.getMatchRate = function (listner, path) {
         if (path === void 0) { path = listner.path; }
@@ -66,7 +77,7 @@ var TypesError;
         var length = childrenKeys.length;
         var sum = childrenKeys
             .map(function (i) { return listner.matchRate[i]; })
-            .map(function (i) { return "boolean" === typeof i ? (i ? 1 : 0) : i; })
+            .map(function (i) { return TypesError.matchRateToNumber(i); })
             .reduce(function (a, b) { return a + b; }, 0.0);
         var result = 0 < length ? sum / length : true;
         if (true === result || 1.0 <= result) {
@@ -78,7 +89,7 @@ var TypesError;
         if (listner) {
             var paths = Object.keys(listner.matchRate)
                 .filter(function (path) { return 0 === path.indexOf(listner.path); });
-            if (paths.every(function (path) { return true === listner.matchRate[path]; })) {
+            if (paths.every(function (path) { return TypesError.isMtached(listner.matchRate[path]); })) {
                 paths.forEach(function (path) { return delete listner.matchRate[path]; });
             }
         }

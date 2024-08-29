@@ -187,7 +187,9 @@
                     "export": true,
                     "$type": "interface",
                     "extends": [
-                        { "$ref": "AlphaElement" }
+                        {
+                            "$ref": "AlphaElement"
+                        }
                     ],
                     "members": {
                         "export?": {
@@ -356,6 +358,48 @@
                         "$ref": {
                             "$type": "primitive-type",
                             "type": "string"
+                        }
+                    }
+                },
+                "PrimitiveTypeEnumMembers": {
+                    "export": true,
+                    "$type": "value",
+                    "value": {
+                        "$type": "literal",
+                        "literal": [
+                            "null",
+                            "boolean",
+                            "number",
+                            "string"
+                        ]
+                    },
+                    "validator": false
+                },
+                "PrimitiveTypeEnum": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "itemof",
+                        "value": {
+                            "$ref": "PrimitiveTypeEnumMembers"
+                        }
+                    }
+                },
+                "PrimitiveTypeElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaElement"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "primitive-type"
+                        },
+                        "literal": {
+                            "$ref": "PrimitiveTypeEnum"
                         }
                     }
                 },
