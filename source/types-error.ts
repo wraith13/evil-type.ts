@@ -61,11 +61,15 @@ export module TypesError
     export const calculateMatchRate = (listner: Listener, path: string = listner.path) =>
     {
         const depth = getPathDepth(path);
-        const childrenKeys = Object.keys(listner.matchRate).filter(i => 0 === i.indexOf(path) && getPathDepth(i) === depth +1);
+        const childrenKeys = Object.keys(listner.matchRate)
+            .filter(i => 0 === i.indexOf(path) && getPathDepth(i) === depth +1);
         const length = childrenKeys.length;
-        const sum = childrenKeys.map(i => listner.matchRate[i]).map(i => "boolean" === typeof i ? (i ? 1: 0): i).reduce((a, b) => a +b, 0.0);
-        const result = 0 < length ? sum /length: 1.0;
-        if (1.0 <= result)
+        const sum = childrenKeys
+            .map(i => listner.matchRate[i])
+            .map(i => "boolean" === typeof i ? (i ? 1: 0): i)
+            .reduce((a, b) => a +b, 0.0);
+        const result = 0 < length ? sum /length: true;
+        if (true === result || 1.0 <= result)
         {
             console.error("🦋 FIXME: \"MatchWithErrors\": " +JSON.stringify({ sum, length, result, listner}));
         }

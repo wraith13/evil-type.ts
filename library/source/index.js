@@ -494,6 +494,7 @@ try {
         var result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile) {
             fs_1.default.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
+            console.log(errorListner);
         }
         else {
             console.log(result);

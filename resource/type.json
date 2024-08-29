@@ -358,6 +358,48 @@
                             "type": "string"
                         }
                     }
+                },
+                "Type": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "or",
+                        "types": [
+                            {
+                                "$ref": "PrimitiveTypeElement"
+                            },
+                            {
+                                "$ref": "TypeDefinition"
+                            },
+                            {
+                                "$ref": "EnumTypeElement"
+                            },
+                            {
+                                "$ref": "TypeofElement"
+                            },
+                            {
+                                "$ref": "ItemofElement"
+                            },
+                            {
+                                "$ref": "InterfaceDefinition"
+                            },
+                            {
+                                "$ref": "DictionaryElement"
+                            },
+                            {
+                                "$ref": "ArrayElement"
+                            },
+                            {
+                                "$ref": "OrElement"
+                            },
+                            {
+                                "$ref": "AndElement"
+                            },
+                            {
+                                "$ref": "LiteralElement"
+                            }
+                        ]
+                    }
                 }
             }
         }

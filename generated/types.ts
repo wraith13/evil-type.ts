@@ -70,6 +70,7 @@ export module Types
     {
         $ref: string;
     }
+    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
     export const isSchema = (value: unknown): value is typeof schema =>
         "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" === value;
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
@@ -112,4 +113,8 @@ export module Types
         isAlphaElement(value) && "$type" in value && "literal" === value.$type && "literal" in value && isJsonable(value.literal);
     export const isReferElement = (value: unknown): value is ReferElement =>
         null !== value && "object" === typeof value && "$ref" in value && "string" === typeof value.$ref;
+    export const isType = (value: unknown): value is Type =>
+        isPrimitiveTypeElement(value) || isTypeDefinition(value) || isEnumTypeElement(value) || isTypeofElement(value) || isItemofElement(value) ||
+        isInterfaceDefinition(value) || isDictionaryElement(value) || isArrayElement(value) || isOrElement(value) || isAndElement(value) ||
+        isLiteralElement(value);
 }

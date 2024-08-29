@@ -609,6 +609,7 @@ try
         if (typeSource.options.outputFile)
         {
             fs.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
+            console.log(errorListner);
         }
         else
         {
