@@ -531,30 +531,42 @@ export module Format
         {
             const nextIndent = buildIndent(options, indentDepth +1);
             const separatorIndex = tokens.findIndex(i => i.endsWith(" =>"));
+            let i = 0;
             if (0 <= separatorIndex)
             {
+                i = separatorIndex;
                 result = indent +tokens.filter((_i, ix) => ix <= separatorIndex).join(" ") +returnCode;
-                let i = separatorIndex;
-                let buffer = "";
-                while(++i < tokens.length)
+            }
+            else
+            {
+                result = "";
+            }
+            let buffer = "";
+            while(++i < tokens.length)
+            {
+                if ("" === buffer)
                 {
-                    if ("" === buffer)
+                    if ("" === result)
                     {
-                        buffer += nextIndent;
-                        buffer += tokens[i];
+                        buffer += indent;
                     }
                     else
                     {
-                        buffer += " " +tokens[i];
+                        buffer += nextIndent;
                     }
-                    if (i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
-                    {
-                        result += buffer +returnCode;
-                        buffer = "";
-                    }
+                    buffer += tokens[i];
                 }
-                result += buffer +";" +returnCode;
+                else
+                {
+                    buffer += " " +tokens[i];
+                }
+                if (i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
+                {
+                    result += buffer +returnCode;
+                    buffer = "";
+                }
             }
+            result += buffer +";" +returnCode;
         }
         return result;
     };

@@ -428,25 +428,34 @@ var Format;
         if (null !== maxLineLength && maxLineLength < result.length) {
             var nextIndent = Format.buildIndent(options, indentDepth + 1);
             var separatorIndex_1 = tokens.findIndex(function (i) { return i.endsWith(" =>"); });
+            var i = 0;
             if (0 <= separatorIndex_1) {
+                i = separatorIndex_1;
                 result = indent + tokens.filter(function (_i, ix) { return ix <= separatorIndex_1; }).join(" ") + returnCode;
-                var i = separatorIndex_1;
-                var buffer = "";
-                while (++i < tokens.length) {
-                    if ("" === buffer) {
-                        buffer += nextIndent;
-                        buffer += tokens[i];
+            }
+            else {
+                result = "";
+            }
+            var buffer = "";
+            while (++i < tokens.length) {
+                if ("" === buffer) {
+                    if ("" === result) {
+                        buffer += indent;
                     }
                     else {
-                        buffer += " " + tokens[i];
+                        buffer += nextIndent;
                     }
-                    if (i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
-                        result += buffer + returnCode;
-                        buffer = "";
-                    }
+                    buffer += tokens[i];
                 }
-                result += buffer + ";" + returnCode;
+                else {
+                    buffer += " " + tokens[i];
+                }
+                if (i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
+                    result += buffer + returnCode;
+                    buffer = "";
+                }
             }
+            result += buffer + ";" + returnCode;
         }
         return result;
     };

@@ -77,22 +77,29 @@ export module Types
         $type: "primitive-type";
         literal: PrimitiveTypeEnum;
     }
-    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
+    type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition |
+        DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
     export interface EnumTypeElement
     {
         $type: "enum-type";
         members: ( null | boolean | number | string ) [];
     }
+    export interface TypeofElement
+    {
+        $type: "typeof";
+        value: ReferElement;
+    }
     export const isSchema = (value: unknown): value is typeof schema =>
         "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" === value;
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
-        null !== value && "object" === typeof value && "$ref" in value && isSchema(value.$ref) && "defines" in value && null !== value.defines &&
-        "object" === typeof value.defines && Object.values(value.defines).every( i => isDefinition(i) ) && "options" in value && isOutputOptions(value.options);
+        null !== value && "object" === typeof value && "$ref" in value && isSchema(value.$ref) && "defines" in value &&
+        null !== value.defines && "object" === typeof value.defines && Object.values(value.defines).every( i => isDefinition(i) ) &&
+        "options" in value && isOutputOptions(value.options);
     export const isOutputOptions = (value: unknown): value is OutputOptions =>
-        null !== value && "object" === typeof value && ( ! ("outputFile" in value) || "string" === typeof value.outputFile ) && "indentUnit" in value && (
-        "number" === typeof value.indentUnit || "\t" === value.indentUnit ) && "indentStyle" in value && isIndentStyleType(value.indentStyle) &&
-        "validatorOption" in value && isValidatorOptionType(value.validatorOption) && ( ! ("maxLineLength" in value) || ( "null" === value.maxLineLength ||
-        "number" === typeof value.maxLineLength ) );
+        null !== value && "object" === typeof value && ( ! ("outputFile" in value) || "string" === typeof value.outputFile ) &&
+        "indentUnit" in value && ( "number" === typeof value.indentUnit || "\t" === value.indentUnit ) && "indentStyle" in value &&
+        isIndentStyleType(value.indentStyle) && "validatorOption" in value && isValidatorOptionType(value.validatorOption) && (
+        ! ("maxLineLength" in value) || ( "null" === value.maxLineLength || "number" === typeof value.maxLineLength ) );
     export const isIndentStyleType = (value: unknown): value is IndentStyleType => indentStyleTypeMember.includes(value as any);
     export const isValidatorOptionType = (value: unknown): value is ValidatorOptionType => ["none","simple","full"].includes(value as any);
     export const isJsonableValue = (value: unknown): value is JsonableValue =>
@@ -100,7 +107,8 @@ export module Types
     export const isJsonableArray = (value: unknown): value is JsonableArray => Array.isArray(value) && value.every( i => isJsonable(i) );
     export const isJsonableObject = (value: unknown): value is JsonableObject =>
         null !== value && "object" === typeof value && Object.values(value).every( i => isJsonable(i) );
-    export const isJsonable = (value: unknown): value is Jsonable => isJsonableValue(value) || isJsonableArray(value) || isJsonableObject(value);
+    export const isJsonable = (value: unknown): value is Jsonable =>
+        isJsonableValue(value) || isJsonableArray(value) || isJsonableObject(value);
     export const isAlphaElement = (value: unknown): value is AlphaElement =>
         null !== value && "object" === typeof value && "$type" in value && "string" === typeof value.$type;
     export const isAlphaDefinition = (value: unknown): value is AlphaDefinition =>
@@ -114,25 +122,32 @@ export module Types
         isAlphaDefinition(value) && "$type" in value && "value" === value.$type && "value" in value && ( isLiteralElement(value.value) ||
         isReferElement(value.value) ) && ( ! ("validator" in value) || "boolean" === typeof value.validator );
     export const isTypeDefinition = (value: unknown): value is TypeDefinition =>
-        isAlphaDefinition(value) && "$type" in value && "type" === value.$type && "define" in value && isTypeOrInterfaceOrRefer(value.define);
+        isAlphaDefinition(value) && "$type" in value && "type" === value.$type && "define" in value &&
+        isTypeOrInterfaceOrRefer(value.define);
     export const isInterfaceDefinition = (value: unknown): value is InterfaceDefinition =>
-        isAlphaDefinition(value) && "$type" in value && "interface" === value.$type && ( ! ("extends" in value) || Array.isArray(value.extends) &&
-        value.extends.every( i => isReferElement(i) ) ) && "members" in value && null !== value.members && "object" === typeof value.members &&
-        Object.values(value.members).every( i => isTypeOrInterfaceOrRefer(i) );
+        isAlphaDefinition(value) && "$type" in value && "interface" === value.$type && ( ! ("extends" in value) ||
+        Array.isArray(value.extends) && value.extends.every( i => isReferElement(i) ) ) && "members" in value && null !== value.members &&
+        "object" === typeof value.members && Object.values(value.members).every( i => isTypeOrInterfaceOrRefer(i) );
     export const isDictionaryElement = (value: unknown): value is DictionaryElement =>
-        isAlphaElement(value) && "$type" in value && "dictionary" === value.$type && "valueType" in value && isTypeOrInterfaceOrRefer(value.valueType);
+        isAlphaElement(value) && "$type" in value && "dictionary" === value.$type && "valueType" in value &&
+        isTypeOrInterfaceOrRefer(value.valueType);
     export const isLiteralElement = (value: unknown): value is LiteralElement =>
         isAlphaElement(value) && "$type" in value && "literal" === value.$type && "literal" in value && isJsonable(value.literal);
     export const isReferElement = (value: unknown): value is ReferElement =>
         null !== value && "object" === typeof value && "$ref" in value && "string" === typeof value.$ref;
     export const isPrimitiveTypeEnum = (value: unknown): value is PrimitiveTypeEnum => PrimitiveTypeEnumMembers.includes(value as any);
     export const isPrimitiveTypeElement = (value: unknown): value is PrimitiveTypeElement =>
-        isAlphaElement(value) && "$type" in value && "primitive-type" === value.$type && "literal" in value && isPrimitiveTypeEnum(value.literal);
+        isAlphaElement(value) && "$type" in value && "primitive-type" === value.$type && "literal" in value &&
+        isPrimitiveTypeEnum(value.literal);
     export const isType = (value: unknown): value is Type =>
-        isPrimitiveTypeElement(value) || isTypeDefinition(value) || isEnumTypeElement(value) || isTypeofElement(value) || isItemofElement(value) ||
-        isInterfaceDefinition(value) || isDictionaryElement(value) || isArrayElement(value) || isOrElement(value) || isAndElement(value) ||
-        isLiteralElement(value);
+        isPrimitiveTypeElement(value) || isTypeDefinition(value) || isEnumTypeElement(value) || isTypeofElement(value) ||
+        isItemofElement(value) || isInterfaceDefinition(value) || isDictionaryElement(value) || isArrayElement(value) || isOrElement(value)
+        || isAndElement(value) || isLiteralElement(value);
     export const isEnumTypeElement = (value: unknown): value is EnumTypeElement =>
-        null !== value && "object" === typeof value && "$type" in value && "enum-type" === value.$type && "members" in value && Array.isArray(value.members) &&
-        value.members.every( i => "null" === i || "boolean" === typeof i || "number" === typeof i || "string" === typeof i );
+        null !== value && "object" === typeof value && "$type" in value && "enum-type" === value.$type && "members" in value &&
+        Array.isArray(value.members) && value.members.every( i => "null" === i || "boolean" === typeof i || "number" === typeof i ||
+        "string" === typeof i );
+    export const isTypeofElement = (value: unknown): value is TypeofElement =>
+        null !== value && "object" === typeof value && "$type" in value && "typeof" === value.$type && "value" in value &&
+        isReferElement(value.value);
 }
