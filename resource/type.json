@@ -444,6 +444,40 @@
                             }
                         ]
                     }
+                },
+                "EnumTypeElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "enum-type"
+                        },
+                        "members": {
+                            "$type": "array",
+                            "items": {
+                                "$type": "or",
+                                "types": [
+                                    {
+                                        "$type": "primitive-type",
+                                        "type": "null"
+                                    },
+                                    {
+                                        "$type": "primitive-type",
+                                        "type": "boolean"
+                                    },
+                                    {
+                                        "$type": "primitive-type",
+                                        "type": "number"
+                                    },
+                                    {
+                                        "$type": "primitive-type",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        }
+                    }
                 }
             }
         }

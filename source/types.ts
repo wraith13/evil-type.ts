@@ -143,7 +143,7 @@ export module Types
     export interface EnumTypeElement extends AlphaElement
     {
         $type: "enum-type";
-        members: (number | string)[];
+        members: (null | boolean | number | string)[];
     }
     export const isEnumTypeElement = (value: unknown, listner?: TypesError.Listener): value is EnumTypeElement => TypesPrime.isSpecificObject<EnumTypeElement>
     ({

@@ -78,6 +78,11 @@ export module Types
         literal: PrimitiveTypeEnum;
     }
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
+    export interface EnumTypeElement
+    {
+        $type: "enum-type";
+        members: ( null | boolean | number | string ) [];
+    }
     export const isSchema = (value: unknown): value is typeof schema =>
         "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" === value;
     export const isTypeSchema = (value: unknown): value is TypeSchema =>
@@ -127,4 +132,7 @@ export module Types
         isPrimitiveTypeElement(value) || isTypeDefinition(value) || isEnumTypeElement(value) || isTypeofElement(value) || isItemofElement(value) ||
         isInterfaceDefinition(value) || isDictionaryElement(value) || isArrayElement(value) || isOrElement(value) || isAndElement(value) ||
         isLiteralElement(value);
+    export const isEnumTypeElement = (value: unknown): value is EnumTypeElement =>
+        null !== value && "object" === typeof value && "$type" in value && "enum-type" === value.$type && "members" in value && Array.isArray(value.members) &&
+        value.members.every( i => "null" === i || "boolean" === typeof i || "number" === typeof i || "string" === typeof i );
 }

@@ -136,7 +136,7 @@ var Build;
             return kindofJoinExpression(value.members.map(function (i) { return (0, exports.$expression)(JSON.stringify(i)); }), (0, exports.$expression)("|"));
         };
         Define.buildInlineDefineArray = function (value) {
-            return __spreadArray(__spreadArray([], Define.buildInlineDefine(value.items), true), [(0, exports.$expression)("[]"),], false);
+            return __spreadArray(__spreadArray([], Define.enParenthesisIfNeed(Define.buildInlineDefine(value.items)), true), [(0, exports.$expression)("[]"),], false);
         };
         Define.buildInlineDefineDictionary = function (value) {
             return (0, exports.$iblock)([(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(value.valueType), true))]);

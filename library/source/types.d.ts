@@ -78,7 +78,7 @@ export declare namespace Types {
     const isTypeDefinition: (value: unknown, listner?: TypesError.Listener) => value is TypeDefinition;
     interface EnumTypeElement extends AlphaElement {
         $type: "enum-type";
-        members: (number | string)[];
+        members: (null | boolean | number | string)[];
     }
     const isEnumTypeElement: (value: unknown, listner?: TypesError.Listener) => value is EnumTypeElement;
     interface InterfaceDefinition extends AlphaDefinition {

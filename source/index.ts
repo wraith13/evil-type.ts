@@ -171,7 +171,7 @@ export module Build
         export const buildInlineDefineEnum = (value: Types.EnumTypeElement) =>
             kindofJoinExpression(value.members.map(i => $expression(JSON.stringify(i))), $expression("|"));
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
-            [ ...buildInlineDefine(value.items), $expression("[]"), ];
+            [ ...enParenthesisIfNeed(buildInlineDefine(value.items)), $expression("[]"), ];
         export const buildInlineDefineDictionary = (value: Types.DictionaryElement) =>
             $iblock([ $line([ $expression("[key: string]:"), ...buildInlineDefine(value.valueType), ]) ]);
         export const buildInlineDefineAnd = (value: Types.AndElement) =>
