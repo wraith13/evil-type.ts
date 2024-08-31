@@ -333,6 +333,24 @@
                         }
                     }
                 },
+                "ArrayElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaElement"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "array"
+                        },
+                        "valueType": {
+                            "$ref": "TypeOrInterfaceOrRefer"
+                        }
+                    }
+                },
                 "LiteralElement": {
                     "export": true,
                     "$type": "interface",
@@ -486,6 +504,19 @@
                         "$type": {
                             "$type": "literal",
                             "literal": "typeof"
+                        },
+                        "value": {
+                            "$ref": "ReferElement"
+                        }
+                    }
+                },
+                "ItemofElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "itemof"
                         },
                         "value": {
                             "$ref": "ReferElement"

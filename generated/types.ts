@@ -61,6 +61,11 @@ export module Types
         $type: "dictionary";
         valueType: TypeOrInterfaceOrRefer;
     }
+    export interface ArrayElement extends AlphaElement
+    {
+        $type: "array";
+        valueType: TypeOrInterfaceOrRefer;
+    }
     export interface LiteralElement extends AlphaElement
     {
         $type: "literal";
@@ -87,6 +92,11 @@ export module Types
     export interface TypeofElement
     {
         $type: "typeof";
+        value: ReferElement;
+    }
+    export interface ItemofElement
+    {
+        $type: "itemof";
         value: ReferElement;
     }
     export const isSchema = (value: unknown): value is typeof schema =>
@@ -131,6 +141,9 @@ export module Types
     export const isDictionaryElement = (value: unknown): value is DictionaryElement =>
         isAlphaElement(value) && "$type" in value && "dictionary" === value.$type && "valueType" in value &&
         isTypeOrInterfaceOrRefer(value.valueType);
+    export const isArrayElement = (value: unknown): value is ArrayElement =>
+        isAlphaElement(value) && "$type" in value && "array" === value.$type && "valueType" in value &&
+        isTypeOrInterfaceOrRefer(value.valueType);
     export const isLiteralElement = (value: unknown): value is LiteralElement =>
         isAlphaElement(value) && "$type" in value && "literal" === value.$type && "literal" in value && isJsonable(value.literal);
     export const isReferElement = (value: unknown): value is ReferElement =>
@@ -149,5 +162,8 @@ export module Types
         "string" === typeof i );
     export const isTypeofElement = (value: unknown): value is TypeofElement =>
         null !== value && "object" === typeof value && "$type" in value && "typeof" === value.$type && "value" in value &&
+        isReferElement(value.value);
+    export const isItemofElement = (value: unknown): value is ItemofElement =>
+        null !== value && "object" === typeof value && "$type" in value && "itemof" === value.$type && "value" in value &&
         isReferElement(value.value);
 }
