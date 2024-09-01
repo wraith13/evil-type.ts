@@ -66,6 +66,16 @@ export module Types
         $type: "array";
         valueType: TypeOrInterfaceOrRefer;
     }
+    export interface OrElement extends AlphaElement
+    {
+        $type: "or";
+        types: TypeOrInterfaceOrRefer [];
+    }
+    export interface AndElement extends AlphaElement
+    {
+        $type: "and";
+        types: TypeOrInterfaceOrRefer [];
+    }
     export interface LiteralElement extends AlphaElement
     {
         $type: "literal";
@@ -144,6 +154,12 @@ export module Types
     export const isArrayElement = (value: unknown): value is ArrayElement =>
         isAlphaElement(value) && "$type" in value && "array" === value.$type && "valueType" in value &&
         isTypeOrInterfaceOrRefer(value.valueType);
+    export const isOrElement = (value: unknown): value is OrElement =>
+        isAlphaElement(value) && "$type" in value && "or" === value.$type && "types" in value && Array.isArray(value.types) &&
+        value.types.every( i => isTypeOrInterfaceOrRefer(i) );
+    export const isAndElement = (value: unknown): value is AndElement =>
+        isAlphaElement(value) && "$type" in value && "and" === value.$type && "types" in value && Array.isArray(value.types) &&
+        value.types.every( i => isTypeOrInterfaceOrRefer(i) );
     export const isLiteralElement = (value: unknown): value is LiteralElement =>
         isAlphaElement(value) && "$type" in value && "literal" === value.$type && "literal" in value && isJsonable(value.literal);
     export const isReferElement = (value: unknown): value is ReferElement =>

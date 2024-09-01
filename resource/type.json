@@ -351,6 +351,48 @@
                         }
                     }
                 },
+                "OrElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaElement"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "or"
+                        },
+                        "types": {
+                            "$type": "array",
+                            "items": {
+                                "$ref": "TypeOrInterfaceOrRefer"
+                            }
+                        }
+                    }
+                },
+                "AndElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaElement"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "and"
+                        },
+                        "types": {
+                            "$type": "array",
+                            "items": {
+                                "$ref": "TypeOrInterfaceOrRefer"
+                            }
+                        }
+                    }
+                },
                 "LiteralElement": {
                     "export": true,
                     "$type": "interface",
