@@ -520,11 +520,39 @@ export module Format
             return [ code.expression, ];
         }
     };
+    export const separator = (result: string, buffer: string, tokens: string[], i: number) =>
+    {
+        const token = tokens[i];
+        if ("" === buffer)
+        {
+            if ("" === result)
+            {
+                return "current-indent";
+            }
+            else
+            {
+                return "next-indent";
+            }
+        }
+        else
+        {
+            if ("[]" === token)
+            {
+                return "none";
+            }
+        }
+        return "space";
+    };
     export const line = (options: Types.OutputOptions, indentDepth: number, code: CodeLine): string =>
     {
         const tokens = code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
-        const indent = buildIndent(options, indentDepth);
-        const nextIndent = buildIndent(options, indentDepth +1);
+        const separatorMap: { [ key: ReturnType<typeof separator>[number] ]: string } =
+        {
+            "current-indent": buildIndent(options, indentDepth),
+            "next-indent": buildIndent(options, indentDepth +1),
+            "space": " ",
+            "none": "",
+        };
         const returnCode = getReturnCode(options);
         const maxLineLength = getMaxLineLength(options);
         let i = 0;
@@ -533,25 +561,7 @@ export module Format
         while(i < tokens.length)
         {
             const token = tokens[i];
-            if ("" === buffer)
-            {
-                if ("" === result)
-                {
-                    buffer += indent;
-                }
-                else
-                {
-                    buffer += nextIndent;
-                }
-            }
-            else
-            {
-                if ("[]" !== token)
-                {
-                    buffer += " ";
-                }
-            }
-            buffer += token;
+            buffer += separatorMap[separator(result, buffer, tokens, i)] +token;
             if (null !== maxLineLength && i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
             {
                 result += buffer +returnCode;

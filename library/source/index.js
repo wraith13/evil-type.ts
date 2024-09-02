@@ -419,10 +419,31 @@ var Format;
                 return [code.expression,];
         }
     };
+    Format.separator = function (result, buffer, tokens, i) {
+        var token = tokens[i];
+        if ("" === buffer) {
+            if ("" === result) {
+                return "current-indent";
+            }
+            else {
+                return "next-indent";
+            }
+        }
+        else {
+            if ("[]" === token) {
+                return "none";
+            }
+        }
+        return "space";
+    };
     Format.line = function (options, indentDepth, code) {
         var tokens = code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-        var indent = Format.buildIndent(options, indentDepth);
-        var nextIndent = Format.buildIndent(options, indentDepth + 1);
+        var separatorMap = {
+            "current-indent": Format.buildIndent(options, indentDepth),
+            "next-indent": Format.buildIndent(options, indentDepth + 1),
+            "space": " ",
+            "none": "",
+        };
         var returnCode = Format.getReturnCode(options);
         var maxLineLength = Format.getMaxLineLength(options);
         var i = 0;
@@ -430,20 +451,7 @@ var Format;
         var buffer = "";
         while (i < tokens.length) {
             var token = tokens[i];
-            if ("" === buffer) {
-                if ("" === result) {
-                    buffer += indent;
-                }
-                else {
-                    buffer += nextIndent;
-                }
-            }
-            else {
-                if ("[]" !== token) {
-                    buffer += " ";
-                }
-            }
-            buffer += token;
+            buffer += separatorMap[Format.separator(result, buffer, tokens, i)] + token;
             if (null !== maxLineLength && i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
                 result += buffer + returnCode;
                 buffer = "";
