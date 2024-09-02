@@ -422,41 +422,35 @@ var Format;
     Format.line = function (options, indentDepth, code) {
         var tokens = code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         var indent = Format.buildIndent(options, indentDepth);
+        var nextIndent = Format.buildIndent(options, indentDepth + 1);
         var returnCode = Format.getReturnCode(options);
-        var result = indent + tokens.join(" ") + ";" + returnCode;
         var maxLineLength = Format.getMaxLineLength(options);
-        if (null !== maxLineLength && maxLineLength < result.length) {
-            var nextIndent = Format.buildIndent(options, indentDepth + 1);
-            var separatorIndex_1 = tokens.findIndex(function (i) { return i.endsWith(" =>"); });
-            var i = 0;
-            if (0 <= separatorIndex_1) {
-                i = separatorIndex_1;
-                result = indent + tokens.filter(function (_i, ix) { return ix <= separatorIndex_1; }).join(" ") + returnCode;
-            }
-            else {
-                result = "";
-            }
-            var buffer = "";
-            while (++i < tokens.length) {
-                if ("" === buffer) {
-                    if ("" === result) {
-                        buffer += indent;
-                    }
-                    else {
-                        buffer += nextIndent;
-                    }
-                    buffer += tokens[i];
+        var i = 0;
+        var result = "";
+        var buffer = "";
+        while (i < tokens.length) {
+            var token = tokens[i];
+            if ("" === buffer) {
+                if ("" === result) {
+                    buffer += indent;
                 }
                 else {
-                    buffer += " " + tokens[i];
-                }
-                if (i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
-                    result += buffer + returnCode;
-                    buffer = "";
+                    buffer += nextIndent;
                 }
             }
-            result += buffer + ";" + returnCode;
+            else {
+                if ("[]" !== token) {
+                    buffer += " ";
+                }
+            }
+            buffer += token;
+            if (null !== maxLineLength && i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
+                result += buffer + returnCode;
+                buffer = "";
+            }
+            ++i;
         }
+        result += buffer + ";" + returnCode;
         return result;
     };
     Format.inlineBlock = function (options, indentDepth, code) {

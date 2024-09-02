@@ -524,50 +524,42 @@ export module Format
     {
         const tokens = code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
         const indent = buildIndent(options, indentDepth);
+        const nextIndent = buildIndent(options, indentDepth +1);
         const returnCode = getReturnCode(options);
-        let result = indent +tokens.join(" ") +";" +returnCode;
         const maxLineLength = getMaxLineLength(options);
-        if (null !== maxLineLength && maxLineLength < result.length)
+        let i = 0;
+        let result = "";
+        let buffer = "";
+        while(i < tokens.length)
         {
-            const nextIndent = buildIndent(options, indentDepth +1);
-            const separatorIndex = tokens.findIndex(i => i.endsWith(" =>"));
-            let i = 0;
-            if (0 <= separatorIndex)
+            const token = tokens[i];
+            if ("" === buffer)
             {
-                i = separatorIndex;
-                result = indent +tokens.filter((_i, ix) => ix <= separatorIndex).join(" ") +returnCode;
-            }
-            else
-            {
-                result = "";
-            }
-            let buffer = "";
-            while(++i < tokens.length)
-            {
-                if ("" === buffer)
+                if ("" === result)
                 {
-                    if ("" === result)
-                    {
-                        buffer += indent;
-                    }
-                    else
-                    {
-                        buffer += nextIndent;
-                    }
-                    buffer += tokens[i];
+                    buffer += indent;
                 }
                 else
                 {
-                    buffer += " " +tokens[i];
-                }
-                if (i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
-                {
-                    result += buffer +returnCode;
-                    buffer = "";
+                    buffer += nextIndent;
                 }
             }
-            result += buffer +";" +returnCode;
+            else
+            {
+                if ("[]" !== token)
+                {
+                    buffer += " ";
+                }
+            }
+            buffer += token;
+            if (null !== maxLineLength && i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
+            {
+                result += buffer +returnCode;
+                buffer = "";
+            }
+            ++i;
         }
+        result += buffer +";" +returnCode;
         return result;
     };
     export const inlineBlock = (options: Types.OutputOptions, indentDepth: number, code: CodeInlineBlock): string =>
