@@ -520,49 +520,46 @@ export module Format
             return [ code.expression, ];
         }
     };
-    export const separator = (result: string, buffer: string, tokens: string[], i: number) =>
+    export const separator = (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number) =>
     {
         const token = tokens[i];
         if ("" === buffer)
         {
             if ("" === result)
             {
-                return "current-indent";
+                return buildIndent(options, indentDepth);
             }
             else
             {
-                return "next-indent";
+                return buildIndent(options, indentDepth +1);
             }
         }
         else
         {
             if ("[]" === token)
             {
-                return "none";
+                return "";
             }
         }
-        return "space";
+        return "　";
     };
+    export const isLineBreak = (options: Types.OutputOptions, buffer: string, tokens: string[], i: number) =>
+    {
+        const maxLineLength = getMaxLineLength(options);
+        return null !== maxLineLength && i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length);
+    }
     export const line = (options: Types.OutputOptions, indentDepth: number, code: CodeLine): string =>
     {
         const tokens = code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
-        const separatorMap: { [ key: ReturnType<typeof separator>[number] ]: string } =
-        {
-            "current-indent": buildIndent(options, indentDepth),
-            "next-indent": buildIndent(options, indentDepth +1),
-            "space": " ",
-            "none": "",
-        };
         const returnCode = getReturnCode(options);
-        const maxLineLength = getMaxLineLength(options);
         let i = 0;
         let result = "";
         let buffer = "";
         while(i < tokens.length)
         {
-            const token = tokens[i];
-            buffer += separatorMap[separator(result, buffer, tokens, i)] +token;
-            if (null !== maxLineLength && i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
+            buffer += separator(options, indentDepth, result, buffer, tokens, i);
+            buffer += tokens[i];
+            if (isLineBreak(options, buffer, tokens, i))
             {
                 result += buffer +returnCode;
                 buffer = "";

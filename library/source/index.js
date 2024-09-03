@@ -419,40 +419,37 @@ var Format;
                 return [code.expression,];
         }
     };
-    Format.separator = function (result, buffer, tokens, i) {
+    Format.separator = function (options, indentDepth, result, buffer, tokens, i) {
         var token = tokens[i];
         if ("" === buffer) {
             if ("" === result) {
-                return "current-indent";
+                return Format.buildIndent(options, indentDepth);
             }
             else {
-                return "next-indent";
+                return Format.buildIndent(options, indentDepth + 1);
             }
         }
         else {
             if ("[]" === token) {
-                return "none";
+                return "";
             }
         }
-        return "space";
+        return "　";
+    };
+    Format.isLineBreak = function (options, buffer, tokens, i) {
+        var maxLineLength = Format.getMaxLineLength(options);
+        return null !== maxLineLength && i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length);
     };
     Format.line = function (options, indentDepth, code) {
         var tokens = code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-        var separatorMap = {
-            "current-indent": Format.buildIndent(options, indentDepth),
-            "next-indent": Format.buildIndent(options, indentDepth + 1),
-            "space": " ",
-            "none": "",
-        };
         var returnCode = Format.getReturnCode(options);
-        var maxLineLength = Format.getMaxLineLength(options);
         var i = 0;
         var result = "";
         var buffer = "";
         while (i < tokens.length) {
-            var token = tokens[i];
-            buffer += separatorMap[Format.separator(result, buffer, tokens, i)] + token;
-            if (null !== maxLineLength && i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
+            buffer += Format.separator(options, indentDepth, result, buffer, tokens, i);
+            buffer += tokens[i];
+            if (Format.isLineBreak(options, buffer, tokens, i)) {
                 result += buffer + returnCode;
                 buffer = "";
             }
