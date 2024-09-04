@@ -57,6 +57,12 @@ export module Types
     {
         export?: boolean;
     }
+    export interface ImportDefinition
+    {
+        $type: "import";
+        target: string;
+        from: string;
+    }
     export interface ModuleDefinition extends AlphaDefinition
     {
         $type: "module";
