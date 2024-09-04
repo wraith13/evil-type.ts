@@ -19,6 +19,7 @@ var Types;
     Types.isTypeSchema = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject({
             "$ref": types_prime_1.TypesPrime.isJust(Types.schema),
+            "imports": types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isImportDefinition)),
             "defines": types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
             "options": Types.isOutputOptions
         })(value, listner);
@@ -26,6 +27,11 @@ var Types;
     Types.isReferElement = types_prime_1.TypesPrime.isSpecificObject({
         "$ref": types_prime_1.TypesPrime.isString,
     });
+    Types.isImportDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        $type: types_prime_1.TypesPrime.isJust("import"),
+        target: types_prime_1.TypesPrime.isString,
+        from: types_prime_1.TypesPrime.isString,
+    })(value, listner); };
     Types.isModuleDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("module"),

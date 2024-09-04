@@ -23,6 +23,12 @@
                                 "$ref": "schema"
                             }
                         },
+                        "imports?": {
+                            "$type": "array",
+                            "items": {
+                                "$ref": "ImportDefinition"
+                            }
+                        },
                         "defines": {
                             "$type": "dictionary",
                             "valueType": {
@@ -195,6 +201,24 @@
                         "export?": {
                             "$type": "primitive-type",
                             "type": "boolean"
+                        }
+                    }
+                },
+                "ImportDefinition": {
+                    "export": true,
+                    "$type": "interface",
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "import"
+                        },
+                        "target": {
+                            "$type": "primitive-type",
+                            "type": "string"
+                        },
+                        "from": {
+                            "$type": "primitive-type",
+                            "type": "string"
                         }
                     }
                 },

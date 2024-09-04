@@ -29,6 +29,7 @@ export module Types
     export interface TypeSchema
     {
         $ref: typeof schema;
+        imports?: ImportDefinition[];
         defines: { [key: string]: Definition; };
         options: OutputOptions;
     }
@@ -36,6 +37,7 @@ export module Types
         TypesPrime.isSpecificObject<TypeSchema>
         ({
             "$ref": TypesPrime.isJust(schema),
+            "imports": TypesPrime.isOptional(TypesPrime.isArray(isImportDefinition)),
             "defines": TypesPrime.isDictionaryObject(isDefinition),
             "options": isOutputOptions
         })
@@ -63,6 +65,13 @@ export module Types
         target: string;
         from: string;
     }
+    export const isImportDefinition = (value: unknown, listner?: TypesError.Listener): value is ImportDefinition => TypesPrime.isSpecificObject<ImportDefinition>
+    ({
+        $type: TypesPrime.isJust("import"),
+        target: TypesPrime.isString,
+        from: TypesPrime.isString,
+    })
+    (value, listner);
     export interface ModuleDefinition extends AlphaDefinition
     {
         $type: "module";

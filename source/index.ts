@@ -541,7 +541,7 @@ export module Format
                 return "";
             }
         }
-        return "　";
+        return " ";
     };
     export const isLineBreak = (options: Types.OutputOptions, buffer: string, tokens: string[], i: number) =>
     {

@@ -18,6 +18,7 @@ export declare namespace Types {
     const isOutputOptions: (value: unknown, listner?: TypesError.Listener | undefined) => value is OutputOptions;
     interface TypeSchema {
         $ref: typeof schema;
+        imports?: ImportDefinition[];
         defines: {
             [key: string]: Definition;
         };
@@ -35,6 +36,12 @@ export declare namespace Types {
     interface AlphaDefinition extends AlphaElement {
         export?: boolean;
     }
+    interface ImportDefinition {
+        $type: "import";
+        target: string;
+        from: string;
+    }
+    const isImportDefinition: (value: unknown, listner?: TypesError.Listener) => value is ImportDefinition;
     interface ModuleDefinition extends AlphaDefinition {
         $type: "module";
         members: {

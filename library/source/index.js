@@ -434,7 +434,7 @@ var Format;
                 return "";
             }
         }
-        return "　";
+        return " ";
     };
     Format.isLineBreak = function (options, buffer, tokens, i) {
         var maxLineLength = Format.getMaxLineLength(options);
