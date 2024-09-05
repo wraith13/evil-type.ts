@@ -441,7 +441,10 @@ var Format;
     };
     Format.isLineBreak = function (options, buffer, tokens, i) {
         var maxLineLength = Format.getMaxLineLength(options);
-        return null !== maxLineLength && i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length);
+        if (null !== maxLineLength && i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
+            return !["async"].includes(tokens[i]) && !["=>"].includes(tokens[i + 1]);
+        }
+        return false;
     };
     Format.line = function (options, indentDepth, code) {
         var tokens = code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);

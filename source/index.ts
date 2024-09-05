@@ -548,7 +548,11 @@ export module Format
     export const isLineBreak = (options: Types.OutputOptions, buffer: string, tokens: string[], i: number) =>
     {
         const maxLineLength = getMaxLineLength(options);
-        return null !== maxLineLength && i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length);
+        if (null !== maxLineLength && i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
+        {
+            return ! ["async"].includes(tokens[i]) && ! ["=>"].includes(tokens[i +1]);
+        }
+        return false;
     }
     export const line = (options: Types.OutputOptions, indentDepth: number, code: CodeLine): string =>
     {

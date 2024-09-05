@@ -120,8 +120,8 @@ export module Types
         "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" === value;
     export const isTypeSchema = (value: unknown): value is TypeSchema => null !== value && "object" === typeof value && "$ref" in value &&
         isSchema(value.$ref) && ( ! ("imports" in value) || Array.isArray(value.imports) && value.imports.every( i => isImportDefinition(i)
-        ) ) && "defines" in value && null !== value.defines && "object" === typeof value.defines && Object.values(value.defines).every( i
-        => isDefinition(i) ) && "options" in value && isOutputOptions(value.options);
+        ) ) && "defines" in value && null !== value.defines && "object" === typeof value.defines && Object.values(value.defines).every( i =>
+        isDefinition(i) ) && "options" in value && isOutputOptions(value.options);
     export const isOutputOptions = (value: unknown): value is OutputOptions => null !== value && "object" === typeof value && (
         ! ("outputFile" in value) || "string" === typeof value.outputFile ) && "indentUnit" in value && (
         "number" === typeof value.indentUnit || "\t" === value.indentUnit ) && "indentStyle" in value &&
