@@ -225,6 +225,8 @@ export module Build
             const lines = buildDefineModuleCore(value.members);
             return $block(header, lines);
         };
+        export const buildImports = (imports: undefined | Types.ImportDefinition[]) =>
+            undefined === imports ? []: imports.map(i => $line([ $expression("import"), $expression(i.target), $expression("from"), $expression(JSON.stringify(i.from)) ]));
         export const buildDefine = (name: string, define: Types.Definition): CodeEntry =>
         {
             switch(define.$type)
@@ -615,7 +617,11 @@ try
     const errorListner = TypesError.makeListener(jsonPath);
     if (Types.isTypeSchema(typeSource, errorListner))
     {
-        const code = Build.Define.buildDefineModuleCore(typeSource.defines);
+        const code =
+        [
+            ...Build.Define.buildImports(typeSource.imports),
+            ...Build.Define.buildDefineModuleCore(typeSource.defines),
+        ];
         const result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile)
         {

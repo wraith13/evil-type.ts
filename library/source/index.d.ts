@@ -51,6 +51,7 @@ export declare namespace Build {
             [key: string]: Types.Definition;
         }) => CodeEntry[];
         const buildDefineModule: (name: string, value: Types.ModuleDefinition) => CodeBlock;
+        const buildImports: (imports: undefined | Types.ImportDefinition[]) => CodeLine[];
         const buildDefine: (name: string, define: Types.Definition) => CodeEntry;
         const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];
     }

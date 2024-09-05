@@ -179,6 +179,9 @@ var Build;
             var lines = Define.buildDefineModuleCore(value.members);
             return (0, exports.$block)(header, lines);
         };
+        Define.buildImports = function (imports) {
+            return undefined === imports ? [] : imports.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("import"), (0, exports.$expression)(i.target), (0, exports.$expression)("from"), (0, exports.$expression)(JSON.stringify(i.from))]); });
+        };
         Define.buildDefine = function (name, define) {
             switch (define.$type) {
                 case "interface":
@@ -498,7 +501,7 @@ try {
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
     var errorListner = types_error_1.TypesError.makeListener(jsonPath);
     if (types_1.Types.isTypeSchema(typeSource, errorListner)) {
-        var code = Build.Define.buildDefineModuleCore(typeSource.defines);
+        var code = __spreadArray(__spreadArray([], Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineModuleCore(typeSource.defines), true);
         var result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile) {
             fs_1.default.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
