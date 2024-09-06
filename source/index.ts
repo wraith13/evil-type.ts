@@ -550,7 +550,7 @@ export module Format
         const maxLineLength = getMaxLineLength(options);
         if (null !== maxLineLength && i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
         {
-            return ! ["async"].includes(tokens[i]) && ! ["=>"].includes(tokens[i +1]);
+            return ! config.lineUnbreakableTokens.heads.includes(tokens[i]) && ! config.lineUnbreakableTokens.tails.includes(tokens[i +1]);
         }
         return false;
     }

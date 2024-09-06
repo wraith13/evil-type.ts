@@ -442,7 +442,7 @@ var Format;
     Format.isLineBreak = function (options, buffer, tokens, i) {
         var maxLineLength = Format.getMaxLineLength(options);
         if (null !== maxLineLength && i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
-            return !["async"].includes(tokens[i]) && !["=>"].includes(tokens[i + 1]);
+            return !config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[i]) && !config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[i + 1]);
         }
         return false;
     };
