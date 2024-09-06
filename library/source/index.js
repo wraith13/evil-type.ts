@@ -439,10 +439,23 @@ var Format;
         }
         return " ";
     };
-    Format.isLineBreak = function (options, buffer, tokens, i) {
+    Format.temporaryAssembleLine = function (options, indentDepth, result, buffer, tokens, i, length) {
+        var ix = i;
+        var temporary = buffer;
+        var ixEnd = Math.min(tokens.length, i + length);
+        while (ix < ixEnd) {
+            temporary += Format.separator(options, indentDepth, result, temporary, tokens, ix);
+            temporary += tokens[ix];
+            ++ix;
+        }
+        return temporary;
+    };
+    Format.isLineBreak = function (options, indentDepth, result, buffer, tokens, i) {
         var maxLineLength = Format.getMaxLineLength(options);
-        if (null !== maxLineLength && i + 1 < tokens.length && maxLineLength <= (buffer.length + 1 + tokens[i + 1].length)) {
-            return !config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[i]) && !config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[i + 1]);
+        if (null !== maxLineLength && i + 1 < tokens.length) {
+            if (maxLineLength <= Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i + 1, 1).length) {
+                return !config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[i]) && !config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[i + 1]);
+            }
         }
         return false;
     };
@@ -453,9 +466,8 @@ var Format;
         var result = "";
         var buffer = "";
         while (i < tokens.length) {
-            buffer += Format.separator(options, indentDepth, result, buffer, tokens, i);
-            buffer += tokens[i];
-            if (Format.isLineBreak(options, buffer, tokens, i)) {
+            buffer = Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i, 1);
+            if (Format.isLineBreak(options, indentDepth, result, buffer, tokens, i)) {
                 result += buffer + returnCode;
                 buffer = "";
             }

@@ -545,12 +545,28 @@ export module Format
         }
         return " ";
     };
-    export const isLineBreak = (options: Types.OutputOptions, buffer: string, tokens: string[], i: number) =>
+    export const temporaryAssembleLine = (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number, length: number) =>
+    {
+        let ix = i;
+        let temporary = buffer;
+        let ixEnd = Math.min(tokens.length, i +length);
+        while(ix < ixEnd)
+        {
+            temporary += separator(options, indentDepth, result, temporary, tokens, ix);
+            temporary += tokens[ix];
+            ++ix;
+        }
+        return temporary;
+    }
+    export const isLineBreak = (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number) =>
     {
         const maxLineLength = getMaxLineLength(options);
-        if (null !== maxLineLength && i +1 < tokens.length && maxLineLength <= (buffer.length +1 +tokens[i +1].length))
+        if (null !== maxLineLength && i +1 < tokens.length)
         {
-            return ! config.lineUnbreakableTokens.heads.includes(tokens[i]) && ! config.lineUnbreakableTokens.tails.includes(tokens[i +1]);
+            if (maxLineLength <= temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i +1, 1).length)
+            {
+                return ! config.lineUnbreakableTokens.heads.includes(tokens[i]) && ! config.lineUnbreakableTokens.tails.includes(tokens[i +1]);
+            }
         }
         return false;
     }
@@ -563,9 +579,8 @@ export module Format
         let buffer = "";
         while(i < tokens.length)
         {
-            buffer += separator(options, indentDepth, result, buffer, tokens, i);
-            buffer += tokens[i];
-            if (isLineBreak(options, buffer, tokens, i))
+            buffer = temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i, 1);
+            if (isLineBreak(options, indentDepth, result, buffer, tokens, i))
             {
                 result += buffer +returnCode;
                 buffer = "";
