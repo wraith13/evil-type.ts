@@ -452,11 +452,11 @@ var Format;
     };
     Format.isLineBreak = function (options, indentDepth, result, buffer, tokens, i) {
         var maxLineLength = Format.getMaxLineLength(options);
-        if (null !== maxLineLength && i + 1 < tokens.length) {
-            if (maxLineLength <= Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i + 1, 1).length) {
+        if (null !== maxLineLength) {
+            if (i + 1 < tokens.length && maxLineLength <= Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i + 1, 1).length) {
                 return !config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[i]) && !config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[i + 1]);
             }
-            if (maxLineLength <= Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i + 1, 2).length) {
+            if (i + 2 < tokens.length && maxLineLength <= Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i + 1, 2).length) {
                 return config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[i + 1]) || config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[i + 2]);
             }
         }
