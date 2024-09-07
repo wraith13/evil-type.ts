@@ -567,6 +567,10 @@ export module Format
             {
                 return ! config.lineUnbreakableTokens.heads.includes(tokens[i]) && ! config.lineUnbreakableTokens.tails.includes(tokens[i +1]);
             }
+            if (maxLineLength <= temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i +1, 2).length)
+            {
+                return config.lineUnbreakableTokens.heads.includes(tokens[i +1]) || config.lineUnbreakableTokens.tails.includes(tokens[i +2]);
+            }
         }
         return false;
     }
