@@ -522,18 +522,27 @@ export module Format
             return [ code.expression, ];
         }
     };
-    export const separator = (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number) =>
+    export interface LineProcess
     {
-        const token = tokens[i];
-        if ("" === buffer)
+        options: Readonly<Types.OutputOptions>;
+        indentDepth: number;
+        result: string;
+        buffer: string;
+        tokens: string[];
+        i: number;
+    }
+    export const separator = (data: Readonly<LineProcess>) =>
+    {
+        const token = data.tokens[data.i];
+        if ("" === data.buffer)
         {
-            if ("" === result)
+            if ("" === data.result)
             {
-                return buildIndent(options, indentDepth);
+                return buildIndent(data.options, data.indentDepth);
             }
             else
             {
-                return buildIndent(options, indentDepth +1);
+                return buildIndent(data.options, data.indentDepth +1);
             }
         }
         else
@@ -545,56 +554,62 @@ export module Format
         }
         return " ";
     };
-    export const temporaryAssembleLine = (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number, length: number) =>
+    export const temporaryAssembleLine = (data: Readonly<LineProcess>, length: number) =>
     {
-        let ix = i;
-        let temporary = buffer;
-        let ixEnd = Math.min(tokens.length, i +length);
-        while(ix < ixEnd)
+        let { options, indentDepth, result, buffer, tokens, i, } = data;
+        let iEnd = Math.min(data.tokens.length, data.i +length);
+        while(i < iEnd)
         {
-            temporary += separator(options, indentDepth, result, temporary, tokens, ix);
-            temporary += tokens[ix];
-            ++ix;
+            buffer += separator({ options, indentDepth, result, buffer, tokens, i, });
+            buffer += data.tokens[i];
+            ++i;
         }
-        return temporary;
+        return buffer;
     }
-    export const isLineBreak = (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number) =>
+    export const isLineBreak = (data: Readonly<LineProcess>) =>
     {
-        const maxLineLength = getMaxLineLength(options);
+        const maxLineLength = getMaxLineLength(data.options);
         if (null !== maxLineLength)
         {
-            if (i +1 < tokens.length && maxLineLength <= temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i +1, 1).length)
+            let { options, indentDepth, result, buffer, tokens, i, } = data;
+            ++i;
+            if (data.i +1 < tokens.length && maxLineLength <= temporaryAssembleLine({ options, indentDepth, result, buffer, tokens, i, }, 1).length)
             {
-                return ! config.lineUnbreakableTokens.heads.includes(tokens[i]) && ! config.lineUnbreakableTokens.tails.includes(tokens[i +1]);
+                return ! config.lineUnbreakableTokens.heads.includes(tokens[data.i]) && ! config.lineUnbreakableTokens.tails.includes(tokens[data.i +1]);
             }
-            if (i +2 < tokens.length && maxLineLength <= temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i +1, 2).length)
+            if (data.i +2 < tokens.length && maxLineLength <= temporaryAssembleLine({ options, indentDepth, result, buffer, tokens, i, }, 2).length)
             {
-                return config.lineUnbreakableTokens.heads.includes(tokens[i +1]) || config.lineUnbreakableTokens.tails.includes(tokens[i +2]);
+                return config.lineUnbreakableTokens.heads.includes(tokens[data.i +1]) || config.lineUnbreakableTokens.tails.includes(tokens[data.i +2]);
             }
         }
         return false;
     }
-    export const line = (options: Types.OutputOptions, indentDepth: number, code: CodeLine): string =>
+    export const line = (options: Readonly<Types.OutputOptions>, indentDepth: number, code: CodeLine): string =>
     {
-        const tokens = code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
         const returnCode = getReturnCode(options);
-        let i = 0;
-        let result = "";
-        let buffer = "";
-        while(i < tokens.length)
+        const data: LineProcess =
         {
-            buffer = temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i, 1);
-            if (isLineBreak(options, indentDepth, result, buffer, tokens, i))
+            options,
+            indentDepth,
+            result: "",
+            buffer: "",
+            tokens: code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []),
+            i: 0,
+        };
+        while(data.i < data.tokens.length)
+        {
+            data.buffer = temporaryAssembleLine(data, 1);
+            if (isLineBreak(data))
             {
-                result += buffer +returnCode;
-                buffer = "";
+                data.result += data.buffer +returnCode;
+                data.buffer = "";
             }
-            ++i;
+            ++data.i;
         }
-        result += buffer +";" +returnCode;
-        return result;
+        data.result += data.buffer +";" +returnCode;
+        return data.result;
     };
-    export const inlineBlock = (options: Types.OutputOptions, indentDepth: number, code: CodeInlineBlock): string =>
+    export const inlineBlock = (options: Readonly<Types.OutputOptions>, indentDepth: number, code: CodeInlineBlock): string =>
         [ "{", ...code.lines.map(i => text(options, indentDepth +1, i)), "}", ].join(" ");
     export const block = (options: Types.OutputOptions, indentDepth: number, code: CodeBlock): string =>
     {

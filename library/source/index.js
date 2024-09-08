@@ -422,14 +422,14 @@ var Format;
                 return [code.expression,];
         }
     };
-    Format.separator = function (options, indentDepth, result, buffer, tokens, i) {
-        var token = tokens[i];
-        if ("" === buffer) {
-            if ("" === result) {
-                return Format.buildIndent(options, indentDepth);
+    Format.separator = function (data) {
+        var token = data.tokens[data.i];
+        if ("" === data.buffer) {
+            if ("" === data.result) {
+                return Format.buildIndent(data.options, data.indentDepth);
             }
             else {
-                return Format.buildIndent(options, indentDepth + 1);
+                return Format.buildIndent(data.options, data.indentDepth + 1);
             }
         }
         else {
@@ -439,45 +439,50 @@ var Format;
         }
         return " ";
     };
-    Format.temporaryAssembleLine = function (options, indentDepth, result, buffer, tokens, i, length) {
-        var ix = i;
-        var temporary = buffer;
-        var ixEnd = Math.min(tokens.length, i + length);
-        while (ix < ixEnd) {
-            temporary += Format.separator(options, indentDepth, result, temporary, tokens, ix);
-            temporary += tokens[ix];
-            ++ix;
+    Format.temporaryAssembleLine = function (data, length) {
+        var options = data.options, indentDepth = data.indentDepth, result = data.result, buffer = data.buffer, tokens = data.tokens, i = data.i;
+        var iEnd = Math.min(data.tokens.length, data.i + length);
+        while (i < iEnd) {
+            buffer += Format.separator({ options: options, indentDepth: indentDepth, result: result, buffer: buffer, tokens: tokens, i: i, });
+            buffer += data.tokens[i];
+            ++i;
         }
-        return temporary;
+        return buffer;
     };
-    Format.isLineBreak = function (options, indentDepth, result, buffer, tokens, i) {
-        var maxLineLength = Format.getMaxLineLength(options);
+    Format.isLineBreak = function (data) {
+        var maxLineLength = Format.getMaxLineLength(data.options);
         if (null !== maxLineLength) {
-            if (i + 1 < tokens.length && maxLineLength <= Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i + 1, 1).length) {
-                return !config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[i]) && !config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[i + 1]);
+            var options = data.options, indentDepth = data.indentDepth, result = data.result, buffer = data.buffer, tokens = data.tokens, i = data.i;
+            ++i;
+            if (data.i + 1 < tokens.length && maxLineLength <= Format.temporaryAssembleLine({ options: options, indentDepth: indentDepth, result: result, buffer: buffer, tokens: tokens, i: i, }, 1).length) {
+                return !config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[data.i]) && !config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[data.i + 1]);
             }
-            if (i + 2 < tokens.length && maxLineLength <= Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i + 1, 2).length) {
-                return config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[i + 1]) || config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[i + 2]);
+            if (data.i + 2 < tokens.length && maxLineLength <= Format.temporaryAssembleLine({ options: options, indentDepth: indentDepth, result: result, buffer: buffer, tokens: tokens, i: i, }, 2).length) {
+                return config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[data.i + 1]) || config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[data.i + 2]);
             }
         }
         return false;
     };
     Format.line = function (options, indentDepth, code) {
-        var tokens = code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         var returnCode = Format.getReturnCode(options);
-        var i = 0;
-        var result = "";
-        var buffer = "";
-        while (i < tokens.length) {
-            buffer = Format.temporaryAssembleLine(options, indentDepth, result, buffer, tokens, i, 1);
-            if (Format.isLineBreak(options, indentDepth, result, buffer, tokens, i)) {
-                result += buffer + returnCode;
-                buffer = "";
+        var data = {
+            options: options,
+            indentDepth: indentDepth,
+            result: "",
+            buffer: "",
+            tokens: code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []),
+            i: 0,
+        };
+        while (data.i < data.tokens.length) {
+            data.buffer = Format.temporaryAssembleLine(data, 1);
+            if (Format.isLineBreak(data)) {
+                data.result += data.buffer + returnCode;
+                data.buffer = "";
             }
-            ++i;
+            ++data.i;
         }
-        result += buffer + ";" + returnCode;
-        return result;
+        data.result += data.buffer + ";" + returnCode;
+        return data.result;
     };
     Format.inlineBlock = function (options, indentDepth, code) {
         return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.text(options, indentDepth + 1, i); }), true), ["}",], false).join(" ");

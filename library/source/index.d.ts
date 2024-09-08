@@ -73,11 +73,19 @@ export declare namespace Format {
     const getReturnCode: (_options: Types.OutputOptions) => string;
     const expressions: (code: CodeExpression[]) => string;
     const getTokens: (code: CodeInlineEntry | CodeInlineEntry | CodeInlineBlock) => string[];
-    const separator: (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number) => string;
-    const temporaryAssembleLine: (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number, length: number) => string;
-    const isLineBreak: (options: Types.OutputOptions, indentDepth: number, result: string, buffer: string, tokens: string[], i: number) => boolean;
-    const line: (options: Types.OutputOptions, indentDepth: number, code: CodeLine) => string;
-    const inlineBlock: (options: Types.OutputOptions, indentDepth: number, code: CodeInlineBlock) => string;
+    interface LineProcess {
+        options: Readonly<Types.OutputOptions>;
+        indentDepth: number;
+        result: string;
+        buffer: string;
+        tokens: string[];
+        i: number;
+    }
+    const separator: (data: Readonly<LineProcess>) => string;
+    const temporaryAssembleLine: (data: Readonly<LineProcess>, length: number) => string;
+    const isLineBreak: (data: Readonly<LineProcess>) => boolean;
+    const line: (options: Readonly<Types.OutputOptions>, indentDepth: number, code: CodeLine) => string;
+    const inlineBlock: (options: Readonly<Types.OutputOptions>, indentDepth: number, code: CodeInlineBlock) => string;
     const block: (options: Types.OutputOptions, indentDepth: number, code: CodeBlock) => string;
     const text: (options: Types.OutputOptions, indentDepth: number, code: CodeExpression | CodeEntry | CodeEntry[]) => string;
 }
