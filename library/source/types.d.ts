@@ -16,7 +16,10 @@ export declare namespace Types {
         maxLineLength?: null | number;
     }
     const isOutputOptions: (value: unknown, listner?: TypesError.Listener | undefined) => value is OutputOptions;
-    interface TypeSchema {
+    interface CommentProperty {
+        comment?: string[];
+    }
+    interface TypeSchema extends CommentProperty {
         $ref: typeof schema;
         imports?: ImportDefinition[];
         defines: {
@@ -33,7 +36,7 @@ export declare namespace Types {
     interface AlphaElement {
         $type: string;
     }
-    interface AlphaDefinition extends AlphaElement {
+    interface AlphaDefinition extends AlphaElement, CommentProperty {
         export?: boolean;
     }
     interface ImportDefinition {

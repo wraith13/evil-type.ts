@@ -26,7 +26,11 @@ export module Types
         "validatorOption": isValidatorOptionType,
         "maxLineLength": TypesPrime.isOptional(TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isNumber)),
     });
-    export interface TypeSchema
+    export interface CommentProperty
+    {
+        comment?: string[];
+    }
+    export interface TypeSchema extends CommentProperty
     {
         $ref: typeof schema;
         imports?: ImportDefinition[];
@@ -36,10 +40,11 @@ export module Types
     export const isTypeSchema = (value: unknown, listner?: TypesError.Listener): value is TypeSchema =>
         TypesPrime.isSpecificObject<TypeSchema>
         ({
-            "$ref": TypesPrime.isJust(schema),
-            "imports": TypesPrime.isOptional(TypesPrime.isArray(isImportDefinition)),
-            "defines": TypesPrime.isDictionaryObject(isDefinition),
-            "options": isOutputOptions
+            $ref: TypesPrime.isJust(schema),
+            comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
+            imports: TypesPrime.isOptional(TypesPrime.isArray(isImportDefinition)),
+            defines: TypesPrime.isDictionaryObject(isDefinition),
+            options: isOutputOptions,
         })
         (value, listner);
     export type FilePath = string;
@@ -55,7 +60,7 @@ export module Types
     {
         $type: string;
     }
-    export interface AlphaDefinition extends AlphaElement
+    export interface AlphaDefinition extends AlphaElement, CommentProperty
     {
         export?: boolean;
     }
@@ -79,6 +84,7 @@ export module Types
     }
     export const isModuleDefinition = (value: unknown, listner?: TypesError.Listener): value is ModuleDefinition => TypesPrime.isSpecificObject<ModuleDefinition>
     ({
+        comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("module"),
         members: TypesPrime.isDictionaryObject(isDefinition),
@@ -117,6 +123,7 @@ export module Types
     }
     export const isValueDefinition = (value: unknown, listner?: TypesError.Listener): value is ValueDefinition => TypesPrime.isSpecificObject<ValueDefinition>
     ({
+        comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("value"),
         value: TypesPrime.isOr(isLiteralElement, isReferElement),
@@ -150,6 +157,7 @@ export module Types
     }
     export const isTypeDefinition = (value: unknown, listner?: TypesError.Listener): value is TypeDefinition => TypesPrime.isSpecificObject<TypeDefinition>
     ({
+        comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("type"),
         define: isTypeOrRefer,
@@ -174,6 +182,7 @@ export module Types
     }
     export const isInterfaceDefinition = (value: unknown, listner?: TypesError.Listener): value is InterfaceDefinition => TypesPrime.isSpecificObject<InterfaceDefinition>
     ({
+        comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("interface"),
         extends: TypesPrime.isOptional(TypesPrime.isArray(isReferElement)),
