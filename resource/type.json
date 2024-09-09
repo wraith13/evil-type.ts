@@ -588,6 +588,21 @@
                             "$ref": "ReferElement"
                         }
                     }
+                },
+                "TypeOrInterfaceOrRefer": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "or",
+                        "types": [
+                            {
+                                "$ref": "Type"
+                            },
+                            {
+                                "$ref": "ReferElement"
+                            }
+                        ]
+                    }
                 }
             }
         }

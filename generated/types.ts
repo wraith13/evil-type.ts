@@ -116,6 +116,7 @@ export module Types
         $type: "itemof";
         value: ReferElement;
     }
+    export type TypeOrInterfaceOrRefer = Type | ReferElement;
     export const isSchema = (value: unknown): value is typeof schema =>
         "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" === value;
     export const isTypeSchema = (value: unknown): value is TypeSchema => null !== value && "object" === typeof value && "$ref" in value &&
@@ -182,4 +183,5 @@ export module Types
         "$type" in value && "typeof" === value.$type && "value" in value && isReferElement(value.value);
     export const isItemofElement = (value: unknown): value is ItemofElement => null !== value && "object" === typeof value &&
         "$type" in value && "itemof" === value.$type && "value" in value && isReferElement(value.value);
+    export const isTypeOrInterfaceOrRefer = (value: unknown): value is TypeOrInterfaceOrRefer => isType(value) || isReferElement(value);
 }
