@@ -25,6 +25,7 @@ interface CodeBlock extends Code {
 type CodeEntry = CodeInlineBlock | CodeLine | CodeBlock;
 export declare const $expression: (expression: CodeExpression["expression"]) => CodeExpression;
 export declare const $line: (expressions: CodeLine["expressions"]) => CodeLine;
+export declare const $comment: (define: Types.CommentProperty) => CodeLine[];
 export declare const $iblock: (lines: CodeInlineBlock["lines"]) => CodeInlineBlock;
 export declare const $block: (header: CodeBlock["header"], lines: CodeBlock["lines"]) => CodeBlock;
 export declare namespace Build {
@@ -52,7 +53,7 @@ export declare namespace Build {
         }) => CodeEntry[];
         const buildDefineModule: (name: string, value: Types.ModuleDefinition) => CodeBlock;
         const buildImports: (imports: undefined | Types.ImportDefinition[]) => CodeLine[];
-        const buildDefine: (name: string, define: Types.Definition) => CodeEntry;
+        const buildDefine: (name: string, define: Types.Definition) => CodeEntry[];
         const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {

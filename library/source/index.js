@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Format = exports.Build = exports.$block = exports.$iblock = exports.$line = exports.$expression = exports.convertToExpression = void 0;
+exports.Format = exports.Build = exports.$block = exports.$iblock = exports.$comment = exports.$line = exports.$expression = exports.convertToExpression = void 0;
 var startAt = new Date();
 var fs_1 = __importDefault(require("fs"));
 var jsonable_1 = require("./jsonable");
@@ -70,6 +70,8 @@ var $expression = function (expression) { return ({ $code: "expression", express
 exports.$expression = $expression;
 var $line = function (expressions) { return ({ $code: "line", expressions: expressions, }); };
 exports.$line = $line;
+var $comment = function (define) { return define.comment ? define.comment.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("//"), (0, exports.$expression)(i)]); }) : []; };
+exports.$comment = $comment;
 var $iblock = function (lines) { return ({ $code: "inline-block", lines: lines, }); };
 exports.$iblock = $iblock;
 var $block = function (header, lines) { return ({ $code: "block", header: header, lines: lines, }); };
@@ -171,7 +173,8 @@ var Build;
         };
         Define.buildDefineModuleCore = function (members) {
             return __spreadArray(__spreadArray([], Object.entries(members)
-                .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); }), true), removeNullFilter(Object.entries(members)
+                .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); })
+                .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true), removeNullFilter(Object.entries(members)
                 .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })), true);
         };
         Define.buildDefineModule = function (name, value) {
@@ -185,13 +188,13 @@ var Build;
         Define.buildDefine = function (name, define) {
             switch (define.$type) {
                 case "interface":
-                    return Define.buildDefineInterface(name, define);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineInterface(name, define),], false);
                 case "module":
-                    return Define.buildDefineModule(name, define);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineModule(name, define),], false);
                 case "type":
-                    return Define.buildDefineLine("type", name, define);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineLine("type", name, define),], false);
                 case "value":
-                    return Define.buildDefineLine("const", name, define, [(0, exports.$expression)("as"), (0, exports.$expression)("const"),]);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineLine("const", name, define, [(0, exports.$expression)("as"), (0, exports.$expression)("const"),]),], false);
             }
         };
         Define.buildInlineDefine = function (define) {
@@ -524,7 +527,7 @@ try {
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
     var errorListner = types_error_1.TypesError.makeListener(jsonPath);
     if (types_1.Types.isTypeSchema(typeSource, errorListner)) {
-        var code = __spreadArray(__spreadArray([], Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineModuleCore(typeSource.defines), true);
+        var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineModuleCore(typeSource.defines), true);
         var result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile) {
             fs_1.default.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });

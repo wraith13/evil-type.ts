@@ -101,6 +101,7 @@ interface CodeBlock extends Code
 type CodeEntry = CodeInlineBlock | CodeLine | CodeBlock;
 export const $expression = (expression: CodeExpression["expression"]): CodeExpression => ({ $code: "expression", expression, });
 export const $line = (expressions: CodeLine["expressions"]): CodeLine => ({ $code: "line", expressions, });
+export const $comment = (define: Types.CommentProperty): CodeLine[] => define.comment ? define.comment.map(i => $line([$expression("//"), $expression(i)])): [];
 export const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ $code: "inline-block", lines, });
 export const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
 export module Build
@@ -212,7 +213,8 @@ export module Build
         export const buildDefineModuleCore = (members: { [key: string]: Types.Definition; }): CodeEntry[] =>
         [
             ...Object.entries(members)
-                .map(i => Build.Define.buildDefine(i[0], i[1])),
+                .map(i => Build.Define.buildDefine(i[0], i[1]))
+                .reduce((a, b) => [...a, ...b], []),
             ...removeNullFilter
             (
                 Object.entries(members)
@@ -227,18 +229,18 @@ export module Build
         };
         export const buildImports = (imports: undefined | Types.ImportDefinition[]) =>
             undefined === imports ? []: imports.map(i => $line([ $expression("import"), $expression(i.target), $expression("from"), $expression(JSON.stringify(i.from)) ]));
-        export const buildDefine = (name: string, define: Types.Definition): CodeEntry =>
+        export const buildDefine = (name: string, define: Types.Definition): CodeEntry[] =>
         {
             switch(define.$type)
             {
             case "interface":
-                return buildDefineInterface(name, define);
+                return [ ...$comment(define), buildDefineInterface(name, define), ];
             case "module":
-                return buildDefineModule(name, define);
+                return [ ...$comment(define), buildDefineModule(name, define), ];
             case "type":
-                return buildDefineLine("type", name, define);
+                return [ ...$comment(define), buildDefineLine("type", name, define), ];
             case "value":
-                return buildDefineLine("const", name, define, [ $expression("as"), $expression("const"), ]);
+                return [ ...$comment(define), buildDefineLine("const", name, define, [ $expression("as"), $expression("const"), ]), ];
             }
         };
         export const buildInlineDefine = (define: Types.TypeOrValueOfRefer): (CodeExpression | CodeInlineBlock)[] =>
@@ -657,6 +659,7 @@ try
     {
         const code =
         [
+            ...$comment(typeSource),
             ...Build.Define.buildImports(typeSource.imports),
             ...Build.Define.buildDefineModuleCore(typeSource.defines),
         ];
