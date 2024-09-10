@@ -24,9 +24,6 @@ var config_json_1 = __importDefault(require("../resource/config.json"));
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
 var jsonPath = process.argv[2];
 console.log("\uD83D\uDE80 ".concat(jsonPath, " build start: ").concat(startAt));
-var removeNullFilter = function (list) {
-    return list.filter(function (i) { return null !== i; });
-};
 var isEmptyArray = function (list) { return Array.isArray(list) && list.length <= 0; };
 var kindofJoinExpression = function (list, separator) {
     return list.reduce(function (a, b) { return isEmptyArray(a) || isEmptyArray(b) ?
@@ -173,9 +170,8 @@ var Build;
         };
         Define.buildDefineModuleCore = function (members) {
             return __spreadArray(__spreadArray([], Object.entries(members)
-                .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); })
-                .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true), removeNullFilter(Object.entries(members)
-                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? null : Build.Validator.buildValidator(i[0], i[1]); })), true);
+                .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); }), true), Object.entries(members)
+                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? [] : [Build.Validator.buildValidator(i[0], i[1])]; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
         Define.buildDefineModule = function (name, value) {
             var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("module"), (0, exports.$expression)(name),], false);

@@ -10,8 +10,6 @@ import config from "../resource/config.json";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
-const removeNullFilter = <ElementType>(list: (ElementType | null)[]): ElementType[] =>
-    list.filter(i => null !== i) as ElementType[];
 const isEmptyArray = (list: unknown) => Array.isArray(list) && list.length <= 0;
 const kindofJoinExpression = <T>(list: T[], separator: CodeExpression) =>
         list.reduce
@@ -213,14 +211,11 @@ export module Build
         export const buildDefineModuleCore = (members: { [key: string]: Types.Definition; }): CodeEntry[] =>
         [
             ...Object.entries(members)
-                .map(i => Build.Define.buildDefine(i[0], i[1]))
-                .reduce((a, b) => [...a, ...b], []),
-            ...removeNullFilter
-            (
-                Object.entries(members)
-                    .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? null: Build.Validator.buildValidator(i[0], i[1]))
-            )
-        ];
+                .map(i => Build.Define.buildDefine(i[0], i[1])),
+            ...Object.entries(members)
+                .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? []: [Build.Validator.buildValidator(i[0], i[1])])
+        ]
+        .reduce((a, b) => [...a, ...b], []);
         export const buildDefineModule = (name: string, value: Types.ModuleDefinition): CodeBlock =>
         {
             const header = [...buildExport(value), $expression("module"), $expression(name), ];
