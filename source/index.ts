@@ -208,30 +208,30 @@ export module Build
                 return $block(header, lines);
             }
         };
-        export const buildDefineModuleCore = (members: { [key: string]: Types.Definition; }): CodeEntry[] =>
+        export const buildDefineModuleCore = (options: Types.OutputOptions, members: { [key: string]: Types.Definition; }): CodeEntry[] =>
         [
             ...Object.entries(members)
-                .map(i => Build.Define.buildDefine(i[0], i[1])),
+                .map(i => Build.Define.buildDefine(options, i[0], i[1])),
             ...Object.entries(members)
-                .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? []: [Build.Validator.buildValidator(i[0], i[1])])
+                .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) || "none" === options.validatorOption ? []: [Build.Validator.buildValidator(i[0], i[1])])
         ]
         .reduce((a, b) => [...a, ...b], []);
-        export const buildDefineModule = (name: string, value: Types.ModuleDefinition): CodeBlock =>
+        export const buildDefineModule = (options: Types.OutputOptions, name: string, value: Types.ModuleDefinition): CodeBlock =>
         {
             const header = [...buildExport(value), $expression("module"), $expression(name), ];
-            const lines = buildDefineModuleCore(value.members);
+            const lines = buildDefineModuleCore(options, value.members);
             return $block(header, lines);
         };
         export const buildImports = (imports: undefined | Types.ImportDefinition[]) =>
             undefined === imports ? []: imports.map(i => $line([ $expression("import"), $expression(i.target), $expression("from"), $expression(JSON.stringify(i.from)) ]));
-        export const buildDefine = (name: string, define: Types.Definition): CodeEntry[] =>
+        export const buildDefine = (options: Types.OutputOptions, name: string, define: Types.Definition): CodeEntry[] =>
         {
             switch(define.$type)
             {
             case "interface":
                 return [ ...$comment(define), buildDefineInterface(name, define), ];
             case "module":
-                return [ ...$comment(define), buildDefineModule(name, define), ];
+                return [ ...$comment(define), buildDefineModule(options, name, define), ];
             case "type":
                 return [ ...$comment(define), buildDefineLine("type", name, define), ];
             case "value":
@@ -656,7 +656,7 @@ try
         [
             ...$comment(typeSource),
             ...Build.Define.buildImports(typeSource.imports),
-            ...Build.Define.buildDefineModuleCore(typeSource.defines),
+            ...Build.Define.buildDefineModuleCore(typeSource.options, typeSource.defines),
         ];
         const result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile)

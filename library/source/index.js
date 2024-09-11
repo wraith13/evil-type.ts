@@ -168,25 +168,25 @@ var Build;
                 return (0, exports.$block)(header, lines);
             }
         };
-        Define.buildDefineModuleCore = function (members) {
+        Define.buildDefineModuleCore = function (options, members) {
             return __spreadArray(__spreadArray([], Object.entries(members)
-                .map(function (i) { return Build.Define.buildDefine(i[0], i[1]); }), true), Object.entries(members)
-                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? [] : [Build.Validator.buildValidator(i[0], i[1])]; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                .map(function (i) { return Build.Define.buildDefine(options, i[0], i[1]); }), true), Object.entries(members)
+                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) || "none" === options.validatorOption ? [] : [Build.Validator.buildValidator(i[0], i[1])]; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
-        Define.buildDefineModule = function (name, value) {
+        Define.buildDefineModule = function (options, name, value) {
             var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("module"), (0, exports.$expression)(name),], false);
-            var lines = Define.buildDefineModuleCore(value.members);
+            var lines = Define.buildDefineModuleCore(options, value.members);
             return (0, exports.$block)(header, lines);
         };
         Define.buildImports = function (imports) {
             return undefined === imports ? [] : imports.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("import"), (0, exports.$expression)(i.target), (0, exports.$expression)("from"), (0, exports.$expression)(JSON.stringify(i.from))]); });
         };
-        Define.buildDefine = function (name, define) {
+        Define.buildDefine = function (options, name, define) {
             switch (define.$type) {
                 case "interface":
                     return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineInterface(name, define),], false);
                 case "module":
-                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineModule(name, define),], false);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineModule(options, name, define),], false);
                 case "type":
                     return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineLine("type", name, define),], false);
                 case "value":
@@ -523,7 +523,7 @@ try {
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
     var errorListner = types_error_1.TypesError.makeListener(jsonPath);
     if (types_1.Types.isTypeSchema(typeSource, errorListner)) {
-        var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineModuleCore(typeSource.defines), true);
+        var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineModuleCore(typeSource.options, typeSource.defines), true);
         var result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile) {
             fs_1.default.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });

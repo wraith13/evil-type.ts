@@ -48,12 +48,12 @@ export declare namespace Build {
         const buildInlineDefineOr: (value: Types.OrElement) => CodeExpression[];
         const buildDefineInlineInterface: (value: Types.InterfaceDefinition) => CodeInlineBlock;
         const buildDefineInterface: (name: string, value: Types.InterfaceDefinition) => CodeBlock;
-        const buildDefineModuleCore: (members: {
+        const buildDefineModuleCore: (options: Types.OutputOptions, members: {
             [key: string]: Types.Definition;
         }) => CodeEntry[];
-        const buildDefineModule: (name: string, value: Types.ModuleDefinition) => CodeBlock;
+        const buildDefineModule: (options: Types.OutputOptions, name: string, value: Types.ModuleDefinition) => CodeBlock;
         const buildImports: (imports: undefined | Types.ImportDefinition[]) => CodeLine[];
-        const buildDefine: (name: string, define: Types.Definition) => CodeEntry[];
+        const buildDefine: (options: Types.OutputOptions, name: string, define: Types.Definition) => CodeEntry[];
         const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {
