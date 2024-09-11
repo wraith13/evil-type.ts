@@ -213,7 +213,7 @@ export module Build
             ...Object.entries(members)
                 .map(i => Build.Define.buildDefine(options, i[0], i[1])),
             ...Object.entries(members)
-                .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) || "none" === options.validatorOption ? []: [Build.Validator.buildValidator(i[0], i[1])])
+                .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? []: Build.Validator.buildValidator(options, i[0], i[1]))
         ]
         .reduce((a, b) => [...a, ...b], []);
         export const buildDefineModule = (options: Types.OutputOptions, name: string, value: Types.ModuleDefinition): CodeBlock =>
@@ -485,14 +485,25 @@ export module Build
         ];
         export const isValidatorTarget = (define: Types.TypeOrValue) =>
             ! (Types.isValueDefinition(define) && false === define.validator);
-        export const buildValidator = (name: string, define: Types.TypeOrValue): CodeLine => $line
-        ([
-            ...buildExport(define),
-            $expression("const"),
-            $expression(buildValidatorName(name)),
-            $expression("="),
-            ...buildInlineValidator(name, define),
-        ]);
+        export const buildValidator = (options: Types.OutputOptions, name: string, define: Types.TypeOrValue): CodeLine[] =>
+        {
+            if ("none" !== options.validatorOption)
+            {
+                const result =
+                [
+                    $line
+                    ([
+                        ...buildExport(define),
+                        $expression("const"),
+                        $expression(buildValidatorName(name)),
+                        $expression("="),
+                        ...buildInlineValidator(name, define),
+                    ])
+                ];
+                return result;
+            }
+            return [];
+        };
     }
 }
 export module Format

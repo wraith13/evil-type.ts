@@ -65,7 +65,7 @@ export declare namespace Build {
         const buildInterfaceValidator: (name: string, define: Types.InterfaceDefinition) => CodeExpression[];
         const buildInlineValidator: (name: string, define: Types.TypeOrValue) => CodeExpression[];
         const isValidatorTarget: (define: Types.TypeOrValue) => boolean;
-        const buildValidator: (name: string, define: Types.TypeOrValue) => CodeLine;
+        const buildValidator: (options: Types.OutputOptions, name: string, define: Types.TypeOrValue) => CodeLine[];
     }
 }
 export declare namespace Format {

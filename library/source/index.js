@@ -171,7 +171,7 @@ var Build;
         Define.buildDefineModuleCore = function (options, members) {
             return __spreadArray(__spreadArray([], Object.entries(members)
                 .map(function (i) { return Build.Define.buildDefine(options, i[0], i[1]); }), true), Object.entries(members)
-                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) || "none" === options.validatorOption ? [] : [Build.Validator.buildValidator(i[0], i[1])]; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? [] : Build.Validator.buildValidator(options, i[0], i[1]); }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
         Define.buildDefineModule = function (options, name, value) {
             var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("module"), (0, exports.$expression)(name),], false);
@@ -389,11 +389,19 @@ var Build;
         Validator.isValidatorTarget = function (define) {
             return !(types_1.Types.isValueDefinition(define) && false === define.validator);
         };
-        Validator.buildValidator = function (name, define) { return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
-            (0, exports.$expression)("const"),
-            (0, exports.$expression)(Validator.buildValidatorName(name)),
-            (0, exports.$expression)("=")
-        ], false), Validator.buildInlineValidator(name, define), true)); };
+        Validator.buildValidator = function (options, name, define) {
+            if ("none" !== options.validatorOption) {
+                var result = [
+                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                        (0, exports.$expression)("const"),
+                        (0, exports.$expression)(Validator.buildValidatorName(name)),
+                        (0, exports.$expression)("=")
+                    ], false), Validator.buildInlineValidator(name, define), true))
+                ];
+                return result;
+            }
+            return [];
+        };
     })(Validator = Build.Validator || (Build.Validator = {}));
 })(Build || (exports.Build = Build = {}));
 var Format;
