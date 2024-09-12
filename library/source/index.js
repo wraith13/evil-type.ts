@@ -386,17 +386,32 @@ var Build;
                 (0, exports.$expression)("(value: unknown): value is ".concat(types_1.Types.isValueDefinition(define) ? "typeof " + name : name, " =>"))
             ], Validator.buildValidatorExpression("value", define), true);
         };
+        Validator.buildFullValidator = function (name, define) {
+            return __spreadArray([
+                (0, exports.$expression)("(value: unknown, listner?: TypesError.Listener): value is ".concat(types_1.Types.isValueDefinition(define) ? "typeof " + name : name, " =>"))
+            ], Validator.buildValidatorExpression("value", define), true);
+        };
         Validator.isValidatorTarget = function (define) {
             return !(types_1.Types.isValueDefinition(define) && false === define.validator);
         };
         Validator.buildValidator = function (options, name, define) {
-            if ("none" !== options.validatorOption) {
+            if ("simple" === options.validatorOption) {
                 var result = [
                     (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
                         (0, exports.$expression)("const"),
                         (0, exports.$expression)(Validator.buildValidatorName(name)),
                         (0, exports.$expression)("=")
                     ], false), Validator.buildInlineValidator(name, define), true))
+                ];
+                return result;
+            }
+            if ("full" === options.validatorOption) {
+                var result = [
+                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                        (0, exports.$expression)("const"),
+                        (0, exports.$expression)(Validator.buildValidatorName(name)),
+                        (0, exports.$expression)("=")
+                    ], false), Validator.buildFullValidator(name, define), true))
                 ];
                 return result;
             }

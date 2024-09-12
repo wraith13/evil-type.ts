@@ -483,11 +483,16 @@ export module Build
             $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
+        export const buildFullValidator = (name: string, define: Types.TypeOrValue) =>
+        [
+            $expression(`(value: unknown, listner?: TypesError.Listener): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
+            ...buildValidatorExpression("value", define),
+        ];
         export const isValidatorTarget = (define: Types.TypeOrValue) =>
             ! (Types.isValueDefinition(define) && false === define.validator);
         export const buildValidator = (options: Types.OutputOptions, name: string, define: Types.TypeOrValue): CodeLine[] =>
         {
-            if ("none" !== options.validatorOption)
+            if ("simple" === options.validatorOption)
             {
                 const result =
                 [
@@ -498,6 +503,21 @@ export module Build
                         $expression(buildValidatorName(name)),
                         $expression("="),
                         ...buildInlineValidator(name, define),
+                    ])
+                ];
+                return result;
+            }
+            if ("full" === options.validatorOption)
+            {
+                const result =
+                [
+                    $line
+                    ([
+                        ...buildExport(define),
+                        $expression("const"),
+                        $expression(buildValidatorName(name)),
+                        $expression("="),
+                        ...buildFullValidator(name, define),
                     ])
                 ];
                 return result;
