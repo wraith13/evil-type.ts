@@ -30,6 +30,12 @@ export module Types
     {
         comment?: string[];
     }
+    export const isCommentProperty = (value: unknown, listner?: TypesError.Listener): value is CommentProperty =>
+        TypesPrime.isSpecificObject<CommentProperty>
+        ({
+            comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
+        })
+        (value, listner);
     export interface TypeSchema extends CommentProperty
     {
         $ref: typeof schema;
