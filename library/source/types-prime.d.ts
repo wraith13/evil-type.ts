@@ -37,7 +37,7 @@ export declare namespace TypesPrime {
     } & {
         [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
     };
-    const isSpecificObject: <ObjectType extends object>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypesError.Listener) => value is ObjectType;
+    const isSpecificObject: <ObjectType extends object>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener) => value is ObjectType;
     const isDictionaryObject: <MemberType>(isType: (m: unknown, listner?: TypesError.Listener) => m is MemberType) => (value: unknown, listner?: TypesError.Listener) => value is {
         [key: string]: MemberType;
     };

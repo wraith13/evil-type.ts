@@ -21,18 +21,14 @@ var Types;
             comment: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isString)),
         });
     };
-    Types.isCommentProperty = function (value, listner) {
-        return types_prime_1.TypesPrime.isSpecificObject(Types.getCommentPropertyValidator())(value, listner);
-    };
+    Types.isCommentProperty = types_prime_1.TypesPrime.isSpecificObject(Types.getCommentPropertyValidator);
     Types.getTypeSchemaValidator = function () { return Object.assign(Types.getCommentPropertyValidator(), {
         $ref: types_prime_1.TypesPrime.isJust(Types.schema),
         imports: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isImportDefinition)),
         defines: types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
         options: Types.isOutputOptions,
     }); };
-    Types.isTypeSchema = function (value, listner) {
-        return types_prime_1.TypesPrime.isSpecificObject(Types.getTypeSchemaValidator())(value, listner);
-    };
+    Types.isTypeSchema = types_prime_1.TypesPrime.isSpecificObject(Types.getTypeSchemaValidator);
     Types.isReferElement = types_prime_1.TypesPrime.isSpecificObject({
         "$ref": types_prime_1.TypesPrime.isString,
     });

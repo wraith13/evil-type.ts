@@ -193,11 +193,11 @@ export module TypesPrime
         { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) } &
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
-    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType>) => (value: unknown, listner?: TypesError.Listener): value is ObjectType =>
+    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener): value is ObjectType =>
     {
         if (isObject(value))
         {
-            const result = Object.entries(memberValidator).map
+            const result = Object.entries("function" === typeof memberValidator ? memberValidator(): memberValidator).map
             (
                 kv => isMemberType<ObjectType>
                 (
@@ -225,7 +225,7 @@ export module TypesPrime
         {
             return undefined !== listner && TypesError.raiseError(listner, "object", value);
         }
-    }
+    };
     export const isDictionaryObject = <MemberType>(isType: ((m: unknown, listner?: TypesError.Listener) => m is MemberType)) => (value: unknown, listner?: TypesError.Listener): value is { [key: string]: MemberType } =>
     {
         if (isObject(value))

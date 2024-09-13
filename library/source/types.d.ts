@@ -21,7 +21,7 @@ export declare namespace Types {
         comment?: string[];
     }
     const getCommentPropertyValidator: () => TypesPrime.ObjectValidator<CommentProperty>;
-    const isCommentProperty: (value: unknown, listner?: TypesError.Listener) => value is CommentProperty;
+    const isCommentProperty: (value: unknown, listner?: TypesError.Listener | undefined) => value is CommentProperty;
     interface TypeSchema extends CommentProperty {
         $ref: typeof schema;
         imports?: ImportDefinition[];
@@ -31,7 +31,7 @@ export declare namespace Types {
         options: OutputOptions;
     }
     const getTypeSchemaValidator: () => TypesPrime.ObjectValidator<TypeSchema>;
-    const isTypeSchema: (value: unknown, listner?: TypesError.Listener) => value is TypeSchema;
+    const isTypeSchema: (value: unknown, listner?: TypesError.Listener | undefined) => value is TypeSchema;
     type FilePath = string;
     interface ReferElement {
         $ref: string;

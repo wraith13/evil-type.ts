@@ -173,7 +173,7 @@ var TypesPrime;
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     TypesPrime.isSpecificObject = function (memberValidator) { return function (value, listner) {
         if (TypesPrime.isObject(value)) {
-            var result = Object.entries(memberValidator).map(function (kv) { return TypesPrime.isMemberType(value, kv[0], kv[1], types_error_1.TypesError.nextListener(kv[0], listner)); })
+            var result = Object.entries("function" === typeof memberValidator ? memberValidator() : memberValidator).map(function (kv) { return TypesPrime.isMemberType(value, kv[0], kv[1], types_error_1.TypesError.nextListener(kv[0], listner)); })
                 .every(function (i) { return i; });
             if (listner) {
                 if (result) {

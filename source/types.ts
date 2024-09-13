@@ -34,8 +34,7 @@ export module Types
     ({
         comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
     });
-    export const isCommentProperty = (value: unknown, listner?: TypesError.Listener): value is CommentProperty =>
-        TypesPrime.isSpecificObject(getCommentPropertyValidator())(value, listner);
+    export const isCommentProperty = TypesPrime.isSpecificObject(getCommentPropertyValidator);
     export interface TypeSchema extends CommentProperty
     {
         $ref: typeof schema;
@@ -53,8 +52,7 @@ export module Types
             options: isOutputOptions,
         }
     );
-    export const isTypeSchema = (value: unknown, listner?: TypesError.Listener): value is TypeSchema =>
-        TypesPrime.isSpecificObject(getTypeSchemaValidator())(value, listner);
+    export const isTypeSchema = TypesPrime.isSpecificObject(getTypeSchemaValidator);
     export type FilePath = string;
     export interface ReferElement
     {
