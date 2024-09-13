@@ -1,5 +1,6 @@
 import { Jsonable } from "./jsonable";
 import { TypesError } from "./types-error";
+import { TypesPrime } from "./types-prime";
 export declare namespace Types {
     const schema: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
     const ValidatorOptionTypeMembers: readonly ["none", "simple", "full"];
@@ -19,6 +20,8 @@ export declare namespace Types {
     interface CommentProperty {
         comment?: string[];
     }
+    const getCommentPropertyValidator: () => TypesPrime.ObjectValidator<CommentProperty>;
+    const isCommentProperty: (value: unknown, listner?: TypesError.Listener) => value is CommentProperty;
     interface TypeSchema extends CommentProperty {
         $ref: typeof schema;
         imports?: ImportDefinition[];
@@ -27,6 +30,7 @@ export declare namespace Types {
         };
         options: OutputOptions;
     }
+    const getTypeSchemaValidator: () => TypesPrime.ObjectValidator<TypeSchema>;
     const isTypeSchema: (value: unknown, listner?: TypesError.Listener) => value is TypeSchema;
     type FilePath = string;
     interface ReferElement {

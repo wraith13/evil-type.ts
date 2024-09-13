@@ -30,12 +30,12 @@ export module Types
     {
         comment?: string[];
     }
+    export const getCommentPropertyValidator = () :TypesPrime.ObjectValidator<CommentProperty> =>
+    ({
+        comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
+    });
     export const isCommentProperty = (value: unknown, listner?: TypesError.Listener): value is CommentProperty =>
-        TypesPrime.isSpecificObject<CommentProperty>
-        ({
-            comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
-        })
-        (value, listner);
+        TypesPrime.isSpecificObject(getCommentPropertyValidator())(value, listner);
     export interface TypeSchema extends CommentProperty
     {
         $ref: typeof schema;
@@ -43,16 +43,18 @@ export module Types
         defines: { [key: string]: Definition; };
         options: OutputOptions;
     }
-    export const isTypeSchema = (value: unknown, listner?: TypesError.Listener): value is TypeSchema =>
-        TypesPrime.isSpecificObject<TypeSchema>
-        ({
+    export const getTypeSchemaValidator = () :TypesPrime.ObjectValidator<TypeSchema> => Object.assign
+    (
+        getCommentPropertyValidator(),
+        {
             $ref: TypesPrime.isJust(schema),
-            comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
             imports: TypesPrime.isOptional(TypesPrime.isArray(isImportDefinition)),
             defines: TypesPrime.isDictionaryObject(isDefinition),
             options: isOutputOptions,
-        })
-        (value, listner);
+        }
+    );
+    export const isTypeSchema = (value: unknown, listner?: TypesError.Listener): value is TypeSchema =>
+        TypesPrime.isSpecificObject(getTypeSchemaValidator())(value, listner);
     export type FilePath = string;
     export interface ReferElement
     {
