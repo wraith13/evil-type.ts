@@ -17,10 +17,11 @@ export declare namespace TypesPrime {
     const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypesError.Listener) => value is T[K]; }) => (value: unknown, listner?: TypesError.Listener) => value is T[number];
     interface OptionalKeyTypeGuard<T> {
         $type: "optional-type-guard";
-        isType: (value: unknown, listner?: TypesError.Listener) => value is T;
+        isType: ((value: unknown, listner?: TypesError.Listener) => value is T) | ObjectValidator<T>;
     }
     const isOptionalKeyTypeGuard: (value: unknown, listner?: TypesError.Listener) => value is OptionalKeyTypeGuard<unknown>;
     const makeOptionalKeyTypeGuard: <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T) => OptionalKeyTypeGuard<T>;
+    const invokeIsType: <T>(isType: ObjectValidator<T> | ((value: unknown, listner?: TypesError.Listener) => value is T)) => ((value: unknown, listner?: TypesError.Listener) => value is T) | ((value: unknown, listner?: TypesError.Listener) => value is object);
     const isOptional: <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T) => OptionalKeyTypeGuard<T>;
     const isOptionalMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener) => boolean;
     const isMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, isType: OptionalKeyTypeGuard<unknown> | ((v: unknown, listner?: TypesError.Listener) => boolean), listner?: TypesError.Listener) => boolean;
@@ -33,7 +34,7 @@ export declare namespace TypesPrime {
     type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
     type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
     type ObjectValidator<ObjectType> = {
-        [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]);
+        [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) | ObjectValidator<ObjectType[key]>;
     } & {
         [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
     };

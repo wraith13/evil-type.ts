@@ -140,7 +140,7 @@ export module TypesPrime
     export interface OptionalKeyTypeGuard<T>
     {
         $type: "optional-type-guard";
-        isType: (value: unknown, listner?: TypesError.Listener) => value is T;
+        isType: ((value: unknown, listner?: TypesError.Listener) => value is T) | ObjectValidator<T>;
     }
     export const isOptionalKeyTypeGuard = (value: unknown, listner?: TypesError.Listener): value is OptionalKeyTypeGuard<unknown> =>
         isSpecificObject<OptionalKeyTypeGuard<unknown>>
@@ -154,10 +154,12 @@ export module TypesPrime
         $type: "optional-type-guard",
         isType,
     });
+    export const invokeIsType = <T>(isType: ((value: unknown, listner?: TypesError.Listener) => value is T) | ObjectValidator<T>) =>
+        "function" === typeof isType ? isType: isSpecificObject(isType);
     export const isOptional = makeOptionalKeyTypeGuard;
     export const isOptionalMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener): boolean =>
     {
-        const result = ! (member in value) || optionalTypeGuard.isType((value as ObjectType)[member], listner);
+        const result = ! (member in value) || invokeIsType(optionalTypeGuard.isType)((value as ObjectType)[member], listner);
         if ( ! result && listner)
         {
             const error = listner.errors.filter(i => i.path === listner.path)[0];
@@ -181,8 +183,8 @@ export module TypesPrime
     };
     export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypesError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener): boolean =>
         isOptionalKeyTypeGuard(isType) ?
-            isOptionalMemberType(value, member, isType,listner):
-            isType((value as ObjectType)[member], listner);
+            isOptionalMemberType(value, member, isType, listner):
+            invokeIsType(isType)((value as ObjectType)[member], listner);
     export type OptionalKeys<T> =
         { [K in keyof T]: T extends Record<K, T[K]> ? never : K } extends { [_ in keyof T]: infer U }
         ? U : never;
@@ -190,7 +192,7 @@ export module TypesPrime
     export type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
     export type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
     export type ObjectValidator<ObjectType> =
-        { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) } &
+        { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) | ObjectValidator<ObjectType[key]> } &
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener): value is ObjectType =>

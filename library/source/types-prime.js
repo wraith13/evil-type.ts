@@ -145,9 +145,12 @@ var TypesPrime;
             isType: isType,
         });
     };
+    TypesPrime.invokeIsType = function (isType) {
+        return "function" === typeof isType ? isType : TypesPrime.isSpecificObject(isType);
+    };
     TypesPrime.isOptional = TypesPrime.makeOptionalKeyTypeGuard;
     TypesPrime.isOptionalMemberType = function (value, member, optionalTypeGuard, listner) {
-        var result = !(member in value) || optionalTypeGuard.isType(value[member], listner);
+        var result = !(member in value) || TypesPrime.invokeIsType(optionalTypeGuard.isType)(value[member], listner);
         if (!result && listner) {
             var error = listner.errors.filter(function (i) { return i.path === listner.path; })[0];
             if (error) {
@@ -168,7 +171,7 @@ var TypesPrime;
     TypesPrime.isMemberType = function (value, member, isType, listner) {
         return TypesPrime.isOptionalKeyTypeGuard(isType) ?
             TypesPrime.isOptionalMemberType(value, member, isType, listner) :
-            isType(value[member], listner);
+            TypesPrime.invokeIsType(isType)(value[member], listner);
     };
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
     TypesPrime.isSpecificObject = function (memberValidator) { return function (value, listner) {
