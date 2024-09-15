@@ -174,6 +174,9 @@ var TypesPrime;
             TypesPrime.invokeIsType(isType)(value[member], listner);
     };
     // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
+    TypesPrime.margeObjectValidator = function (a, b) {
+        return Object.assign({}, a, b);
+    };
     TypesPrime.isSpecificObject = function (memberValidator) { return function (value, listner) {
         if (TypesPrime.isObject(value)) {
             var result = Object.entries("function" === typeof memberValidator ? memberValidator() : memberValidator).map(function (kv) { return TypesPrime.isMemberType(value, kv[0], kv[1], types_error_1.TypesError.nextListener(kv[0], listner)); })

@@ -8,23 +8,23 @@ export declare namespace TypesPrime {
     const isNumber: (value: unknown, listner?: TypesError.Listener) => value is number;
     const isString: (value: unknown, listner?: TypesError.Listener) => value is string;
     type ActualObject = Exclude<object, null>;
-    const isObject: (value: unknown) => value is object;
+    const isObject: (value: unknown) => value is ActualObject;
     const isEnum: <T>(list: readonly T[]) => (value: unknown, listner?: TypesError.Listener) => value is T;
     const isArray: <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T) => (value: unknown, listner?: TypesError.Listener) => value is T[];
     const isJsonable: (value: unknown, listner?: TypesError.Listener) => value is Jsonable.Jsonable;
-    const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypesError.Listener) => value is T[K]; }) => string[];
+    const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]); }) => string[];
     const getBestMatchErrors: (listeners: TypesError.Listener[]) => TypesError.Listener[];
-    const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: (value: unknown, listner?: TypesError.Listener) => value is T[K]; }) => (value: unknown, listner?: TypesError.Listener) => value is T[number];
+    const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]); }) => (value: unknown, listner?: TypesError.Listener) => value is T[number];
     interface OptionalKeyTypeGuard<T> {
         $type: "optional-type-guard";
         isType: ((value: unknown, listner?: TypesError.Listener) => value is T) | ObjectValidator<T>;
     }
     const isOptionalKeyTypeGuard: (value: unknown, listner?: TypesError.Listener) => value is OptionalKeyTypeGuard<unknown>;
     const makeOptionalKeyTypeGuard: <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T) => OptionalKeyTypeGuard<T>;
-    const invokeIsType: <T>(isType: ObjectValidator<T> | ((value: unknown, listner?: TypesError.Listener) => value is T)) => ((value: unknown, listner?: TypesError.Listener) => value is T) | ((value: unknown, listner?: TypesError.Listener) => value is object);
+    const invokeIsType: <T>(isType: ((value: unknown, listner?: TypesError.Listener) => value is T) | ObjectValidator<T>) => ((value: unknown, listner?: TypesError.Listener) => value is T) | ((value: unknown, listner?: TypesError.Listener) => value is object);
     const isOptional: <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T) => OptionalKeyTypeGuard<T>;
-    const isOptionalMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener) => boolean;
-    const isMemberType: <ObjectType extends object>(value: ActualObject, member: keyof ObjectType, isType: OptionalKeyTypeGuard<unknown> | ((v: unknown, listner?: TypesError.Listener) => boolean), listner?: TypesError.Listener) => boolean;
+    const isOptionalMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener) => boolean;
+    const isMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypesError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener) => boolean;
     type OptionalKeys<T> = {
         [K in keyof T]: T extends Record<K, T[K]> ? never : K;
     } extends {
@@ -38,8 +38,9 @@ export declare namespace TypesPrime {
     } & {
         [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
     };
-    const isSpecificObject: <ObjectType extends object>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener) => value is ObjectType;
-    const isDictionaryObject: <MemberType>(isType: (m: unknown, listner?: TypesError.Listener) => m is MemberType) => (value: unknown, listner?: TypesError.Listener) => value is {
+    const margeObjectValidator: <A, B>(a: ObjectValidator<A>, b: ObjectValidator<B>) => ObjectValidator<Omit<A, keyof B> & B>;
+    const isSpecificObject: <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener) => value is ObjectType;
+    const isDictionaryObject: <MemberType>(isType: ((m: unknown, listner?: TypesError.Listener) => m is MemberType)) => (value: unknown, listner?: TypesError.Listener) => value is {
         [key: string]: MemberType;
     };
 }

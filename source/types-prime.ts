@@ -195,6 +195,8 @@ export module TypesPrime
         { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) | ObjectValidator<ObjectType[key]> } &
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
+    export const margeObjectValidator = <A, B>(a: ObjectValidator<A>, b: ObjectValidator<B>) =>
+        Object.assign({ }, a, b) as ObjectValidator<Omit<A, keyof B> & B>;
     export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener): value is ObjectType =>
     {
         if (isObject(value))

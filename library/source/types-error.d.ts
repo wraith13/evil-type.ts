@@ -16,10 +16,10 @@ export declare namespace TypesError {
     const nextListener: (name: string | number, listner: Listener | undefined) => Listener | undefined;
     const makePath: (path: string, name: string | number) => string;
     const getPathDepth: (path: string) => number;
-    const getType: (isType: (v: unknown, listner?: TypesError.Listener) => boolean) => string[];
-    const isMtached: (matchRate: boolean | number) => boolean;
+    const getType: (isType: ((v: unknown, listner?: TypesError.Listener) => boolean)) => string[];
+    const isMtached: (matchRate: boolean | number) => matchRate is true;
     const matchRateToNumber: (matchRate: boolean | number) => number;
-    const setMatchRate: (listner: Listener | undefined, matchRate: boolean | number) => boolean;
+    const setMatchRate: (listner: Listener | undefined, matchRate: boolean | number) => matchRate is true;
     const getMatchRate: (listner: Listener, path?: string) => number | boolean;
     const calculateMatchRate: (listner: Listener, path?: string) => number | true;
     const setMatch: (listner: Listener | undefined) => void;
