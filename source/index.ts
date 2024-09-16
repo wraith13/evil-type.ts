@@ -330,6 +330,8 @@ export module Build
             $expression(`(value: unknown): value is ${Define.buildInlineDefineLiteral(define)} => ${buildLiterarlValidatorExpression("value", define.literal)};`);
         export const buildValidatorLine = (declarator: string, name: string, define: Types.Type): CodeExpression[] =>
             [ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define)), ];
+        export const buildObjectValidatorGetterName = (name: string) =>
+            [ ...Text.getNameSpace(name).split("."), `get${Text.toUpperCamelCase(Text.getNameBody(name))}Validator`, ].filter(i => "" !== i).join(".");
         export const buildValidatorName = (name: string) =>
             [ ...Text.getNameSpace(name).split("."), `is${Text.toUpperCamelCase(Text.getNameBody(name))}`, ].filter(i => "" !== i).join(".");
         export const buildValidatorExpression = (name: string, define: Types.TypeOrValueOfRefer): CodeExpression[] =>
@@ -511,6 +513,23 @@ export module Build
             {
                 const result =
                 [
+                    ...
+                    (
+                        "interface" === define.$type ?
+                        [
+                            $line
+                            ([
+                                ...buildExport(define),
+                                $expression("const"),
+                                $expression(buildObjectValidatorGetterName(name)),
+                                $expression("="),
+                                $expression("()"),
+                                $expression("=>"),
+                                ...buildObjectValidatorGetter(define),
+                            ])
+                        ]:
+                        []
+                    ),
                     $line
                     ([
                         ...buildExport(define),

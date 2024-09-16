@@ -42,7 +42,7 @@ export module Types
         defines: { [key: string]: Definition; };
         options: OutputOptions;
     }
-    export const getTypeSchemaValidator = () :TypesPrime.ObjectValidator<TypeSchema> => Object.assign
+    export const getTypeSchemaValidator = () => <TypesPrime.ObjectValidator<TypeSchema>>TypesPrime.margeObjectValidator
     (
         getCommentPropertyValidator(),
         {

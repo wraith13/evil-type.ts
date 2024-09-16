@@ -22,7 +22,7 @@ var Types;
         });
     };
     Types.isCommentProperty = types_prime_1.TypesPrime.isSpecificObject(Types.getCommentPropertyValidator);
-    Types.getTypeSchemaValidator = function () { return Object.assign(Types.getCommentPropertyValidator(), {
+    Types.getTypeSchemaValidator = function () { return types_prime_1.TypesPrime.margeObjectValidator(Types.getCommentPropertyValidator(), {
         $ref: types_prime_1.TypesPrime.isJust(Types.schema),
         imports: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isImportDefinition)),
         defines: types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
