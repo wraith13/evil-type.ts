@@ -485,6 +485,7 @@ export module Build
             $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
+        export const buildObjectValidatorGetter = (_define: Types.TypeOrValue) => [$iblock([])];
         export const buildFullValidator = (name: string, define: Types.TypeOrValue) =>
         [
             $expression(`(value: unknown, listner?: TypesError.Listener): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
