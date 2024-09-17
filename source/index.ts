@@ -485,17 +485,94 @@ export module Build
             $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
-        export const buildObjectValidatorGetter = (define: Types.InterfaceDefinition) => (define.extends ?? []).some(_ => true) ?
+        export const buildObjectValidatorGetterCoreEntry = (define: Types.TypeOrInterfaceOrRefer): CodeExpression =>
+        {
+            if (Types.isReferElement(define))
+            {
+                return [ $expression(`${buildValidatorName(define.$ref)}(${name})`), ];
+            }
+            else
+            {
+                switch(define.$type)
+                {
+                case "literal":
+                    return buildLiterarlValidatorExpression(name, define.literal);
+                case "typeof":
+                    return buildValidatorExpression(name, define.value);
+                case "itemof":
+                    return [ $expression(`${define.value.$ref}.includes(${name} as any)`), ];
+                case "primitive-type":
+                    return [
+                        $expression
+                        (
+                            "null" === define.type ?
+                                `"${define.type}" === ${name}`:
+                                `"${define.type}" === typeof ${name}`
+                        ),
+                    ];
+                case "type":
+                    return buildValidatorExpression(name, define.define);
+                case "enum-type":
+                    return [ $expression(`${JSON.stringify(define.members)}.includes(${name} as any)`), ];
+                case "array":
+                    return [
+                        $expression(`Array.isArray(${name})`),
+                        $expression("&&"),
+                        $expression(`${name}.every(`),
+                        $expression("i"),
+                        $expression("=>"),
+                        ...buildValidatorExpression("i", define.items),
+                        $expression(")")
+                    ];
+                case "and":
+                    return kindofJoinExpression
+                    (
+                        define.types.map
+                        (
+                            i => TypesPrime.isObject(i) ?
+                                Define.enParenthesis(buildValidatorExpression(name, i)):
+                                buildValidatorExpression(name, i)
+                        ),
+                        $expression("&&")
+                    );
+                case "or":
+                    return  kindofJoinExpression
+                    (
+                        define.types.map(i => buildValidatorExpression(name, i)),
+                        $expression("||")
+                    );
+                case "interface":
+                    return buildInterfaceValidator(name, define);
+                case "dictionary":
+                    return [
+                        $expression(`null !== ${name}`),
+                        $expression("&&"),
+                        $expression(`"object" === typeof ${name}`),
+                        $expression("&&"),
+                        $expression(`Object.values(${name}).every(`),
+                        $expression("i"),
+                        $expression("=>"),
+                        ...buildValidatorExpression("i", define.valueType),
+                        $expression(")")
+                    ];
+                }
+            }
+        };
+        export const buildObjectValidatorGetterCore = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrInterfaceOrRefer; }; }) => $iblock
+        (
+            Object.entries(define.members).map(i => $line([ $expression(`${i[0]}`), buildObjectValidatorGetterCoreEntry(i[1]) ]))
+        );
+        export const buildObjectValidatorGetter = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrInterfaceOrRefer; }; }) => (define.extends ?? []).some(_ => true) ?
             [
                 $expression("TypesPrime.mergeObjectValidator"),
                 $expression("("),
                 ...(define.extends ?? []).map(i => $expression(`${buildObjectValidatorGetterName(i.$ref)},`)),
-                $iblock([]),
+                buildObjectValidatorGetterCore(define),
                 $expression(")"),
             ]:
             [
                 $expression("("),
-                $iblock([]),
+                buildObjectValidatorGetterCore(define),
                 $expression(")"),
             ];
         export const buildFullValidator = (name: string, define: Types.TypeOrValue) =>
