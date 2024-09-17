@@ -485,7 +485,19 @@ export module Build
             $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
-        export const buildObjectValidatorGetter = (_define: Types.TypeOrValue) => [$iblock([])];
+        export const buildObjectValidatorGetter = (define: Types.InterfaceDefinition) => (define.extends ?? []).some(_ => true) ?
+            [
+                $expression("TypesPrime.mergeObjectValidator"),
+                $expression("("),
+                ...(define.extends ?? []).map(i => $expression(`${buildObjectValidatorGetterName(i.$ref)},`)),
+                $iblock([]),
+                $expression(")"),
+            ]:
+            [
+                $expression("("),
+                $iblock([]),
+                $expression(")"),
+            ];
         export const buildFullValidator = (name: string, define: Types.TypeOrValue) =>
         [
             $expression(`(value: unknown, listner?: TypesError.Listener): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
@@ -524,7 +536,8 @@ export module Build
                                 $expression("const"),
                                 $expression(buildObjectValidatorGetterName(name)),
                                 $expression("="),
-                                $expression("()"),
+                                $expression("():"),
+                                $expression(`TypesPrime.ObjectValidator<${name}>`),
                                 $expression("=>"),
                                 ...buildObjectValidatorGetter(define),
                             ])
