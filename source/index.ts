@@ -565,7 +565,8 @@ export module Build
                 i =>
                 {
                     const key = Text.getPrimaryKeyName(i[0]);
-                    return $line([ $expression(`${key}`), buildObjectValidatorGetterCoreEntry(i[1]) ])
+                    const value = buildObjectValidatorGetterCoreEntry(i[1]);
+                    return $line([ $expression(`${key}`), key === i[0] ? value: $expression(`TypesPrime.isOptional(${value})`) ])
                 }
             )
         );
