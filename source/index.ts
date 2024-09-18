@@ -560,7 +560,14 @@ export module Build
         };
         export const buildObjectValidatorGetterCore = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrInterfaceOrRefer; }; }) => $iblock
         (
-            Object.entries(define.members).map(i => $line([ $expression(`${i[0]}`), buildObjectValidatorGetterCoreEntry(i[1]) ]))
+            Object.entries(define.members).map
+            (
+                i =>
+                {
+                    const key = Text.getPrimaryKeyName(i[0]);
+                    return $line([ $expression(`${key}`), buildObjectValidatorGetterCoreEntry(i[1]) ])
+                }
+            )
         );
         export const buildObjectValidatorGetter = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrInterfaceOrRefer; }; }) => (define.extends ?? []).some(_ => true) ?
             [
