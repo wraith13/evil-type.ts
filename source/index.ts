@@ -567,23 +567,20 @@ export module Build
                 {
                     const key = Text.getPrimaryKeyName(i[0]);
                     const value = buildObjectValidatorGetterCoreEntry(i[1]);
-                    return $line([ $expression(`${key}`), key === i[0] ? value: $expression(`TypesPrime.isOptional(${value})`) ])
+                    return $line([ $expression(`${key}`), key === i[0] ? value: buildCall("TypesPrime.isOptional", [ value.expression, ]) ])
                 }
             )
         );
         export const buildObjectValidatorGetter = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrInterfaceOrRefer; }; }) => (define.extends ?? []).some(_ => true) ?
             [
                 $expression("TypesPrime.mergeObjectValidator"),
-                $expression("("),
-                ...(define.extends ?? []).map(i => $expression(`${buildObjectValidatorGetterName(i.$ref)},`)),
-                buildObjectValidatorGetterCore(define),
-                $expression(")"),
+                ...Define.enParenthesis
+                ([
+                    ...(define.extends ?? []).map(i => $expression(`${buildObjectValidatorGetterName(i.$ref)},`)),
+                    buildObjectValidatorGetterCore(define),
+                ]),
             ]:
-            [
-                $expression("("),
-                buildObjectValidatorGetterCore(define),
-                $expression(")"),
-            ];
+            Define.enParenthesis([ buildObjectValidatorGetterCore(define), ]);
         export const buildFullValidator = (name: string, define: Types.TypeOrValue) =>
         [
             $expression(`(value: unknown, listner?: TypesError.Listener): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
