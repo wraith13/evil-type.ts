@@ -278,6 +278,7 @@ export module Build
     }
     export module Validator
     {
+        export const buildCall = (method: string, args: string[]): CodeExpression => $expression(`${method}(${args.join(", ")})`);
         export const buildLiterarlValidatorExpression = (name: string, value: Jsonable.Jsonable): CodeExpression[] =>
         {
             if (null !== value && "object" === typeof value)
