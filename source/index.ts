@@ -691,7 +691,13 @@ export module Format
         }
         else
         {
-            if ("[]" === token)
+            if
+            (
+                "[]" === token ||
+                ( ! data.buffer.endsWith("=>") && "(" === token) ||
+                data.buffer.endsWith("(") ||
+                ")" === token
+            )
             {
                 return "";
             }
