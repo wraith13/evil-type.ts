@@ -693,10 +693,9 @@ export module Format
         {
             if
             (
-                "[]" === token ||
-                ( ! data.buffer.endsWith("=>") && "(" === token) ||
-                data.buffer.endsWith("(") ||
-                ")" === token
+                [ ")", "[]", ":", ",", ";" ].includes(token) ||
+                ( ! data.buffer.endsWith("=") && ! data.buffer.endsWith("=>") && "(" === token) ||
+                data.buffer.endsWith("(")
             )
             {
                 return "";
