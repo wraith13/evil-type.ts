@@ -278,7 +278,8 @@ export module Build
     }
     export module Validator
     {
-        export const buildCall = (method: string, args: string[]): CodeExpression => $expression(`${method}(${args.join(", ")})`);
+        export const buildCall = (method: CodeExpression[], args: CodeExpression[]): CodeExpression[] =>
+            [ ...method, ...Define.enParenthesis(kindofJoinExpression(args, $expression(",")))];
         export const buildLiterarlValidatorExpression = (name: string, value: Jsonable.Jsonable): CodeExpression[] =>
         {
             if (null !== value && "object" === typeof value)
@@ -693,9 +694,11 @@ export module Format
         {
             if
             (
-                [ ")", "[]", ":", ",", ";" ].includes(token) ||
+                [ ")", "[]", ":", ".", ",", ";", ].includes(token) ||
                 ( ! data.buffer.endsWith("=") && ! data.buffer.endsWith("=>") && "(" === token) ||
-                data.buffer.endsWith("(")
+                data.buffer.endsWith("(") ||
+                data.buffer.endsWith(".")
+                // data.buffer.endsWith("...")
             )
             {
                 return "";
