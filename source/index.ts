@@ -487,31 +487,35 @@ export module Build
             $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
-        export const buildObjectValidatorGetterCoreEntry = (define: Types.TypeOrInterfaceOrRefer): CodeExpression =>
+        export const buildObjectValidatorGetterCoreEntry = (define: Types.TypeOrInterfaceOrRefer): CodeExpression[] =>
         {
             if (Types.isReferElement(define))
             {
-                return [ $expression(`${buildValidatorName(define.$ref)}(${name})`), ];
+                return [ $expression(buildValidatorName(define.$ref)), ];
             }
             else
             {
                 switch(define.$type)
                 {
                 case "literal":
-                    return buildLiterarlValidatorExpression(name, define.literal);
+                    return buildCall([ $expression("TypesPrime.isJust"), ], [ $expression(Jsonable.stringify(define.literal)), ]);
                 case "typeof":
                     return buildValidatorExpression(name, define.value);
                 case "itemof":
                     return [ $expression(`${define.value.$ref}.includes(${name} as any)`), ];
                 case "primitive-type":
-                    return [
-                        $expression
-                        (
-                            "null" === define.type ?
-                                `"${define.type}" === ${name}`:
-                                `"${define.type}" === typeof ${name}`
-                        ),
-                    ];
+                    switch(define.type)
+                    {
+                    case "null":
+                        return [ $expression("TypesPrime.isNull"), ];
+                    case "boolean":
+                        return [ $expression("TypesPrime.isBoolean"), ];
+                    case "number":
+                        return [ $expression("TypesPrime.isNumber"), ];
+                    case "string":
+                        return [ $expression("TypesPrime.isString"), ];
+                    }
+                    return [ $expression(`TypesPrime.is${Text.toUpperCamelCase(define.type)}`), ];
                 case "type":
                     return buildValidatorExpression(name, define.define);
                 case "enum-type":
