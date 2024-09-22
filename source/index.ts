@@ -500,7 +500,7 @@ export module Build
                 case "literal":
                     return buildCall([ $expression("TypesPrime.isJust"), ], [ $expression(Jsonable.stringify(define.literal)), ]);
                 case "typeof":
-                    return buildValidatorExpression(name, define.value);
+                    return [ $expression(buildValidatorName(define.value.$ref)), ];
                 case "itemof":
                     return [ $expression(`${define.value.$ref}.includes(${name} as any)`), ];
                 case "primitive-type":
@@ -542,10 +542,10 @@ export module Build
                         $expression("&&")
                     );
                 case "or":
-                    return  kindofJoinExpression
+                    return buildCall
                     (
-                        define.types.map(i => buildValidatorExpression(name, i)),
-                        $expression("||")
+                        [ $expression("TypesPrime.isJust"), ],
+                        define.types.map(i => buildObjectValidatorGetterCoreEntry(i)).reduce((a, b) => [...a, ...b], [])
                     );
                 case "interface":
                     return buildInterfaceValidator(name, define);
