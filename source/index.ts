@@ -502,7 +502,7 @@ export module Build
                 case "typeof":
                     return [ $expression(buildValidatorName(define.value.$ref)), ];
                 case "itemof":
-                    return [ $expression(`${define.value.$ref}.includes(${name} as any)`), ];
+                    return buildCall([ $expression("TypesPrime.isEnum"), ], [ $expression(define.value.$ref), ]);
                 case "primitive-type":
                     switch(define.type)
                     {
