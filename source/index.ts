@@ -113,7 +113,7 @@ export module Build
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
             $line([ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define)), ...postEpressions, ]);
-        export const buildInlineDefineLiteral = (define: Types.LiteralElement) => [$expression(JSON.stringify(define.literal))];
+        export const buildInlineDefineLiteral = (define: Types.LiteralElement) => [$expression(Jsonable.stringify(define.literal))];
         export const buildInlineDefinePrimitiveType = (value: Types.PrimitiveTypeElement) =>
             $expression(value.type);
         export const buildDefinePrimitiveType = (name: string, value: Types.PrimitiveTypeElement): CodeLine =>
@@ -168,7 +168,7 @@ export module Build
         export const enParenthesisIfNeed = <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) =>
             isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
         export const buildInlineDefineEnum = (value: Types.EnumTypeElement) =>
-            kindofJoinExpression(value.members.map(i => $expression(JSON.stringify(i))), $expression("|"));
+            kindofJoinExpression(value.members.map(i => $expression(Jsonable.stringify(i))), $expression("|"));
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
             [ ...enParenthesisIfNeed(buildInlineDefine(value.items)), $expression("[]"), ];
         export const buildInlineDefineDictionary = (value: Types.DictionaryElement) =>
@@ -223,7 +223,7 @@ export module Build
             return $block(header, lines);
         };
         export const buildImports = (imports: undefined | Types.ImportDefinition[]) =>
-            undefined === imports ? []: imports.map(i => $line([ $expression("import"), $expression(i.target), $expression("from"), $expression(JSON.stringify(i.from)) ]));
+            undefined === imports ? []: imports.map(i => $line([ $expression("import"), $expression(i.target), $expression("from"), $expression(Jsonable.stringify(i.from)) ]));
         export const buildDefine = (options: Types.OutputOptions, name: string, define: Types.Definition): CodeEntry[] =>
         {
             switch(define.$type)
@@ -325,7 +325,7 @@ export module Build
             }
             else
             {
-                return [ $expression(JSON.stringify(value)), $expression("==="), $expression(name), ];
+                return [ $expression(Jsonable.stringify(value)), $expression("==="), $expression(name), ];
             }
         };
         export const buildInlineLiteralValidator = (define: Types.LiteralElement) =>
@@ -366,7 +366,7 @@ export module Build
                 case "type":
                     return buildValidatorExpression(name, define.define);
                 case "enum-type":
-                    return [ $expression(`${JSON.stringify(define.members)}.includes(${name} as any)`), ];
+                    return [ $expression(`${Jsonable.stringify(define.members)}.includes(${name} as any)`), ];
                 case "array":
                     return [
                         $expression(`Array.isArray(${name})`),
@@ -517,9 +517,9 @@ export module Build
                     }
                     return [ $expression(`TypesPrime.is${Text.toUpperCamelCase(define.type)}`), ];
                 case "type":
-                    return buildValidatorExpression(name, define.define);
+                    return buildObjectValidatorGetterCoreEntry(define.define);
                 case "enum-type":
-                    return [ $expression(`${JSON.stringify(define.members)}.includes(${name} as any)`), ];
+                    return buildCall([ $expression("TypesPrime.isEnum"), ], [ $expression(Jsonable.stringify(define.members)), ]);
                 case "array":
                     return [
                         $expression(`Array.isArray(${name})`),
