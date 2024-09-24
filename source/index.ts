@@ -278,7 +278,7 @@ export module Build
     }
     export module Validator
     {
-        export const buildCall = (method: CodeExpression[], args: CodeExpression[]): CodeExpression[] =>
+        export const buildCall = (method: CodeExpression[], args: (CodeExpression | CodeExpression[])[]): CodeExpression[] =>
             [ ...method, ...Define.enParenthesis(kindofJoinExpression(args, $expression(",")))];
         export const buildLiterarlValidatorExpression = (name: string, value: Jsonable.Jsonable): CodeExpression[] =>
         {
@@ -521,15 +521,7 @@ export module Build
                 case "enum-type":
                     return buildCall([ $expression("TypesPrime.isEnum"), ], [ $expression(Jsonable.stringify(define.members)), ]);
                 case "array":
-                    return [
-                        $expression(`Array.isArray(${name})`),
-                        $expression("&&"),
-                        $expression(`${name}.every(`),
-                        $expression("i"),
-                        $expression("=>"),
-                        ...buildValidatorExpression("i", define.items),
-                        $expression(")")
-                    ];
+                    return buildCall([ $expression("TypesPrime.isArray"), ], [ buildObjectValidatorGetterCoreEntry(define.items), ]);
                 case "and":
                     return kindofJoinExpression
                     (
@@ -572,7 +564,7 @@ export module Build
                 {
                     const key = Text.getPrimaryKeyName(i[0]);
                     const value = buildObjectValidatorGetterCoreEntry(i[1]);
-                    return $line([ $expression(`${key}`), key === i[0] ? value: buildCall("TypesPrime.isOptional", [ value.expression, ]) ])
+                    return $line([ $expression(`${key}`), ...(key === i[0] ? value: buildCall([ $expression("TypesPrime.isOptional"), ], value)) ])
                 }
             )
         );
