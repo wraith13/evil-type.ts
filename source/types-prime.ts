@@ -136,7 +136,69 @@ export module TypesPrime
             {
                 return isTypeList.some(i => i(value));
             }
-        }
+        };
+        export type OrTypeToAndType<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+        export const isAnd = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]) }) =>
+            (value: unknown, listner?: TypesError.Listener): value is OrTypeToAndType<T[number]> =>
+            {
+                if (listner)
+                {
+                    const resultList = isTypeList.map
+                    (
+                        i =>
+                        {
+                            const transactionListner = TypesError.makeListener(listner.path);
+                            const result =
+                            {
+                                transactionListner,
+                                result: i(value, transactionListner),
+                            }
+                            return result;
+                        }
+                    );
+                    const success = resultList.filter(i => i.result)[0];
+                    const result = Boolean(success);
+                    if (result)
+                    {
+                        TypesError.setMatch(listner);
+                        //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
+                    }
+                    else
+                    {
+                        const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
+                        if ((isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array")))
+                        {
+                            const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner));
+                            const errors = bestMatchErrors.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
+                            const fullErrors = resultList.map(i => i.transactionListner).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
+                            TypesError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
+                            if (errors.length <= 0)
+                            {
+                                console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
+                            }
+                            if (0 < bestMatchErrors.length)
+                            {
+                                Object.entries(bestMatchErrors[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
+                                //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
+                            }
+                        }
+                        else
+                        {
+                            TypesError.raiseError
+                            (
+                                listner,
+                                requiredType.join(" | "),
+                                value
+                            );
+                        }
+                    }
+                    return result;
+                }
+                else
+                {
+                    return isTypeList.some(i => i(value));
+                }
+            };
     export interface OptionalKeyTypeGuard<T>
     {
         $type: "optional-type-guard";

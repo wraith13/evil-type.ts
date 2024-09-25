@@ -536,7 +536,7 @@ export module Build
                 case "or":
                     return buildCall
                     (
-                        [ $expression("TypesPrime.isJust"), ],
+                        [ $expression("TypesPrime.isOr"), ],
                         define.types.map(i => buildObjectValidatorGetterCoreEntry(i)).reduce((a, b) => [...a, ...b], [])
                     );
                 case "interface":
