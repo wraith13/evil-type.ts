@@ -141,6 +141,7 @@ export module TypesPrime
         export const isAnd = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]) }) =>
             (value: unknown, listner?: TypesError.Listener): value is OrTypeToAndType<T[number]> =>
             {
+                // このコードは現状、 isOr をコピーしただけのモックです。
                 if (listner)
                 {
                     const resultList = isTypeList.map

@@ -140,6 +140,7 @@ export module TypesError
     };
     export const andErros = (listner: Listener, modulus: number, errors: Error[], fullErrors: Error[]) =>
     {
+        // このコードは現状、 orErros をコピーしただけのモックです。
         const paths = errors.map(i => i.path).filter((i, ix, list) => ix === list.indexOf(i));
         listner.errors.push
         (

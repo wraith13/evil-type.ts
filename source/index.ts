@@ -523,15 +523,10 @@ export module Build
                 case "array":
                     return buildCall([ $expression("TypesPrime.isArray"), ], [ buildObjectValidatorGetterCoreEntry(define.items), ]);
                 case "and":
-                    return kindofJoinExpression
+                    return buildCall
                     (
-                        define.types.map
-                        (
-                            i => TypesPrime.isObject(i) ?
-                                Define.enParenthesis(buildValidatorExpression(name, i)):
-                                buildValidatorExpression(name, i)
-                        ),
-                        $expression("&&")
+                        [ $expression("TypesPrime.isAnd"), ],
+                        define.types.map(i => buildObjectValidatorGetterCoreEntry(i)).reduce((a, b) => [...a, ...b], [])
                     );
                 case "or":
                     return buildCall
@@ -540,7 +535,7 @@ export module Build
                         define.types.map(i => buildObjectValidatorGetterCoreEntry(i)).reduce((a, b) => [...a, ...b], [])
                     );
                 case "interface":
-                    return buildInterfaceValidator(name, define);
+                    return buildObjectValidatorGetter(define);
                 case "dictionary":
                     return [
                         $expression(`null !== ${name}`),
