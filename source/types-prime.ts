@@ -109,7 +109,7 @@ export module TypesPrime
                         const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner));
                         const errors = bestMatchErrors.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
                         const fullErrors = resultList.map(i => i.transactionListner).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                        TypesError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
+                        TypesError.orErros(listner, isTypeList.length, errors, fullErrors);
                         if (errors.length <= 0)
                         {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
@@ -156,8 +156,7 @@ export module TypesPrime
                             return result;
                         }
                     );
-                    const success = resultList.filter(i => i.result)[0];
-                    const result = Boolean(success);
+                    const result = resultList.every(i => i.result);
                     if (result)
                     {
                         TypesError.setMatch(listner);
@@ -168,17 +167,17 @@ export module TypesPrime
                         const requiredType = makeOrTypeNameFromIsTypeList(...isTypeList);
                         if ((isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array")))
                         {
-                            const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner));
-                            const errors = bestMatchErrors.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
+                            const transactionListners = resultList.map(i => i.transactionListner);
+                            const errors = transactionListners.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
                             const fullErrors = resultList.map(i => i.transactionListner).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                            TypesError.aggregateErros(listner, isTypeList.length, errors, fullErrors);
+                            TypesError.andErros(listner, isTypeList.length, errors, fullErrors);
                             if (errors.length <= 0)
                             {
                                 console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
                             }
-                            if (0 < bestMatchErrors.length)
+                            if (0 < transactionListners.length)
                             {
-                                Object.entries(bestMatchErrors[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
+                                Object.entries(transactionListners[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                                 //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
                             }
                         }
@@ -187,7 +186,7 @@ export module TypesPrime
                             TypesError.raiseError
                             (
                                 listner,
-                                requiredType.join(" | "),
+                                requiredType.join(" & "),
                                 value
                             );
                         }
