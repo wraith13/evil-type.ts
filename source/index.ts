@@ -537,17 +537,11 @@ export module Build
                 case "interface":
                     return buildObjectValidatorGetter(define);
                 case "dictionary":
-                    return [
-                        $expression(`null !== ${name}`),
-                        $expression("&&"),
-                        $expression(`"object" === typeof ${name}`),
-                        $expression("&&"),
-                        $expression(`Object.values(${name}).every(`),
-                        $expression("i"),
-                        $expression("=>"),
-                        ...buildValidatorExpression("i", define.valueType),
-                        $expression(")")
-                    ];
+                    return buildCall
+                    (
+                        [ $expression("TypesPrime.isDictionaryObject"), ],
+                        [ buildObjectValidatorGetterCoreEntry(define.valueType), ]
+                    );
                 }
             }
         };
