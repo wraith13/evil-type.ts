@@ -184,7 +184,7 @@ export module Types
     {
         $type: "interface";
         extends?: ReferElement[];
-        members: { [key: string]: TypeOrInterfaceOrRefer; } | DictionaryElement;
+        members: { [key: string]: TypeOrInterfaceOrRefer; };
     }
     export const isInterfaceDefinition = (value: unknown, listner?: TypesError.Listener): value is InterfaceDefinition => TypesPrime.isSpecificObject<InterfaceDefinition>
     ({
@@ -192,16 +192,18 @@ export module Types
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("interface"),
         extends: TypesPrime.isOptional(TypesPrime.isArray(isReferElement)),
-        members: TypesPrime.isOr(TypesPrime.isDictionaryObject(isTypeOrRefer), isDictionaryElement),
+        members: TypesPrime.isDictionaryObject(isTypeOrRefer),
     })
     (value, listner);
-    export interface DictionaryElement extends AlphaElement
+    export interface DictionaryDefinition extends AlphaDefinition
     {
         $type: "dictionary";
         valueType: TypeOrInterfaceOrRefer;
     }
-    export const isDictionaryElement = (value: unknown, listner?: TypesError.Listener): value is DictionaryElement => TypesPrime.isSpecificObject<DictionaryElement>
+    export const isDictionaryElement = (value: unknown, listner?: TypesError.Listener): value is DictionaryDefinition => TypesPrime.isSpecificObject<DictionaryDefinition>
     ({
+        comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
+        export: TypesPrime.isOptional(TypesPrime.isBoolean),
         $type: TypesPrime.isJust("dictionary"),
         valueType: isTypeOrRefer,
     })
@@ -239,15 +241,15 @@ export module Types
         types: TypesPrime.isArray(isTypeOrRefer),
     })
     (value, listner);
-    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
+    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     export const isType = TypesPrime.isOr(isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryElement, isArrayElement, isOrElement, isAndElement, isLiteralElement);
     export type TypeOrValue = Type | ValueDefinition;
     export const isTypeOrValue = TypesPrime.isOr(isType, isValueDefinition);
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
     export const isTypeOrRefer = TypesPrime.isOr(isType, isReferElement);
-    export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
-    export const isDefinition = TypesPrime.isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition);
+    export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
+    export const isDefinition = TypesPrime.isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryElement);
     export type DefineOrRefer = Definition | ReferElement;
     export const isDefineOrRefer = TypesPrime.isOr(isDefinition, isReferElement);
 }

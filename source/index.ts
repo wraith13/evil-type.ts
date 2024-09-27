@@ -171,42 +171,28 @@ export module Build
             kindofJoinExpression(value.members.map(i => $expression(Jsonable.stringify(i))), $expression("|"));
         export const buildInlineDefineArray = (value: Types.ArrayElement) =>
             [ ...enParenthesisIfNeed(buildInlineDefine(value.items)), $expression("[]"), ];
-        export const buildInlineDefineDictionary = (value: Types.DictionaryElement) =>
+        export const buildInlineDefineDictionary = (value: Types.DictionaryDefinition) =>
             $iblock([ $line([ $expression("[key: string]:"), ...buildInlineDefine(value.valueType), ]) ]);
         export const buildInlineDefineAnd = (value: Types.AndElement) =>
             kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("&"));
         export const buildInlineDefineOr = (value: Types.OrElement) =>
             kindofJoinExpression(value.types.map(i => enParenthesisIfNeed(buildInlineDefine(i))), $expression("|"));
-        export const buildDefineInlineInterface = (value: Types.InterfaceDefinition) =>
-        {
-            const members = value.members;
-            if (Types.isDictionaryElement(members))
-            {
-                return buildInlineDefineDictionary(members);
-            }
-            else
-            {
-                return $iblock
-                (
-                    Object.keys(members)
-                        .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(members[name])]))
-                );
-            }
-        };
+        export const buildDefineInlineInterface = (value: Types.InterfaceDefinition) => $iblock
+        (
+            Object.keys(value.members)
+                .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(value.members[name])]))
+        );
         export const buildDefineInterface = (name: string, value: Types.InterfaceDefinition): CodeBlock =>
         {
             const header = [ ...buildExport(value), ...["interface", name].map(i => $expression(i)), ...buildExtends(value), ];
-            const members = value.members;
-            if (Types.isDictionaryElement(members))
-            {
-                return $block(header, [ $line([ $expression("[key: string]:"), ...buildInlineDefine(members.valueType), ]) ]);
-            }
-            else
-            {
-                const lines = Object.keys(members)
-                    .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(members[name]), ]));
-                return $block(header, lines);
-            }
+            const lines = Object.keys(value.members)
+                .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(value.members[name]), ]));
+            return $block(header, lines);
+        };
+        export const buildDefineDictionary = (name: string, value: Types.DictionaryDefinition): CodeBlock =>
+        {
+            const header = [ ...buildExport(value), ...["type", name].map(i => $expression(i)), $expression("=")];
+            return $block(header, [ $line([ $expression("[key: string]:"), ...buildInlineDefine(value.valueType), ]) ]);
         };
         export const buildDefineModuleCore = (options: Types.OutputOptions, members: { [key: string]: Types.Definition; }): CodeEntry[] =>
         [
@@ -230,6 +216,8 @@ export module Build
             {
             case "interface":
                 return [ ...$comment(define), buildDefineInterface(name, define), ];
+            case "dictionary":
+                return [ ...$comment(define), buildDefineDictionary(name, define), ];
             case "module":
                 return [ ...$comment(define), buildDefineModule(options, name, define), ];
             case "type":
