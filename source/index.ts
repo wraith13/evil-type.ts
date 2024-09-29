@@ -266,7 +266,7 @@ export module Build
     }
     export module Validator
     {
-        export const buildCall = (method: CodeExpression[], args: (CodeExpression | (CodeExpression | CodeInlineBlock)[])[]): CodeExpression[] =>
+        export const buildCall = (method: CodeExpression[], args: (CodeInlineEntry | CodeInlineEntry[])[]): CodeExpression[] =>
             [ ...method, ...Define.enParenthesis(kindofJoinExpression(args, $expression(",")))];
         export const buildLiterarlValidatorExpression = (name: string, value: Jsonable.Jsonable): CodeExpression[] =>
         {
@@ -475,7 +475,7 @@ export module Build
             $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
-        export const buildObjectValidatorGetterCoreEntry = (define: Types.TypeOrInterfaceOrRefer): (CodeExpression | CodeInlineBlock)[] =>
+        export const buildObjectValidatorGetterCoreEntry = (define: Types.TypeOrInterfaceOrRefer): CodeInlineEntry[] =>
         {
             if (Types.isReferElement(define))
             {
