@@ -2,8 +2,8 @@
 const startAt = new Date();
 import fs from "fs";
 import { Jsonable } from "./jsonable";
-import { TypesError } from "./types-error";
 import { TypesPrime } from "./types-prime";
+import { TypesError } from "./types-error";
 import { Types } from "./types";
 import { Text } from "./text";
 import config from "../resource/config.json";
@@ -46,12 +46,7 @@ export const convertToExpression = (code: CodeInlineEntry[]) =>
                     result.concat($expression("{"), ...convertToExpression(i.lines), $expression("}"));
                     break;
                 case "line":
-                    {
-                        const line = convertToExpression(i.expressions);
-                        const last = line[line.length -1];
-                        last.expression += ";"
-                        result.concat(...line);
-                    }
+                    result.concat(...convertToExpression(i.expressions), $expression(";"));
                     break;
                 case "expression":
                     result.push(i);
@@ -514,13 +509,13 @@ export module Build
                     return buildCall
                     (
                         [ $expression("TypesPrime.isAnd"), ],
-                        define.types.map(i => buildObjectValidatorGetterCoreEntry(i)).reduce((a, b) => [...a, ...b], [])
+                        define.types.map(i => buildObjectValidatorGetterCoreEntry(i))
                     );
                 case "or":
                     return buildCall
                     (
                         [ $expression("TypesPrime.isOr"), ],
-                        define.types.map(i => buildObjectValidatorGetterCoreEntry(i)).reduce((a, b) => [...a, ...b], [])
+                        define.types.map(i => buildObjectValidatorGetterCoreEntry(i))
                     );
                 case "interface":
                     return buildObjectValidatorGetter(define);
@@ -541,7 +536,7 @@ export module Build
                 {
                     const key = Text.getPrimaryKeyName(i[0]);
                     const value = buildObjectValidatorGetterCoreEntry(i[1]);
-                    return $line([ $expression(`${key}`), ...(key === i[0] ? value: buildCall([ $expression("TypesPrime.isOptional"), ], value)) ])
+                    return $line([ $expression(`${key}`), $expression(":"), ...(key === i[0] ? value: buildCall([ $expression("TypesPrime.isOptional"), ], [ value, ])) ])
                 }
             )
         );
@@ -550,7 +545,7 @@ export module Build
                 $expression("TypesPrime.mergeObjectValidator"),
                 ...Define.enParenthesis
                 ([
-                    ...(define.extends ?? []).map(i => $expression(`${buildObjectValidatorGetterName(i.$ref)},`)),
+                    ...(define.extends ?? []).map(i => $expression(`${buildObjectValidatorGetterName(i.$ref)}(),`)),
                     buildObjectValidatorGetterCore(define),
                 ]),
             ]:
@@ -593,9 +588,9 @@ export module Build
                                 $expression("const"),
                                 $expression(buildObjectValidatorGetterName(name)),
                                 $expression("="),
-                                $expression("():"),
-                                $expression(`TypesPrime.ObjectValidator<${name}>`),
+                                $expression("()"),
                                 $expression("=>"),
+                                $expression(`<TypesPrime.ObjectValidator<${name}>>`),
                                 ...buildObjectValidatorGetter(define),
                             ])
                         ]:
@@ -635,7 +630,7 @@ export module Format
         case "inline-block":
             return [ "{", ...code.lines.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []), "}", ];
         case "line":
-            return code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []);
+            return [ ...code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []), "," ];
         case "expression":
             return [ code.expression, ];
         }

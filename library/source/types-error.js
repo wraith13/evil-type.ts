@@ -105,7 +105,7 @@ var TypesError;
         });
         return false;
     };
-    TypesError.aggregateErros = function (listner, modulus, errors, fullErrors) {
+    TypesError.orErros = function (listner, modulus, errors, fullErrors) {
         var _a;
         var paths = errors.map(function (i) { return i.path; }).filter(function (i, ix, list) { return ix === list.indexOf(i); });
         (_a = listner.errors).push.apply(_a, paths.map(function (path) {
@@ -121,6 +121,27 @@ var TypesError;
                     .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
                     .filter(function (i, ix, list) { return ix === list.indexOf(i); })
                     .join(" | "),
+                actualValue: errors.filter(function (i) { return i.path === path; }).map(function (i) { return i.actualValue; })[0],
+            });
+        }));
+    };
+    TypesError.andErros = function (listner, modulus, errors, fullErrors) {
+        var _a;
+        // このコードは現状、 orErros をコピーしただけのモックです。
+        var paths = errors.map(function (i) { return i.path; }).filter(function (i, ix, list) { return ix === list.indexOf(i); });
+        (_a = listner.errors).push.apply(_a, paths.map(function (path) {
+            return ({
+                type: modulus <= fullErrors.filter(function (i) { return "solid" === i.type && i.path === path; }).length ?
+                    "solid" :
+                    "fragment",
+                path: path,
+                requiredType: errors
+                    .filter(function (i) { return i.path === path; })
+                    .map(function (i) { return i.requiredType; })
+                    .map(function (i) { return i.split(" & "); })
+                    .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
+                    .filter(function (i, ix, list) { return ix === list.indexOf(i); })
+                    .join(" & "),
                 actualValue: errors.filter(function (i) { return i.path === path; }).map(function (i) { return i.actualValue; })[0],
             });
         }));

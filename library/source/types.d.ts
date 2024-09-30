@@ -100,14 +100,14 @@ export declare namespace Types {
         extends?: ReferElement[];
         members: {
             [key: string]: TypeOrInterfaceOrRefer;
-        } | DictionaryElement;
+        };
     }
     const isInterfaceDefinition: (value: unknown, listner?: TypesError.Listener) => value is InterfaceDefinition;
-    interface DictionaryElement extends AlphaElement {
+    interface DictionaryDefinition extends AlphaDefinition {
         $type: "dictionary";
         valueType: TypeOrInterfaceOrRefer;
     }
-    const isDictionaryElement: (value: unknown, listner?: TypesError.Listener) => value is DictionaryElement;
+    const isDictionaryElement: (value: unknown, listner?: TypesError.Listener) => value is DictionaryDefinition;
     interface ArrayElement extends AlphaElement {
         $type: "array";
         items: TypeOrInterfaceOrRefer;
@@ -123,15 +123,15 @@ export declare namespace Types {
         types: TypeOrInterfaceOrRefer[];
     }
     const isAndElement: (value: unknown, listner?: TypesError.Listener) => value is AndElement;
-    type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
-    const isType: (value: unknown, listner?: TypesError.Listener) => value is TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | DictionaryElement | ArrayElement | OrElement | AndElement;
+    type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    const isType: (value: unknown, listner?: TypesError.Listener) => value is TypeDefinition | InterfaceDefinition | DictionaryDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValue = Type | ValueDefinition;
-    const isTypeOrValue: (value: unknown, listner?: TypesError.Listener) => value is ValueDefinition | TypeDefinition | InterfaceDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | DictionaryElement | ArrayElement | OrElement | AndElement;
+    const isTypeOrValue: (value: unknown, listner?: TypesError.Listener) => value is ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     type TypeOrInterfaceOrRefer = Type | ReferElement;
-    const isTypeOrRefer: (value: unknown, listner?: TypesError.Listener) => value is TypeDefinition | InterfaceDefinition | ReferElement | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | DictionaryElement | ArrayElement | OrElement | AndElement;
-    type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
-    const isDefinition: (value: unknown, listner?: TypesError.Listener) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    const isTypeOrRefer: (value: unknown, listner?: TypesError.Listener) => value is TypeDefinition | InterfaceDefinition | DictionaryDefinition | ReferElement | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
+    type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
+    const isDefinition: (value: unknown, listner?: TypesError.Listener) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
     type DefineOrRefer = Definition | ReferElement;
-    const isDefineOrRefer: (value: unknown, listner?: TypesError.Listener) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | ReferElement;
+    const isDefineOrRefer: (value: unknown, listner?: TypesError.Listener) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition | ReferElement;
 }

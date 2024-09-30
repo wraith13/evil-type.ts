@@ -6,6 +6,11 @@
     "imports": [
         {
             "$type": "import",
+            "target": "{ TypesPrime }",
+            "from": "../source/types-prime.ts"
+        },
+        {
+            "$type": "import",
             "target": "{ TypesError }",
             "from": "../source/types-error.ts"
         }
@@ -163,12 +168,9 @@
                 },
                 "JsonableObject": {
                     "export": true,
-                    "$type": "interface",
-                    "members": {
-                        "$type": "dictionary",
-                        "valueType": {
-                            "$ref": "Jsonable"
-                        }
+                    "$type": "dictionary",
+                    "valueType": {
+                        "$ref": "Jsonable"
                     }
                 },
                 "Jsonable": {

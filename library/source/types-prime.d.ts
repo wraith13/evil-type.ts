@@ -15,6 +15,8 @@ export declare namespace TypesPrime {
     const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]); }) => string[];
     const getBestMatchErrors: (listeners: TypesError.Listener[]) => TypesError.Listener[];
     const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]); }) => (value: unknown, listner?: TypesError.Listener) => value is T[number];
+    type OrTypeToAndType<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+    const isAnd: <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]); }) => (value: unknown, listner?: TypesError.Listener) => value is OrTypeToAndType<T[number]>;
     interface OptionalKeyTypeGuard<T> {
         $type: "optional-type-guard";
         isType: ((value: unknown, listner?: TypesError.Listener) => value is T) | ObjectValidator<T>;
@@ -38,7 +40,9 @@ export declare namespace TypesPrime {
     } & {
         [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
     };
-    const margeObjectValidator: <A, B>(a: ObjectValidator<A>, b: ObjectValidator<B>) => Omit<ObjectValidator<A>, keyof B> & ObjectValidator<B>;
+    type MergeObjectValidatorType<A, B> = Omit<A, keyof B> & B;
+    type MergeMultipleObjectValidatorType<A, B extends any[]> = B extends [infer Head, ...infer Tail] ? MergeObjectValidatorType<A, Head> & MergeObjectValidatorType<MergeObjectValidatorType<A, Head>, Tail> : A;
+    const mergeObjectValidator: <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) => MergeMultipleObjectValidatorType<ObjectValidator<A>, B>;
     const isSpecificObject: <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener) => value is ObjectType;
     const isDictionaryObject: <MemberType>(isType: ((m: unknown, listner?: TypesError.Listener) => m is MemberType)) => (value: unknown, listner?: TypesError.Listener) => value is {
         [key: string]: MemberType;

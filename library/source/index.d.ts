@@ -43,11 +43,12 @@ export declare namespace Build {
         const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | CodeInlineBlock)[];
         const buildInlineDefineEnum: (value: Types.EnumTypeElement) => CodeExpression[];
         const buildInlineDefineArray: (value: Types.ArrayElement) => (CodeExpression | CodeInlineBlock)[];
-        const buildInlineDefineDictionary: (value: Types.DictionaryElement) => CodeInlineBlock;
+        const buildInlineDefineDictionary: (value: Types.DictionaryDefinition) => CodeInlineBlock;
         const buildInlineDefineAnd: (value: Types.AndElement) => CodeExpression[];
         const buildInlineDefineOr: (value: Types.OrElement) => CodeExpression[];
         const buildDefineInlineInterface: (value: Types.InterfaceDefinition) => CodeInlineBlock;
         const buildDefineInterface: (name: string, value: Types.InterfaceDefinition) => CodeBlock;
+        const buildDefineDictionary: (name: string, value: Types.DictionaryDefinition) => CodeBlock;
         const buildDefineModuleCore: (options: Types.OutputOptions, members: {
             [key: string]: Types.Definition;
         }) => CodeEntry[];
@@ -57,13 +58,26 @@ export declare namespace Build {
         const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {
+        const buildCall: (method: CodeExpression[], args: (CodeInlineEntry | CodeInlineEntry[])[]) => CodeExpression[];
         const buildLiterarlValidatorExpression: (name: string, value: Jsonable.Jsonable) => CodeExpression[];
         const buildInlineLiteralValidator: (define: Types.LiteralElement) => CodeExpression;
         const buildValidatorLine: (declarator: string, name: string, define: Types.Type) => CodeExpression[];
+        const buildObjectValidatorGetterName: (name: string) => string;
         const buildValidatorName: (name: string) => string;
         const buildValidatorExpression: (name: string, define: Types.TypeOrValueOfRefer) => CodeExpression[];
         const buildInterfaceValidator: (name: string, define: Types.InterfaceDefinition) => CodeExpression[];
         const buildInlineValidator: (name: string, define: Types.TypeOrValue) => CodeExpression[];
+        const buildObjectValidatorGetterCoreEntry: (define: Types.TypeOrInterfaceOrRefer) => CodeInlineEntry[];
+        const buildObjectValidatorGetterCore: (define: Types.InterfaceDefinition & {
+            members: {
+                [key: string]: Types.TypeOrInterfaceOrRefer;
+            };
+        }) => CodeInlineBlock;
+        const buildObjectValidatorGetter: (define: Types.InterfaceDefinition & {
+            members: {
+                [key: string]: Types.TypeOrInterfaceOrRefer;
+            };
+        }) => (CodeExpression | CodeInlineBlock)[];
         const buildFullValidator: (name: string, define: Types.TypeOrValue) => CodeExpression[];
         const isValidatorTarget: (define: Types.TypeOrValue) => boolean;
         const buildValidator: (options: Types.OutputOptions, name: string, define: Types.TypeOrValue) => CodeLine[];

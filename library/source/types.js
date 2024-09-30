@@ -22,7 +22,7 @@ var Types;
         });
     };
     Types.isCommentProperty = types_prime_1.TypesPrime.isSpecificObject(Types.getCommentPropertyValidator);
-    Types.getTypeSchemaValidator = function () { return types_prime_1.TypesPrime.margeObjectValidator(Types.getCommentPropertyValidator(), {
+    Types.getTypeSchemaValidator = function () { return types_prime_1.TypesPrime.mergeObjectValidator(Types.getCommentPropertyValidator(), {
         $ref: types_prime_1.TypesPrime.isJust(Types.schema),
         imports: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isImportDefinition)),
         defines: types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
@@ -83,9 +83,11 @@ var Types;
         export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("interface"),
         extends: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isReferElement)),
-        members: types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer), Types.isDictionaryElement),
+        members: types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer),
     })(value, listner); };
     Types.isDictionaryElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        comment: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isString)),
+        export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("dictionary"),
         valueType: Types.isTypeOrRefer,
     })(value, listner); };
@@ -104,7 +106,7 @@ var Types;
     Types.isType = types_prime_1.TypesPrime.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isDictionaryElement, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
     Types.isTypeOrValue = types_prime_1.TypesPrime.isOr(Types.isType, Types.isValueDefinition);
     Types.isTypeOrRefer = types_prime_1.TypesPrime.isOr(Types.isType, Types.isReferElement);
-    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition);
+    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition, Types.isDictionaryElement);
     Types.isDefineOrRefer = types_prime_1.TypesPrime.isOr(Types.isDefinition, Types.isReferElement);
 })(Types || (exports.Types = Types = {}));
 //# sourceMappingURL=types.js.map
