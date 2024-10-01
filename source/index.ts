@@ -576,36 +576,58 @@ export module Build
             }
             if ("full" === options.validatorOption)
             {
-                const result =
-                [
-                    ...
-                    (
-                        "interface" === define.$type ?
-                        [
-                            $line
-                            ([
-                                ...buildExport(define),
-                                $expression("const"),
-                                $expression(buildObjectValidatorGetterName(name)),
-                                $expression("="),
-                                $expression("()"),
-                                $expression("=>"),
-                                $expression(`<TypesPrime.ObjectValidator<${name}>>`),
-                                ...buildObjectValidatorGetter(define),
-                            ])
-                        ]:
-                        []
-                    ),
-                    $line
-                    ([
-                        ...buildExport(define),
-                        $expression("const"),
-                        $expression(buildValidatorName(name)),
-                        $expression("="),
-                        ...buildFullValidator(name, define),
-                    ])
-                ];
-                return result;
+                if ("interface" === define.$type)
+                {
+                    const result =
+                    [
+                        ...
+                        (
+                            "interface" === define.$type ?
+                            [
+                                $line
+                                ([
+                                    ...buildExport(define),
+                                    $expression("const"),
+                                    $expression(buildObjectValidatorGetterName(name)),
+                                    $expression("="),
+                                    $expression("()"),
+                                    $expression("=>"),
+                                    $expression(`<TypesPrime.ObjectValidator<${name}>>`),
+                                    ...buildObjectValidatorGetter(define),
+                                ])
+                            ]:
+                            []
+                        ),
+                        $line
+                        ([
+                            ...buildExport(define),
+                            $expression("const"),
+                            $expression(buildValidatorName(name)),
+                            $expression("="),
+                            ...buildCall
+                            (
+                                [ $expression(`TypesPrime.isSpecificObject<${name}>`), ],
+                                [ buildCall([ $expression(buildObjectValidatorGetterName(name)), ], [  ]) ]
+                            )
+                        ])
+                    ];
+                    return result;
+                }
+                else
+                {
+                    const result =
+                    [
+                        $line
+                        ([
+                            ...buildExport(define),
+                            $expression("const"),
+                            $expression(buildValidatorName(name)),
+                            $expression("="),
+                            ...buildFullValidator(name, define),
+                        ])
+                    ];
+                    return result;
+                }
             }
             return [];
         };

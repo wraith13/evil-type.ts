@@ -454,25 +454,37 @@ var Build;
                 return result;
             }
             if ("full" === options.validatorOption) {
-                var result = __spreadArray(__spreadArray([], ("interface" === define.$type ?
-                    [
+                if ("interface" === define.$type) {
+                    var result = __spreadArray(__spreadArray([], ("interface" === define.$type ?
+                        [
+                            (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                                (0, exports.$expression)("const"),
+                                (0, exports.$expression)(Validator.buildObjectValidatorGetterName(name)),
+                                (0, exports.$expression)("="),
+                                (0, exports.$expression)("()"),
+                                (0, exports.$expression)("=>"),
+                                (0, exports.$expression)("<TypesPrime.ObjectValidator<".concat(name, ">>"))
+                            ], false), Validator.buildObjectValidatorGetter(define), true))
+                        ] :
+                        []), true), [
                         (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
                             (0, exports.$expression)("const"),
-                            (0, exports.$expression)(Validator.buildObjectValidatorGetterName(name)),
-                            (0, exports.$expression)("="),
-                            (0, exports.$expression)("()"),
-                            (0, exports.$expression)("=>"),
-                            (0, exports.$expression)("<TypesPrime.ObjectValidator<".concat(name, ">>"))
-                        ], false), Validator.buildObjectValidatorGetter(define), true))
-                    ] :
-                    []), true), [
-                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
-                        (0, exports.$expression)("const"),
-                        (0, exports.$expression)(Validator.buildValidatorName(name)),
-                        (0, exports.$expression)("=")
-                    ], false), Validator.buildFullValidator(name, define), true))
-                ], false);
-                return result;
+                            (0, exports.$expression)(Validator.buildValidatorName(name)),
+                            (0, exports.$expression)("=")
+                        ], false), Validator.buildCall([(0, exports.$expression)("TypesPrime.isSpecificObject<".concat(name, ">")),], [Validator.buildCall([(0, exports.$expression)(Validator.buildObjectValidatorGetterName(name)),], [])]), true))
+                    ], false);
+                    return result;
+                }
+                else {
+                    var result = [
+                        (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                            (0, exports.$expression)("const"),
+                            (0, exports.$expression)(Validator.buildValidatorName(name)),
+                            (0, exports.$expression)("=")
+                        ], false), Validator.buildFullValidator(name, define), true))
+                    ];
+                    return result;
+                }
             }
             return [];
         };
