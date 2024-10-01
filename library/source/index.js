@@ -475,13 +475,36 @@ var Build;
                     ], false);
                     return result;
                 }
+                else if ("value" === define.$type) {
+                    if (types_1.Types.isReferElement(define.value)) {
+                        var result = [
+                            (0, exports.$line)(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                                (0, exports.$expression)("const"),
+                                (0, exports.$expression)(Validator.buildValidatorName(name)),
+                                (0, exports.$expression)("="),
+                                (0, exports.$expression)(Validator.buildValidatorName(define.value.$ref)),
+                            ], false))
+                        ];
+                        return result;
+                    }
+                    else {
+                        var result = [
+                            (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                                (0, exports.$expression)("const"),
+                                (0, exports.$expression)(Validator.buildValidatorName(name)),
+                                (0, exports.$expression)("=")
+                            ], false), Validator.buildCall([(0, exports.$expression)("TypesPrime.isJust"),], [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.value.literal)),]), true))
+                        ];
+                        return result;
+                    }
+                }
                 else {
                     var result = [
                         (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
                             (0, exports.$expression)("const"),
                             (0, exports.$expression)(Validator.buildValidatorName(name)),
                             (0, exports.$expression)("=")
-                        ], false), Validator.buildFullValidator(name, define), true))
+                        ], false), Validator.buildObjectValidatorGetterCoreEntry(define), true))
                     ];
                     return result;
                 }

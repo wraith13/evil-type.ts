@@ -120,8 +120,7 @@ export module Types
         value: ReferElement;
     }
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
-    export const isSchema = (value: unknown, listner?: TypesError.Listener): value is typeof schema =>
-        "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" === value;
+    export const isSchema = TypesPrime.isJust("https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#");
     export const getTypeSchemaValidator = () => <TypesPrime.ObjectValidator<TypeSchema>>({ $ref: isSchema, imports: TypesPrime.isOptional(
         TypesPrime.isArray(isImportDefinition)), defines: TypesPrime.isDictionaryObject(isDefinition), options: isOutputOptions, });
     export const isTypeSchema = TypesPrime.isSpecificObject<TypeSchema>(getTypeSchemaValidator());
@@ -130,18 +129,12 @@ export module Types
         validatorOption: isValidatorOptionType, maxLineLength: TypesPrime.isOptional(TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isNumber
         )), });
     export const isOutputOptions = TypesPrime.isSpecificObject<OutputOptions>(getOutputOptionsValidator());
-    export const isIndentStyleType = (value: unknown, listner?: TypesError.Listener): value is IndentStyleType =>
-        indentStyleTypeMember.includes(value as any);
-    export const isValidatorOptionType = (value: unknown, listner?: TypesError.Listener): value is ValidatorOptionType =>
-        ["none","simple","full"].includes(value as any);
-    export const isJsonableValue = (value: unknown, listner?: TypesError.Listener): value is JsonableValue => "null" === value ||
-        "boolean" === typeof value || "number" === typeof value || "string" === typeof value;
-    export const isJsonableArray = (value: unknown, listner?: TypesError.Listener): value is JsonableArray => Array.isArray(value) &&
-        value.every(i => isJsonable(i));
-    export const isJsonableObject = (value: unknown, listner?: TypesError.Listener): value is JsonableObject => null !== value &&
-        "object" === typeof value && Object.values(value).every(i => isJsonable(i));
-    export const isJsonable = (value: unknown, listner?: TypesError.Listener): value is Jsonable => isJsonableValue(value) ||
-        isJsonableArray(value) || isJsonableObject(value);
+    export const isIndentStyleType = TypesPrime.isEnum(indentStyleTypeMember);
+    export const isValidatorOptionType = TypesPrime.isEnum(["none","simple","full"]);
+    export const isJsonableValue = TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isBoolean, TypesPrime.isNumber, TypesPrime.isString);
+    export const isJsonableArray = TypesPrime.isArray(isJsonable);
+    export const isJsonableObject = TypesPrime.isDictionaryObject(isJsonable);
+    export const isJsonable = TypesPrime.isOr(isJsonableValue, isJsonableArray, isJsonableObject);
     export const getAlphaElementValidator = () => <TypesPrime.ObjectValidator<AlphaElement>>({ $type: TypesPrime.isString, });
     export const isAlphaElement = TypesPrime.isSpecificObject<AlphaElement>(getAlphaElementValidator());
     export const getAlphaDefinitionValidator = () => <TypesPrime.ObjectValidator<AlphaDefinition>> TypesPrime.mergeObjectValidator(
@@ -150,8 +143,7 @@ export module Types
     export const getImportDefinitionValidator = () => <TypesPrime.ObjectValidator<ImportDefinition>>({ $type: TypesPrime.isJust("import"),
         target: TypesPrime.isString, from: TypesPrime.isString, });
     export const isImportDefinition = TypesPrime.isSpecificObject<ImportDefinition>(getImportDefinitionValidator());
-    export const isDefinition = (value: unknown, listner?: TypesError.Listener): value is Definition => isModuleDefinition(value) ||
-        isValueDefinition(value) || isTypeDefinition(value) || isInterfaceDefinition(value);
+    export const isDefinition = TypesPrime.isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition);
     export const getModuleDefinitionValidator = () => <TypesPrime.ObjectValidator<ModuleDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("module"), members: TypesPrime.isDictionaryObject(isDefinition), });
     export const isModuleDefinition = TypesPrime.isSpecificObject<ModuleDefinition>(getModuleDefinitionValidator());
@@ -183,16 +175,13 @@ export module Types
     export const isLiteralElement = TypesPrime.isSpecificObject<LiteralElement>(getLiteralElementValidator());
     export const getReferElementValidator = () => <TypesPrime.ObjectValidator<ReferElement>>({ $ref: TypesPrime.isString, });
     export const isReferElement = TypesPrime.isSpecificObject<ReferElement>(getReferElementValidator());
-    export const isPrimitiveTypeEnum = (value: unknown, listner?: TypesError.Listener): value is PrimitiveTypeEnum =>
-        PrimitiveTypeEnumMembers.includes(value as any);
+    export const isPrimitiveTypeEnum = TypesPrime.isEnum(PrimitiveTypeEnumMembers);
     export const getPrimitiveTypeElementValidator = () => <TypesPrime.ObjectValidator<PrimitiveTypeElement>>
         TypesPrime.mergeObjectValidator(getAlphaElementValidator(), { $type: TypesPrime.isJust("primitive-type"), literal:
         isPrimitiveTypeEnum, });
     export const isPrimitiveTypeElement = TypesPrime.isSpecificObject<PrimitiveTypeElement>(getPrimitiveTypeElementValidator());
-    export const isType = (value: unknown, listner?: TypesError.Listener): value is Type => isPrimitiveTypeElement(value) ||
-        isTypeDefinition(value) || isEnumTypeElement(value) || isTypeofElement(value) || isItemofElement(value) ||
-        isInterfaceDefinition(value) || isDictionaryElement(value) || isArrayElement(value) || isOrElement(value) || isAndElement(value) ||
-        isLiteralElement(value);
+    export const isType = TypesPrime.isOr(isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement,
+        isInterfaceDefinition, isDictionaryElement, isArrayElement, isOrElement, isAndElement, isLiteralElement);
     export const getEnumTypeElementValidator = () => <TypesPrime.ObjectValidator<EnumTypeElement>>({ $type: TypesPrime.isJust("enum-type"),
         members: TypesPrime.isArray(TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isBoolean, TypesPrime.isNumber, TypesPrime.isString)), });
     export const isEnumTypeElement = TypesPrime.isSpecificObject<EnumTypeElement>(getEnumTypeElementValidator());
@@ -202,6 +191,5 @@ export module Types
     export const getItemofElementValidator = () => <TypesPrime.ObjectValidator<ItemofElement>>({ $type: TypesPrime.isJust("itemof"), value:
         isReferElement, });
     export const isItemofElement = TypesPrime.isSpecificObject<ItemofElement>(getItemofElementValidator());
-    export const isTypeOrInterfaceOrRefer = (value: unknown, listner?: TypesError.Listener): value is TypeOrInterfaceOrRefer =>
-        isType(value) || isReferElement(value);
+    export const isTypeOrInterfaceOrRefer = TypesPrime.isOr(isType, isReferElement);
 }

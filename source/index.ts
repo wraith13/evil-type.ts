@@ -614,6 +614,40 @@ export module Build
                     return result;
                 }
                 else
+                if ("value" === define.$type)
+                {
+                    if (Types.isReferElement(define.value))
+                    {
+                        const result =
+                        [
+                            $line
+                            ([
+                                ...buildExport(define),
+                                $expression("const"),
+                                $expression(buildValidatorName(name)),
+                                $expression("="),
+                                $expression(buildValidatorName(define.value.$ref)),
+                            ])
+                        ];
+                        return result;
+                    }
+                    else
+                    {
+                        const result =
+                        [
+                            $line
+                            ([
+                                ...buildExport(define),
+                                $expression("const"),
+                                $expression(buildValidatorName(name)),
+                                $expression("="),
+                                ...buildCall([ $expression("TypesPrime.isJust"), ], [ $expression(Jsonable.stringify(define.value.literal)), ]),
+                            ])
+                        ];
+                        return result;
+                    }
+                }
+                else
                 {
                     const result =
                     [
@@ -623,7 +657,8 @@ export module Build
                             $expression("const"),
                             $expression(buildValidatorName(name)),
                             $expression("="),
-                            ...buildFullValidator(name, define),
+                            ...buildObjectValidatorGetterCoreEntry(define),
+                            //...buildFullValidator(name, define),
                         ])
                     ];
                     return result;
