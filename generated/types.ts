@@ -129,12 +129,18 @@ export module Types
         validatorOption: isValidatorOptionType, maxLineLength: TypesPrime.isOptional(TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isNumber
         )), });
     export const isOutputOptions = TypesPrime.isSpecificObject<OutputOptions>(getOutputOptionsValidator());
-    export const isIndentStyleType = TypesPrime.isEnum(indentStyleTypeMember);
-    export const isValidatorOptionType = TypesPrime.isEnum(["none","simple","full"]);
-    export const isJsonableValue = TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isBoolean, TypesPrime.isNumber, TypesPrime.isString);
-    export const isJsonableArray = TypesPrime.isArray(isJsonable);
-    export const isJsonableObject = TypesPrime.isDictionaryObject(isJsonable);
-    export const isJsonable = TypesPrime.isOr(isJsonableValue, isJsonableArray, isJsonableObject);
+    export const isIndentStyleType = (value: unknown, listner?: TypesError.Listener): value is IndentStyleType => TypesPrime.isEnum(
+        indentStyleTypeMember)(value, listner);
+    export const isValidatorOptionType = (value: unknown, listner?: TypesError.Listener): value is ValidatorOptionType => TypesPrime.isEnum
+        (["none","simple","full"])(value, listner);
+    export const isJsonableValue = (value: unknown, listner?: TypesError.Listener): value is JsonableValue => TypesPrime.isOr(
+        TypesPrime.isNull, TypesPrime.isBoolean, TypesPrime.isNumber, TypesPrime.isString)(value, listner);
+    export const isJsonableArray = (value: unknown, listner?: TypesError.Listener): value is JsonableArray => TypesPrime.isArray(isJsonable
+        )(value, listner);
+    export const isJsonableObject = (value: unknown, listner?: TypesError.Listener): value is JsonableObject =>
+        TypesPrime.isDictionaryObject(isJsonable)(value, listner);
+    export const isJsonable = (value: unknown, listner?: TypesError.Listener): value is Jsonable => TypesPrime.isOr(isJsonableValue,
+        isJsonableArray, isJsonableObject)(value, listner);
     export const getAlphaElementValidator = () => <TypesPrime.ObjectValidator<AlphaElement>>({ $type: TypesPrime.isString, });
     export const isAlphaElement = TypesPrime.isSpecificObject<AlphaElement>(getAlphaElementValidator());
     export const getAlphaDefinitionValidator = () => <TypesPrime.ObjectValidator<AlphaDefinition>> TypesPrime.mergeObjectValidator(
@@ -143,7 +149,8 @@ export module Types
     export const getImportDefinitionValidator = () => <TypesPrime.ObjectValidator<ImportDefinition>>({ $type: TypesPrime.isJust("import"),
         target: TypesPrime.isString, from: TypesPrime.isString, });
     export const isImportDefinition = TypesPrime.isSpecificObject<ImportDefinition>(getImportDefinitionValidator());
-    export const isDefinition = TypesPrime.isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition);
+    export const isDefinition = (value: unknown, listner?: TypesError.Listener): value is Definition => TypesPrime.isOr(isModuleDefinition,
+        isValueDefinition, isTypeDefinition, isInterfaceDefinition)(value, listner);
     export const getModuleDefinitionValidator = () => <TypesPrime.ObjectValidator<ModuleDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("module"), members: TypesPrime.isDictionaryObject(isDefinition), });
     export const isModuleDefinition = TypesPrime.isSpecificObject<ModuleDefinition>(getModuleDefinitionValidator());
@@ -175,13 +182,15 @@ export module Types
     export const isLiteralElement = TypesPrime.isSpecificObject<LiteralElement>(getLiteralElementValidator());
     export const getReferElementValidator = () => <TypesPrime.ObjectValidator<ReferElement>>({ $ref: TypesPrime.isString, });
     export const isReferElement = TypesPrime.isSpecificObject<ReferElement>(getReferElementValidator());
-    export const isPrimitiveTypeEnum = TypesPrime.isEnum(PrimitiveTypeEnumMembers);
+    export const isPrimitiveTypeEnum = (value: unknown, listner?: TypesError.Listener): value is PrimitiveTypeEnum => TypesPrime.isEnum(
+        PrimitiveTypeEnumMembers)(value, listner);
     export const getPrimitiveTypeElementValidator = () => <TypesPrime.ObjectValidator<PrimitiveTypeElement>>
         TypesPrime.mergeObjectValidator(getAlphaElementValidator(), { $type: TypesPrime.isJust("primitive-type"), literal:
         isPrimitiveTypeEnum, });
     export const isPrimitiveTypeElement = TypesPrime.isSpecificObject<PrimitiveTypeElement>(getPrimitiveTypeElementValidator());
-    export const isType = TypesPrime.isOr(isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement,
-        isInterfaceDefinition, isDictionaryElement, isArrayElement, isOrElement, isAndElement, isLiteralElement);
+    export const isType = (value: unknown, listner?: TypesError.Listener): value is Type => TypesPrime.isOr(isPrimitiveTypeElement,
+        isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryElement, isArrayElement,
+        isOrElement, isAndElement, isLiteralElement)(value, listner);
     export const getEnumTypeElementValidator = () => <TypesPrime.ObjectValidator<EnumTypeElement>>({ $type: TypesPrime.isJust("enum-type"),
         members: TypesPrime.isArray(TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isBoolean, TypesPrime.isNumber, TypesPrime.isString)), });
     export const isEnumTypeElement = TypesPrime.isSpecificObject<EnumTypeElement>(getEnumTypeElementValidator());
@@ -191,5 +200,6 @@ export module Types
     export const getItemofElementValidator = () => <TypesPrime.ObjectValidator<ItemofElement>>({ $type: TypesPrime.isJust("itemof"), value:
         isReferElement, });
     export const isItemofElement = TypesPrime.isSpecificObject<ItemofElement>(getItemofElementValidator());
-    export const isTypeOrInterfaceOrRefer = TypesPrime.isOr(isType, isReferElement);
+    export const isTypeOrInterfaceOrRefer = (value: unknown, listner?: TypesError.Listener): value is TypeOrInterfaceOrRefer =>
+        TypesPrime.isOr(isType, isReferElement)(value, listner);
 }

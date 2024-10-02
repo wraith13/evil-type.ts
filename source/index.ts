@@ -261,7 +261,7 @@ export module Build
     }
     export module Validator
     {
-        export const buildCall = (method: CodeExpression[], args: (CodeInlineEntry | CodeInlineEntry[])[]): CodeExpression[] =>
+        export const buildCall = (method: CodeInlineEntry[], args: (CodeInlineEntry | CodeInlineEntry[])[]): CodeInlineEntry[] =>
             [ ...method, ...Define.enParenthesis(kindofJoinExpression(args, $expression(",")))];
         export const buildLiterarlValidatorExpression = (name: string, value: Jsonable.Jsonable): CodeExpression[] =>
         {
@@ -550,10 +550,14 @@ export module Build
                 ]),
             ]:
             Define.enParenthesis([ buildObjectValidatorGetterCore(define), ]);
-        export const buildFullValidator = (name: string, define: Types.TypeOrValue) =>
+        export const buildFullValidator = (name: string, define: Types.Type) =>
         [
             $expression(`(value: unknown, listner?: TypesError.Listener): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
-            ...buildValidatorExpression("value", define),
+            ...buildCall
+            (
+                buildObjectValidatorGetterCoreEntry(define),
+                [ $expression("value"), $expression("listner"), ]
+            ),
         ];
         export const isValidatorTarget = (define: Types.TypeOrValue) =>
             ! (Types.isValueDefinition(define) && false === define.validator);
@@ -657,8 +661,7 @@ export module Build
                             $expression("const"),
                             $expression(buildValidatorName(name)),
                             $expression("="),
-                            ...buildObjectValidatorGetterCoreEntry(define),
-                            //...buildFullValidator(name, define),
+                            ...buildFullValidator(name, define),
                         ])
                     ];
                     return result;

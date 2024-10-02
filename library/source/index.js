@@ -437,7 +437,7 @@ var Build;
         Validator.buildFullValidator = function (name, define) {
             return __spreadArray([
                 (0, exports.$expression)("(value: unknown, listner?: TypesError.Listener): value is ".concat(types_1.Types.isValueDefinition(define) ? "typeof " + name : name, " =>"))
-            ], Validator.buildValidatorExpression("value", define), true);
+            ], Validator.buildCall(Validator.buildObjectValidatorGetterCoreEntry(define), [(0, exports.$expression)("value"), (0, exports.$expression)("listner"),]), true);
         };
         Validator.isValidatorTarget = function (define) {
             return !(types_1.Types.isValueDefinition(define) && false === define.validator);
@@ -504,7 +504,7 @@ var Build;
                             (0, exports.$expression)("const"),
                             (0, exports.$expression)(Validator.buildValidatorName(name)),
                             (0, exports.$expression)("=")
-                        ], false), Validator.buildObjectValidatorGetterCoreEntry(define), true))
+                        ], false), Validator.buildFullValidator(name, define), true))
                     ];
                     return result;
                 }

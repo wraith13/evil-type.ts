@@ -58,7 +58,7 @@ export declare namespace Build {
         const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {
-        const buildCall: (method: CodeExpression[], args: (CodeInlineEntry | CodeInlineEntry[])[]) => CodeExpression[];
+        const buildCall: (method: CodeInlineEntry[], args: (CodeInlineEntry | CodeInlineEntry[])[]) => CodeInlineEntry[];
         const buildLiterarlValidatorExpression: (name: string, value: Jsonable.Jsonable) => CodeExpression[];
         const buildInlineLiteralValidator: (define: Types.LiteralElement) => CodeExpression;
         const buildValidatorLine: (declarator: string, name: string, define: Types.Type) => CodeExpression[];
@@ -78,7 +78,7 @@ export declare namespace Build {
                 [key: string]: Types.TypeOrInterfaceOrRefer;
             };
         }) => (CodeExpression | CodeInlineBlock)[];
-        const buildFullValidator: (name: string, define: Types.TypeOrValue) => CodeExpression[];
+        const buildFullValidator: (name: string, define: Types.Type) => CodeInlineEntry[];
         const isValidatorTarget: (define: Types.TypeOrValue) => boolean;
         const buildValidator: (options: Types.OutputOptions, name: string, define: Types.TypeOrValue) => CodeLine[];
     }
