@@ -120,7 +120,8 @@ export module Types
         value: ReferElement;
     }
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
-    export const isSchema = TypesPrime.isJust("https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#");
+    export const isSchema = TypesPrime.isJust(
+        "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const);
     export const getTypeSchemaValidator = () => <TypesPrime.ObjectValidator<TypeSchema>>({ $ref: isSchema, imports: TypesPrime.isOptional(
         TypesPrime.isArray(isImportDefinition)), defines: TypesPrime.isDictionaryObject(isDefinition), options: isOutputOptions, });
     export const isTypeSchema = TypesPrime.isSpecificObject<TypeSchema>(getTypeSchemaValidator());

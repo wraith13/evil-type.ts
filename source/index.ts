@@ -611,7 +611,7 @@ export module Build
                             ...buildCall
                             (
                                 [ $expression(`TypesPrime.isSpecificObject<${name}>`), ],
-                                [ buildCall([ $expression(buildObjectValidatorGetterName(name)), ], [  ]) ]
+                                [ buildCall([ $expression(buildObjectValidatorGetterName(name)), ], [ ]) ]
                             )
                         ])
                     ];
@@ -645,7 +645,7 @@ export module Build
                                 $expression("const"),
                                 $expression(buildValidatorName(name)),
                                 $expression("="),
-                                ...buildCall([ $expression("TypesPrime.isJust"), ], [ $expression(Jsonable.stringify(define.value.literal)), ]),
+                                ...buildCall([ $expression("TypesPrime.isJust"), ], [ [ $expression(Jsonable.stringify(define.value.literal)), $expression("as"), $expression("const")], ]),
                             ])
                         ];
                         return result;
