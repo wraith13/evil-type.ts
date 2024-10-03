@@ -493,7 +493,7 @@ var Build;
                                 (0, exports.$expression)("const"),
                                 (0, exports.$expression)(Validator.buildValidatorName(name)),
                                 (0, exports.$expression)("=")
-                            ], false), Validator.buildCall([(0, exports.$expression)("TypesPrime.isJust"),], [[(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.value.literal)), (0, exports.$expression)("as"), (0, exports.$expression)("const")],]), true))
+                            ], false), Validator.buildCall([(0, exports.$expression)("TypesPrime.isJust"),], [(0, exports.$expression)(name),]), true))
                         ];
                         return result;
                     }
