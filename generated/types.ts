@@ -1,6 +1,7 @@
 // This file is generated.;
 import { TypesPrime } from "../source/types-prime.ts";
 import { TypesError } from "../source/types-error.ts";
+import { Jsonable } from "./jsonable.ts";
 export module Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
@@ -22,13 +23,6 @@ export module Types
     export const indentStyleTypeMember = ["allman","egyptian"] as const;
     export type IndentStyleType = typeof indentStyleTypeMember[number];
     export type ValidatorOptionType = "none" | "simple" | "full";
-    export type JsonableValue = null | boolean | number | string;
-    export type JsonableArray = Jsonable[];
-    export type JsonableObject =
-    {
-        [key: string]: Jsonable;
-    }
-    export type Jsonable = JsonableValue | JsonableArray | JsonableObject;
     export interface AlphaElement
     {
         $type: string;
@@ -89,7 +83,7 @@ export module Types
     export interface LiteralElement extends AlphaElement
     {
         $type: "literal";
-        literal: Jsonable;
+        literal: Jsonable.Jsonable;
     }
     export interface ReferElement
     {
@@ -133,14 +127,6 @@ export module Types
         indentStyleTypeMember)(value, listner);
     export const isValidatorOptionType = (value: unknown, listner?: TypesError.Listener): value is ValidatorOptionType => TypesPrime.isEnum
         (["none","simple","full"])(value, listner);
-    export const isJsonableValue = (value: unknown, listner?: TypesError.Listener): value is JsonableValue => TypesPrime.isOr(
-        TypesPrime.isNull, TypesPrime.isBoolean, TypesPrime.isNumber, TypesPrime.isString)(value, listner);
-    export const isJsonableArray = (value: unknown, listner?: TypesError.Listener): value is JsonableArray => TypesPrime.isArray(isJsonable
-        )(value, listner);
-    export const isJsonableObject = (value: unknown, listner?: TypesError.Listener): value is JsonableObject =>
-        TypesPrime.isDictionaryObject(isJsonable)(value, listner);
-    export const isJsonable = (value: unknown, listner?: TypesError.Listener): value is Jsonable => TypesPrime.isOr(isJsonableValue,
-        isJsonableArray, isJsonableObject)(value, listner);
     export const getAlphaElementValidator = () => <TypesPrime.ObjectValidator<AlphaElement>>({ $type: TypesPrime.isString, });
     export const isAlphaElement = TypesPrime.isSpecificObject<AlphaElement>(getAlphaElementValidator());
     export const getAlphaDefinitionValidator = () => <TypesPrime.ObjectValidator<AlphaDefinition>> TypesPrime.mergeObjectValidator(
@@ -178,7 +164,7 @@ export module Types
         getAlphaElementValidator(), { $type: TypesPrime.isJust("and"), types: TypesPrime.isArray(isTypeOrInterfaceOrRefer), });
     export const isAndElement = TypesPrime.isSpecificObject<AndElement>(getAndElementValidator());
     export const getLiteralElementValidator = () => <TypesPrime.ObjectValidator<LiteralElement>> TypesPrime.mergeObjectValidator(
-        getAlphaElementValidator(), { $type: TypesPrime.isJust("literal"), literal: isJsonable, });
+        getAlphaElementValidator(), { $type: TypesPrime.isJust("literal"), literal: Jsonable.isJsonable, });
     export const isLiteralElement = TypesPrime.isSpecificObject<LiteralElement>(getLiteralElementValidator());
     export const getReferElementValidator = () => <TypesPrime.ObjectValidator<ReferElement>>({ $ref: TypesPrime.isString, });
     export const isReferElement = TypesPrime.isSpecificObject<ReferElement>(getReferElementValidator());

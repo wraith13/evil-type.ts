@@ -13,6 +13,11 @@
             "$type": "import",
             "target": "{ TypesError }",
             "from": "../source/types-error.ts"
+        },
+        {
+            "$type": "import",
+            "target": "{ Jsonable }",
+            "from": "./jsonable.ts"
         }
     ],
     "defines": {
@@ -128,66 +133,6 @@
                             "none",
                             "simple",
                             "full"
-                        ]
-                    }
-                },
-                "JsonableValue": {
-                    "export": true,
-                    "$type": "type",
-                    "define": {
-                        "$type": "or",
-                        "types": [
-                            {
-                                "$type": "primitive-type",
-                                "type": "null"
-                            },
-                            {
-                                "$type": "primitive-type",
-                                "type": "boolean"
-                            },
-                            {
-                                "$type": "primitive-type",
-                                "type": "number"
-                            },
-                            {
-                                "$type": "primitive-type",
-                                "type": "string"
-                            }
-                        ]
-                    }
-                },
-                "JsonableArray": {
-                    "export": true,
-                    "$type": "type",
-                    "define": {
-                        "$type": "array",
-                        "items": {
-                            "$ref": "Jsonable"
-                        }
-                    }
-                },
-                "JsonableObject": {
-                    "export": true,
-                    "$type": "dictionary",
-                    "valueType": {
-                        "$ref": "Jsonable"
-                    }
-                },
-                "Jsonable": {
-                    "export": true,
-                    "$type": "type",
-                    "define": {
-                        "$type": "or",
-                        "types": [
-                            {
-                                "$ref": "JsonableValue"
-                            },
-                            {
-                                "$ref": "JsonableArray"
-                            },
-                            {
-                                "$ref": "JsonableObject"
-                            }
                         ]
                     }
                 },
@@ -443,7 +388,7 @@
                             "literal": "literal"
                         },
                         "literal": {
-                            "$ref": "Jsonable"
+                            "$ref": "Jsonable.Jsonable"
                         }
                     }
                 },
