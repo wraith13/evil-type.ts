@@ -570,9 +570,13 @@ var Format;
         }
         return buffer;
     };
+    Format.isInLineComment = function (data) {
+        var ix = data.tokens.indexOf("//");
+        return 0 <= ix && ix <= data.i;
+    };
     Format.isLineBreak = function (data) {
         var maxLineLength = Format.getMaxLineLength(data.options);
-        if (null !== maxLineLength) {
+        if (null !== maxLineLength && !Format.isInLineComment(data)) {
             var options = data.options, indentDepth = data.indentDepth, result = data.result, buffer = data.buffer, tokens = data.tokens, i = data.i;
             ++i;
             if (data.i + 1 < tokens.length && maxLineLength <= Format.temporaryAssembleLine({ options: options, indentDepth: indentDepth, result: result, buffer: buffer, tokens: tokens, i: i, }, 1).length) {
@@ -602,7 +606,11 @@ var Format;
             }
             ++data.i;
         }
-        data.result += data.buffer + ";" + returnCode;
+        data.result += data.buffer;
+        if (!Format.isInLineComment(data)) {
+            data.result += ";";
+        }
+        data.result += returnCode;
         return data.result;
     };
     Format.inlineBlock = function (options, indentDepth, code) {

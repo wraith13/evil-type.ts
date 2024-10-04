@@ -99,6 +99,7 @@ export declare namespace Format {
     }
     const separator: (data: Readonly<LineProcess>) => string;
     const temporaryAssembleLine: (data: Readonly<LineProcess>, length: number) => string;
+    const isInLineComment: (data: Readonly<LineProcess>) => boolean;
     const isLineBreak: (data: Readonly<LineProcess>) => boolean;
     const line: (options: Readonly<Types.OutputOptions>, indentDepth: number, code: CodeLine) => string;
     const inlineBlock: (options: Readonly<Types.OutputOptions>, indentDepth: number, code: CodeInlineBlock) => string;

@@ -746,10 +746,15 @@ export module Format
         }
         return buffer;
     }
+    export const isInLineComment = (data: Readonly<LineProcess>) =>
+    {
+        const ix = data.tokens.indexOf("//");
+        return 0 <= ix && ix <= data.i;
+    }
     export const isLineBreak = (data: Readonly<LineProcess>) =>
     {
         const maxLineLength = getMaxLineLength(data.options);
-        if (null !== maxLineLength)
+        if (null !== maxLineLength && ! isInLineComment(data))
         {
             let { options, indentDepth, result, buffer, tokens, i, } = data;
             ++i;
@@ -786,7 +791,12 @@ export module Format
             }
             ++data.i;
         }
-        data.result += data.buffer +";" +returnCode;
+        data.result += data.buffer;
+        if ( ! isInLineComment(data))
+        {
+            data.result += ";";
+        }
+        data.result += returnCode;
         return data.result;
     };
     export const inlineBlock = (options: Readonly<Types.OutputOptions>, indentDepth: number, code: CodeInlineBlock): string =>

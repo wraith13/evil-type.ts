@@ -1,4 +1,4 @@
-// This file is generated.;
+// This file is generated.
 import { TypesPrime } from "../source/types-prime.ts";
 import { TypesError } from "../source/types-error.ts";
 export module Jsonable
