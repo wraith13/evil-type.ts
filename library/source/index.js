@@ -156,7 +156,7 @@ var Build;
         Define.buildDefineModuleCore = function (options, members) {
             return __spreadArray(__spreadArray([], Object.entries(members)
                 .map(function (i) { return Build.Define.buildDefine(options, i[0], i[1]); }), true), Object.entries(members)
-                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? [] : Build.Validator.buildValidator(options, i[0], i[1]); }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || types_1.Types.isCodeDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? [] : Build.Validator.buildValidator(options, i[0], i[1]); }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
         Define.buildDefineModule = function (options, name, value) {
             var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("module"), (0, exports.$expression)(name),], false);
@@ -168,6 +168,8 @@ var Build;
         };
         Define.buildDefine = function (options, name, define) {
             switch (define.$type) {
+                case "code":
+                    return [(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(define), true), Build.buildExport(define), true), define.tokens.map(function (i) { return (0, exports.$expression)(i); }), true)),];
                 case "interface":
                     return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineInterface(name, define),], false);
                 case "dictionary":

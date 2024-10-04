@@ -79,6 +79,27 @@
                             }
                         ]
                     }
+                },
+                "parse": {
+                    "export": true,
+                    "$type": "code",
+                    "tokens": [
+                        "const",
+                        "parse",
+                        "=",
+                        "(",
+                        "json",
+                        ":",
+                        "string",
+                        ")",
+                        ":",
+                        "Jsonable",
+                        "=>",
+                        "JSON.parse",
+                        "(",
+                        "json",
+                        ")"
+                    ]
                 }
             }
         }

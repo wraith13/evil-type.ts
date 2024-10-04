@@ -32,6 +32,12 @@ var Types;
     Types.isReferElement = types_prime_1.TypesPrime.isSpecificObject({
         "$ref": types_prime_1.TypesPrime.isString,
     });
+    Types.isCodeDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+        comment: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isString)),
+        export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
+        $type: types_prime_1.TypesPrime.isJust("code"),
+        tokens: types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isString),
+    })(value, listner); };
     Types.isImportDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         $type: types_prime_1.TypesPrime.isJust("import"),
         target: types_prime_1.TypesPrime.isString,
@@ -106,7 +112,7 @@ var Types;
     Types.isType = types_prime_1.TypesPrime.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isDictionaryElement, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
     Types.isTypeOrValue = types_prime_1.TypesPrime.isOr(Types.isType, Types.isValueDefinition);
     Types.isTypeOrRefer = types_prime_1.TypesPrime.isOr(Types.isType, Types.isReferElement);
-    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition, Types.isDictionaryElement);
+    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isCodeDefinition, Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition, Types.isDictionaryElement);
     Types.isDefineOrRefer = types_prime_1.TypesPrime.isOr(Types.isDefinition, Types.isReferElement);
 })(Types || (exports.Types = Types = {}));
 //# sourceMappingURL=types.js.map

@@ -186,6 +186,9 @@
                         "$type": "or",
                         "types": [
                             {
+                                "$ref": "CodeDefinition"
+                            },
+                            {
                                 "$ref": "ModuleDefinition"
                             },
                             {
@@ -198,6 +201,28 @@
                                 "$ref": "InterfaceDefinition"
                             }
                         ]
+                    }
+                },
+                "CodeDefinition": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "AlphaDefinition"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "code"
+                        },
+                        "tokens": {
+                            "$type": "array",
+                            "items": {
+                                "$type": "primitive-type",
+                                "type": "string"
+                            }
+                        }
                     }
                 },
                 "ModuleDefinition": {

@@ -37,7 +37,12 @@ export module Types
         target: string;
         from: string;
     }
-    export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    export type Definition = CodeDefinition | ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    export interface CodeDefinition extends AlphaDefinition
+    {
+        $type: "code";
+        tokens: string[];
+    }
     export interface ModuleDefinition extends AlphaDefinition
     {
         $type: "module";
@@ -135,8 +140,11 @@ export module Types
     export const getImportDefinitionValidator = () => <TypesPrime.ObjectValidator<ImportDefinition>>({ $type: TypesPrime.isJust("import"),
         target: TypesPrime.isString, from: TypesPrime.isString, });
     export const isImportDefinition = TypesPrime.isSpecificObject<ImportDefinition>(getImportDefinitionValidator());
-    export const isDefinition = (value: unknown, listner?: TypesError.Listener): value is Definition => TypesPrime.isOr(isModuleDefinition,
-        isValueDefinition, isTypeDefinition, isInterfaceDefinition)(value, listner);
+    export const isDefinition = (value: unknown, listner?: TypesError.Listener): value is Definition => TypesPrime.isOr(isCodeDefinition,
+        isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition)(value, listner);
+    export const getCodeDefinitionValidator = () => <TypesPrime.ObjectValidator<CodeDefinition>> TypesPrime.mergeObjectValidator(
+        getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("code"), tokens: TypesPrime.isArray(TypesPrime.isString), });
+    export const isCodeDefinition = TypesPrime.isSpecificObject<CodeDefinition>(getCodeDefinitionValidator());
     export const getModuleDefinitionValidator = () => <TypesPrime.ObjectValidator<ModuleDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("module"), members: TypesPrime.isDictionaryObject(isDefinition), });
     export const isModuleDefinition = TypesPrime.isSpecificObject<ModuleDefinition>(getModuleDefinitionValidator());

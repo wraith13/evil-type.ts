@@ -70,6 +70,19 @@ export module Types
     {
         export?: boolean;
     }
+    export interface CodeDefinition extends AlphaDefinition
+    {
+        $type: "code";
+        tokens: string[];
+    }
+    export const isCodeDefinition = (value: unknown, listner?: TypesError.Listener): value is CodeDefinition => TypesPrime.isSpecificObject<CodeDefinition>
+    ({
+        comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
+        export: TypesPrime.isOptional(TypesPrime.isBoolean),
+        $type: TypesPrime.isJust("code"),
+        tokens: TypesPrime.isArray(TypesPrime.isString),
+    })
+    (value, listner);
     export interface ImportDefinition
     {
         $type: "import";
@@ -248,8 +261,8 @@ export module Types
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
     export const isTypeOrRefer = TypesPrime.isOr(isType, isReferElement);
-    export type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
-    export const isDefinition = TypesPrime.isOr(isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryElement);
+    export type Definition = CodeDefinition | ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
+    export const isDefinition = TypesPrime.isOr(isCodeDefinition, isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryElement);
     export type DefineOrRefer = Definition | ReferElement;
     export const isDefineOrRefer = TypesPrime.isOr(isDefinition, isReferElement);
 }

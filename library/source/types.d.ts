@@ -43,6 +43,11 @@ export declare namespace Types {
     interface AlphaDefinition extends AlphaElement, CommentProperty {
         export?: boolean;
     }
+    interface CodeDefinition extends AlphaDefinition {
+        $type: "code";
+        tokens: string[];
+    }
+    const isCodeDefinition: (value: unknown, listner?: TypesError.Listener) => value is CodeDefinition;
     interface ImportDefinition {
         $type: "import";
         target: string;
@@ -130,8 +135,8 @@ export declare namespace Types {
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     type TypeOrInterfaceOrRefer = Type | ReferElement;
     const isTypeOrRefer: (value: unknown, listner?: TypesError.Listener) => value is TypeDefinition | InterfaceDefinition | DictionaryDefinition | ReferElement | PrimitiveTypeElement | LiteralElement | TypeofElement | ItemofElement | EnumTypeElement | ArrayElement | OrElement | AndElement;
-    type Definition = ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
-    const isDefinition: (value: unknown, listner?: TypesError.Listener) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
+    type Definition = CodeDefinition | ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
+    const isDefinition: (value: unknown, listner?: TypesError.Listener) => value is CodeDefinition | ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
     type DefineOrRefer = Definition | ReferElement;
-    const isDefineOrRefer: (value: unknown, listner?: TypesError.Listener) => value is ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition | ReferElement;
+    const isDefineOrRefer: (value: unknown, listner?: TypesError.Listener) => value is CodeDefinition | ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition | ReferElement;
 }

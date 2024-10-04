@@ -194,7 +194,7 @@ export module Build
             ...Object.entries(members)
                 .map(i => Build.Define.buildDefine(options, i[0], i[1])),
             ...Object.entries(members)
-                .map(i => Types.isModuleDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? []: Build.Validator.buildValidator(options, i[0], i[1]))
+                .map(i => Types.isModuleDefinition(i[1]) || Types.isCodeDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? []: Build.Validator.buildValidator(options, i[0], i[1]))
         ]
         .reduce((a, b) => [...a, ...b], []);
         export const buildDefineModule = (options: Types.OutputOptions, name: string, value: Types.ModuleDefinition): CodeBlock =>
@@ -209,6 +209,8 @@ export module Build
         {
             switch(define.$type)
             {
+            case "code":
+                return [ $line([ ...$comment(define), ...buildExport(define), ...define.tokens.map(i => $expression(i)), ]), ];
             case "interface":
                 return [ ...$comment(define), buildDefineInterface(name, define), ];
             case "dictionary":
