@@ -7,18 +7,18 @@
         {
             "$type": "import",
             "target": "{ TypesPrime }",
-            "from": "../source/types-prime.ts"
+            "from": "../source/types-prime"
         },
         {
             "$type": "import",
             "target": "{ TypesError }",
-            "from": "../source/types-error.ts"
+            "from": "../source/types-error"
         }
     ],
     "defines": {
         "Jsonable": {
             "export": true,
-            "$type": "module",
+            "$type": "namespace",
             "members": {
                 "JsonableValue": {
                     "export": true,
@@ -99,6 +99,39 @@
                         "(",
                         "json",
                         ")"
+                    ]
+                },
+                "stringify": {
+                    "export": true,
+                    "$type": "code",
+                    "tokens": [
+                        "const",
+                        "stringify",
+                        "=",
+                        "(",
+                        "value",
+                        ":",
+                        "Jsonable",
+                        ")",
+                        ":",
+                        "string",
+                        "=>",
+                        "JSON.stringify",
+                        "(",
+                        "value",
+                        ")"
+                    ]
+                },
+                "JsonablePartial": {
+                    "export": true,
+                    "$type": "code",
+                    "tokens": [
+                        "type",
+                        "JsonablePartial<Target extends JsonableObject>",
+                        "=",
+                        "{ [key in keyof Target]?: Target[key] }",
+                        "&",
+                        "JsonableObject"
                     ]
                 }
             }

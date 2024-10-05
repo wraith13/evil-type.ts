@@ -1,11 +1,13 @@
 'use strict';
 const startAt = new Date();
 import fs from "fs";
-import { Jsonable } from "./jsonable";
 import { TypesPrime } from "./types-prime";
 import { TypesError } from "./types-error";
-import { Types } from "./types";
 import { Text } from "./text";
+// import { Jsonable } from "../generated/jsonable";
+import { Jsonable } from "./jsonable";
+// import { Types } from "../generated/types";
+import { Types } from "./types";
 import config from "../resource/config.json";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
@@ -97,14 +99,14 @@ export const $line = (expressions: CodeLine["expressions"]): CodeLine => ({ $cod
 export const $comment = (define: Types.CommentProperty): CodeLine[] => define.comment ? define.comment.map(i => $line([$expression("//"), $expression(i)])): [];
 export const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ $code: "inline-block", lines, });
 export const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
-export module Build
+export namespace Build
 {
 // data:input(json) to data:code(object)
     export const buildExport = (define: { export?: boolean } | { }): CodeExpression[] =>
         ("export" in define && (define.export ?? true)) ? [$expression("export")]: [];
     export const buildExtends = (define: Types.InterfaceDefinition): CodeExpression[] =>
         undefined !== define.extends ? [$expression("extends"), ...define.extends.map((i, ix, list) => $expression(ix < (list.length -1) ? `${i.$ref},`: `${i.$ref}`))]: [];
-    export module Define
+    export namespace Define
     {
         export const buildDefineLine = (declarator: string, name: string, define: Types.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
             $line([ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define)), ...postEpressions, ]);
@@ -189,18 +191,18 @@ export module Build
             const header = [ ...buildExport(value), ...["type", name].map(i => $expression(i)), $expression("=")];
             return $block(header, [ $line([ $expression("[key: string]:"), ...buildInlineDefine(value.valueType), ]) ]);
         };
-        export const buildDefineModuleCore = (options: Types.OutputOptions, members: { [key: string]: Types.Definition; }): CodeEntry[] =>
+        export const buildDefineNamespaceCore = (options: Types.OutputOptions, members: { [key: string]: Types.Definition; }): CodeEntry[] =>
         [
             ...Object.entries(members)
                 .map(i => Build.Define.buildDefine(options, i[0], i[1])),
             ...Object.entries(members)
-                .map(i => Types.isModuleDefinition(i[1]) || Types.isCodeDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? []: Build.Validator.buildValidator(options, i[0], i[1]))
+                .map(i => Types.isNamespaceDefinition(i[1]) || Types.isCodeDefinition(i[1]) || ! Build.Validator.isValidatorTarget(i[1]) ? []: Build.Validator.buildValidator(options, i[0], i[1]))
         ]
         .reduce((a, b) => [...a, ...b], []);
-        export const buildDefineModule = (options: Types.OutputOptions, name: string, value: Types.ModuleDefinition): CodeBlock =>
+        export const buildDefineNamespace = (options: Types.OutputOptions, name: string, value: Types.NamespaceDefinition): CodeBlock =>
         {
-            const header = [...buildExport(value), $expression("module"), $expression(name), ];
-            const lines = buildDefineModuleCore(options, value.members);
+            const header = [...buildExport(value), $expression("namespace"), $expression(name), ];
+            const lines = buildDefineNamespaceCore(options, value.members);
             return $block(header, lines);
         };
         export const buildImports = (imports: undefined | Types.ImportDefinition[]) =>
@@ -215,8 +217,8 @@ export module Build
                 return [ ...$comment(define), buildDefineInterface(name, define), ];
             case "dictionary":
                 return [ ...$comment(define), buildDefineDictionary(name, define), ];
-            case "module":
-                return [ ...$comment(define), buildDefineModule(options, name, define), ];
+            case "namespace":
+                return [ ...$comment(define), buildDefineNamespace(options, name, define), ];
             case "type":
                 return [ ...$comment(define), buildDefineLine("type", name, define), ];
             case "value":
@@ -261,7 +263,7 @@ export module Build
             }
         };
     }
-    export module Validator
+    export namespace Validator
     {
         export const buildCall = (method: CodeInlineEntry[], args: (CodeInlineEntry | CodeInlineEntry[])[]): CodeInlineEntry[] =>
             [ ...method, ...Define.enParenthesis(kindofJoinExpression(args, $expression(",")))];
@@ -673,7 +675,7 @@ export module Build
         };
     }
 }
-export module Format
+export namespace Format
 {
 // data:code(object) to data:output(text)
     export const getMaxLineLength = (options: Types.OutputOptions): null | number =>
@@ -851,7 +853,7 @@ try
         [
             ...$comment(typeSource),
             ...Build.Define.buildImports(typeSource.imports),
-            ...Build.Define.buildDefineModuleCore(typeSource.options, typeSource.defines),
+            ...Build.Define.buildDefineNamespaceCore(typeSource.options, typeSource.defines),
         ];
         const result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile)

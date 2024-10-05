@@ -1,8 +1,8 @@
 // This file is generated.
-import { TypesPrime } from "../source/types-prime.ts";
-import { TypesError } from "../source/types-error.ts";
-import { Jsonable } from "./jsonable.ts";
-export module Types
+import { TypesPrime } from "../source/types-prime";
+import { TypesError } from "../source/types-error";
+import { Jsonable } from "./jsonable";
+export namespace Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
     export interface TypeSchema
@@ -37,15 +37,15 @@ export module Types
         target: string;
         from: string;
     }
-    export type Definition = CodeDefinition | ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    export type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
     export interface CodeDefinition extends AlphaDefinition
     {
         $type: "code";
         tokens: string[];
     }
-    export interface ModuleDefinition extends AlphaDefinition
+    export interface NamespaceDefinition extends AlphaDefinition
     {
-        $type: "module";
+        $type: "namespace";
         members: { [key: string]: Definition, };
     }
     export interface ValueDefinition extends AlphaDefinition
@@ -141,13 +141,13 @@ export module Types
         target: TypesPrime.isString, from: TypesPrime.isString, });
     export const isImportDefinition = TypesPrime.isSpecificObject<ImportDefinition>(getImportDefinitionValidator());
     export const isDefinition = (value: unknown, listner?: TypesError.Listener): value is Definition => TypesPrime.isOr(isCodeDefinition,
-        isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition)(value, listner);
+        isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition)(value, listner);
     export const getCodeDefinitionValidator = () => <TypesPrime.ObjectValidator<CodeDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("code"), tokens: TypesPrime.isArray(TypesPrime.isString), });
     export const isCodeDefinition = TypesPrime.isSpecificObject<CodeDefinition>(getCodeDefinitionValidator());
-    export const getModuleDefinitionValidator = () => <TypesPrime.ObjectValidator<ModuleDefinition>> TypesPrime.mergeObjectValidator(
-        getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("module"), members: TypesPrime.isDictionaryObject(isDefinition), });
-    export const isModuleDefinition = TypesPrime.isSpecificObject<ModuleDefinition>(getModuleDefinitionValidator());
+    export const getNamespaceDefinitionValidator = () => <TypesPrime.ObjectValidator<NamespaceDefinition>> TypesPrime.mergeObjectValidator(
+        getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("namespace"), members: TypesPrime.isDictionaryObject(isDefinition), });
+    export const isNamespaceDefinition = TypesPrime.isSpecificObject<NamespaceDefinition>(getNamespaceDefinitionValidator());
     export const getValueDefinitionValidator = () => <TypesPrime.ObjectValidator<ValueDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("value"), value: TypesPrime.isOr(isLiteralElement, isReferElement),
         validator: TypesPrime.isOptional(TypesPrime.isBoolean), });

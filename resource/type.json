@@ -7,23 +7,23 @@
         {
             "$type": "import",
             "target": "{ TypesPrime }",
-            "from": "../source/types-prime.ts"
+            "from": "../source/types-prime"
         },
         {
             "$type": "import",
             "target": "{ TypesError }",
-            "from": "../source/types-error.ts"
+            "from": "../source/types-error"
         },
         {
             "$type": "import",
             "target": "{ Jsonable }",
-            "from": "./jsonable.ts"
+            "from": "./jsonable"
         }
     ],
     "defines": {
         "Types": {
             "export": true,
-            "$type": "module",
+            "$type": "namespace",
             "members": {
                 "schema": {
                     "export": true,
@@ -189,7 +189,7 @@
                                 "$ref": "CodeDefinition"
                             },
                             {
-                                "$ref": "ModuleDefinition"
+                                "$ref": "NamespaceDefinition"
                             },
                             {
                                 "$ref": "ValueDefinition"
@@ -225,7 +225,7 @@
                         }
                     }
                 },
-                "ModuleDefinition": {
+                "NamespaceDefinition": {
                     "export": true,
                     "$type": "interface",
                     "extends": [
@@ -236,7 +236,7 @@
                     "members": {
                         "$type": {
                             "$type": "literal",
-                            "literal": "module"
+                            "literal": "namespace"
                         },
                         "members": {
                             "$type": "dictionary",

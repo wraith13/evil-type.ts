@@ -43,10 +43,10 @@ var Types;
         target: types_prime_1.TypesPrime.isString,
         from: types_prime_1.TypesPrime.isString,
     })(value, listner); };
-    Types.isModuleDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+    Types.isNamespaceDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         comment: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isString)),
         export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
-        $type: types_prime_1.TypesPrime.isJust("module"),
+        $type: types_prime_1.TypesPrime.isJust("namespace"),
         members: types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition),
     })(value, listner); };
     Types.PrimitiveTypeEnumMembers = ["null", "boolean", "number", "string"];
@@ -112,7 +112,7 @@ var Types;
     Types.isType = types_prime_1.TypesPrime.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isDictionaryElement, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
     Types.isTypeOrValue = types_prime_1.TypesPrime.isOr(Types.isType, Types.isValueDefinition);
     Types.isTypeOrRefer = types_prime_1.TypesPrime.isOr(Types.isType, Types.isReferElement);
-    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isCodeDefinition, Types.isModuleDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition, Types.isDictionaryElement);
+    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isCodeDefinition, Types.isNamespaceDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition, Types.isDictionaryElement);
     Types.isDefineOrRefer = types_prime_1.TypesPrime.isOr(Types.isDefinition, Types.isReferElement);
 })(Types || (exports.Types = Types = {}));
 //# sourceMappingURL=types.js.map

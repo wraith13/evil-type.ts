@@ -49,10 +49,10 @@ export declare namespace Build {
         const buildDefineInlineInterface: (value: Types.InterfaceDefinition) => CodeInlineBlock;
         const buildDefineInterface: (name: string, value: Types.InterfaceDefinition) => CodeBlock;
         const buildDefineDictionary: (name: string, value: Types.DictionaryDefinition) => CodeBlock;
-        const buildDefineModuleCore: (options: Types.OutputOptions, members: {
+        const buildDefineNamespaceCore: (options: Types.OutputOptions, members: {
             [key: string]: Types.Definition;
         }) => CodeEntry[];
-        const buildDefineModule: (options: Types.OutputOptions, name: string, value: Types.ModuleDefinition) => CodeBlock;
+        const buildDefineNamespace: (options: Types.OutputOptions, name: string, value: Types.NamespaceDefinition) => CodeBlock;
         const buildImports: (imports: undefined | Types.ImportDefinition[]) => CodeLine[];
         const buildDefine: (options: Types.OutputOptions, name: string, define: Types.Definition) => CodeEntry[];
         const buildInlineDefine: (define: Types.TypeOrValueOfRefer) => (CodeExpression | CodeInlineBlock)[];

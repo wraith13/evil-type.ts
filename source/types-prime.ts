@@ -1,6 +1,6 @@
 import { Jsonable } from "./jsonable";
 import { TypesError } from "./types-error";
-export module TypesPrime
+export namespace TypesPrime
 {
     export const isJust = <T>(target: T) => (value: unknown, listner?: TypesError.Listener): value is T =>
         TypesError.withErrorHandling(target === value, listner, () => TypesError.valueToString(target), value);

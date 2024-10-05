@@ -1,4 +1,4 @@
-export module TypesError
+export namespace TypesError
 {
     export interface Error
     {

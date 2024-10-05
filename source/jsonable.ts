@@ -1,4 +1,4 @@
-export module Jsonable
+export namespace Jsonable
 {
     export type JsonableValue = null | boolean | number | string;
     export const isJsonableValue = (value: unknown): value is JsonableValue =>

@@ -1,7 +1,7 @@
 import { Jsonable } from "./jsonable";
 import { TypesError } from "./types-error";
 import { TypesPrime } from "./types-prime";
-export module Types
+export namespace Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
     export const ValidatorOptionTypeMembers = [ "none", "simple", "full", ] as const;
@@ -96,16 +96,16 @@ export module Types
         from: TypesPrime.isString,
     })
     (value, listner);
-    export interface ModuleDefinition extends AlphaDefinition
+    export interface NamespaceDefinition extends AlphaDefinition
     {
-        $type: "module";
+        $type: "namespace";
         members: { [key: string]: Definition; };
     }
-    export const isModuleDefinition = (value: unknown, listner?: TypesError.Listener): value is ModuleDefinition => TypesPrime.isSpecificObject<ModuleDefinition>
+    export const isNamespaceDefinition = (value: unknown, listner?: TypesError.Listener): value is NamespaceDefinition => TypesPrime.isSpecificObject<NamespaceDefinition>
     ({
         comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
-        $type: TypesPrime.isJust("module"),
+        $type: TypesPrime.isJust("namespace"),
         members: TypesPrime.isDictionaryObject(isDefinition),
     })
     (value, listner);
@@ -261,8 +261,8 @@ export module Types
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
     export const isTypeOrRefer = TypesPrime.isOr(isType, isReferElement);
-    export type Definition = CodeDefinition | ModuleDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
-    export const isDefinition = TypesPrime.isOr(isCodeDefinition, isModuleDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryElement);
+    export type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
+    export const isDefinition = TypesPrime.isOr(isCodeDefinition, isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryElement);
     export type DefineOrRefer = Definition | ReferElement;
     export const isDefineOrRefer = TypesPrime.isOr(isDefinition, isReferElement);
 }

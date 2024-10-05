@@ -1,4 +1,4 @@
-export module Text
+export namespace Text
 {
     export const getNameSpace = (name: string) =>
         name.split(".").slice(0, -1).join(".");

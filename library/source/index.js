@@ -15,11 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Format = exports.Build = exports.$block = exports.$iblock = exports.$comment = exports.$line = exports.$expression = exports.convertToExpression = void 0;
 var startAt = new Date();
 var fs_1 = __importDefault(require("fs"));
-var jsonable_1 = require("./jsonable");
 var types_prime_1 = require("./types-prime");
 var types_error_1 = require("./types-error");
-var types_1 = require("./types");
 var text_1 = require("./text");
+// import { Jsonable } from "../generated/jsonable";
+var jsonable_1 = require("./jsonable");
+// import { Types } from "../generated/types";
+var types_1 = require("./types");
 var config_json_1 = __importDefault(require("../resource/config.json"));
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
 var jsonPath = process.argv[2];
@@ -153,14 +155,14 @@ var Build;
             var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(value), true), ["type", name].map(function (i) { return (0, exports.$expression)(i); }), true), [(0, exports.$expression)("=")], false);
             return (0, exports.$block)(header, [(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(value.valueType), true))]);
         };
-        Define.buildDefineModuleCore = function (options, members) {
+        Define.buildDefineNamespaceCore = function (options, members) {
             return __spreadArray(__spreadArray([], Object.entries(members)
                 .map(function (i) { return Build.Define.buildDefine(options, i[0], i[1]); }), true), Object.entries(members)
-                .map(function (i) { return types_1.Types.isModuleDefinition(i[1]) || types_1.Types.isCodeDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? [] : Build.Validator.buildValidator(options, i[0], i[1]); }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                .map(function (i) { return types_1.Types.isNamespaceDefinition(i[1]) || types_1.Types.isCodeDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? [] : Build.Validator.buildValidator(options, i[0], i[1]); }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
-        Define.buildDefineModule = function (options, name, value) {
-            var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("module"), (0, exports.$expression)(name),], false);
-            var lines = Define.buildDefineModuleCore(options, value.members);
+        Define.buildDefineNamespace = function (options, name, value) {
+            var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("namespace"), (0, exports.$expression)(name),], false);
+            var lines = Define.buildDefineNamespaceCore(options, value.members);
             return (0, exports.$block)(header, lines);
         };
         Define.buildImports = function (imports) {
@@ -174,8 +176,8 @@ var Build;
                     return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineInterface(name, define),], false);
                 case "dictionary":
                     return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineDictionary(name, define),], false);
-                case "module":
-                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineModule(options, name, define),], false);
+                case "namespace":
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineNamespace(options, name, define),], false);
                 case "type":
                     return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineLine("type", name, define),], false);
                 case "value":
@@ -655,7 +657,7 @@ try {
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
     var errorListner = types_error_1.TypesError.makeListener(jsonPath);
     if (types_1.Types.isTypeSchema(typeSource, errorListner)) {
-        var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineModuleCore(typeSource.options, typeSource.defines), true);
+        var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineNamespaceCore(typeSource.options, typeSource.defines), true);
         var result = Format.text(typeSource.options, 0, code);
         if (typeSource.options.outputFile) {
             fs_1.default.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });

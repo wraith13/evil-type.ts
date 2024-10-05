@@ -331,14 +331,14 @@
                 "type"
             ]
         },
-        "Module":
+        "Namespace":
         {
             "type": "object",
             "properties": {
                 "type":
                 {
                     "type": "string",
-                    "enum": [ "module" ]
+                    "enum": [ "namespace" ]
                 },
                 "name":
                 {
@@ -352,12 +352,12 @@
                         "$ref": "#/definitions/Type"
                     }
                 },
-                "modules":
+                "namespaces":
                 {
                     "type": "array",
                     "items":
                     {
-                        "$ref": "#/definitions/Module"
+                        "$ref": "#/definitions/Namespace"
                     }
                 }
             },
@@ -378,12 +378,12 @@
                         "$ref": "#/definitions/Type"
                     }
                 },
-                "modules":
+                "namespaces":
                 {
                     "type": "array",
                     "items":
                     {
-                        "$ref": "#/definitions/Module"
+                        "$ref": "#/definitions/Namespace"
                     }
                 },
                 "options":
