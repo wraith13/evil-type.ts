@@ -1,4 +1,4 @@
-import { Jsonable } from "./jsonable";
+import { Jsonable } from "../generated/jsonable";
 import { Types } from "./types";
 interface Code {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];

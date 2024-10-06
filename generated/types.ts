@@ -5,7 +5,11 @@ import { Jsonable } from "./jsonable";
 export namespace Types
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
-    export interface TypeSchema
+    export interface CommentProperty
+    {
+        comment?: string[];
+    }
+    export interface TypeSchema extends CommentProperty
     {
         $ref: typeof schema;
         imports?: ImportDefinition[];
@@ -27,7 +31,7 @@ export namespace Types
     {
         $type: string;
     }
-    export interface AlphaDefinition extends AlphaElement
+    export interface AlphaDefinition extends AlphaElement, CommentProperty
     {
         export?: boolean;
     }
@@ -120,8 +124,12 @@ export namespace Types
     }
     export type TypeOrInterfaceOrRefer = Type | ReferElement;
     export const isSchema = TypesPrime.isJust(schema);
-    export const getTypeSchemaValidator = () => <TypesPrime.ObjectValidator<TypeSchema>>({ $ref: isSchema, imports: TypesPrime.isOptional(
-        TypesPrime.isArray(isImportDefinition)), defines: TypesPrime.isDictionaryObject(isDefinition), options: isOutputOptions, });
+    export const getCommentPropertyValidator = () => <TypesPrime.ObjectValidator<CommentProperty>>({ comment: TypesPrime.isOptional(
+        TypesPrime.isArray(TypesPrime.isString)), });
+    export const isCommentProperty = TypesPrime.isSpecificObject<CommentProperty>(getCommentPropertyValidator());
+    export const getTypeSchemaValidator = () => <TypesPrime.ObjectValidator<TypeSchema>> TypesPrime.mergeObjectValidator(
+        getCommentPropertyValidator(), { $ref: isSchema, imports: TypesPrime.isOptional(TypesPrime.isArray(isImportDefinition)), defines:
+        TypesPrime.isDictionaryObject(isDefinition), options: isOutputOptions, });
     export const isTypeSchema = TypesPrime.isSpecificObject<TypeSchema>(getTypeSchemaValidator());
     export const getOutputOptionsValidator = () => <TypesPrime.ObjectValidator<OutputOptions>>({ outputFile: TypesPrime.isOptional(
         TypesPrime.isString), indentUnit: TypesPrime.isOr(TypesPrime.isNumber, TypesPrime.isJust("\t")), indentStyle: isIndentStyleType,
@@ -135,7 +143,7 @@ export namespace Types
     export const getAlphaElementValidator = () => <TypesPrime.ObjectValidator<AlphaElement>>({ $type: TypesPrime.isString, });
     export const isAlphaElement = TypesPrime.isSpecificObject<AlphaElement>(getAlphaElementValidator());
     export const getAlphaDefinitionValidator = () => <TypesPrime.ObjectValidator<AlphaDefinition>> TypesPrime.mergeObjectValidator(
-        getAlphaElementValidator(), { export: TypesPrime.isOptional(TypesPrime.isBoolean), });
+        getAlphaElementValidator(), getCommentPropertyValidator(), { export: TypesPrime.isOptional(TypesPrime.isBoolean), });
     export const isAlphaDefinition = TypesPrime.isSpecificObject<AlphaDefinition>(getAlphaDefinitionValidator());
     export const getImportDefinitionValidator = () => <TypesPrime.ObjectValidator<ImportDefinition>>({ $type: TypesPrime.isJust("import"),
         target: TypesPrime.isString, from: TypesPrime.isString, });

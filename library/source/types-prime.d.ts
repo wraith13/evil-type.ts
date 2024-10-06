@@ -40,9 +40,9 @@ export declare namespace TypesPrime {
     } & {
         [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
     };
-    type MergeObjectValidatorType<A, B> = Omit<A, keyof B> & B;
-    type MergeMultipleObjectValidatorType<A, B extends any[]> = B extends [infer Head, ...infer Tail] ? MergeObjectValidatorType<A, Head> & MergeObjectValidatorType<MergeObjectValidatorType<A, Head>, Tail> : A;
-    const mergeObjectValidator: <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) => MergeMultipleObjectValidatorType<ObjectValidator<A>, B>;
+    type MergeType<A, B> = Omit<A, keyof B> & B;
+    type MergeMultipleType<A, B extends any[]> = B extends [infer Head, ...infer Tail] ? MergeType<MergeType<A, Head>, Tail> : A;
+    const mergeObjectValidator: <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) => MergeMultipleType<ObjectValidator<A>, B>;
     const isSpecificObject: <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener) => value is ObjectType;
     const isDictionaryObject: <MemberType>(isType: ((m: unknown, listner?: TypesError.Listener) => m is MemberType)) => (value: unknown, listner?: TypesError.Listener) => value is {
         [key: string]: MemberType;

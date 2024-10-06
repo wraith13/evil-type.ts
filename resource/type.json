@@ -33,9 +33,27 @@
                         "literal": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#"
                     }
                 },
+                "CommentProperty": {
+                    "export": true,
+                    "$type": "interface",
+                    "members": {
+                        "comment?": {
+                            "$type": "array",
+                            "items": {
+                                "$type": "primitive-type",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
                 "TypeSchema": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommentProperty"
+                        }
+                    ],
                     "members": {
                         "$ref": {
                             "$type": "typeof",
@@ -152,6 +170,9 @@
                     "extends": [
                         {
                             "$ref": "AlphaElement"
+                        },
+                        {
+                            "$ref": "CommentProperty"
                         }
                     ],
                     "members": {

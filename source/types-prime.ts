@@ -257,13 +257,13 @@ export namespace TypesPrime
         { [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) | ObjectValidator<ObjectType[key]> } &
         { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
         // { [key in keyof ObjectType]: ((v: unknown) => v is ObjectType[key]) | OptionalKeyTypeGuard<ObjectType[key]> };
-    export type MergeObjectValidatorType<A, B> = Omit<A, keyof B> & B;
-    export type MergeMultipleObjectValidatorType<A, B extends any[]> =
+    export type MergeType<A, B> = Omit<A, keyof B> & B;
+    export type MergeMultipleType<A, B extends any[]> =
         B extends [infer Head, ...infer Tail] ?
-            MergeObjectValidatorType<A, Head> & MergeObjectValidatorType<MergeObjectValidatorType<A, Head>, Tail>:
+            MergeType<MergeType<A, Head>, Tail>:
             A;
     export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
-        Object.assign(...[{ }, target, ...sources]) as MergeMultipleObjectValidatorType<ObjectValidator<A>, B>;
+        Object.assign(...[{ }, target, ...sources]) as MergeMultipleType<ObjectValidator<A>, B>;
     // export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
     //     Object.assign(...[{ }, target, ...sources]) as ObjectValidator<unknown>;
     export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener): value is ObjectType =>
