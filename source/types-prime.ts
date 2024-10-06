@@ -260,7 +260,7 @@ export namespace TypesPrime
     export type MergeType<A, B> = Omit<A, keyof B> & B;
     export type MergeMultipleType<A, B extends any[]> =
         B extends [infer Head, ...infer Tail] ?
-            MergeType<MergeType<A, Head>, Tail>:
+        MergeMultipleType<MergeType<A, Head>, Tail>:
             A;
     export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
         Object.assign(...[{ }, target, ...sources]) as MergeMultipleType<ObjectValidator<A>, B>;
