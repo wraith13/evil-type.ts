@@ -220,6 +220,9 @@
                             },
                             {
                                 "$ref": "InterfaceDefinition"
+                            },
+                            {
+                                "$ref": "DictionaryDefinition"
                             }
                         ]
                     }
@@ -342,12 +345,12 @@
                         }
                     }
                 },
-                "DictionaryElement": {
+                "DictionaryDefinition": {
                     "export": true,
                     "$type": "interface",
                     "extends": [
                         {
-                            "$ref": "AlphaElement"
+                            "$ref": "AlphaDefinition"
                         }
                     ],
                     "members": {
@@ -373,7 +376,7 @@
                             "$type": "literal",
                             "literal": "array"
                         },
-                        "valueType": {
+                        "items": {
                             "$ref": "TypeOrRefer"
                         }
                     }
@@ -515,7 +518,7 @@
                                 "$ref": "InterfaceDefinition"
                             },
                             {
-                                "$ref": "DictionaryElement"
+                                "$ref": "DictionaryDefinition"
                             },
                             {
                                 "$ref": "ArrayElement"
@@ -618,6 +621,21 @@
                             },
                             {
                                 "$ref": "ValueDefinition"
+                            }
+                        ]
+                    }
+                },
+                "TypeOrValueOfRefer": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "or",
+                        "types": [
+                            {
+                                "$ref": "TypeOrValue"
+                            },
+                            {
+                                "$ref": "ReferElement"
                             }
                         ]
                     }

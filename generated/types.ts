@@ -41,7 +41,8 @@ export namespace Types
         target: string;
         from: string;
     }
-    export type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition;
+    export type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition |
+        DictionaryDefinition;
     export interface CodeDefinition extends AlphaDefinition
     {
         $type: "code";
@@ -69,7 +70,7 @@ export namespace Types
         extends?: ReferElement[];
         members: { [key: string]: TypeOrRefer, };
     }
-    export interface DictionaryElement extends AlphaElement
+    export interface DictionaryDefinition extends AlphaDefinition
     {
         $type: "dictionary";
         valueType: TypeOrRefer;
@@ -77,7 +78,7 @@ export namespace Types
     export interface ArrayElement extends AlphaElement
     {
         $type: "array";
-        valueType: TypeOrRefer;
+        items: TypeOrRefer;
     }
     export interface OrElement extends AlphaElement
     {
@@ -106,7 +107,7 @@ export namespace Types
         type: PrimitiveTypeEnum;
     }
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition |
-        DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
+        DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     export interface EnumTypeElement
     {
         $type: "enum-type";
@@ -124,6 +125,7 @@ export namespace Types
     }
     export type TypeOrRefer = Type | ReferElement;
     export type TypeOrValue = Type | ValueDefinition;
+    export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export const isSchema = TypesPrime.isJust(schema);
     export const getCommentPropertyValidator = () => <TypesPrime.ObjectValidator<CommentProperty>>({ comment: TypesPrime.isOptional(
         TypesPrime.isArray(TypesPrime.isString)), });
@@ -150,7 +152,7 @@ export namespace Types
         target: TypesPrime.isString, from: TypesPrime.isString, });
     export const isImportDefinition = TypesPrime.isSpecificObject<ImportDefinition>(getImportDefinitionValidator());
     export const isDefinition = (value: unknown, listner?: TypesError.Listener): value is Definition => TypesPrime.isOr(isCodeDefinition,
-        isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition)(value, listner);
+        isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryDefinition)(value, listner);
     export const getCodeDefinitionValidator = () => <TypesPrime.ObjectValidator<CodeDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("code"), tokens: TypesPrime.isArray(TypesPrime.isString), });
     export const isCodeDefinition = TypesPrime.isSpecificObject<CodeDefinition>(getCodeDefinitionValidator());
@@ -168,11 +170,12 @@ export namespace Types
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("interface"), extends: TypesPrime.isOptional(TypesPrime.isArray(
         isReferElement)), members: TypesPrime.isDictionaryObject(isTypeOrRefer), });
     export const isInterfaceDefinition = TypesPrime.isSpecificObject<InterfaceDefinition>(getInterfaceDefinitionValidator());
-    export const getDictionaryElementValidator = () => <TypesPrime.ObjectValidator<DictionaryElement>> TypesPrime.mergeObjectValidator(
-        getAlphaElementValidator(), { $type: TypesPrime.isJust("dictionary"), valueType: isTypeOrRefer, });
-    export const isDictionaryElement = TypesPrime.isSpecificObject<DictionaryElement>(getDictionaryElementValidator());
+    export const getDictionaryDefinitionValidator = () => <TypesPrime.ObjectValidator<DictionaryDefinition>>
+        TypesPrime.mergeObjectValidator(getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("dictionary"), valueType: isTypeOrRefer,
+        });
+    export const isDictionaryDefinition = TypesPrime.isSpecificObject<DictionaryDefinition>(getDictionaryDefinitionValidator());
     export const getArrayElementValidator = () => <TypesPrime.ObjectValidator<ArrayElement>> TypesPrime.mergeObjectValidator(
-        getAlphaElementValidator(), { $type: TypesPrime.isJust("array"), valueType: isTypeOrRefer, });
+        getAlphaElementValidator(), { $type: TypesPrime.isJust("array"), items: isTypeOrRefer, });
     export const isArrayElement = TypesPrime.isSpecificObject<ArrayElement>(getArrayElementValidator());
     export const getOrElementValidator = () => <TypesPrime.ObjectValidator<OrElement>> TypesPrime.mergeObjectValidator(
         getAlphaElementValidator(), { $type: TypesPrime.isJust("or"), types: TypesPrime.isArray(isTypeOrRefer), });
@@ -192,8 +195,8 @@ export namespace Types
         , });
     export const isPrimitiveTypeElement = TypesPrime.isSpecificObject<PrimitiveTypeElement>(getPrimitiveTypeElementValidator());
     export const isType = (value: unknown, listner?: TypesError.Listener): value is Type => TypesPrime.isOr(isPrimitiveTypeElement,
-        isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryElement, isArrayElement,
-        isOrElement, isAndElement, isLiteralElement)(value, listner);
+        isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryDefinition,
+        isArrayElement, isOrElement, isAndElement, isLiteralElement)(value, listner);
     export const getEnumTypeElementValidator = () => <TypesPrime.ObjectValidator<EnumTypeElement>>({ $type: TypesPrime.isJust("enum-type"),
         members: TypesPrime.isArray(TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isBoolean, TypesPrime.isNumber, TypesPrime.isString)), });
     export const isEnumTypeElement = TypesPrime.isSpecificObject<EnumTypeElement>(getEnumTypeElementValidator());
@@ -207,4 +210,6 @@ export namespace Types
         isReferElement)(value, listner);
     export const isTypeOrValue = (value: unknown, listner?: TypesError.Listener): value is TypeOrValue => TypesPrime.isOr(isType,
         isValueDefinition)(value, listner);
+    export const isTypeOrValueOfRefer = (value: unknown, listner?: TypesError.Listener): value is TypeOrValueOfRefer => TypesPrime.isOr(
+        isTypeOrValue, isReferElement)(value, listner);
 }

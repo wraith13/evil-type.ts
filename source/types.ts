@@ -213,7 +213,7 @@ export namespace Types
         $type: "dictionary";
         valueType: TypeOrRefer;
     }
-    export const isDictionaryElement = (value: unknown, listner?: TypesError.Listener): value is DictionaryDefinition => TypesPrime.isSpecificObject<DictionaryDefinition>
+    export const isDictionaryDefinition = (value: unknown, listner?: TypesError.Listener): value is DictionaryDefinition => TypesPrime.isSpecificObject<DictionaryDefinition>
     ({
         comment: TypesPrime.isOptional(TypesPrime.isArray(TypesPrime.isString)),
         export: TypesPrime.isOptional(TypesPrime.isBoolean),
@@ -255,14 +255,14 @@ export namespace Types
     })
     (value, listner);
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
-    export const isType = TypesPrime.isOr(isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryElement, isArrayElement, isOrElement, isAndElement, isLiteralElement);
+    export const isType = TypesPrime.isOr(isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement);
     export type TypeOrValue = Type | ValueDefinition;
     export const isTypeOrValue = TypesPrime.isOr(isType, isValueDefinition);
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrRefer = Type | ReferElement;
     export const isTypeOrRefer = TypesPrime.isOr(isType, isReferElement);
     export type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
-    export const isDefinition = TypesPrime.isOr(isCodeDefinition, isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryElement);
+    export const isDefinition = TypesPrime.isOr(isCodeDefinition, isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryDefinition);
     export type DefineOrRefer = Definition | ReferElement;
     export const isDefineOrRefer = TypesPrime.isOr(isDefinition, isReferElement);
 }

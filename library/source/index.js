@@ -20,8 +20,8 @@ var types_error_1 = require("./types-error");
 var text_1 = require("./text");
 var jsonable_1 = require("../generated/jsonable");
 //import { Jsonable } from "./jsonable";
-//import { Types } from "../generated/types";
-var types_1 = require("./types");
+var types_1 = require("../generated/types");
+//import { Types } from "./types";
 var config_json_1 = __importDefault(require("../resource/config.json"));
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
 var jsonPath = process.argv[2];
@@ -337,7 +337,7 @@ var Build;
                     list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression(name, i)));
                 });
             }
-            if (types_1.Types.isDictionaryElement(members)) {
+            if (types_1.Types.isDictionaryDefinition(members)) {
                 if (undefined !== define.extends) {
                     list.push((0, exports.$expression)("&&"));
                 }
