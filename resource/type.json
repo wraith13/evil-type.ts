@@ -311,7 +311,7 @@
                             "literal": "type"
                         },
                         "define": {
-                            "$ref": "TypeOrInterfaceOrRefer"
+                            "$ref": "TypeOrRefer"
                         }
                     }
                 },
@@ -337,7 +337,7 @@
                         "members": {
                             "$type": "dictionary",
                             "valueType": {
-                                "$ref": "TypeOrInterfaceOrRefer"
+                                "$ref": "TypeOrRefer"
                             }
                         }
                     }
@@ -356,7 +356,7 @@
                             "literal": "dictionary"
                         },
                         "valueType": {
-                            "$ref": "TypeOrInterfaceOrRefer"
+                            "$ref": "TypeOrRefer"
                         }
                     }
                 },
@@ -374,7 +374,7 @@
                             "literal": "array"
                         },
                         "valueType": {
-                            "$ref": "TypeOrInterfaceOrRefer"
+                            "$ref": "TypeOrRefer"
                         }
                     }
                 },
@@ -394,7 +394,7 @@
                         "types": {
                             "$type": "array",
                             "items": {
-                                "$ref": "TypeOrInterfaceOrRefer"
+                                "$ref": "TypeOrRefer"
                             }
                         }
                     }
@@ -415,7 +415,7 @@
                         "types": {
                             "$type": "array",
                             "items": {
-                                "$ref": "TypeOrInterfaceOrRefer"
+                                "$ref": "TypeOrRefer"
                             }
                         }
                     }
@@ -485,7 +485,7 @@
                             "$type": "literal",
                             "literal": "primitive-type"
                         },
-                        "literal": {
+                        "type": {
                             "$ref": "PrimitiveTypeEnum"
                         }
                     }
@@ -592,7 +592,7 @@
                         }
                     }
                 },
-                "TypeOrInterfaceOrRefer": {
+                "TypeOrRefer": {
                     "export": true,
                     "$type": "type",
                     "define": {
@@ -603,6 +603,21 @@
                             },
                             {
                                 "$ref": "ReferElement"
+                            }
+                        ]
+                    }
+                },
+                "TypeOrValue": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "or",
+                        "types": [
+                            {
+                                "$ref": "Type"
+                            },
+                            {
+                                "$ref": "ValueDefinition"
                             }
                         ]
                     }

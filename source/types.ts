@@ -172,7 +172,7 @@ export namespace Types
     export interface TypeDefinition extends AlphaDefinition
     {
         $type: "type";
-        define: TypeOrInterfaceOrRefer;
+        define: TypeOrRefer;
     }
     export const isTypeDefinition = (value: unknown, listner?: TypesError.Listener): value is TypeDefinition => TypesPrime.isSpecificObject<TypeDefinition>
     ({
@@ -197,7 +197,7 @@ export namespace Types
     {
         $type: "interface";
         extends?: ReferElement[];
-        members: { [key: string]: TypeOrInterfaceOrRefer; };
+        members: { [key: string]: TypeOrRefer; };
     }
     export const isInterfaceDefinition = (value: unknown, listner?: TypesError.Listener): value is InterfaceDefinition => TypesPrime.isSpecificObject<InterfaceDefinition>
     ({
@@ -211,7 +211,7 @@ export namespace Types
     export interface DictionaryDefinition extends AlphaDefinition
     {
         $type: "dictionary";
-        valueType: TypeOrInterfaceOrRefer;
+        valueType: TypeOrRefer;
     }
     export const isDictionaryElement = (value: unknown, listner?: TypesError.Listener): value is DictionaryDefinition => TypesPrime.isSpecificObject<DictionaryDefinition>
     ({
@@ -224,7 +224,7 @@ export namespace Types
     export interface ArrayElement extends AlphaElement
     {
         $type: "array";
-        items: TypeOrInterfaceOrRefer;
+        items: TypeOrRefer;
     }
     export const isArrayElement = (value: unknown, listner?: TypesError.Listener): value is ArrayElement => TypesPrime.isSpecificObject<ArrayElement>
     ({
@@ -235,7 +235,7 @@ export namespace Types
     export interface OrElement extends AlphaElement
     {
         $type: "or";
-        types: TypeOrInterfaceOrRefer[];
+        types: TypeOrRefer[];
     }
     export const isOrElement = (value: unknown, listner?: TypesError.Listener): value is OrElement => TypesPrime.isSpecificObject<OrElement>
     ({
@@ -246,7 +246,7 @@ export namespace Types
     export interface AndElement extends AlphaElement
     {
         $type: "and";
-        types: TypeOrInterfaceOrRefer[];
+        types: TypeOrRefer[];
     }
     export const isAndElement = (value: unknown, listner?: TypesError.Listener): value is AndElement => TypesPrime.isSpecificObject<AndElement>
     ({
@@ -259,7 +259,7 @@ export namespace Types
     export type TypeOrValue = Type | ValueDefinition;
     export const isTypeOrValue = TypesPrime.isOr(isType, isValueDefinition);
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
-    export type TypeOrInterfaceOrRefer = Type | ReferElement;
+    export type TypeOrRefer = Type | ReferElement;
     export const isTypeOrRefer = TypesPrime.isOr(isType, isReferElement);
     export type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
     export const isDefinition = TypesPrime.isOr(isCodeDefinition, isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryElement);

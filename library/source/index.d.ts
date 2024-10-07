@@ -67,15 +67,15 @@ export declare namespace Build {
         const buildValidatorExpression: (name: string, define: Types.TypeOrValueOfRefer) => CodeExpression[];
         const buildInterfaceValidator: (name: string, define: Types.InterfaceDefinition) => CodeExpression[];
         const buildInlineValidator: (name: string, define: Types.TypeOrValue) => CodeExpression[];
-        const buildObjectValidatorGetterCoreEntry: (define: Types.TypeOrInterfaceOrRefer) => CodeInlineEntry[];
+        const buildObjectValidatorGetterCoreEntry: (define: Types.TypeOrRefer) => CodeInlineEntry[];
         const buildObjectValidatorGetterCore: (define: Types.InterfaceDefinition & {
             members: {
-                [key: string]: Types.TypeOrInterfaceOrRefer;
+                [key: string]: Types.TypeOrRefer;
             };
         }) => CodeInlineBlock;
         const buildObjectValidatorGetter: (define: Types.InterfaceDefinition & {
             members: {
-                [key: string]: Types.TypeOrInterfaceOrRefer;
+                [key: string]: Types.TypeOrRefer;
             };
         }) => (CodeExpression | CodeInlineBlock)[];
         const buildFullValidator: (name: string, define: Types.Type) => CodeInlineEntry[];

@@ -61,33 +61,33 @@ export namespace Types
     export interface TypeDefinition extends AlphaDefinition
     {
         $type: "type";
-        define: TypeOrInterfaceOrRefer;
+        define: TypeOrRefer;
     }
     export interface InterfaceDefinition extends AlphaDefinition
     {
         $type: "interface";
         extends?: ReferElement[];
-        members: { [key: string]: TypeOrInterfaceOrRefer, };
+        members: { [key: string]: TypeOrRefer, };
     }
     export interface DictionaryElement extends AlphaElement
     {
         $type: "dictionary";
-        valueType: TypeOrInterfaceOrRefer;
+        valueType: TypeOrRefer;
     }
     export interface ArrayElement extends AlphaElement
     {
         $type: "array";
-        valueType: TypeOrInterfaceOrRefer;
+        valueType: TypeOrRefer;
     }
     export interface OrElement extends AlphaElement
     {
         $type: "or";
-        types: TypeOrInterfaceOrRefer[];
+        types: TypeOrRefer[];
     }
     export interface AndElement extends AlphaElement
     {
         $type: "and";
-        types: TypeOrInterfaceOrRefer[];
+        types: TypeOrRefer[];
     }
     export interface LiteralElement extends AlphaElement
     {
@@ -103,7 +103,7 @@ export namespace Types
     export interface PrimitiveTypeElement extends AlphaElement
     {
         $type: "primitive-type";
-        literal: PrimitiveTypeEnum;
+        type: PrimitiveTypeEnum;
     }
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition |
         DictionaryElement | ArrayElement | OrElement | AndElement | LiteralElement;
@@ -122,7 +122,8 @@ export namespace Types
         $type: "itemof";
         value: ReferElement;
     }
-    export type TypeOrInterfaceOrRefer = Type | ReferElement;
+    export type TypeOrRefer = Type | ReferElement;
+    export type TypeOrValue = Type | ValueDefinition;
     export const isSchema = TypesPrime.isJust(schema);
     export const getCommentPropertyValidator = () => <TypesPrime.ObjectValidator<CommentProperty>>({ comment: TypesPrime.isOptional(
         TypesPrime.isArray(TypesPrime.isString)), });
@@ -161,23 +162,23 @@ export namespace Types
         validator: TypesPrime.isOptional(TypesPrime.isBoolean), });
     export const isValueDefinition = TypesPrime.isSpecificObject<ValueDefinition>(getValueDefinitionValidator());
     export const getTypeDefinitionValidator = () => <TypesPrime.ObjectValidator<TypeDefinition>> TypesPrime.mergeObjectValidator(
-        getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("type"), define: isTypeOrInterfaceOrRefer, });
+        getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("type"), define: isTypeOrRefer, });
     export const isTypeDefinition = TypesPrime.isSpecificObject<TypeDefinition>(getTypeDefinitionValidator());
     export const getInterfaceDefinitionValidator = () => <TypesPrime.ObjectValidator<InterfaceDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("interface"), extends: TypesPrime.isOptional(TypesPrime.isArray(
-        isReferElement)), members: TypesPrime.isDictionaryObject(isTypeOrInterfaceOrRefer), });
+        isReferElement)), members: TypesPrime.isDictionaryObject(isTypeOrRefer), });
     export const isInterfaceDefinition = TypesPrime.isSpecificObject<InterfaceDefinition>(getInterfaceDefinitionValidator());
     export const getDictionaryElementValidator = () => <TypesPrime.ObjectValidator<DictionaryElement>> TypesPrime.mergeObjectValidator(
-        getAlphaElementValidator(), { $type: TypesPrime.isJust("dictionary"), valueType: isTypeOrInterfaceOrRefer, });
+        getAlphaElementValidator(), { $type: TypesPrime.isJust("dictionary"), valueType: isTypeOrRefer, });
     export const isDictionaryElement = TypesPrime.isSpecificObject<DictionaryElement>(getDictionaryElementValidator());
     export const getArrayElementValidator = () => <TypesPrime.ObjectValidator<ArrayElement>> TypesPrime.mergeObjectValidator(
-        getAlphaElementValidator(), { $type: TypesPrime.isJust("array"), valueType: isTypeOrInterfaceOrRefer, });
+        getAlphaElementValidator(), { $type: TypesPrime.isJust("array"), valueType: isTypeOrRefer, });
     export const isArrayElement = TypesPrime.isSpecificObject<ArrayElement>(getArrayElementValidator());
     export const getOrElementValidator = () => <TypesPrime.ObjectValidator<OrElement>> TypesPrime.mergeObjectValidator(
-        getAlphaElementValidator(), { $type: TypesPrime.isJust("or"), types: TypesPrime.isArray(isTypeOrInterfaceOrRefer), });
+        getAlphaElementValidator(), { $type: TypesPrime.isJust("or"), types: TypesPrime.isArray(isTypeOrRefer), });
     export const isOrElement = TypesPrime.isSpecificObject<OrElement>(getOrElementValidator());
     export const getAndElementValidator = () => <TypesPrime.ObjectValidator<AndElement>> TypesPrime.mergeObjectValidator(
-        getAlphaElementValidator(), { $type: TypesPrime.isJust("and"), types: TypesPrime.isArray(isTypeOrInterfaceOrRefer), });
+        getAlphaElementValidator(), { $type: TypesPrime.isJust("and"), types: TypesPrime.isArray(isTypeOrRefer), });
     export const isAndElement = TypesPrime.isSpecificObject<AndElement>(getAndElementValidator());
     export const getLiteralElementValidator = () => <TypesPrime.ObjectValidator<LiteralElement>> TypesPrime.mergeObjectValidator(
         getAlphaElementValidator(), { $type: TypesPrime.isJust("literal"), literal: Jsonable.isJsonable, });
@@ -187,8 +188,8 @@ export namespace Types
     export const isPrimitiveTypeEnum = (value: unknown, listner?: TypesError.Listener): value is PrimitiveTypeEnum => TypesPrime.isEnum(
         PrimitiveTypeEnumMembers)(value, listner);
     export const getPrimitiveTypeElementValidator = () => <TypesPrime.ObjectValidator<PrimitiveTypeElement>>
-        TypesPrime.mergeObjectValidator(getAlphaElementValidator(), { $type: TypesPrime.isJust("primitive-type"), literal:
-        isPrimitiveTypeEnum, });
+        TypesPrime.mergeObjectValidator(getAlphaElementValidator(), { $type: TypesPrime.isJust("primitive-type"), type: isPrimitiveTypeEnum
+        , });
     export const isPrimitiveTypeElement = TypesPrime.isSpecificObject<PrimitiveTypeElement>(getPrimitiveTypeElementValidator());
     export const isType = (value: unknown, listner?: TypesError.Listener): value is Type => TypesPrime.isOr(isPrimitiveTypeElement,
         isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryElement, isArrayElement,
@@ -202,6 +203,8 @@ export namespace Types
     export const getItemofElementValidator = () => <TypesPrime.ObjectValidator<ItemofElement>>({ $type: TypesPrime.isJust("itemof"), value:
         isReferElement, });
     export const isItemofElement = TypesPrime.isSpecificObject<ItemofElement>(getItemofElementValidator());
-    export const isTypeOrInterfaceOrRefer = (value: unknown, listner?: TypesError.Listener): value is TypeOrInterfaceOrRefer =>
-        TypesPrime.isOr(isType, isReferElement)(value, listner);
+    export const isTypeOrRefer = (value: unknown, listner?: TypesError.Listener): value is TypeOrRefer => TypesPrime.isOr(isType,
+        isReferElement)(value, listner);
+    export const isTypeOrValue = (value: unknown, listner?: TypesError.Listener): value is TypeOrValue => TypesPrime.isOr(isType,
+        isValueDefinition)(value, listner);
 }

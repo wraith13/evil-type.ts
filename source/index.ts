@@ -14,13 +14,13 @@ const jsonPath = process.argv[2];
 console.log(`🚀 ${jsonPath} build start: ${startAt}`);
 const isEmptyArray = (list: unknown) => Array.isArray(list) && list.length <= 0;
 const kindofJoinExpression = <T>(list: T[], separator: CodeExpression) =>
-        list.reduce
-        (
-            (a, b) => isEmptyArray(a) || isEmptyArray(b) ?
-                (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [...b]: [b]):
-                (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]),
-            <CodeExpression[]>[]
-        );
+    list.reduce
+    (
+        (a, b) => isEmptyArray(a) || isEmptyArray(b) ?
+            (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [...b]: [b]):
+            (Array.isArray(a) ? a: [a]).concat(Array.isArray(b) ? [separator, ...b]: [separator, b]),
+        <CodeExpression[]>[]
+    );
 interface Code
 {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
@@ -474,7 +474,7 @@ export namespace Build
             $expression(`(value: unknown): value is ${Types.isValueDefinition(define) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", define),
         ];
-        export const buildObjectValidatorGetterCoreEntry = (define: Types.TypeOrInterfaceOrRefer): CodeInlineEntry[] =>
+        export const buildObjectValidatorGetterCoreEntry = (define: Types.TypeOrRefer): CodeInlineEntry[] =>
         {
             if (Types.isReferElement(define))
             {
@@ -532,7 +532,7 @@ export namespace Build
                 }
             }
         };
-        export const buildObjectValidatorGetterCore = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrInterfaceOrRefer; }; }) => $iblock
+        export const buildObjectValidatorGetterCore = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrRefer; }; }) => $iblock
         (
             Object.entries(define.members).map
             (
@@ -544,7 +544,7 @@ export namespace Build
                 }
             )
         );
-        export const buildObjectValidatorGetter = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrInterfaceOrRefer; }; }) => (define.extends ?? []).some(_ => true) ?
+        export const buildObjectValidatorGetter = (define: Types.InterfaceDefinition & { members: { [key: string]: Types.TypeOrRefer; }; }) => (define.extends ?? []).some(_ => true) ?
             [
                 $expression("TypesPrime.mergeObjectValidator"),
                 ...Define.enParenthesis
