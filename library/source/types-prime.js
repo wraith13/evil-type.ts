@@ -11,7 +11,6 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TypesPrime = void 0;
 var jsonable_1 = require("../generated/jsonable");
-//import { Jsonable } from "./jsonable";
 var types_error_1 = require("./types-error");
 var TypesPrime;
 (function (TypesPrime) {
