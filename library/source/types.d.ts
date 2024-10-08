@@ -112,7 +112,7 @@ export declare namespace Types {
         $type: "dictionary";
         valueType: TypeOrRefer;
     }
-    const isDictionaryElement: (value: unknown, listner?: TypesError.Listener) => value is DictionaryDefinition;
+    const isDictionaryDefinition: (value: unknown, listner?: TypesError.Listener) => value is DictionaryDefinition;
     interface ArrayElement extends AlphaElement {
         $type: "array";
         items: TypeOrRefer;

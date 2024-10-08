@@ -20,8 +20,8 @@ var types_error_1 = require("./types-error");
 var text_1 = require("./text");
 var jsonable_1 = require("../generated/jsonable");
 //import { Jsonable } from "./jsonable";
-var types_1 = require("../generated/types");
-//import { Types } from "./types";
+//import { Types } from "../generated/types";
+var types_1 = require("./types");
 var config_json_1 = __importDefault(require("../resource/config.json"));
 var getBuildTime = function () { return new Date().getTime() - startAt.getTime(); };
 var jsonPath = process.argv[2];
@@ -474,8 +474,9 @@ var Build;
                         (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
                             (0, exports.$expression)("const"),
                             (0, exports.$expression)(Validator.buildValidatorName(name)),
-                            (0, exports.$expression)("=")
-                        ], false), Validator.buildCall([(0, exports.$expression)("TypesPrime.isSpecificObject<".concat(name, ">")),], [Validator.buildCall([(0, exports.$expression)(Validator.buildObjectValidatorGetterName(name)),], [])]), true))
+                            (0, exports.$expression)("="),
+                            (0, exports.$expression)("(value: unknown, listner?: TypesError.Listener): value is ".concat(name, " =>"))
+                        ], false), Validator.buildCall(Validator.buildCall([(0, exports.$expression)("TypesPrime.isSpecificObject<".concat(name, ">")),], [Validator.buildCall([(0, exports.$expression)(Validator.buildObjectValidatorGetterName(name)),], [])]), [(0, exports.$expression)("value"), (0, exports.$expression)("listner"),]), true))
                     ], false);
                     return result;
                 }

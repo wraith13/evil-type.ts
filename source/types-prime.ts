@@ -1,4 +1,5 @@
-import { Jsonable } from "./jsonable";
+import { Jsonable } from "../generated/jsonable";
+//import { Jsonable } from "./jsonable";
 import { TypesError } from "./types-error";
 export namespace TypesPrime
 {

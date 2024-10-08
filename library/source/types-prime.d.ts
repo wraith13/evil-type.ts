@@ -1,4 +1,4 @@
-import { Jsonable } from "./jsonable";
+import { Jsonable } from "../generated/jsonable";
 import { TypesError } from "./types-error";
 export declare namespace TypesPrime {
     const isJust: <T>(target: T) => (value: unknown, listner?: TypesError.Listener) => value is T;

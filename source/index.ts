@@ -6,8 +6,8 @@ import { TypesError } from "./types-error";
 import { Text } from "./text";
 import { Jsonable } from "../generated/jsonable";
 //import { Jsonable } from "./jsonable";
-import { Types } from "../generated/types";
-//import { Types } from "./types";
+//import { Types } from "../generated/types";
+import { Types } from "./types";
 import config from "../resource/config.json";
 const getBuildTime = () => new Date().getTime() - startAt.getTime();
 const jsonPath = process.argv[2];
@@ -612,11 +612,16 @@ export namespace Build
                             $expression("const"),
                             $expression(buildValidatorName(name)),
                             $expression("="),
+                            $expression(`(value: unknown, listner?: TypesError.Listener): value is ${name} =>`),
                             ...buildCall
                             (
-                                [ $expression(`TypesPrime.isSpecificObject<${name}>`), ],
-                                [ buildCall([ $expression(buildObjectValidatorGetterName(name)), ], [ ]) ]
-                            )
+                                buildCall
+                                (
+                                    [ $expression(`TypesPrime.isSpecificObject<${name}>`), ],
+                                    [ buildCall([ $expression(buildObjectValidatorGetterName(name)), ], [ ]) ]
+                                ),
+                                [ $expression("value"), $expression("listner"), ]
+                            ),
                         ])
                     ];
                     return result;

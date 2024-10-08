@@ -91,7 +91,7 @@ var Types;
         extends: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isReferElement)),
         members: types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer),
     })(value, listner); };
-    Types.isDictionaryElement = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
+    Types.isDictionaryDefinition = function (value, listner) { return types_prime_1.TypesPrime.isSpecificObject({
         comment: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isString)),
         export: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean),
         $type: types_prime_1.TypesPrime.isJust("dictionary"),
@@ -109,10 +109,10 @@ var Types;
         $type: types_prime_1.TypesPrime.isJust("and"),
         types: types_prime_1.TypesPrime.isArray(Types.isTypeOrRefer),
     })(value, listner); };
-    Types.isType = types_prime_1.TypesPrime.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isDictionaryElement, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
+    Types.isType = types_prime_1.TypesPrime.isOr(Types.isPrimitiveTypeElement, Types.isTypeDefinition, Types.isEnumTypeElement, Types.isTypeofElement, Types.isItemofElement, Types.isInterfaceDefinition, Types.isDictionaryDefinition, Types.isArrayElement, Types.isOrElement, Types.isAndElement, Types.isLiteralElement);
     Types.isTypeOrValue = types_prime_1.TypesPrime.isOr(Types.isType, Types.isValueDefinition);
     Types.isTypeOrRefer = types_prime_1.TypesPrime.isOr(Types.isType, Types.isReferElement);
-    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isCodeDefinition, Types.isNamespaceDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition, Types.isDictionaryElement);
+    Types.isDefinition = types_prime_1.TypesPrime.isOr(Types.isCodeDefinition, Types.isNamespaceDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition, Types.isDictionaryDefinition);
     Types.isDefineOrRefer = types_prime_1.TypesPrime.isOr(Types.isDefinition, Types.isReferElement);
 })(Types || (exports.Types = Types = {}));
 //# sourceMappingURL=types.js.map
