@@ -82,6 +82,11 @@ export declare namespace Build {
         const isValidatorTarget: (define: Types.TypeOrValue) => boolean;
         const buildValidator: (options: Types.OutputOptions, name: string, define: Types.TypeOrValue) => CodeLine[];
     }
+    namespace Schema {
+        const buildSchema: (_options: Types.OutputOptions, _members: {
+            [key: string]: Types.Definition;
+        }) => Jsonable.Jsonable;
+    }
 }
 export declare namespace Format {
     const getMaxLineLength: (options: Types.OutputOptions) => null | number;

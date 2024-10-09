@@ -23,6 +23,11 @@ export namespace Types
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
         maxLineLength?: null | number;
+        schema?: SchemaOptions;
+    }
+    export interface SchemaOptions
+    {
+        outputFile: string;
     }
     export const indentStyleTypeMember = ["allman","egyptian"] as const;
     export type IndentStyleType = typeof indentStyleTypeMember[number];
@@ -139,9 +144,12 @@ export namespace Types
     export const getOutputOptionsValidator = () => <TypesPrime.ObjectValidator<OutputOptions>>({ outputFile: TypesPrime.isOptional(
         TypesPrime.isString), indentUnit: TypesPrime.isOr(TypesPrime.isNumber, TypesPrime.isJust("\t")), indentStyle: isIndentStyleType,
         validatorOption: isValidatorOptionType, maxLineLength: TypesPrime.isOptional(TypesPrime.isOr(TypesPrime.isNull, TypesPrime.isNumber
-        )), });
+        )), schema: TypesPrime.isOptional(isSchemaOptions), });
     export const isOutputOptions = (value: unknown, listner?: TypesError.Listener): value is OutputOptions =>
         TypesPrime.isSpecificObject<OutputOptions>(getOutputOptionsValidator())(value, listner);
+    export const getSchemaOptionsValidator = () => <TypesPrime.ObjectValidator<SchemaOptions>>({ outputFile: TypesPrime.isString, });
+    export const isSchemaOptions = (value: unknown, listner?: TypesError.Listener): value is SchemaOptions =>
+        TypesPrime.isSpecificObject<SchemaOptions>(getSchemaOptionsValidator())(value, listner);
     export const isIndentStyleType = (value: unknown, listner?: TypesError.Listener): value is IndentStyleType => TypesPrime.isEnum(
         indentStyleTypeMember)(value, listner);
     export const isValidatorOptionType = (value: unknown, listner?: TypesError.Listener): value is ValidatorOptionType => TypesPrime.isEnum

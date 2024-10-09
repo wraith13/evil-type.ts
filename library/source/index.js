@@ -515,6 +515,15 @@ var Build;
             return [];
         };
     })(Validator = Build.Validator || (Build.Validator = {}));
+    var Schema;
+    (function (Schema) {
+        Schema.buildSchema = function (_options, _members) {
+            var result = {
+                $ref: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#",
+            };
+            return result;
+        };
+    })(Schema = Build.Schema || (Build.Schema = {}));
 })(Build || (exports.Build = Build = {}));
 var Format;
 (function (Format) {
@@ -664,6 +673,10 @@ try {
         }
         else {
             console.log(result);
+        }
+        if (typeSource.options.schema) {
+            var schema = Build.Schema.buildSchema(typeSource.options, typeSource.defines);
+            fs_1.default.writeFileSync(typeSource.options.schema.outputFile, jsonable_1.Jsonable.stringify(schema), { encoding: "utf-8" });
         }
         console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     }

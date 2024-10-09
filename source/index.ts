@@ -677,6 +677,17 @@ export namespace Build
             return [];
         };
     }
+    export namespace Schema
+    {
+        export const buildSchema = (_options: Types.OutputOptions, _members: { [key: string]: Types.Definition; }):Jsonable.Jsonable =>
+        {
+            const result =
+            {
+                $ref: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#",
+            };
+            return result;
+        };
+    }
 }
 export namespace Format
 {
@@ -867,6 +878,11 @@ try
         else
         {
             console.log(result);
+        }
+        if (typeSource.options.schema)
+        {
+            const schema = Build.Schema.buildSchema(typeSource.options, typeSource.defines);
+            fs.writeFileSync(typeSource.options.schema.outputFile, Jsonable.stringify(schema), { encoding: "utf-8" });
         }
         console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     }

@@ -19,9 +19,13 @@ var Types;
         return types_prime_1.TypesPrime.isSpecificObject(Types.getTypeSchemaValidator())(value, listner);
     };
     Types.getOutputOptionsValidator = function () { return ({ outputFile: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isString), indentUnit: types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNumber, types_prime_1.TypesPrime.isJust("\t")), indentStyle: Types.isIndentStyleType,
-        validatorOption: Types.isValidatorOptionType, maxLineLength: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNull, types_prime_1.TypesPrime.isNumber)), }); };
+        validatorOption: Types.isValidatorOptionType, maxLineLength: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNull, types_prime_1.TypesPrime.isNumber)), schema: types_prime_1.TypesPrime.isOptional(Types.isSchemaOptions), }); };
     Types.isOutputOptions = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getOutputOptionsValidator())(value, listner);
+    };
+    Types.getSchemaOptionsValidator = function () { return ({ outputFile: types_prime_1.TypesPrime.isString, }); };
+    Types.isSchemaOptions = function (value, listner) {
+        return types_prime_1.TypesPrime.isSpecificObject(Types.getSchemaOptionsValidator())(value, listner);
     };
     Types.isIndentStyleType = function (value, listner) { return types_prime_1.TypesPrime.isEnum(Types.indentStyleTypeMember)(value, listner); };
     Types.isValidatorOptionType = function (value, listner) { return types_prime_1.TypesPrime.isEnum(["none", "simple", "full"])(value, listner); };

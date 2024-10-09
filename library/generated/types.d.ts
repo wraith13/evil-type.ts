@@ -20,6 +20,10 @@ export declare namespace Types {
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
         maxLineLength?: null | number;
+        schema?: SchemaOptions;
+    }
+    interface SchemaOptions {
+        outputFile: string;
     }
     const indentStyleTypeMember: readonly ["allman", "egyptian"];
     type IndentStyleType = typeof indentStyleTypeMember[number];
@@ -114,6 +118,8 @@ export declare namespace Types {
     const isTypeSchema: (value: unknown, listner?: TypesError.Listener) => value is TypeSchema;
     const getOutputOptionsValidator: () => TypesPrime.ObjectValidator<OutputOptions>;
     const isOutputOptions: (value: unknown, listner?: TypesError.Listener) => value is OutputOptions;
+    const getSchemaOptionsValidator: () => TypesPrime.ObjectValidator<SchemaOptions>;
+    const isSchemaOptions: (value: unknown, listner?: TypesError.Listener) => value is SchemaOptions;
     const isIndentStyleType: (value: unknown, listner?: TypesError.Listener) => value is IndentStyleType;
     const isValidatorOptionType: (value: unknown, listner?: TypesError.Listener) => value is ValidatorOptionType;
     const getAlphaElementValidator: () => TypesPrime.ObjectValidator<AlphaElement>;
