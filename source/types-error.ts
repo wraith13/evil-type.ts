@@ -28,9 +28,12 @@ export namespace TypesError
         }:
         undefined;
     export const makePath = (path: string, name: string | number) =>
-        "string" === typeof name ?
-                    `${path}.${name}`:
-                    `${path}[${name}]`;
+    {
+        const base = path.includes("#") ? path: `${path}#`;
+        const separator = base.endsWith("#") || "string" !== typeof name ? "": ".";
+        const tail = "string" === typeof name ? name: `[${name}]`;
+        return base +separator +tail;
+    };
     export const getPathDepth = (path: string) =>
         path.split(".").length + path.split("[").length -2;
     export const getType = (isType: ((v: unknown, listner?: TypesError.Listener) => boolean)) =>

@@ -30,9 +30,10 @@ var TypesError;
             undefined;
     };
     TypesError.makePath = function (path, name) {
-        return "string" === typeof name ?
-            "".concat(path, ".").concat(name) :
-            "".concat(path, "[").concat(name, "]");
+        var base = path.includes("#") ? path : "".concat(path, "#");
+        var separator = base.endsWith("#") || "string" !== typeof name ? "" : ".";
+        var tail = "string" === typeof name ? name : "[".concat(name, "]");
+        return base + separator + tail;
     };
     TypesError.getPathDepth = function (path) {
         return path.split(".").length + path.split("[").length - 2;

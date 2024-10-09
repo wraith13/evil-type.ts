@@ -41,7 +41,7 @@
                             "$type": "array",
                             "items": {
                                 "$type": "primitive-type",
-                                "type": "stringx"
+                                "type": "string"
                             }
                         }
                     }
@@ -658,7 +658,7 @@
     },
     "options": {
         "outputFile": "./generated/types.ts",
-        "indentUnit": "text",
+        "indentUnit": 4,
         "indentStyle": "allman",
         "validatorOption": "full"
     }
