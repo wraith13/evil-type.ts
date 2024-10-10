@@ -36,8 +36,8 @@ var TypesError;
         return base + separator + tail;
     };
     TypesError.getPathDepth = function (path) {
-        var valuePath = path.replace(/[^#]*#/, "#");
-        return valuePath.split(/[#\.\[]/).filter(function (i) { return 0 < i.length; }).length;
+        var valuePath = path.replace(/[^#]*#/, "#").replace(/\[(\d+)\]/g, ".$1");
+        return valuePath.split(/[#\.]/).filter(function (i) { return 0 < i.length; }).length;
     };
     TypesError.getType = function (isType) {
         var transactionListner = TypesError.makeListener();
