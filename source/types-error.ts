@@ -35,7 +35,10 @@ export namespace TypesError
         return base +separator +tail;
     };
     export const getPathDepth = (path: string) =>
-        path.split(".").length + path.split("[").length -2;
+    {
+        const valuePath = path.replace(/[^#]*#/, "#");
+        return valuePath.split(/[#\.\[]/).filter(i => 0 < i.length).length;
+    }
     export const getType = (isType: ((v: unknown, listner?: TypesError.Listener) => boolean)) =>
     {
         const transactionListner = makeListener();

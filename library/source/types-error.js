@@ -36,7 +36,8 @@ var TypesError;
         return base + separator + tail;
     };
     TypesError.getPathDepth = function (path) {
-        return path.split(".").length + path.split("[").length - 2;
+        var valuePath = path.replace(/[^#]*#/, "#");
+        return valuePath.split(/[#\.\[]/).filter(function (i) { return 0 < i.length; }).length;
     };
     TypesError.getType = function (isType) {
         var transactionListner = TypesError.makeListener();
