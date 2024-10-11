@@ -36,9 +36,9 @@ export namespace TypesError
     };
     export const getPathDepth = (path: string) =>
     {
-        const valuePath = path.replace(/[^#]*#/, "#").replace(/\[(\d+)\]/g,".$1");
+        const valuePath = path.replace(/[^#]*#/, "#").replace(/\[(\d+)\]/g, ".$1");
         return valuePath.split(/[#\.]/).filter(i => 0 < i.length).length;
-    }
+    };
     export const getType = (isType: ((v: unknown, listner?: TypesError.Listener) => boolean)) =>
     {
         const transactionListner = makeListener();
@@ -60,7 +60,7 @@ export namespace TypesError
         default:
             return matchRate;
         }
-    }
+    };
     export const setMatchRate = (listner: Listener | undefined, matchRate: boolean | number) =>
     {
         if (listner)

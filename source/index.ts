@@ -679,11 +679,12 @@ export namespace Build
     }
     export namespace Schema
     {
-        export const buildSchema = (_options: Types.OutputOptions, _members: { [key: string]: Types.Definition; }):Jsonable.Jsonable =>
+        export const buildSchema = (schema: Types.SchemaOptions, _options: Types.OutputOptions, _members: { [key: string]: Types.Definition; }):Jsonable.Jsonable =>
         {
             const result =
             {
-                $ref: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#",
+                id: schema.id,
+                $schema: "http://json-schema.org/draft-07/schema#"
             };
             return result;
         };
@@ -881,8 +882,8 @@ try
         }
         if (typeSource.options.schema)
         {
-            const schema = Build.Schema.buildSchema(typeSource.options, typeSource.defines);
-            fs.writeFileSync(typeSource.options.schema.outputFile, Jsonable.stringify(schema), { encoding: "utf-8" });
+            const schema = Build.Schema.buildSchema(typeSource.options.schema, typeSource.options, typeSource.defines);
+            fs.writeFileSync(typeSource.options.schema.outputFile, Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
         }
         console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
     }

@@ -517,9 +517,10 @@ var Build;
     })(Validator = Build.Validator || (Build.Validator = {}));
     var Schema;
     (function (Schema) {
-        Schema.buildSchema = function (_options, _members) {
+        Schema.buildSchema = function (schema, _options, _members) {
             var result = {
-                $ref: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#",
+                id: schema.id,
+                $schema: "http://json-schema.org/draft-07/schema#"
             };
             return result;
         };
@@ -675,8 +676,8 @@ try {
             console.log(result);
         }
         if (typeSource.options.schema) {
-            var schema = Build.Schema.buildSchema(typeSource.options, typeSource.defines);
-            fs_1.default.writeFileSync(typeSource.options.schema.outputFile, jsonable_1.Jsonable.stringify(schema), { encoding: "utf-8" });
+            var schema = Build.Schema.buildSchema(typeSource.options.schema, typeSource.options, typeSource.defines);
+            fs_1.default.writeFileSync(typeSource.options.schema.outputFile, jsonable_1.Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
         }
         console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));
     }

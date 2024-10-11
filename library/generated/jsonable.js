@@ -6,7 +6,7 @@ var types_prime_1 = require("../source/types-prime");
 var Jsonable;
 (function (Jsonable) {
     Jsonable.parse = function (json) { return JSON.parse(json); };
-    Jsonable.stringify = function (value) { return JSON.stringify(value); };
+    Jsonable.stringify = function (value, replacer, space) { return JSON.stringify(value, replacer, space); };
     Jsonable.isJsonableValue = function (value, listner) { return types_prime_1.TypesPrime.isOr(types_prime_1.TypesPrime.isNull, types_prime_1.TypesPrime.isBoolean, types_prime_1.TypesPrime.isNumber, types_prime_1.TypesPrime.isString)(value, listner); };
     Jsonable.isJsonableArray = function (value, listner) { return types_prime_1.TypesPrime.isArray(Jsonable.isJsonable)(value, listner); };
     Jsonable.isJsonableObject = function (value, listner) {
