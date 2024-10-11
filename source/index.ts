@@ -679,13 +679,56 @@ export namespace Build
     }
     export namespace Schema
     {
-        export const buildSchema = (schema: Types.SchemaOptions, _options: Types.OutputOptions, _members: { [key: string]: Types.Definition; }):Jsonable.Jsonable =>
+        export const buildSchema = (schema: Types.SchemaOptions, options: Types.OutputOptions, members: { [key: string]: Types.Definition; }):Jsonable.JsonableObject =>
         {
-            const result =
+            const result: Jsonable.JsonableObject =
             {
                 id: schema.id,
-                $schema: "http://json-schema.org/draft-07/schema#"
+                $schema: "http://json-schema.org/draft-07/schema#",
             };
+            if (schema.$ref)
+            {
+                result["$ref"] = schema.$ref;
+            }
+            result["definitions"] = buildSchemaDefinitions(schema, options, members);
+            return result;
+        };
+        export const buildSchemaDefinitions = (schema: Types.SchemaOptions, options: Types.OutputOptions, members: { [key: string]: Types.Definition; }):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject = { };
+            Object.entries(members).forEach
+            (
+                i =>
+                {
+                    const key = i[0];
+                    const value = i[1];
+                    switch(value.$type)
+                    {
+                    case "value":
+                        result[key] = { };
+                        break;
+                    case "type":
+                        result[key] = { };
+                        break;
+                    case "interface":
+                        result[key] = { };
+                        break;
+                    case "dictionary":
+                        result[key] = { };
+                        break;
+                    case "code":
+                        //  nothing
+                        break;
+                    case "namespace":
+                        {
+                            const members = buildSchemaDefinitions(schema, options, value.members);
+                            Object.entries(members).forEach(j => result[`${key}.${j[0]}`] = j[1]);
+                        }
+                        break;
+                    }
+                }
+            );
+            
             return result;
         };
     }

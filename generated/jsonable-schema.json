@@ -1,0 +1,10 @@
+{
+    "id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/jsonable-schema.json#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "Jsonable.JsonableValue": {},
+        "Jsonable.JsonableArray": {},
+        "Jsonable.JsonableObject": {},
+        "Jsonable.Jsonable": {}
+    }
+}

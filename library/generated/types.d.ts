@@ -25,6 +25,7 @@ export declare namespace Types {
     interface SchemaOptions {
         outputFile: string;
         id: string;
+        $ref?: string;
     }
     const indentStyleTypeMember: readonly ["allman", "egyptian"];
     type IndentStyleType = typeof indentStyleTypeMember[number];

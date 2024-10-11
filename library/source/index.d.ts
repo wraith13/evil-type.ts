@@ -83,9 +83,12 @@ export declare namespace Build {
         const buildValidator: (options: Types.OutputOptions, name: string, define: Types.TypeOrValue) => CodeLine[];
     }
     namespace Schema {
-        const buildSchema: (schema: Types.SchemaOptions, _options: Types.OutputOptions, _members: {
+        const buildSchema: (schema: Types.SchemaOptions, options: Types.OutputOptions, members: {
             [key: string]: Types.Definition;
-        }) => Jsonable.Jsonable;
+        }) => Jsonable.JsonableObject;
+        const buildSchemaDefinitions: (schema: Types.SchemaOptions, options: Types.OutputOptions, members: {
+            [key: string]: Types.Definition;
+        }) => Jsonable.JsonableObject;
     }
 }
 export declare namespace Format {

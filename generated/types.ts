@@ -29,6 +29,7 @@ export namespace Types
     {
         outputFile: string;
         id: string;
+        $ref?: string;
     }
     export const indentStyleTypeMember = ["allman","egyptian"] as const;
     export type IndentStyleType = typeof indentStyleTypeMember[number];
@@ -149,7 +150,7 @@ export namespace Types
     export const isOutputOptions = (value: unknown, listner?: TypesError.Listener): value is OutputOptions =>
         TypesPrime.isSpecificObject<OutputOptions>(getOutputOptionsValidator())(value, listner);
     export const getSchemaOptionsValidator = () => <TypesPrime.ObjectValidator<SchemaOptions>>({ outputFile: TypesPrime.isString, id:
-        TypesPrime.isString, });
+        TypesPrime.isString, $ref: TypesPrime.isOptional(TypesPrime.isString), });
     export const isSchemaOptions = (value: unknown, listner?: TypesError.Listener): value is SchemaOptions =>
         TypesPrime.isSpecificObject<SchemaOptions>(getSchemaOptionsValidator())(value, listner);
     export const isIndentStyleType = (value: unknown, listner?: TypesError.Listener): value is IndentStyleType => TypesPrime.isEnum(

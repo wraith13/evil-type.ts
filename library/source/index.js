@@ -517,11 +517,46 @@ var Build;
     })(Validator = Build.Validator || (Build.Validator = {}));
     var Schema;
     (function (Schema) {
-        Schema.buildSchema = function (schema, _options, _members) {
+        Schema.buildSchema = function (schema, options, members) {
             var result = {
                 id: schema.id,
-                $schema: "http://json-schema.org/draft-07/schema#"
+                $schema: "http://json-schema.org/draft-07/schema#",
             };
+            if (schema.$ref) {
+                result["$ref"] = schema.$ref;
+            }
+            result["definitions"] = Schema.buildSchemaDefinitions(schema, options, members);
+            return result;
+        };
+        Schema.buildSchemaDefinitions = function (schema, options, members) {
+            var result = {};
+            Object.entries(members).forEach(function (i) {
+                var key = i[0];
+                var value = i[1];
+                switch (value.$type) {
+                    case "value":
+                        result[key] = {};
+                        break;
+                    case "type":
+                        result[key] = {};
+                        break;
+                    case "interface":
+                        result[key] = {};
+                        break;
+                    case "dictionary":
+                        result[key] = {};
+                        break;
+                    case "code":
+                        //  nothing
+                        break;
+                    case "namespace":
+                        {
+                            var members_1 = Schema.buildSchemaDefinitions(schema, options, value.members);
+                            Object.entries(members_1).forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
+                        }
+                        break;
+                }
+            });
             return result;
         };
     })(Schema = Build.Schema || (Build.Schema = {}));

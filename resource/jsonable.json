@@ -141,6 +141,10 @@
         "outputFile": "./generated/jsonable.ts",
         "indentUnit": 4,
         "indentStyle": "allman",
-        "validatorOption": "full"
+        "validatorOption": "full",
+        "schema": {
+            "outputFile": "./generated/jsonable-schema.json",
+            "id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/jsonable-schema.json#"
+        }
     }
 }
