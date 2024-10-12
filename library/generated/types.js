@@ -14,7 +14,7 @@ var Types;
     Types.isCommentProperty = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getCommentPropertyValidator())(value, listner);
     };
-    Types.getTypeSchemaValidator = function () { return types_prime_1.TypesPrime.mergeObjectValidator(Types.getCommentPropertyValidator(), { $ref: Types.isSchema, imports: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isImportDefinition)), defines: types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition), options: Types.isOutputOptions, }); };
+    Types.getTypeSchemaValidator = function () { return types_prime_1.TypesPrime.mergeObjectValidator(Types.getCommentPropertyValidator(), { $ref: Types.isSchema, imports: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isImportDefinition)), defines: Types.isDefinitionMap, options: Types.isOutputOptions, }); };
     Types.isTypeSchema = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getTypeSchemaValidator())(value, listner);
     };
@@ -43,11 +43,12 @@ var Types;
         return types_prime_1.TypesPrime.isSpecificObject(Types.getImportDefinitionValidator())(value, listner);
     };
     Types.isDefinition = function (value, listner) { return types_prime_1.TypesPrime.isOr(Types.isCodeDefinition, Types.isNamespaceDefinition, Types.isValueDefinition, Types.isTypeDefinition, Types.isInterfaceDefinition, Types.isDictionaryDefinition)(value, listner); };
+    Types.isDefinitionMap = function (value, listner) { return types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition)(value, listner); };
     Types.getCodeDefinitionValidator = function () { return types_prime_1.TypesPrime.mergeObjectValidator(Types.getAlphaDefinitionValidator(), { $type: types_prime_1.TypesPrime.isJust("code"), tokens: types_prime_1.TypesPrime.isArray(types_prime_1.TypesPrime.isString), }); };
     Types.isCodeDefinition = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getCodeDefinitionValidator())(value, listner);
     };
-    Types.getNamespaceDefinitionValidator = function () { return types_prime_1.TypesPrime.mergeObjectValidator(Types.getAlphaDefinitionValidator(), { $type: types_prime_1.TypesPrime.isJust("namespace"), members: types_prime_1.TypesPrime.isDictionaryObject(Types.isDefinition), }); };
+    Types.getNamespaceDefinitionValidator = function () { return types_prime_1.TypesPrime.mergeObjectValidator(Types.getAlphaDefinitionValidator(), { $type: types_prime_1.TypesPrime.isJust("namespace"), members: Types.isDefinitionMap, }); };
     Types.isNamespaceDefinition = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getNamespaceDefinitionValidator())(value, listner);
     };

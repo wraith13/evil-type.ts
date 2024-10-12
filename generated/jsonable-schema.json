@@ -21,25 +21,25 @@
         "Jsonable.JsonableArray": {
             "type": "array",
             "items": {
-                "$ref": "#/definitions/Jsonable"
+                "$ref": "#/definitions/Jsonable.Jsonable"
             }
         },
         "Jsonable.JsonableObject": {
             "type": "object",
             "additionalProperties": {
-                "$ref": "#/definitions/Jsonable"
+                "$ref": "#/definitions/Jsonable.Jsonable"
             }
         },
         "Jsonable.Jsonable": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/JsonableValue"
+                    "$ref": "#/definitions/Jsonable.JsonableValue"
                 },
                 {
-                    "$ref": "#/definitions/JsonableArray"
+                    "$ref": "#/definitions/Jsonable.JsonableArray"
                 },
                 {
-                    "$ref": "#/definitions/JsonableObject"
+                    "$ref": "#/definitions/Jsonable.JsonableObject"
                 }
             ]
         }

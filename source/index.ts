@@ -687,13 +687,15 @@ export namespace Build
         {
             source: Types.TypeSchema;
             schema: Types.SchemaOptions;
+            definitions: Types.DefinitionMap;
             path: string;
             value: ValueType;
         }
-        export const makeProcess = (source: Types.TypeSchema, schema: Types.SchemaOptions): SchemaProcess<Types.TypeSchema["defines"]> =>
+        export const makeProcess = (source: Types.TypeSchema, schema: Types.SchemaOptions): SchemaProcess<Types.DefinitionMap> =>
         ({
             source,
             schema,
+            definitions: makeDefinitionFlatMap(source.defines),
             path: "",
             value: source.defines,
         });
@@ -701,11 +703,68 @@ export namespace Build
         ({
             source: current.source,
             schema: current.schema,
+            definitions: current.definitions,
             path: nextPath(current.path, key),
             value,
         });
-        export const nextPath = (path: string, key: null | string) => null === key ? path: `${path}.${key}`;
-        export const build = (data: SchemaProcess<Types.TypeSchema["defines"]>):Jsonable.JsonableObject =>
+        export const nextPath = (path: string, key: null | string) =>
+            null === key ?
+                path:
+                "" === path?
+                    key:
+                    `${path}.${key}`;
+        export const makeDefinitionFlatMap = (defines: Types.DefinitionMap): Types.DefinitionMap =>
+        {
+            const result: { [key: string]: Types.Definition } = { };
+            Object.entries(defines).forEach
+            (
+                i =>
+                {
+                    const key = i[0];
+                    const value = i[1];
+                    if (Types.isDefinition(value))
+                    {
+                        result[key] = value;
+                        if (Types.isNamespaceDefinition(value))
+                        {
+                            Object.entries(makeDefinitionFlatMap(value.members))
+                                .forEach(j => result[`${key}.${j[0]}`] = j[1]);
+                        }
+                    }
+                }
+            );
+            return result;
+        };
+        export const getDefinition = (current: SchemaProcess<unknown>, value: Types.ReferElement, context: string = current.path): SchemaProcess<Types.Definition> =>
+        {
+            const path = getAbsolutePath(current, value, context);
+            const result: SchemaProcess<Types.Definition> =
+            {
+                source: current.source,
+                schema: current.schema,
+                definitions: current.definitions,
+                path,
+                value: current.definitions[path],
+            };
+            return result;
+        };
+        export const getAbsolutePath = (current: SchemaProcess<unknown>, value: Types.ReferElement, context: string = current.path): string =>
+        {
+            if ("" === context)
+            {
+                return value.$ref;
+            }
+            else
+            {
+                const path = `${context}.${value.$ref}`;
+                if (current.definitions[path])
+                {
+                    return path;
+                }
+                return getAbsolutePath(current, value, Text.getNameSpace(context));
+            }
+        };
+        export const build = (data: SchemaProcess<Types.DefinitionMap>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -719,7 +778,7 @@ export namespace Build
             result[Const.definitions] = buildDefinitions(data);
             return result;
         };
-        export const buildDefinitions = (data: SchemaProcess<Types.TypeSchema["defines"]>):Jsonable.JsonableObject =>
+        export const buildDefinitions = (data: SchemaProcess<Types.DefinitionMap>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject = { };
             Object.entries(data.value).forEach
@@ -777,9 +836,9 @@ export namespace Build
             case "enum-type":
                 return buildEnumType(nextProcess(data, null, data.value));
             case "typeof":
-                break;
+                return buildTypeOf(nextProcess(data, null, data.value));
             case "itemof":
-                break;
+                return buildItemOf(nextProcess(data, null, data.value));
             case "array":
                 return buildArray(nextProcess(data, null, data.value));
             case "or":
@@ -844,11 +903,36 @@ export namespace Build
             };
             return result;
         };
+        export const buildTypeOf = (_data: SchemaProcess<Types.TypeofElement>):Jsonable.JsonableObject =>
+        {
+            // const result: Jsonable.JsonableObject =
+            // {
+            //     enum: data.value.members,
+            // };
+            // return result;
+            const result: Jsonable.JsonableObject =
+            {
+            };
+            return result;
+        };
+        export const buildItemOf = (_data: SchemaProcess<Types.ItemofElement>):Jsonable.JsonableObject =>
+        {
+            // const body = getDefinition(data, data.value.value);
+            // const result: Jsonable.JsonableObject =
+            // {
+            //     enum: ,
+            // };
+            // return result;
+            const result: Jsonable.JsonableObject =
+            {
+            };
+            return result;
+        };
         export const buildRefer = (data: SchemaProcess<Types.ReferElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                $ref: `#/${Const.definitions}/${data.value.$ref}`,
+                $ref: `#/${Const.definitions}/${getAbsolutePath(data, data.value)}`,
             };
             return result;
         };

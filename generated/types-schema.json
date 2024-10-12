@@ -26,17 +26,14 @@
                 "imports": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ImportDefinition"
+                        "$ref": "#/definitions/Types.ImportDefinition"
                     }
                 },
                 "defines": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/Definition"
-                    }
+                    "$ref": "#/definitions/Types.DefinitionMap"
                 },
                 "options": {
-                    "$ref": "#/definitions/OutputOptions"
+                    "$ref": "#/definitions/Types.OutputOptions"
                 }
             },
             "additionalProperties": false,
@@ -47,7 +44,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/CommentProperty"
+                    "$ref": "#/definitions/Types.CommentProperty"
                 }
             ]
         },
@@ -68,10 +65,10 @@
                     ]
                 },
                 "indentStyle": {
-                    "$ref": "#/definitions/IndentStyleType"
+                    "$ref": "#/definitions/Types.IndentStyleType"
                 },
                 "validatorOption": {
-                    "$ref": "#/definitions/ValidatorOptionType"
+                    "$ref": "#/definitions/Types.ValidatorOptionType"
                 },
                 "maxLineLength": {
                     "oneOf": [
@@ -84,7 +81,7 @@
                     ]
                 },
                 "schema": {
-                    "$ref": "#/definitions/SchemaOptions"
+                    "$ref": "#/definitions/Types.SchemaOptions"
                 }
             },
             "additionalProperties": false,
@@ -150,10 +147,10 @@
             "required": [],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaElement"
+                    "$ref": "#/definitions/Types.AlphaElement"
                 },
                 {
-                    "$ref": "#/definitions/CommentProperty"
+                    "$ref": "#/definitions/Types.CommentProperty"
                 }
             ]
         },
@@ -180,24 +177,30 @@
         "Types.Definition": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/CodeDefinition"
+                    "$ref": "#/definitions/Types.CodeDefinition"
                 },
                 {
-                    "$ref": "#/definitions/NamespaceDefinition"
+                    "$ref": "#/definitions/Types.NamespaceDefinition"
                 },
                 {
-                    "$ref": "#/definitions/ValueDefinition"
+                    "$ref": "#/definitions/Types.ValueDefinition"
                 },
                 {
-                    "$ref": "#/definitions/TypeDefinition"
+                    "$ref": "#/definitions/Types.TypeDefinition"
                 },
                 {
-                    "$ref": "#/definitions/InterfaceDefinition"
+                    "$ref": "#/definitions/Types.InterfaceDefinition"
                 },
                 {
-                    "$ref": "#/definitions/DictionaryDefinition"
+                    "$ref": "#/definitions/Types.DictionaryDefinition"
                 }
             ]
+        },
+        "Types.DefinitionMap": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/Types.Definition"
+            }
         },
         "Types.CodeDefinition": {
             "type": "object",
@@ -219,7 +222,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaDefinition"
+                    "$ref": "#/definitions/Types.AlphaDefinition"
                 }
             ]
         },
@@ -230,10 +233,7 @@
                     "const": "namespace"
                 },
                 "members": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/Definition"
-                    }
+                    "$ref": "#/definitions/Types.DefinitionMap"
                 }
             },
             "additionalProperties": false,
@@ -243,7 +243,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaDefinition"
+                    "$ref": "#/definitions/Types.AlphaDefinition"
                 }
             ]
         },
@@ -256,10 +256,10 @@
                 "value": {
                     "oneOf": [
                         {
-                            "$ref": "#/definitions/LiteralElement"
+                            "$ref": "#/definitions/Types.LiteralElement"
                         },
                         {
-                            "$ref": "#/definitions/ReferElement"
+                            "$ref": "#/definitions/Types.ReferElement"
                         }
                     ]
                 },
@@ -274,7 +274,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaDefinition"
+                    "$ref": "#/definitions/Types.AlphaDefinition"
                 }
             ]
         },
@@ -285,7 +285,7 @@
                     "const": "type"
                 },
                 "define": {
-                    "$ref": "#/definitions/TypeOrRefer"
+                    "$ref": "#/definitions/Types.TypeOrRefer"
                 }
             },
             "additionalProperties": false,
@@ -295,7 +295,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaDefinition"
+                    "$ref": "#/definitions/Types.AlphaDefinition"
                 }
             ]
         },
@@ -308,13 +308,13 @@
                 "extends": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ReferElement"
+                        "$ref": "#/definitions/Types.ReferElement"
                     }
                 },
                 "members": {
                     "type": "object",
                     "additionalProperties": {
-                        "$ref": "#/definitions/TypeOrRefer"
+                        "$ref": "#/definitions/Types.TypeOrRefer"
                     }
                 }
             },
@@ -325,7 +325,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaDefinition"
+                    "$ref": "#/definitions/Types.AlphaDefinition"
                 }
             ]
         },
@@ -336,7 +336,7 @@
                     "const": "dictionary"
                 },
                 "valueType": {
-                    "$ref": "#/definitions/TypeOrRefer"
+                    "$ref": "#/definitions/Types.TypeOrRefer"
                 }
             },
             "additionalProperties": false,
@@ -346,7 +346,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaDefinition"
+                    "$ref": "#/definitions/Types.AlphaDefinition"
                 }
             ]
         },
@@ -357,7 +357,7 @@
                     "const": "array"
                 },
                 "items": {
-                    "$ref": "#/definitions/TypeOrRefer"
+                    "$ref": "#/definitions/Types.TypeOrRefer"
                 }
             },
             "additionalProperties": false,
@@ -367,7 +367,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaElement"
+                    "$ref": "#/definitions/Types.AlphaElement"
                 }
             ]
         },
@@ -380,7 +380,7 @@
                 "types": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/TypeOrRefer"
+                        "$ref": "#/definitions/Types.TypeOrRefer"
                     }
                 }
             },
@@ -391,7 +391,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaElement"
+                    "$ref": "#/definitions/Types.AlphaElement"
                 }
             ]
         },
@@ -404,7 +404,7 @@
                 "types": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/TypeOrRefer"
+                        "$ref": "#/definitions/Types.TypeOrRefer"
                     }
                 }
             },
@@ -415,7 +415,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaElement"
+                    "$ref": "#/definitions/Types.AlphaElement"
                 }
             ]
         },
@@ -436,7 +436,7 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaElement"
+                    "$ref": "#/definitions/Types.AlphaElement"
                 }
             ]
         },
@@ -468,7 +468,7 @@
                     "const": "primitive-type"
                 },
                 "type": {
-                    "$ref": "#/definitions/PrimitiveTypeEnum"
+                    "$ref": "#/definitions/Types.PrimitiveTypeEnum"
                 }
             },
             "additionalProperties": false,
@@ -478,44 +478,44 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/AlphaElement"
+                    "$ref": "#/definitions/Types.AlphaElement"
                 }
             ]
         },
         "Types.Type": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/PrimitiveTypeElement"
+                    "$ref": "#/definitions/Types.PrimitiveTypeElement"
                 },
                 {
-                    "$ref": "#/definitions/TypeDefinition"
+                    "$ref": "#/definitions/Types.TypeDefinition"
                 },
                 {
-                    "$ref": "#/definitions/EnumTypeElement"
+                    "$ref": "#/definitions/Types.EnumTypeElement"
                 },
                 {
-                    "$ref": "#/definitions/TypeofElement"
+                    "$ref": "#/definitions/Types.TypeofElement"
                 },
                 {
-                    "$ref": "#/definitions/ItemofElement"
+                    "$ref": "#/definitions/Types.ItemofElement"
                 },
                 {
-                    "$ref": "#/definitions/InterfaceDefinition"
+                    "$ref": "#/definitions/Types.InterfaceDefinition"
                 },
                 {
-                    "$ref": "#/definitions/DictionaryDefinition"
+                    "$ref": "#/definitions/Types.DictionaryDefinition"
                 },
                 {
-                    "$ref": "#/definitions/ArrayElement"
+                    "$ref": "#/definitions/Types.ArrayElement"
                 },
                 {
-                    "$ref": "#/definitions/OrElement"
+                    "$ref": "#/definitions/Types.OrElement"
                 },
                 {
-                    "$ref": "#/definitions/AndElement"
+                    "$ref": "#/definitions/Types.AndElement"
                 },
                 {
-                    "$ref": "#/definitions/LiteralElement"
+                    "$ref": "#/definitions/Types.LiteralElement"
                 }
             ]
         },
@@ -558,7 +558,7 @@
                     "const": "typeof"
                 },
                 "value": {
-                    "$ref": "#/definitions/ReferElement"
+                    "$ref": "#/definitions/Types.ReferElement"
                 }
             },
             "additionalProperties": false,
@@ -574,7 +574,7 @@
                     "const": "itemof"
                 },
                 "value": {
-                    "$ref": "#/definitions/ReferElement"
+                    "$ref": "#/definitions/Types.ReferElement"
                 }
             },
             "additionalProperties": false,
@@ -586,30 +586,30 @@
         "Types.TypeOrRefer": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/Type"
+                    "$ref": "#/definitions/Types.Type"
                 },
                 {
-                    "$ref": "#/definitions/ReferElement"
+                    "$ref": "#/definitions/Types.ReferElement"
                 }
             ]
         },
         "Types.TypeOrValue": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/Type"
+                    "$ref": "#/definitions/Types.Type"
                 },
                 {
-                    "$ref": "#/definitions/ValueDefinition"
+                    "$ref": "#/definitions/Types.ValueDefinition"
                 }
             ]
         },
         "Types.TypeOrValueOfRefer": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/TypeOrValue"
+                    "$ref": "#/definitions/Types.TypeOrValue"
                 },
                 {
-                    "$ref": "#/definitions/ReferElement"
+                    "$ref": "#/definitions/Types.ReferElement"
                 }
             ]
         }

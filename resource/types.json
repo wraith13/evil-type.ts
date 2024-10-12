@@ -68,10 +68,7 @@
                             }
                         },
                         "defines": {
-                            "$type": "dictionary",
-                            "valueType": {
-                                "$ref": "Definition"
-                            }
+                            "$ref": "DefinitionMap"
                         },
                         "options": {
                             "$ref": "OutputOptions"
@@ -248,6 +245,13 @@
                         ]
                     }
                 },
+                "DefinitionMap": {
+                    "export": true,
+                    "$type": "dictionary",
+                    "valueType": {
+                        "$ref": "Definition"
+                    }
+                },
                 "CodeDefinition": {
                     "export": true,
                     "$type": "interface",
@@ -284,10 +288,7 @@
                             "literal": "namespace"
                         },
                         "members": {
-                            "$type": "dictionary",
-                            "valueType": {
-                                "$ref": "Definition"
-                            }
+                            "$ref": "DefinitionMap"
                         }
                     }
                 },

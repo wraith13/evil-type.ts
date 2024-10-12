@@ -89,14 +89,18 @@ export declare namespace Build {
         interface SchemaProcess<ValueType> {
             source: Types.TypeSchema;
             schema: Types.SchemaOptions;
+            definitions: Types.DefinitionMap;
             path: string;
             value: ValueType;
         }
-        const makeProcess: (source: Types.TypeSchema, schema: Types.SchemaOptions) => SchemaProcess<Types.TypeSchema["defines"]>;
+        const makeProcess: (source: Types.TypeSchema, schema: Types.SchemaOptions) => SchemaProcess<Types.DefinitionMap>;
         const nextProcess: <ValueType>(current: SchemaProcess<unknown>, key: null | string, value: ValueType) => SchemaProcess<ValueType>;
         const nextPath: (path: string, key: null | string) => string;
-        const build: (data: SchemaProcess<Types.TypeSchema["defines"]>) => Jsonable.JsonableObject;
-        const buildDefinitions: (data: SchemaProcess<Types.TypeSchema["defines"]>) => Jsonable.JsonableObject;
+        const makeDefinitionFlatMap: (defines: Types.DefinitionMap) => Types.DefinitionMap;
+        const getDefinition: (current: SchemaProcess<unknown>, value: Types.ReferElement, context?: string) => SchemaProcess<Types.Definition>;
+        const getAbsolutePath: (current: SchemaProcess<unknown>, value: Types.ReferElement, context?: string) => string;
+        const build: (data: SchemaProcess<Types.DefinitionMap>) => Jsonable.JsonableObject;
+        const buildDefinitions: (data: SchemaProcess<Types.DefinitionMap>) => Jsonable.JsonableObject;
         const buildLiteral: (data: SchemaProcess<Types.LiteralElement>) => Jsonable.JsonableObject;
         const buildValue: (data: SchemaProcess<Types.ValueDefinition>) => Jsonable.JsonableObject;
         const buildType: (data: SchemaProcess<Types.Type>) => Jsonable.JsonableObject;
@@ -104,6 +108,8 @@ export declare namespace Build {
         const buildInterface: (data: SchemaProcess<Types.InterfaceDefinition>) => Jsonable.JsonableObject;
         const buildDictionary: (data: SchemaProcess<Types.DictionaryDefinition>) => Jsonable.JsonableObject;
         const buildEnumType: (data: SchemaProcess<Types.EnumTypeElement>) => Jsonable.JsonableObject;
+        const buildTypeOf: (_data: SchemaProcess<Types.TypeofElement>) => Jsonable.JsonableObject;
+        const buildItemOf: (_data: SchemaProcess<Types.ItemofElement>) => Jsonable.JsonableObject;
         const buildRefer: (data: SchemaProcess<Types.ReferElement>) => Jsonable.JsonableObject;
         const buildArray: (data: SchemaProcess<Types.ArrayElement>) => Jsonable.JsonableObject;
         const buildOr: (data: SchemaProcess<Types.OrElement>) => Jsonable.JsonableObject;

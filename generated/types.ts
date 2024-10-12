@@ -13,7 +13,7 @@ export namespace Types
     {
         $ref: typeof schema;
         imports?: ImportDefinition[];
-        defines: { [key: string]: Definition, };
+        defines: DefinitionMap;
         options: OutputOptions;
     }
     export interface OutputOptions
@@ -50,6 +50,10 @@ export namespace Types
     }
     export type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition |
         DictionaryDefinition;
+    export type DefinitionMap =
+    {
+        [key: string]: Definition;
+    }
     export interface CodeDefinition extends AlphaDefinition
     {
         $type: "code";
@@ -58,7 +62,7 @@ export namespace Types
     export interface NamespaceDefinition extends AlphaDefinition
     {
         $type: "namespace";
-        members: { [key: string]: Definition, };
+        members: DefinitionMap;
     }
     export interface ValueDefinition extends AlphaDefinition
     {
@@ -140,7 +144,7 @@ export namespace Types
         TypesPrime.isSpecificObject<CommentProperty>(getCommentPropertyValidator())(value, listner);
     export const getTypeSchemaValidator = () => <TypesPrime.ObjectValidator<TypeSchema>> TypesPrime.mergeObjectValidator(
         getCommentPropertyValidator(), { $ref: isSchema, imports: TypesPrime.isOptional(TypesPrime.isArray(isImportDefinition)), defines:
-        TypesPrime.isDictionaryObject(isDefinition), options: isOutputOptions, });
+        isDefinitionMap, options: isOutputOptions, });
     export const isTypeSchema = (value: unknown, listner?: TypesError.Listener): value is TypeSchema =>
         TypesPrime.isSpecificObject<TypeSchema>(getTypeSchemaValidator())(value, listner);
     export const getOutputOptionsValidator = () => <TypesPrime.ObjectValidator<OutputOptions>>({ outputFile: TypesPrime.isOptional(
@@ -170,12 +174,14 @@ export namespace Types
         TypesPrime.isSpecificObject<ImportDefinition>(getImportDefinitionValidator())(value, listner);
     export const isDefinition = (value: unknown, listner?: TypesError.Listener): value is Definition => TypesPrime.isOr(isCodeDefinition,
         isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryDefinition)(value, listner);
+    export const isDefinitionMap = (value: unknown, listner?: TypesError.Listener): value is DefinitionMap => TypesPrime.isDictionaryObject
+        (isDefinition)(value, listner);
     export const getCodeDefinitionValidator = () => <TypesPrime.ObjectValidator<CodeDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("code"), tokens: TypesPrime.isArray(TypesPrime.isString), });
     export const isCodeDefinition = (value: unknown, listner?: TypesError.Listener): value is CodeDefinition =>
         TypesPrime.isSpecificObject<CodeDefinition>(getCodeDefinitionValidator())(value, listner);
     export const getNamespaceDefinitionValidator = () => <TypesPrime.ObjectValidator<NamespaceDefinition>> TypesPrime.mergeObjectValidator(
-        getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("namespace"), members: TypesPrime.isDictionaryObject(isDefinition), });
+        getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("namespace"), members: isDefinitionMap, });
     export const isNamespaceDefinition = (value: unknown, listner?: TypesError.Listener): value is NamespaceDefinition =>
         TypesPrime.isSpecificObject<NamespaceDefinition>(getNamespaceDefinitionValidator())(value, listner);
     export const getValueDefinitionValidator = () => <TypesPrime.ObjectValidator<ValueDefinition>> TypesPrime.mergeObjectValidator(

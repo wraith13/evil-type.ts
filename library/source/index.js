@@ -525,6 +525,7 @@ var Build;
             return ({
                 source: source,
                 schema: schema,
+                definitions: Schema.makeDefinitionFlatMap(source.defines),
                 path: "",
                 value: source.defines,
             });
@@ -533,12 +534,60 @@ var Build;
             return ({
                 source: current.source,
                 schema: current.schema,
+                definitions: current.definitions,
                 path: Schema.nextPath(current.path, key),
                 value: value,
             });
         };
-        Schema.nextPath = function (path, key) { return null === key ? path : "".concat(path, ".").concat(key); };
+        Schema.nextPath = function (path, key) {
+            return null === key ?
+                path :
+                "" === path ?
+                    key :
+                    "".concat(path, ".").concat(key);
+        };
+        Schema.makeDefinitionFlatMap = function (defines) {
+            var result = {};
+            Object.entries(defines).forEach(function (i) {
+                var key = i[0];
+                var value = i[1];
+                if (types_1.Types.isDefinition(value)) {
+                    result[key] = value;
+                    if (types_1.Types.isNamespaceDefinition(value)) {
+                        Object.entries(Schema.makeDefinitionFlatMap(value.members))
+                            .forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
+                    }
+                }
+            });
+            return result;
+        };
+        Schema.getDefinition = function (current, value, context) {
+            if (context === void 0) { context = current.path; }
+            var path = Schema.getAbsolutePath(current, value, context);
+            var result = {
+                source: current.source,
+                schema: current.schema,
+                definitions: current.definitions,
+                path: path,
+                value: current.definitions[path],
+            };
+            return result;
+        };
+        Schema.getAbsolutePath = function (current, value, context) {
+            if (context === void 0) { context = current.path; }
+            if ("" === context) {
+                return value.$ref;
+            }
+            else {
+                var path = "".concat(context, ".").concat(value.$ref);
+                if (current.definitions[path]) {
+                    return path;
+                }
+                return Schema.getAbsolutePath(current, value, text_1.Text.getNameSpace(context));
+            }
+        };
         Schema.build = function (data) {
+            Object.keys(data.definitions).forEach(function (i) { return console.log(i); });
             var result = {
                 $id: data.schema.$id,
                 $schema: "http://json-schema.org/draft-07/schema#",
@@ -598,9 +647,9 @@ var Build;
                 case "enum-type":
                     return Schema.buildEnumType(Schema.nextProcess(data, null, data.value));
                 case "typeof":
-                    break;
+                    return Schema.buildTypeOf(Schema.nextProcess(data, null, data.value));
                 case "itemof":
-                    break;
+                    return Schema.buildItemOf(Schema.nextProcess(data, null, data.value));
                 case "array":
                     return Schema.buildArray(Schema.nextProcess(data, null, data.value));
                 case "or":
@@ -650,9 +699,28 @@ var Build;
             };
             return result;
         };
+        Schema.buildTypeOf = function (_data) {
+            // const result: Jsonable.JsonableObject =
+            // {
+            //     enum: data.value.members,
+            // };
+            // return result;
+            var result = {};
+            return result;
+        };
+        Schema.buildItemOf = function (_data) {
+            // const body = getDefinition(data, data.value.value);
+            // const result: Jsonable.JsonableObject =
+            // {
+            //     enum: ,
+            // };
+            // return result;
+            var result = {};
+            return result;
+        };
         Schema.buildRefer = function (data) {
             var result = {
-                $ref: "#/".concat(Const.definitions, "/").concat(data.value.$ref),
+                $ref: "#/".concat(Const.definitions, "/").concat(Schema.getAbsolutePath(data, data.value)),
             };
             return result;
         };

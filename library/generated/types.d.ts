@@ -9,9 +9,7 @@ export declare namespace Types {
     interface TypeSchema extends CommentProperty {
         $ref: typeof schema;
         imports?: ImportDefinition[];
-        defines: {
-            [key: string]: Definition;
-        };
+        defines: DefinitionMap;
         options: OutputOptions;
     }
     interface OutputOptions {
@@ -42,15 +40,16 @@ export declare namespace Types {
         from: string;
     }
     type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
+    type DefinitionMap = {
+        [key: string]: Definition;
+    };
     interface CodeDefinition extends AlphaDefinition {
         $type: "code";
         tokens: string[];
     }
     interface NamespaceDefinition extends AlphaDefinition {
         $type: "namespace";
-        members: {
-            [key: string]: Definition;
-        };
+        members: DefinitionMap;
     }
     interface ValueDefinition extends AlphaDefinition {
         $type: "value";
@@ -131,6 +130,7 @@ export declare namespace Types {
     const getImportDefinitionValidator: () => TypesPrime.ObjectValidator<ImportDefinition>;
     const isImportDefinition: (value: unknown, listner?: TypesError.Listener) => value is ImportDefinition;
     const isDefinition: (value: unknown, listner?: TypesError.Listener) => value is Definition;
+    const isDefinitionMap: (value: unknown, listner?: TypesError.Listener) => value is DefinitionMap;
     const getCodeDefinitionValidator: () => TypesPrime.ObjectValidator<CodeDefinition>;
     const isCodeDefinition: (value: unknown, listner?: TypesError.Listener) => value is CodeDefinition;
     const getNamespaceDefinitionValidator: () => TypesPrime.ObjectValidator<NamespaceDefinition>;
