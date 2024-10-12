@@ -679,6 +679,10 @@ export namespace Build
     }
     export namespace Schema
     {
+        export namespace Const
+        {
+            export const definitions = "definitions";
+        }
         export interface SchemaProcess<ValueType>
         {
             source: Types.TypeSchema;
@@ -701,24 +705,24 @@ export namespace Build
             value,
         });
         export const nextPath = (path: string, key: null | string) => null === key ? path: `${path}.${key}`;
-        export const build = (schema: Types.SchemaOptions, options: Types.OutputOptions, members: { [key: string]: Types.Definition; }):Jsonable.JsonableObject =>
+        export const build = (data: SchemaProcess<Types.TypeSchema["defines"]>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                $id: schema.$id,
+                $id: data.schema.$id,
                 $schema: "http://json-schema.org/draft-07/schema#",
             };
-            if (schema.$ref)
+            if (data.schema.$ref)
             {
-                result["$ref"] = schema.$ref;
+                result["$ref"] = data.schema.$ref;
             }
-            result["definitions"] = buildDefinitions(schema, options, members);
+            result[Const.definitions] = buildDefinitions(data);
             return result;
         };
-        export const buildDefinitions = (schema: Types.SchemaOptions, options: Types.OutputOptions, members: { [key: string]: Types.Definition; }):Jsonable.JsonableObject =>
+        export const buildDefinitions = (data: SchemaProcess<Types.TypeSchema["defines"]>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject = { };
-            Object.entries(members).forEach
+            Object.entries(data.value).forEach
             (
                 i =>
                 {
@@ -727,76 +731,78 @@ export namespace Build
                     switch(value.$type)
                     {
                     case "value":
-                        result[key] = buildValue(schema, options, value);
+                        result[key] = buildValue(nextProcess(data, null, value));
                         break;
                     case "code":
                         //  nothing
                         break;
                     case "namespace":
                         {
-                            const members = buildDefinitions(schema, options, value.members);
+                            const members = buildDefinitions(nextProcess(data, key, value.members));
                             Object.entries(members).forEach(j => result[`${key}.${j[0]}`] = j[1]);
                         }
                         break;
                     default:
-                        result[key] = buildType(schema, options, value);
+                        result[key] = buildType(nextProcess(data, null, value));
                     }
                 }
             );
             return result;
         };
-        export const buildLiteral = (_schema: Types.SchemaOptions, _options: Types.OutputOptions, value: Types.LiteralElement):Jsonable.JsonableObject =>
+        export const buildLiteral = (data: SchemaProcess<Types.LiteralElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                const: value.literal,
+                const: data.value.literal,
                 //enum: [ value.literal, ],
             };
             return result;
         };
-        export const buildValue = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.ValueDefinition):Jsonable.JsonableObject =>
-            Types.isLiteralElement(value.value) ? buildLiteral(schema, options, value.value): buildRefer(schema, options, value.value);
-        export const buildType = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.Type):Jsonable.JsonableObject =>
+        export const buildValue = (data: SchemaProcess<Types.ValueDefinition>):Jsonable.JsonableObject =>
+            Types.isLiteralElement(data.value.value) ?
+                buildLiteral(nextProcess(data, null, data.value.value)):
+                buildRefer(nextProcess(data, null, data.value.value));
+        export const buildType = (data: SchemaProcess<Types.Type>):Jsonable.JsonableObject =>
         {
-            switch(value.$type)
+            switch(data.value.$type)
             {
             case "primitive-type":
-                return buildPrimitiveType(schema, options, value);
+                return buildPrimitiveType(nextProcess(data, null, data.value));
             case "type":
-                return buildTypeOrRefer(schema, options, value.define);
+                return buildTypeOrRefer(nextProcess(data, null, data.value.define));
             case "interface":
-                return buildInterface(schema, options, value);
+                return buildInterface(nextProcess(data, null, data.value));
             case "dictionary":
-                return buildDictionary(schema, options, value);
+                return buildDictionary(nextProcess(data, null, data.value));
             case "enum-type":
-                break;
+                return buildEnumType(nextProcess(data, null, data.value));
             case "typeof":
                 break;
             case "itemof":
                 break;
             case "array":
-                return buildArray(schema, options, value);
+                return buildArray(nextProcess(data, null, data.value));
             case "or":
-                return buildOr(schema, options, value);
+                return buildOr(nextProcess(data, null, data.value));
             case "and":
-                return buildAnd(schema, options, value);
+                return buildAnd(nextProcess(data, null, data.value));
             case "literal":
-                return buildLiteral(schema, options, value);
+                return buildLiteral(nextProcess(data, null, data.value));
             }
             const result: Jsonable.JsonableObject =
             {
             };
             return result;
         };
-        export const buildPrimitiveType = (_schema: Types.SchemaOptions, _options: Types.OutputOptions, value: Types.PrimitiveTypeElement):Jsonable.JsonableObject =>
+        export const buildPrimitiveType = (data: SchemaProcess<Types.PrimitiveTypeElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                type: value.type,
+                type: data.value.type,
             };
             return result;
         };
-        export const buildInterface = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.InterfaceDefinition):Jsonable.JsonableObject =>
+        export const buildInterface = (data: SchemaProcess<Types.InterfaceDefinition>):Jsonable.JsonableObject =>
         {
             const properties: Jsonable.JsonableObject = { };
             const result: Jsonable.JsonableObject =
@@ -804,67 +810,77 @@ export namespace Build
                 type: "object",
                 properties,
                 additionalProperties: false,
-                required: Object.keys(value.members).filter(i => ! i.endsWith("?")),
+                required: Object.keys(data.value.members).filter(i => ! i.endsWith("?")),
             };
-            if (value.extends)
+            if (data.value.extends)
             {
-                result["allOf"] = value.extends.map(i => buildRefer(schema, options, i));
+                result["allOf"] = data.value.extends.map(i => buildRefer(nextProcess(data, null, i)));
             }
-            Object.entries(value.members).forEach
+            Object.entries(data.value.members).forEach
             (
                 i =>
                 {
                     const key = Text.getPrimaryKeyName(i[0]);
                     const value = i[1];
-                    properties[key] = buildTypeOrRefer(schema, options, value);
+                    properties[key] = buildTypeOrRefer(nextProcess(data, null, value));
                 }
             );
             return result;
         };
-        export const buildDictionary = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.DictionaryDefinition):Jsonable.JsonableObject =>
+        export const buildDictionary = (data: SchemaProcess<Types.DictionaryDefinition>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
                 type: "object",
-                additionalProperties: buildTypeOrRefer(schema, options, value.valueType),
+                additionalProperties: buildTypeOrRefer(nextProcess(data, null, data.value.valueType)),
             };
             return result;
         };
-        export const buildRefer = (_schema: Types.SchemaOptions, _options: Types.OutputOptions, value: Types.ReferElement):Jsonable.JsonableObject =>
+        export const buildEnumType = (data: SchemaProcess<Types.EnumTypeElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                $ref: `#/definitions/${value.$ref}`,
+                enum: data.value.members,
             };
             return result;
         };
-        export const buildArray = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.ArrayElement):Jsonable.JsonableObject =>
+        export const buildRefer = (data: SchemaProcess<Types.ReferElement>):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+                $ref: `#/${Const.definitions}/${data.value.$ref}`,
+            };
+            return result;
+        };
+        export const buildArray = (data: SchemaProcess<Types.ArrayElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
                 type: "array",
-                items: buildTypeOrRefer(schema, options, value.items),
+                items: buildTypeOrRefer(nextProcess(data, null, data.value.items)),
             };
             return result;
         };
-        export const buildOr = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.OrElement):Jsonable.JsonableObject =>
+        export const buildOr = (data: SchemaProcess<Types.OrElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                oneOf: value.types.map(i => buildTypeOrRefer(schema, options, i)),
+                oneOf: data.value.types.map(i => buildTypeOrRefer(nextProcess(data, null, i))),
             };
             return result;
         };
-        export const buildAnd = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.AndElement):Jsonable.JsonableObject =>
+        export const buildAnd = (data: SchemaProcess<Types.AndElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                allOf: value.types.map(i => buildTypeOrRefer(schema, options, i)),
+                allOf: data.value.types.map(i => buildTypeOrRefer(nextProcess(data, null, i))),
             };
             return result;
         };
-        export const buildTypeOrRefer = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.TypeOrRefer):Jsonable.JsonableObject =>
-            Types.isReferElement(value) ? buildRefer(schema, options, value): buildType(schema, options, value);
+        export const buildTypeOrRefer = (data: SchemaProcess<Types.TypeOrRefer>):Jsonable.JsonableObject =>
+            Types.isReferElement(data.value) ?
+                buildRefer(nextProcess(data, null, data.value)):
+                buildType(nextProcess(data, null, data.value));
     }
 }
 export namespace Format
@@ -1059,7 +1075,7 @@ try
         }
         if (typeSource.options.schema)
         {
-            const schema = Build.Schema.build(typeSource.options.schema, typeSource.options, typeSource.defines);
+            const schema = Build.Schema.build(Build.Schema.makeProcess(typeSource, typeSource.options.schema));
             fs.writeFileSync(typeSource.options.schema.outputFile, Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
         }
         console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);

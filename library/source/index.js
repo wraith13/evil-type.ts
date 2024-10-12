@@ -517,6 +517,10 @@ var Build;
     })(Validator = Build.Validator || (Build.Validator = {}));
     var Schema;
     (function (Schema) {
+        var Const;
+        (function (Const) {
+            Const.definitions = "definitions";
+        })(Const = Schema.Const || (Schema.Const = {}));
         Schema.makeProcess = function (source, schema) {
             return ({
                 source: source,
@@ -534,137 +538,147 @@ var Build;
             });
         };
         Schema.nextPath = function (path, key) { return null === key ? path : "".concat(path, ".").concat(key); };
-        Schema.build = function (schema, options, members) {
+        Schema.build = function (data) {
             var result = {
-                $id: schema.$id,
+                $id: data.schema.$id,
                 $schema: "http://json-schema.org/draft-07/schema#",
             };
-            if (schema.$ref) {
-                result["$ref"] = schema.$ref;
+            if (data.schema.$ref) {
+                result["$ref"] = data.schema.$ref;
             }
-            result["definitions"] = Schema.buildDefinitions(schema, options, members);
+            result[Const.definitions] = Schema.buildDefinitions(data);
             return result;
         };
-        Schema.buildDefinitions = function (schema, options, members) {
+        Schema.buildDefinitions = function (data) {
             var result = {};
-            Object.entries(members).forEach(function (i) {
+            Object.entries(data.value).forEach(function (i) {
                 var key = i[0];
                 var value = i[1];
                 switch (value.$type) {
                     case "value":
-                        result[key] = Schema.buildValue(schema, options, value);
+                        result[key] = Schema.buildValue(Schema.nextProcess(data, null, value));
                         break;
                     case "code":
                         //  nothing
                         break;
                     case "namespace":
                         {
-                            var members_1 = Schema.buildDefinitions(schema, options, value.members);
-                            Object.entries(members_1).forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
+                            var members = Schema.buildDefinitions(Schema.nextProcess(data, key, value.members));
+                            Object.entries(members).forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
                         }
                         break;
                     default:
-                        result[key] = Schema.buildType(schema, options, value);
+                        result[key] = Schema.buildType(Schema.nextProcess(data, null, value));
                 }
             });
             return result;
         };
-        Schema.buildLiteral = function (_schema, _options, value) {
+        Schema.buildLiteral = function (data) {
             var result = {
-                const: value.literal,
+                const: data.value.literal,
                 //enum: [ value.literal, ],
             };
             return result;
         };
-        Schema.buildValue = function (schema, options, value) {
-            return types_1.Types.isLiteralElement(value.value) ? Schema.buildLiteral(schema, options, value.value) : Schema.buildRefer(schema, options, value.value);
+        Schema.buildValue = function (data) {
+            return types_1.Types.isLiteralElement(data.value.value) ?
+                Schema.buildLiteral(Schema.nextProcess(data, null, data.value.value)) :
+                Schema.buildRefer(Schema.nextProcess(data, null, data.value.value));
         };
-        Schema.buildType = function (schema, options, value) {
-            switch (value.$type) {
+        Schema.buildType = function (data) {
+            switch (data.value.$type) {
                 case "primitive-type":
-                    return Schema.buildPrimitiveType(schema, options, value);
+                    return Schema.buildPrimitiveType(Schema.nextProcess(data, null, data.value));
                 case "type":
-                    return Schema.buildTypeOrRefer(schema, options, value.define);
+                    return Schema.buildTypeOrRefer(Schema.nextProcess(data, null, data.value.define));
                 case "interface":
-                    return Schema.buildInterface(schema, options, value);
+                    return Schema.buildInterface(Schema.nextProcess(data, null, data.value));
                 case "dictionary":
-                    return Schema.buildDictionary(schema, options, value);
+                    return Schema.buildDictionary(Schema.nextProcess(data, null, data.value));
                 case "enum-type":
-                    break;
+                    return Schema.buildEnumType(Schema.nextProcess(data, null, data.value));
                 case "typeof":
                     break;
                 case "itemof":
                     break;
                 case "array":
-                    return Schema.buildArray(schema, options, value);
+                    return Schema.buildArray(Schema.nextProcess(data, null, data.value));
                 case "or":
-                    return Schema.buildOr(schema, options, value);
+                    return Schema.buildOr(Schema.nextProcess(data, null, data.value));
                 case "and":
-                    return Schema.buildAnd(schema, options, value);
+                    return Schema.buildAnd(Schema.nextProcess(data, null, data.value));
                 case "literal":
-                    return Schema.buildLiteral(schema, options, value);
+                    return Schema.buildLiteral(Schema.nextProcess(data, null, data.value));
             }
             var result = {};
             return result;
         };
-        Schema.buildPrimitiveType = function (_schema, _options, value) {
+        Schema.buildPrimitiveType = function (data) {
             var result = {
-                type: value.type,
+                type: data.value.type,
             };
             return result;
         };
-        Schema.buildInterface = function (schema, options, value) {
+        Schema.buildInterface = function (data) {
             var properties = {};
             var result = {
                 type: "object",
                 properties: properties,
                 additionalProperties: false,
-                required: Object.keys(value.members).filter(function (i) { return !i.endsWith("?"); }),
+                required: Object.keys(data.value.members).filter(function (i) { return !i.endsWith("?"); }),
             };
-            if (value.extends) {
-                result["allOf"] = value.extends.map(function (i) { return Schema.buildRefer(schema, options, i); });
+            if (data.value.extends) {
+                result["allOf"] = data.value.extends.map(function (i) { return Schema.buildRefer(Schema.nextProcess(data, null, i)); });
             }
-            Object.entries(value.members).forEach(function (i) {
+            Object.entries(data.value.members).forEach(function (i) {
                 var key = text_1.Text.getPrimaryKeyName(i[0]);
                 var value = i[1];
-                properties[key] = Schema.buildTypeOrRefer(schema, options, value);
+                properties[key] = Schema.buildTypeOrRefer(Schema.nextProcess(data, null, value));
             });
             return result;
         };
-        Schema.buildDictionary = function (schema, options, value) {
+        Schema.buildDictionary = function (data) {
             var result = {
                 type: "object",
-                additionalProperties: Schema.buildTypeOrRefer(schema, options, value.valueType),
+                additionalProperties: Schema.buildTypeOrRefer(Schema.nextProcess(data, null, data.value.valueType)),
             };
             return result;
         };
-        Schema.buildRefer = function (_schema, _options, value) {
+        Schema.buildEnumType = function (data) {
             var result = {
-                $ref: "#/definitions/".concat(value.$ref),
+                enum: data.value.members,
             };
             return result;
         };
-        Schema.buildArray = function (schema, options, value) {
+        Schema.buildRefer = function (data) {
+            var result = {
+                $ref: "#/".concat(Const.definitions, "/").concat(data.value.$ref),
+            };
+            return result;
+        };
+        Schema.buildArray = function (data) {
             var result = {
                 type: "array",
-                items: Schema.buildTypeOrRefer(schema, options, value.items),
+                items: Schema.buildTypeOrRefer(Schema.nextProcess(data, null, data.value.items)),
             };
             return result;
         };
-        Schema.buildOr = function (schema, options, value) {
+        Schema.buildOr = function (data) {
             var result = {
-                oneOf: value.types.map(function (i) { return Schema.buildTypeOrRefer(schema, options, i); }),
+                oneOf: data.value.types.map(function (i) { return Schema.buildTypeOrRefer(Schema.nextProcess(data, null, i)); }),
             };
             return result;
         };
-        Schema.buildAnd = function (schema, options, value) {
+        Schema.buildAnd = function (data) {
             var result = {
-                allOf: value.types.map(function (i) { return Schema.buildTypeOrRefer(schema, options, i); }),
+                allOf: data.value.types.map(function (i) { return Schema.buildTypeOrRefer(Schema.nextProcess(data, null, i)); }),
             };
             return result;
         };
-        Schema.buildTypeOrRefer = function (schema, options, value) {
-            return types_1.Types.isReferElement(value) ? Schema.buildRefer(schema, options, value) : Schema.buildType(schema, options, value);
+        Schema.buildTypeOrRefer = function (data) {
+            return types_1.Types.isReferElement(data.value) ?
+                Schema.buildRefer(Schema.nextProcess(data, null, data.value)) :
+                Schema.buildType(Schema.nextProcess(data, null, data.value));
         };
     })(Schema = Build.Schema || (Build.Schema = {}));
 })(Build || (exports.Build = Build = {}));
@@ -818,7 +832,7 @@ try {
             console.log(result);
         }
         if (typeSource.options.schema) {
-            var schema = Build.Schema.build(typeSource.options.schema, typeSource.options, typeSource.defines);
+            var schema = Build.Schema.build(Build.Schema.makeProcess(typeSource, typeSource.options.schema));
             fs_1.default.writeFileSync(typeSource.options.schema.outputFile, jsonable_1.Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
         }
         console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));

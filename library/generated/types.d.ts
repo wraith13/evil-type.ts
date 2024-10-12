@@ -2,7 +2,7 @@ import { TypesPrime } from "../source/types-prime";
 import { TypesError } from "../source/types-error";
 import { Jsonable } from "./jsonable";
 export declare namespace Types {
-    const schema: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
+    const schema: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/types-schema.json#";
     interface CommentProperty {
         comment?: string[];
     }
@@ -113,7 +113,7 @@ export declare namespace Types {
     type TypeOrRefer = Type | ReferElement;
     type TypeOrValue = Type | ValueDefinition;
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
-    const isSchema: (value: unknown, listner?: TypesError.Listener) => value is "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
+    const isSchema: (value: unknown, listner?: TypesError.Listener) => value is "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/types-schema.json#";
     const getCommentPropertyValidator: () => TypesPrime.ObjectValidator<CommentProperty>;
     const isCommentProperty: (value: unknown, listner?: TypesError.Listener) => value is CommentProperty;
     const getTypeSchemaValidator: () => TypesPrime.ObjectValidator<TypeSchema>;

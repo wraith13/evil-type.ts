@@ -4,7 +4,7 @@ import { TypesError } from "../source/types-error";
 import { Jsonable } from "./jsonable";
 export namespace Types
 {
-    export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#" as const;
+    export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/types-schema.json#" as const;
     export interface CommentProperty
     {
         comment?: string[];

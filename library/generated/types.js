@@ -6,7 +6,7 @@ var types_prime_1 = require("../source/types-prime");
 var jsonable_1 = require("./jsonable");
 var Types;
 (function (Types) {
-    Types.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/type-schema.json#";
+    Types.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/types-schema.json#";
     Types.indentStyleTypeMember = ["allman", "egyptian"];
     Types.PrimitiveTypeEnumMembers = ["null", "boolean", "number", "string"];
     Types.isSchema = types_prime_1.TypesPrime.isJust(Types.schema);

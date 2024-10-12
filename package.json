@@ -1,30 +1,30 @@
 {
-  "name": "@wraith13/evil-type.ts",
-  "version": "0.0.0",
-  "description": "... for TypeScript",
-  "main": "./library/source/index.js",
-  "scripts": {
-    "generate type.ts": "node ./ ./resource/type.json",
-    "generate jsonable.ts": "node ./ ./resource/jsonable.json",
-    "build script": "tsc -p ./source/tsconfig.json",
-    "watch script": "tsc --watch -p ./source/tsconfig.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wraith13/evil-type.ts.git"
-  },
-  "keywords": [
-    "type",
-    "typescript"
-  ],
-  "author": "wraith13",
-  "license": "BSL-1.0",
-  "bugs": {
-    "url": "https://github.com/wraith13/evil-type.ts/issues"
-  },
-  "homepage": "https://github.com/wraith13/evil-type.ts/#readme",
-  "devDependencies": {
-    "@types/node": "^20.11.24",
-    "typescript": "^5.6.2"
-  }
+    "name": "@wraith13/evil-type.ts",
+    "version": "0.0.0",
+    "description": "... for TypeScript",
+    "main": "./library/source/index.js",
+    "scripts": {
+        "generate types.ts": "node ./ ./resource/types.json",
+        "generate jsonable.ts": "node ./ ./resource/jsonable.json",
+        "build script": "tsc -p ./source/tsconfig.json",
+        "watch script": "tsc --watch -p ./source/tsconfig.json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/wraith13/evil-type.ts.git"
+    },
+    "keywords": [
+        "type",
+        "typescript"
+    ],
+    "author": "wraith13",
+    "license": "BSL-1.0",
+    "bugs": {
+        "url": "https://github.com/wraith13/evil-type.ts/issues"
+    },
+    "homepage": "https://github.com/wraith13/evil-type.ts/#readme",
+    "devDependencies": {
+        "@types/node": "^20.11.24",
+        "typescript": "^5.6.2"
+    }
 }
