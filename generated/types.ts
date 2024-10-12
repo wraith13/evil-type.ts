@@ -28,7 +28,7 @@ export namespace Types
     export interface SchemaOptions
     {
         outputFile: string;
-        id: string;
+        $id: string;
         $ref?: string;
     }
     export const indentStyleTypeMember = ["allman","egyptian"] as const;
@@ -149,7 +149,7 @@ export namespace Types
         )), schema: TypesPrime.isOptional(isSchemaOptions), });
     export const isOutputOptions = (value: unknown, listner?: TypesError.Listener): value is OutputOptions =>
         TypesPrime.isSpecificObject<OutputOptions>(getOutputOptionsValidator())(value, listner);
-    export const getSchemaOptionsValidator = () => <TypesPrime.ObjectValidator<SchemaOptions>>({ outputFile: TypesPrime.isString, id:
+    export const getSchemaOptionsValidator = () => <TypesPrime.ObjectValidator<SchemaOptions>>({ outputFile: TypesPrime.isString, $id:
         TypesPrime.isString, $ref: TypesPrime.isOptional(TypesPrime.isString), });
     export const isSchemaOptions = (value: unknown, listner?: TypesError.Listener): value is SchemaOptions =>
         TypesPrime.isSpecificObject<SchemaOptions>(getSchemaOptionsValidator())(value, listner);

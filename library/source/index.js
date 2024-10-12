@@ -517,47 +517,154 @@ var Build;
     })(Validator = Build.Validator || (Build.Validator = {}));
     var Schema;
     (function (Schema) {
-        Schema.buildSchema = function (schema, options, members) {
+        Schema.makeProcess = function (source, schema) {
+            return ({
+                source: source,
+                schema: schema,
+                path: "",
+                value: source.defines,
+            });
+        };
+        Schema.nextProcess = function (current, key, value) {
+            return ({
+                source: current.source,
+                schema: current.schema,
+                path: Schema.nextPath(current.path, key),
+                value: value,
+            });
+        };
+        Schema.nextPath = function (path, key) { return null === key ? path : "".concat(path, ".").concat(key); };
+        Schema.build = function (schema, options, members) {
             var result = {
-                id: schema.id,
+                $id: schema.$id,
                 $schema: "http://json-schema.org/draft-07/schema#",
             };
             if (schema.$ref) {
                 result["$ref"] = schema.$ref;
             }
-            result["definitions"] = Schema.buildSchemaDefinitions(schema, options, members);
+            result["definitions"] = Schema.buildDefinitions(schema, options, members);
             return result;
         };
-        Schema.buildSchemaDefinitions = function (schema, options, members) {
+        Schema.buildDefinitions = function (schema, options, members) {
             var result = {};
             Object.entries(members).forEach(function (i) {
                 var key = i[0];
                 var value = i[1];
                 switch (value.$type) {
                     case "value":
-                        result[key] = {};
-                        break;
-                    case "type":
-                        result[key] = {};
-                        break;
-                    case "interface":
-                        result[key] = {};
-                        break;
-                    case "dictionary":
-                        result[key] = {};
+                        result[key] = Schema.buildValue(schema, options, value);
                         break;
                     case "code":
                         //  nothing
                         break;
                     case "namespace":
                         {
-                            var members_1 = Schema.buildSchemaDefinitions(schema, options, value.members);
+                            var members_1 = Schema.buildDefinitions(schema, options, value.members);
                             Object.entries(members_1).forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
                         }
                         break;
+                    default:
+                        result[key] = Schema.buildType(schema, options, value);
                 }
             });
             return result;
+        };
+        Schema.buildLiteral = function (_schema, _options, value) {
+            var result = {
+                const: value.literal,
+                //enum: [ value.literal, ],
+            };
+            return result;
+        };
+        Schema.buildValue = function (schema, options, value) {
+            return types_1.Types.isLiteralElement(value.value) ? Schema.buildLiteral(schema, options, value.value) : Schema.buildRefer(schema, options, value.value);
+        };
+        Schema.buildType = function (schema, options, value) {
+            switch (value.$type) {
+                case "primitive-type":
+                    return Schema.buildPrimitiveType(schema, options, value);
+                case "type":
+                    return Schema.buildTypeOrRefer(schema, options, value.define);
+                case "interface":
+                    return Schema.buildInterface(schema, options, value);
+                case "dictionary":
+                    return Schema.buildDictionary(schema, options, value);
+                case "enum-type":
+                    break;
+                case "typeof":
+                    break;
+                case "itemof":
+                    break;
+                case "array":
+                    return Schema.buildArray(schema, options, value);
+                case "or":
+                    return Schema.buildOr(schema, options, value);
+                case "and":
+                    return Schema.buildAnd(schema, options, value);
+                case "literal":
+                    return Schema.buildLiteral(schema, options, value);
+            }
+            var result = {};
+            return result;
+        };
+        Schema.buildPrimitiveType = function (_schema, _options, value) {
+            var result = {
+                type: value.type,
+            };
+            return result;
+        };
+        Schema.buildInterface = function (schema, options, value) {
+            var properties = {};
+            var result = {
+                type: "object",
+                properties: properties,
+                additionalProperties: false,
+                required: Object.keys(value.members).filter(function (i) { return !i.endsWith("?"); }),
+            };
+            if (value.extends) {
+                result["allOf"] = value.extends.map(function (i) { return Schema.buildRefer(schema, options, i); });
+            }
+            Object.entries(value.members).forEach(function (i) {
+                var key = text_1.Text.getPrimaryKeyName(i[0]);
+                var value = i[1];
+                properties[key] = Schema.buildTypeOrRefer(schema, options, value);
+            });
+            return result;
+        };
+        Schema.buildDictionary = function (schema, options, value) {
+            var result = {
+                type: "object",
+                additionalProperties: Schema.buildTypeOrRefer(schema, options, value.valueType),
+            };
+            return result;
+        };
+        Schema.buildRefer = function (_schema, _options, value) {
+            var result = {
+                $ref: "#/definitions/".concat(value.$ref),
+            };
+            return result;
+        };
+        Schema.buildArray = function (schema, options, value) {
+            var result = {
+                type: "array",
+                items: Schema.buildTypeOrRefer(schema, options, value.items),
+            };
+            return result;
+        };
+        Schema.buildOr = function (schema, options, value) {
+            var result = {
+                oneOf: value.types.map(function (i) { return Schema.buildTypeOrRefer(schema, options, i); }),
+            };
+            return result;
+        };
+        Schema.buildAnd = function (schema, options, value) {
+            var result = {
+                allOf: value.types.map(function (i) { return Schema.buildTypeOrRefer(schema, options, i); }),
+            };
+            return result;
+        };
+        Schema.buildTypeOrRefer = function (schema, options, value) {
+            return types_1.Types.isReferElement(value) ? Schema.buildRefer(schema, options, value) : Schema.buildType(schema, options, value);
         };
     })(Schema = Build.Schema || (Build.Schema = {}));
 })(Build || (exports.Build = Build = {}));
@@ -711,7 +818,7 @@ try {
             console.log(result);
         }
         if (typeSource.options.schema) {
-            var schema = Build.Schema.buildSchema(typeSource.options.schema, typeSource.options, typeSource.defines);
+            var schema = Build.Schema.build(typeSource.options.schema, typeSource.options, typeSource.defines);
             fs_1.default.writeFileSync(typeSource.options.schema.outputFile, jsonable_1.Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
         }
         console.log("\u2705 ".concat(jsonPath, " build end: ").concat(new Date(), " ( ").concat((getBuildTime() / 1000).toLocaleString(), "s )"));

@@ -1,10 +1,47 @@
 {
-    "id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/jsonable-schema.json#",
+    "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/jsonable-schema.json#",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
-        "Jsonable.JsonableValue": {},
-        "Jsonable.JsonableArray": {},
-        "Jsonable.JsonableObject": {},
-        "Jsonable.Jsonable": {}
+        "Jsonable.JsonableValue": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "boolean"
+                },
+                {
+                    "type": "number"
+                },
+                {
+                    "type": "string"
+                }
+            ]
+        },
+        "Jsonable.JsonableArray": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Jsonable"
+            }
+        },
+        "Jsonable.JsonableObject": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/Jsonable"
+            }
+        },
+        "Jsonable.Jsonable": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/JsonableValue"
+                },
+                {
+                    "$ref": "#/definitions/JsonableArray"
+                },
+                {
+                    "$ref": "#/definitions/JsonableObject"
+                }
+            ]
+        }
     }
 }

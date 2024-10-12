@@ -144,7 +144,7 @@
         "validatorOption": "full",
         "schema": {
             "outputFile": "./generated/jsonable-schema.json",
-            "id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/jsonable-schema.json#"
+            "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/jsonable-schema.json#"
         }
     }
 }

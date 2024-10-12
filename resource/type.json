@@ -131,7 +131,7 @@
                             "$type": "primitive-type",
                             "type": "string"
                         },
-                        "id": {
+                        "$id": {
                             "$type": "primitive-type",
                             "type": "string"
                         },
@@ -671,7 +671,7 @@
         "validatorOption": "full",
         "schema": {
             "outputFile": "./generated/schema.json",
-            "id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema.json#",
+            "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema.json#",
             "$ref": "Types.TypeSchema"
         }
     }

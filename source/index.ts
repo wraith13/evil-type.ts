@@ -679,21 +679,43 @@ export namespace Build
     }
     export namespace Schema
     {
-        export const buildSchema = (schema: Types.SchemaOptions, options: Types.OutputOptions, members: { [key: string]: Types.Definition; }):Jsonable.JsonableObject =>
+        export interface SchemaProcess<ValueType>
+        {
+            source: Types.TypeSchema;
+            schema: Types.SchemaOptions;
+            path: string;
+            value: ValueType;
+        }
+        export const makeProcess = (source: Types.TypeSchema, schema: Types.SchemaOptions): SchemaProcess<Types.TypeSchema["defines"]> =>
+        ({
+            source,
+            schema,
+            path: "",
+            value: source.defines,
+        });
+        export const nextProcess = <ValueType>(current: SchemaProcess<unknown>, key: null | string, value: ValueType):SchemaProcess<ValueType> =>
+        ({
+            source: current.source,
+            schema: current.schema,
+            path: nextPath(current.path, key),
+            value,
+        });
+        export const nextPath = (path: string, key: null | string) => null === key ? path: `${path}.${key}`;
+        export const build = (schema: Types.SchemaOptions, options: Types.OutputOptions, members: { [key: string]: Types.Definition; }):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                id: schema.id,
+                $id: schema.$id,
                 $schema: "http://json-schema.org/draft-07/schema#",
             };
             if (schema.$ref)
             {
                 result["$ref"] = schema.$ref;
             }
-            result["definitions"] = buildSchemaDefinitions(schema, options, members);
+            result["definitions"] = buildDefinitions(schema, options, members);
             return result;
         };
-        export const buildSchemaDefinitions = (schema: Types.SchemaOptions, options: Types.OutputOptions, members: { [key: string]: Types.Definition; }):Jsonable.JsonableObject =>
+        export const buildDefinitions = (schema: Types.SchemaOptions, options: Types.OutputOptions, members: { [key: string]: Types.Definition; }):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject = { };
             Object.entries(members).forEach
@@ -705,32 +727,144 @@ export namespace Build
                     switch(value.$type)
                     {
                     case "value":
-                        result[key] = { };
-                        break;
-                    case "type":
-                        result[key] = { };
-                        break;
-                    case "interface":
-                        result[key] = { };
-                        break;
-                    case "dictionary":
-                        result[key] = { };
+                        result[key] = buildValue(schema, options, value);
                         break;
                     case "code":
                         //  nothing
                         break;
                     case "namespace":
                         {
-                            const members = buildSchemaDefinitions(schema, options, value.members);
+                            const members = buildDefinitions(schema, options, value.members);
                             Object.entries(members).forEach(j => result[`${key}.${j[0]}`] = j[1]);
                         }
                         break;
+                    default:
+                        result[key] = buildType(schema, options, value);
                     }
                 }
             );
-            
             return result;
         };
+        export const buildLiteral = (_schema: Types.SchemaOptions, _options: Types.OutputOptions, value: Types.LiteralElement):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+                const: value.literal,
+                //enum: [ value.literal, ],
+            };
+            return result;
+        };
+        export const buildValue = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.ValueDefinition):Jsonable.JsonableObject =>
+            Types.isLiteralElement(value.value) ? buildLiteral(schema, options, value.value): buildRefer(schema, options, value.value);
+        export const buildType = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.Type):Jsonable.JsonableObject =>
+        {
+            switch(value.$type)
+            {
+            case "primitive-type":
+                return buildPrimitiveType(schema, options, value);
+            case "type":
+                return buildTypeOrRefer(schema, options, value.define);
+            case "interface":
+                return buildInterface(schema, options, value);
+            case "dictionary":
+                return buildDictionary(schema, options, value);
+            case "enum-type":
+                break;
+            case "typeof":
+                break;
+            case "itemof":
+                break;
+            case "array":
+                return buildArray(schema, options, value);
+            case "or":
+                return buildOr(schema, options, value);
+            case "and":
+                return buildAnd(schema, options, value);
+            case "literal":
+                return buildLiteral(schema, options, value);
+            }
+            const result: Jsonable.JsonableObject =
+            {
+            };
+            return result;
+        };
+        export const buildPrimitiveType = (_schema: Types.SchemaOptions, _options: Types.OutputOptions, value: Types.PrimitiveTypeElement):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+                type: value.type,
+            };
+            return result;
+        };
+        export const buildInterface = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.InterfaceDefinition):Jsonable.JsonableObject =>
+        {
+            const properties: Jsonable.JsonableObject = { };
+            const result: Jsonable.JsonableObject =
+            {
+                type: "object",
+                properties,
+                additionalProperties: false,
+                required: Object.keys(value.members).filter(i => ! i.endsWith("?")),
+            };
+            if (value.extends)
+            {
+                result["allOf"] = value.extends.map(i => buildRefer(schema, options, i));
+            }
+            Object.entries(value.members).forEach
+            (
+                i =>
+                {
+                    const key = Text.getPrimaryKeyName(i[0]);
+                    const value = i[1];
+                    properties[key] = buildTypeOrRefer(schema, options, value);
+                }
+            );
+            return result;
+        };
+        export const buildDictionary = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.DictionaryDefinition):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+                type: "object",
+                additionalProperties: buildTypeOrRefer(schema, options, value.valueType),
+            };
+            return result;
+        };
+        export const buildRefer = (_schema: Types.SchemaOptions, _options: Types.OutputOptions, value: Types.ReferElement):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+                $ref: `#/definitions/${value.$ref}`,
+            };
+            return result;
+        };
+        export const buildArray = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.ArrayElement):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+                type: "array",
+                items: buildTypeOrRefer(schema, options, value.items),
+            };
+            return result;
+        };
+        export const buildOr = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.OrElement):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+                oneOf: value.types.map(i => buildTypeOrRefer(schema, options, i)),
+            };
+            return result;
+        };
+        export const buildAnd = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.AndElement):Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+                allOf: value.types.map(i => buildTypeOrRefer(schema, options, i)),
+            };
+            return result;
+        };
+        export const buildTypeOrRefer = (schema: Types.SchemaOptions, options: Types.OutputOptions, value: Types.TypeOrRefer):Jsonable.JsonableObject =>
+            Types.isReferElement(value) ? buildRefer(schema, options, value): buildType(schema, options, value);
     }
 }
 export namespace Format
@@ -925,7 +1059,7 @@ try
         }
         if (typeSource.options.schema)
         {
-            const schema = Build.Schema.buildSchema(typeSource.options.schema, typeSource.options, typeSource.defines);
+            const schema = Build.Schema.build(typeSource.options.schema, typeSource.options, typeSource.defines);
             fs.writeFileSync(typeSource.options.schema.outputFile, Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
         }
         console.log(`✅ ${jsonPath} build end: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
