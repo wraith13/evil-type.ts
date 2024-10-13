@@ -24,6 +24,9 @@ export declare namespace Types {
         outputFile: string;
         $id: string;
         $ref?: string;
+        externalReferMapping?: {
+            [key: string]: string;
+        };
     }
     const indentStyleTypeMember: readonly ["allman", "egyptian"];
     type IndentStyleType = typeof indentStyleTypeMember[number];

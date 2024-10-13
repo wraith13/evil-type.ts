@@ -30,6 +30,7 @@ export namespace Types
         outputFile: string;
         $id: string;
         $ref?: string;
+        externalReferMapping?: { [key: string]: string, };
     }
     export const indentStyleTypeMember = ["allman","egyptian"] as const;
     export type IndentStyleType = typeof indentStyleTypeMember[number];
@@ -154,7 +155,8 @@ export namespace Types
     export const isOutputOptions = (value: unknown, listner?: TypesError.Listener): value is OutputOptions =>
         TypesPrime.isSpecificObject<OutputOptions>(getOutputOptionsValidator())(value, listner);
     export const getSchemaOptionsValidator = () => <TypesPrime.ObjectValidator<SchemaOptions>>({ outputFile: TypesPrime.isString, $id:
-        TypesPrime.isString, $ref: TypesPrime.isOptional(TypesPrime.isString), });
+        TypesPrime.isString, $ref: TypesPrime.isOptional(TypesPrime.isString), externalReferMapping: TypesPrime.isOptional(
+        TypesPrime.isDictionaryObject(TypesPrime.isString)), });
     export const isSchemaOptions = (value: unknown, listner?: TypesError.Listener): value is SchemaOptions =>
         TypesPrime.isSpecificObject<SchemaOptions>(getSchemaOptionsValidator())(value, listner);
     export const isIndentStyleType = (value: unknown, listner?: TypesError.Listener): value is IndentStyleType => TypesPrime.isEnum(

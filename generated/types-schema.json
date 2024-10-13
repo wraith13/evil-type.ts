@@ -1,7 +1,7 @@
 {
     "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/types-schema.json#",
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "Types.TypeSchema",
+    "$ref": "#/definitions/Types.TypeSchema",
     "definitions": {
         "Types.schema": {
             "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/types-schema.json#"
@@ -16,13 +16,14 @@
                     }
                 }
             },
-            "additionalProperties": false,
             "required": []
         },
         "Types.TypeSchema": {
             "type": "object",
             "properties": {
-                "$ref": {},
+                "$ref": {
+                    "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/types-schema.json#"
+                },
                 "imports": {
                     "type": "array",
                     "items": {
@@ -36,7 +37,6 @@
                     "$ref": "#/definitions/Types.OutputOptions"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$ref",
                 "defines",
@@ -84,7 +84,6 @@
                     "$ref": "#/definitions/Types.SchemaOptions"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "indentUnit",
                 "indentStyle",
@@ -102,9 +101,14 @@
                 },
                 "$ref": {
                     "type": "string"
+                },
+                "externalReferMapping": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "outputFile",
                 "$id"
@@ -116,7 +120,12 @@
                 "egyptian"
             ]
         },
-        "Types.IndentStyleType": {},
+        "Types.IndentStyleType": {
+            "enum": [
+                "allman",
+                "egyptian"
+            ]
+        },
         "Types.ValidatorOptionType": {
             "enum": [
                 "none",
@@ -131,7 +140,6 @@
                     "type": "string"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type"
             ]
@@ -143,7 +151,6 @@
                     "type": "boolean"
                 }
             },
-            "additionalProperties": false,
             "required": [],
             "allOf": [
                 {
@@ -167,7 +174,6 @@
                     "type": "string"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "target",
@@ -215,7 +221,6 @@
                     }
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "tokens"
@@ -236,7 +241,6 @@
                     "$ref": "#/definitions/Types.DefinitionMap"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "members"
@@ -267,7 +271,6 @@
                     "type": "boolean"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "value"
@@ -288,7 +291,6 @@
                     "$ref": "#/definitions/Types.TypeOrRefer"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "define"
@@ -318,7 +320,6 @@
                     }
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "members"
@@ -339,7 +340,6 @@
                     "$ref": "#/definitions/Types.TypeOrRefer"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "valueType"
@@ -360,7 +360,6 @@
                     "$ref": "#/definitions/Types.TypeOrRefer"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "items"
@@ -384,7 +383,6 @@
                     }
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "types"
@@ -408,7 +406,6 @@
                     }
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "types"
@@ -426,10 +423,9 @@
                     "const": "literal"
                 },
                 "literal": {
-                    "$ref": "#/definitions/Jsonable.Jsonable"
+                    "$ref": "jsonable-schema.json#/definitions/Jsonable.Jsonable"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "literal"
@@ -447,7 +443,6 @@
                     "type": "string"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$ref"
             ]
@@ -460,7 +455,14 @@
                 "string"
             ]
         },
-        "Types.PrimitiveTypeEnum": {},
+        "Types.PrimitiveTypeEnum": {
+            "enum": [
+                "null",
+                "boolean",
+                "number",
+                "string"
+            ]
+        },
         "Types.PrimitiveTypeElement": {
             "type": "object",
             "properties": {
@@ -471,7 +473,6 @@
                     "$ref": "#/definitions/Types.PrimitiveTypeEnum"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "type"
@@ -545,7 +546,6 @@
                     }
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "members"
@@ -561,7 +561,6 @@
                     "$ref": "#/definitions/Types.ReferElement"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "value"
@@ -577,7 +576,6 @@
                     "$ref": "#/definitions/Types.ReferElement"
                 }
             },
-            "additionalProperties": false,
             "required": [
                 "$type",
                 "value"

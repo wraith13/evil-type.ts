@@ -561,39 +561,58 @@ var Build;
             });
             return result;
         };
-        Schema.getDefinition = function (current, value, context) {
-            if (context === void 0) { context = current.path; }
-            var path = Schema.getAbsolutePath(current, value, context);
-            var result = {
-                source: current.source,
-                schema: current.schema,
-                definitions: current.definitions,
-                path: path,
-                value: current.definitions[path],
-            };
-            return result;
-        };
-        Schema.getAbsolutePath = function (current, value, context) {
-            if (context === void 0) { context = current.path; }
+        Schema.getAbsolutePath = function (data, value, context) {
+            if (context === void 0) { context = data.path; }
             if ("" === context) {
                 return value.$ref;
             }
             else {
                 var path = "".concat(context, ".").concat(value.$ref);
-                if (current.definitions[path]) {
+                if (data.definitions[path]) {
                     return path;
                 }
-                return Schema.getAbsolutePath(current, value, text_1.Text.getNameSpace(context));
+                return Schema.getAbsolutePath(data, value, text_1.Text.getNameSpace(context));
             }
         };
+        Schema.resolveExternalRefer = function (data, absolutePath) {
+            if (data.schema.externalReferMapping) {
+                var key = Object.keys(data.schema.externalReferMapping).filter(function (i) { return i === absolutePath || absolutePath.startsWith("".concat(i, ".")); })[0];
+                if (key) {
+                    return data.schema.externalReferMapping[key] + absolutePath.slice(key.length);
+                }
+            }
+            return null;
+        };
+        Schema.getDefinition = function (data, value) {
+            var path = Schema.getAbsolutePath(data, value);
+            var result = {
+                source: data.source,
+                schema: data.schema,
+                definitions: data.definitions,
+                path: path,
+                value: data.definitions[path],
+            };
+            return result;
+        };
+        Schema.getLiteral = function (data, value) {
+            var definition = Schema.getDefinition(data, value);
+            if (types_1.Types.isValueDefinition(definition.value)) {
+                if (types_1.Types.isLiteralElement(definition.value.value)) {
+                    return definition.value.value;
+                }
+                else {
+                    return Schema.getLiteral(definition, definition.value.value);
+                }
+            }
+            return null;
+        };
         Schema.build = function (data) {
-            Object.keys(data.definitions).forEach(function (i) { return console.log(i); });
             var result = {
                 $id: data.schema.$id,
                 $schema: "http://json-schema.org/draft-07/schema#",
             };
             if (data.schema.$ref) {
-                result["$ref"] = data.schema.$ref;
+                result["$ref"] = "#/".concat(Const.definitions, "/").concat(data.schema.$ref);
             }
             result[Const.definitions] = Schema.buildDefinitions(data);
             return result;
@@ -673,7 +692,7 @@ var Build;
             var result = {
                 type: "object",
                 properties: properties,
-                additionalProperties: false,
+                //additionalProperties: false,
                 required: Object.keys(data.value.members).filter(function (i) { return !i.endsWith("?"); }),
             };
             if (data.value.extends) {
@@ -699,28 +718,38 @@ var Build;
             };
             return result;
         };
-        Schema.buildTypeOf = function (_data) {
-            // const result: Jsonable.JsonableObject =
-            // {
-            //     enum: data.value.members,
-            // };
-            // return result;
+        Schema.buildTypeOf = function (data) {
             var result = {};
+            var literal = Schema.getLiteral(data, data.value.value);
+            if (literal) {
+                result["const"] = literal.literal;
+            }
+            else {
+                console.error("\uD83D\uDEAB Can not resolve refer: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref })));
+            }
             return result;
         };
-        Schema.buildItemOf = function (_data) {
-            // const body = getDefinition(data, data.value.value);
-            // const result: Jsonable.JsonableObject =
-            // {
-            //     enum: ,
-            // };
-            // return result;
+        Schema.buildItemOf = function (data) {
             var result = {};
+            var literal = Schema.getLiteral(data, data.value.value);
+            if (literal) {
+                if (Array.isArray(literal.literal)) {
+                    result["enum"] = literal.literal;
+                }
+                else {
+                    console.error("\uD83D\uDEAB Not array itemof: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref, literal: literal.literal })));
+                }
+            }
+            else {
+                console.error("\uD83D\uDEAB Can not resolve refer: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref })));
+            }
             return result;
         };
         Schema.buildRefer = function (data) {
+            var _a;
+            var path = Schema.getAbsolutePath(data, data.value);
             var result = {
-                $ref: "#/".concat(Const.definitions, "/").concat(Schema.getAbsolutePath(data, data.value)),
+                $ref: (_a = Schema.resolveExternalRefer(data, path)) !== null && _a !== void 0 ? _a : "#/".concat(Const.definitions, "/").concat(path),
             };
             return result;
         };

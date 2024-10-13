@@ -735,20 +735,7 @@ export namespace Build
             );
             return result;
         };
-        export const getDefinition = (current: SchemaProcess<unknown>, value: Types.ReferElement, context: string = current.path): SchemaProcess<Types.Definition> =>
-        {
-            const path = getAbsolutePath(current, value, context);
-            const result: SchemaProcess<Types.Definition> =
-            {
-                source: current.source,
-                schema: current.schema,
-                definitions: current.definitions,
-                path,
-                value: current.definitions[path],
-            };
-            return result;
-        };
-        export const getAbsolutePath = (current: SchemaProcess<unknown>, value: Types.ReferElement, context: string = current.path): string =>
+        export const getAbsolutePath = (data: SchemaProcess<unknown>, value: Types.ReferElement, context: string = data.path): string =>
         {
             if ("" === context)
             {
@@ -757,12 +744,53 @@ export namespace Build
             else
             {
                 const path = `${context}.${value.$ref}`;
-                if (current.definitions[path])
+                if (data.definitions[path])
                 {
                     return path;
                 }
-                return getAbsolutePath(current, value, Text.getNameSpace(context));
+                return getAbsolutePath(data, value, Text.getNameSpace(context));
             }
+        };
+        export const resolveExternalRefer = (data: SchemaProcess<unknown>, absolutePath: string) =>
+        {
+            if (data.schema.externalReferMapping)
+            {
+                const key = Object.keys(data.schema.externalReferMapping).filter(i => i === absolutePath || absolutePath.startsWith(`${i}.`))[0];
+                if (key)
+                {
+                    return data.schema.externalReferMapping[key] +absolutePath.slice(key.length);
+                }
+            }
+            return null;
+        };
+        export const getDefinition = (data: SchemaProcess<unknown>, value: Types.ReferElement): SchemaProcess<Types.Definition> =>
+        {
+            const path = getAbsolutePath(data, value);
+            const result: SchemaProcess<Types.Definition> =
+            {
+                source: data.source,
+                schema: data.schema,
+                definitions: data.definitions,
+                path,
+                value: data.definitions[path],
+            };
+            return result;
+        };
+        export const getLiteral = (data: SchemaProcess<unknown>, value: Types.ReferElement): Types.LiteralElement | null =>
+        {
+            const definition = getDefinition(data, value);
+            if (Types.isValueDefinition(definition.value))
+            {
+                if (Types.isLiteralElement(definition.value.value))
+                {
+                    return definition.value.value;
+                }
+                else
+                {
+                    return getLiteral(definition, definition.value.value);
+                }
+            }
+            return null;
         };
         export const build = (data: SchemaProcess<Types.DefinitionMap>):Jsonable.JsonableObject =>
         {
@@ -773,7 +801,7 @@ export namespace Build
             };
             if (data.schema.$ref)
             {
-                result["$ref"] = data.schema.$ref;
+                result["$ref"] = `#/${Const.definitions}/${data.schema.$ref}`;
             }
             result[Const.definitions] = buildDefinitions(data);
             return result;
@@ -868,7 +896,7 @@ export namespace Build
             {
                 type: "object",
                 properties,
-                additionalProperties: false,
+                //additionalProperties: false,
                 required: Object.keys(data.value.members).filter(i => ! i.endsWith("?")),
             };
             if (data.value.extends)
@@ -903,36 +931,51 @@ export namespace Build
             };
             return result;
         };
-        export const buildTypeOf = (_data: SchemaProcess<Types.TypeofElement>):Jsonable.JsonableObject =>
+        export const buildTypeOf = (data: SchemaProcess<Types.TypeofElement>):Jsonable.JsonableObject =>
         {
-            // const result: Jsonable.JsonableObject =
-            // {
-            //     enum: data.value.members,
-            // };
-            // return result;
             const result: Jsonable.JsonableObject =
             {
             };
+            let literal = getLiteral(data, data.value.value);
+            if (literal)
+            {
+                result["const"] = literal.literal;
+            }
+            else
+            {
+                console.error(`🚫 Can not resolve refer: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref }) }`);
+            }
             return result;
         };
-        export const buildItemOf = (_data: SchemaProcess<Types.ItemofElement>):Jsonable.JsonableObject =>
+        export const buildItemOf = (data: SchemaProcess<Types.ItemofElement>):Jsonable.JsonableObject =>
         {
-            // const body = getDefinition(data, data.value.value);
-            // const result: Jsonable.JsonableObject =
-            // {
-            //     enum: ,
-            // };
-            // return result;
             const result: Jsonable.JsonableObject =
             {
             };
+            let literal = getLiteral(data, data.value.value);
+            if (literal)
+            {
+                if (Array.isArray(literal.literal))
+                {
+                    result["enum"] = literal.literal;
+                }
+                else
+                {
+                    console.error(`🚫 Not array itemof: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref, literal: literal.literal }) }`);
+                }
+            }
+            else
+            {
+                console.error(`🚫 Can not resolve refer: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref }) }`);
+            }
             return result;
         };
         export const buildRefer = (data: SchemaProcess<Types.ReferElement>):Jsonable.JsonableObject =>
         {
+            const path = getAbsolutePath(data, data.value);
             const result: Jsonable.JsonableObject =
             {
-                $ref: `#/${Const.definitions}/${getAbsolutePath(data, data.value)}`,
+                $ref: resolveExternalRefer(data, path) ?? `#/${Const.definitions}/${path}`,
             };
             return result;
         };

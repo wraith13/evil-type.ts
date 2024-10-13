@@ -23,7 +23,7 @@ var Types;
     Types.isOutputOptions = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getOutputOptionsValidator())(value, listner);
     };
-    Types.getSchemaOptionsValidator = function () { return ({ outputFile: types_prime_1.TypesPrime.isString, $id: types_prime_1.TypesPrime.isString, $ref: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isString), }); };
+    Types.getSchemaOptionsValidator = function () { return ({ outputFile: types_prime_1.TypesPrime.isString, $id: types_prime_1.TypesPrime.isString, $ref: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isString), externalReferMapping: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isDictionaryObject(types_prime_1.TypesPrime.isString)), }); };
     Types.isSchemaOptions = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getSchemaOptionsValidator())(value, listner);
     };
