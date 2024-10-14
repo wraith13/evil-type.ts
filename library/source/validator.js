@@ -9,65 +9,61 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TypesPrime = void 0;
-var jsonable_1 = require("../generated/jsonable");
-var types_error_1 = require("./types-error");
-var TypesPrime;
-(function (TypesPrime) {
-    TypesPrime.isJust = function (target) { return function (value, listner) {
-        return types_error_1.TypesError.withErrorHandling(target === value, listner, function () { return types_error_1.TypesError.valueToString(target); }, value);
+exports.EvilTypeValidator = void 0;
+var error_1 = require("./error");
+var EvilTypeValidator;
+(function (EvilTypeValidator) {
+    EvilTypeValidator.isJust = function (target) { return function (value, listner) {
+        return error_1.EvilTypeError.withErrorHandling(target === value, listner, function () { return error_1.EvilTypeError.valueToString(target); }, value);
     }; };
-    TypesPrime.isUndefined = TypesPrime.isJust(undefined);
-    TypesPrime.isNull = TypesPrime.isJust(null);
-    TypesPrime.isBoolean = function (value, listner) {
-        return types_error_1.TypesError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
+    EvilTypeValidator.isUndefined = EvilTypeValidator.isJust(undefined);
+    EvilTypeValidator.isNull = EvilTypeValidator.isJust(null);
+    EvilTypeValidator.isBoolean = function (value, listner) {
+        return error_1.EvilTypeError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
     };
-    TypesPrime.isNumber = function (value, listner) {
-        return types_error_1.TypesError.withErrorHandling("number" === typeof value, listner, "number", value);
+    EvilTypeValidator.isNumber = function (value, listner) {
+        return error_1.EvilTypeError.withErrorHandling("number" === typeof value, listner, "number", value);
     };
-    TypesPrime.isString = function (value, listner) {
-        return types_error_1.TypesError.withErrorHandling("string" === typeof value, listner, "string", value);
+    EvilTypeValidator.isString = function (value, listner) {
+        return error_1.EvilTypeError.withErrorHandling("string" === typeof value, listner, "string", value);
     };
-    TypesPrime.isObject = function (value) {
+    EvilTypeValidator.isObject = function (value) {
         return null !== value && "object" === typeof value && !Array.isArray(value);
     };
-    TypesPrime.isEnum = function (list) { return function (value, listner) {
-        return types_error_1.TypesError.withErrorHandling(list.includes(value), listner, function () { return list.map(function (i) { return types_error_1.TypesError.valueToString(i); }).join(" | "); }, value);
+    EvilTypeValidator.isEnum = function (list) { return function (value, listner) {
+        return error_1.EvilTypeError.withErrorHandling(list.includes(value), listner, function () { return list.map(function (i) { return error_1.EvilTypeError.valueToString(i); }).join(" | "); }, value);
     }; };
-    TypesPrime.isArray = function (isType) { return function (value, listner) {
+    EvilTypeValidator.isArray = function (isType) { return function (value, listner) {
         if (Array.isArray(value)) {
             var result = value.map(function (i) { return isType(i, listner); }).every(function (i) { return i; });
             if (listner) {
                 if (result) {
-                    types_error_1.TypesError.setMatch(listner);
+                    error_1.EvilTypeError.setMatch(listner);
                 }
                 else {
-                    types_error_1.TypesError.calculateMatchRate(listner);
+                    error_1.EvilTypeError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else {
-            return undefined !== listner && types_error_1.TypesError.raiseError(listner, "array", value);
+            return undefined !== listner && error_1.EvilTypeError.raiseError(listner, "array", value);
         }
     }; };
-    TypesPrime.isJsonable = function (value, listner) {
-        return types_error_1.TypesError.withErrorHandling(jsonable_1.Jsonable.isJsonable(value), listner, "jsonable", value);
-    };
-    TypesPrime.makeOrTypeNameFromIsTypeList = function () {
+    EvilTypeValidator.makeOrTypeNameFromIsTypeList = function () {
         var isTypeList = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             isTypeList[_i] = arguments[_i];
         }
-        return isTypeList.map(function (i) { return types_error_1.TypesError.getType(i); })
+        return isTypeList.map(function (i) { return error_1.EvilTypeError.getType(i); })
             .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
             .filter(function (i, ix, list) { return ix === list.indexOf(i); });
     };
-    TypesPrime.getBestMatchErrors = function (listeners) {
+    EvilTypeValidator.getBestMatchErrors = function (listeners) {
         return listeners.map(function (listener) {
             return ({
                 listener: listener,
-                matchRate: types_error_1.TypesError.getMatchRate(listener),
+                matchRate: error_1.EvilTypeError.getMatchRate(listener),
             });
         })
             .sort(function (a, b) {
@@ -84,7 +80,7 @@ var TypesPrime;
             .filter(function (i, _ix, list) { return i.matchRate === list[0].matchRate; })
             .map(function (i) { return i.listener; });
     };
-    TypesPrime.isOr = function () {
+    EvilTypeValidator.isOr = function () {
         var isTypeList = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             isTypeList[_i] = arguments[_i];
@@ -92,7 +88,7 @@ var TypesPrime;
         return function (value, listner) {
             if (listner) {
                 var resultList = isTypeList.map(function (i) {
-                    var transactionListner = types_error_1.TypesError.makeListener(listner.path);
+                    var transactionListner = error_1.EvilTypeError.makeListener(listner.path);
                     var result = {
                         transactionListner: transactionListner,
                         result: i(value, transactionListner),
@@ -102,26 +98,26 @@ var TypesPrime;
                 var success = resultList.filter(function (i) { return i.result; })[0];
                 var result = Boolean(success);
                 if (result) {
-                    types_error_1.TypesError.setMatch(listner);
+                    error_1.EvilTypeError.setMatch(listner);
                     //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                 }
                 else {
-                    var requiredType = TypesPrime.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
-                    if ((TypesPrime.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
-                        var bestMatchErrors = TypesPrime.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; }));
+                    var requiredType = EvilTypeValidator.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
+                    if ((EvilTypeValidator.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
+                        var bestMatchErrors = EvilTypeValidator.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; }));
                         var errors = bestMatchErrors.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
                         var fullErrors = resultList.map(function (i) { return i.transactionListner; }).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                        types_error_1.TypesError.orErros(listner, isTypeList.length, errors, fullErrors);
+                        error_1.EvilTypeError.orErros(listner, isTypeList.length, errors, fullErrors);
                         if (errors.length <= 0) {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
                         }
                         if (0 < bestMatchErrors.length) {
                             Object.entries(bestMatchErrors[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
-                            //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
+                            //EvilTypeError.setMatchRate(listner, EvilTypeError.getMatchRate(bestMatchErrors[0]));
                         }
                     }
                     else {
-                        types_error_1.TypesError.raiseError(listner, requiredType.join(" | "), value);
+                        error_1.EvilTypeError.raiseError(listner, requiredType.join(" | "), value);
                     }
                 }
                 return result;
@@ -131,7 +127,7 @@ var TypesPrime;
             }
         };
     };
-    TypesPrime.isAnd = function () {
+    EvilTypeValidator.isAnd = function () {
         var isTypeList = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             isTypeList[_i] = arguments[_i];
@@ -140,7 +136,7 @@ var TypesPrime;
             // このコードは現状、 isOr をコピーしただけのモックです。
             if (listner) {
                 var resultList = isTypeList.map(function (i) {
-                    var transactionListner = types_error_1.TypesError.makeListener(listner.path);
+                    var transactionListner = error_1.EvilTypeError.makeListener(listner.path);
                     var result = {
                         transactionListner: transactionListner,
                         result: i(value, transactionListner),
@@ -149,26 +145,26 @@ var TypesPrime;
                 });
                 var result = resultList.every(function (i) { return i.result; });
                 if (result) {
-                    types_error_1.TypesError.setMatch(listner);
+                    error_1.EvilTypeError.setMatch(listner);
                     //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                 }
                 else {
-                    var requiredType = TypesPrime.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
-                    if ((TypesPrime.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
+                    var requiredType = EvilTypeValidator.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
+                    if ((EvilTypeValidator.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
                         var transactionListners = resultList.map(function (i) { return i.transactionListner; });
                         var errors = transactionListners.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
                         var fullErrors = resultList.map(function (i) { return i.transactionListner; }).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                        types_error_1.TypesError.andErros(listner, isTypeList.length, errors, fullErrors);
+                        error_1.EvilTypeError.andErros(listner, isTypeList.length, errors, fullErrors);
                         if (errors.length <= 0) {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
                         }
                         if (0 < transactionListners.length) {
                             Object.entries(transactionListners[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
-                            //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
+                            //EvilTypeError.setMatchRate(listner, EvilTypeError.getMatchRate(bestMatchErrors[0]));
                         }
                     }
                     else {
-                        types_error_1.TypesError.raiseError(listner, requiredType.join(" & "), value);
+                        error_1.EvilTypeError.raiseError(listner, requiredType.join(" & "), value);
                     }
                 }
                 return result;
@@ -178,26 +174,26 @@ var TypesPrime;
             }
         };
     };
-    TypesPrime.isOptionalKeyTypeGuard = function (value, listner) {
-        return TypesPrime.isSpecificObject({
-            $type: TypesPrime.isJust("optional-type-guard"),
+    EvilTypeValidator.isOptionalKeyTypeGuard = function (value, listner) {
+        return EvilTypeValidator.isSpecificObject({
+            $type: EvilTypeValidator.isJust("optional-type-guard"),
             isType: function (value, listner) {
-                return "function" === typeof value || (undefined !== listner && types_error_1.TypesError.raiseError(listner, "function", value));
+                return "function" === typeof value || (undefined !== listner && error_1.EvilTypeError.raiseError(listner, "function", value));
             },
         })(value, listner);
     };
-    TypesPrime.makeOptionalKeyTypeGuard = function (isType) {
+    EvilTypeValidator.makeOptionalKeyTypeGuard = function (isType) {
         return ({
             $type: "optional-type-guard",
             isType: isType,
         });
     };
-    TypesPrime.invokeIsType = function (isType) {
-        return "function" === typeof isType ? isType : TypesPrime.isSpecificObject(isType);
+    EvilTypeValidator.invokeIsType = function (isType) {
+        return "function" === typeof isType ? isType : EvilTypeValidator.isSpecificObject(isType);
     };
-    TypesPrime.isOptional = TypesPrime.makeOptionalKeyTypeGuard;
-    TypesPrime.isOptionalMemberType = function (value, member, optionalTypeGuard, listner) {
-        var result = !(member in value) || TypesPrime.invokeIsType(optionalTypeGuard.isType)(value[member], listner);
+    EvilTypeValidator.isOptional = EvilTypeValidator.makeOptionalKeyTypeGuard;
+    EvilTypeValidator.isOptionalMemberType = function (value, member, optionalTypeGuard, listner) {
+        var result = !(member in value) || EvilTypeValidator.invokeIsType(optionalTypeGuard.isType)(value[member], listner);
         if (!result && listner) {
             var error = listner.errors.filter(function (i) { return i.path === listner.path; })[0];
             if (error) {
@@ -209,18 +205,18 @@ var TypesPrime;
                     type: "fragment",
                     path: listner.path,
                     requiredType: "never",
-                    actualValue: types_error_1.TypesError.valueToString(value[member]),
+                    actualValue: error_1.EvilTypeError.valueToString(value[member]),
                 });
             }
         }
         return result;
     };
-    TypesPrime.isMemberType = function (value, member, isType, listner) {
-        return TypesPrime.isOptionalKeyTypeGuard(isType) ?
-            TypesPrime.isOptionalMemberType(value, member, isType, listner) :
-            TypesPrime.invokeIsType(isType)(value[member], listner);
+    EvilTypeValidator.isMemberType = function (value, member, isType, listner) {
+        return EvilTypeValidator.isOptionalKeyTypeGuard(isType) ?
+            EvilTypeValidator.isOptionalMemberType(value, member, isType, listner) :
+            EvilTypeValidator.invokeIsType(isType)(value[member], listner);
     };
-    TypesPrime.mergeObjectValidator = function (target) {
+    EvilTypeValidator.mergeObjectValidator = function (target) {
         var sources = [];
         for (var _i = 1; _i < arguments.length; _i++) {
             sources[_i - 1] = arguments[_i];
@@ -229,39 +225,39 @@ var TypesPrime;
     };
     // export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
     //     Object.assign(...[{ }, target, ...sources]) as ObjectValidator<unknown>;
-    TypesPrime.isSpecificObject = function (memberValidator) { return function (value, listner) {
-        if (TypesPrime.isObject(value)) {
-            var result = Object.entries("function" === typeof memberValidator ? memberValidator() : memberValidator).map(function (kv) { return TypesPrime.isMemberType(value, kv[0], kv[1], types_error_1.TypesError.nextListener(kv[0], listner)); })
+    EvilTypeValidator.isSpecificObject = function (memberValidator) { return function (value, listner) {
+        if (EvilTypeValidator.isObject(value)) {
+            var result = Object.entries("function" === typeof memberValidator ? memberValidator() : memberValidator).map(function (kv) { return EvilTypeValidator.isMemberType(value, kv[0], kv[1], error_1.EvilTypeError.nextListener(kv[0], listner)); })
                 .every(function (i) { return i; });
             if (listner) {
                 if (result) {
-                    types_error_1.TypesError.setMatch(listner);
+                    error_1.EvilTypeError.setMatch(listner);
                 }
                 else {
-                    types_error_1.TypesError.calculateMatchRate(listner);
+                    error_1.EvilTypeError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else {
-            return undefined !== listner && types_error_1.TypesError.raiseError(listner, "object", value);
+            return undefined !== listner && error_1.EvilTypeError.raiseError(listner, "object", value);
         }
     }; };
-    TypesPrime.isDictionaryObject = function (isType) { return function (value, listner) {
-        if (TypesPrime.isObject(value)) {
-            var result = Object.entries(value).map(function (kv) { return isType(kv[1], types_error_1.TypesError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
+    EvilTypeValidator.isDictionaryObject = function (isType) { return function (value, listner) {
+        if (EvilTypeValidator.isObject(value)) {
+            var result = Object.entries(value).map(function (kv) { return isType(kv[1], error_1.EvilTypeError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
             if (listner) {
                 if (result) {
-                    types_error_1.TypesError.setMatch(listner);
+                    error_1.EvilTypeError.setMatch(listner);
                 }
                 else {
-                    types_error_1.TypesError.calculateMatchRate(listner);
+                    error_1.EvilTypeError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else {
-            return undefined !== listner && types_error_1.TypesError.raiseError(listner, "object", value);
+            return undefined !== listner && error_1.EvilTypeError.raiseError(listner, "object", value);
         }
     }; };
     // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。
@@ -285,5 +281,5 @@ var TypesPrime;
     // } as const;
     // export type GenericTypeOptions = BuildInterface<typeof TypeOptionsTypeSource>;
     // export const isGenericTypeOptions = isSpecificObjectX(TypeOptionsTypeSource);
-})(TypesPrime || (exports.TypesPrime = TypesPrime = {}));
-//# sourceMappingURL=types-prime.js.map
+})(EvilTypeValidator || (exports.EvilTypeValidator = EvilTypeValidator = {}));
+//# sourceMappingURL=validator.js.map

@@ -1,0 +1,289 @@
+"use strict";
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TypePrime = void 0;
+var jsonable_1 = require("../generated/jsonable");
+var type_error_1 = require("./type-error");
+var TypePrime;
+(function (TypePrime) {
+    TypePrime.isJust = function (target) { return function (value, listner) {
+        return type_error_1.TypeError.withErrorHandling(target === value, listner, function () { return type_error_1.TypeError.valueToString(target); }, value);
+    }; };
+    TypePrime.isUndefined = TypePrime.isJust(undefined);
+    TypePrime.isNull = TypePrime.isJust(null);
+    TypePrime.isBoolean = function (value, listner) {
+        return type_error_1.TypeError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
+    };
+    TypePrime.isNumber = function (value, listner) {
+        return type_error_1.TypeError.withErrorHandling("number" === typeof value, listner, "number", value);
+    };
+    TypePrime.isString = function (value, listner) {
+        return type_error_1.TypeError.withErrorHandling("string" === typeof value, listner, "string", value);
+    };
+    TypePrime.isObject = function (value) {
+        return null !== value && "object" === typeof value && !Array.isArray(value);
+    };
+    TypePrime.isEnum = function (list) { return function (value, listner) {
+        return type_error_1.TypeError.withErrorHandling(list.includes(value), listner, function () { return list.map(function (i) { return type_error_1.TypeError.valueToString(i); }).join(" | "); }, value);
+    }; };
+    TypePrime.isArray = function (isType) { return function (value, listner) {
+        if (Array.isArray(value)) {
+            var result = value.map(function (i) { return isType(i, listner); }).every(function (i) { return i; });
+            if (listner) {
+                if (result) {
+                    type_error_1.TypeError.setMatch(listner);
+                }
+                else {
+                    type_error_1.TypeError.calculateMatchRate(listner);
+                }
+            }
+            return result;
+        }
+        else {
+            return undefined !== listner && type_error_1.TypeError.raiseError(listner, "array", value);
+        }
+    }; };
+    TypePrime.isJsonable = function (value, listner) {
+        return type_error_1.TypeError.withErrorHandling(jsonable_1.Jsonable.isJsonable(value), listner, "jsonable", value);
+    };
+    TypePrime.makeOrTypeNameFromIsTypeList = function () {
+        var isTypeList = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            isTypeList[_i] = arguments[_i];
+        }
+        return isTypeList.map(function (i) { return type_error_1.TypeError.getType(i); })
+            .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
+            .filter(function (i, ix, list) { return ix === list.indexOf(i); });
+    };
+    TypePrime.getBestMatchErrors = function (listeners) {
+        return listeners.map(function (listener) {
+            return ({
+                listener: listener,
+                matchRate: type_error_1.TypeError.getMatchRate(listener),
+            });
+        })
+            .sort(function (a, b) {
+            if (a.matchRate < b.matchRate) {
+                return 1;
+            }
+            else if (b.matchRate < a.matchRate) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        })
+            .filter(function (i, _ix, list) { return i.matchRate === list[0].matchRate; })
+            .map(function (i) { return i.listener; });
+    };
+    TypePrime.isOr = function () {
+        var isTypeList = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            isTypeList[_i] = arguments[_i];
+        }
+        return function (value, listner) {
+            if (listner) {
+                var resultList = isTypeList.map(function (i) {
+                    var transactionListner = type_error_1.TypeError.makeListener(listner.path);
+                    var result = {
+                        transactionListner: transactionListner,
+                        result: i(value, transactionListner),
+                    };
+                    return result;
+                });
+                var success = resultList.filter(function (i) { return i.result; })[0];
+                var result = Boolean(success);
+                if (result) {
+                    type_error_1.TypeError.setMatch(listner);
+                    //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
+                }
+                else {
+                    var requiredType = TypePrime.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
+                    if ((TypePrime.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
+                        var bestMatchErrors = TypePrime.getBestMatchErrors(resultList.map(function (i) { return i.transactionListner; }));
+                        var errors = bestMatchErrors.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                        var fullErrors = resultList.map(function (i) { return i.transactionListner; }).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                        type_error_1.TypeError.orErros(listner, isTypeList.length, errors, fullErrors);
+                        if (errors.length <= 0) {
+                            console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
+                        }
+                        if (0 < bestMatchErrors.length) {
+                            Object.entries(bestMatchErrors[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
+                            //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
+                        }
+                    }
+                    else {
+                        type_error_1.TypeError.raiseError(listner, requiredType.join(" | "), value);
+                    }
+                }
+                return result;
+            }
+            else {
+                return isTypeList.some(function (i) { return i(value); });
+            }
+        };
+    };
+    TypePrime.isAnd = function () {
+        var isTypeList = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            isTypeList[_i] = arguments[_i];
+        }
+        return function (value, listner) {
+            // このコードは現状、 isOr をコピーしただけのモックです。
+            if (listner) {
+                var resultList = isTypeList.map(function (i) {
+                    var transactionListner = type_error_1.TypeError.makeListener(listner.path);
+                    var result = {
+                        transactionListner: transactionListner,
+                        result: i(value, transactionListner),
+                    };
+                    return result;
+                });
+                var result = resultList.every(function (i) { return i.result; });
+                if (result) {
+                    type_error_1.TypeError.setMatch(listner);
+                    //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
+                }
+                else {
+                    var requiredType = TypePrime.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
+                    if ((TypePrime.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
+                        var transactionListners = resultList.map(function (i) { return i.transactionListner; });
+                        var errors = transactionListners.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                        var fullErrors = resultList.map(function (i) { return i.transactionListner; }).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                        type_error_1.TypeError.andErros(listner, isTypeList.length, errors, fullErrors);
+                        if (errors.length <= 0) {
+                            console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
+                        }
+                        if (0 < transactionListners.length) {
+                            Object.entries(transactionListners[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
+                            //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
+                        }
+                    }
+                    else {
+                        type_error_1.TypeError.raiseError(listner, requiredType.join(" & "), value);
+                    }
+                }
+                return result;
+            }
+            else {
+                return isTypeList.some(function (i) { return i(value); });
+            }
+        };
+    };
+    TypePrime.isOptionalKeyTypeGuard = function (value, listner) {
+        return TypePrime.isSpecificObject({
+            $type: TypePrime.isJust("optional-type-guard"),
+            isType: function (value, listner) {
+                return "function" === typeof value || (undefined !== listner && type_error_1.TypeError.raiseError(listner, "function", value));
+            },
+        })(value, listner);
+    };
+    TypePrime.makeOptionalKeyTypeGuard = function (isType) {
+        return ({
+            $type: "optional-type-guard",
+            isType: isType,
+        });
+    };
+    TypePrime.invokeIsType = function (isType) {
+        return "function" === typeof isType ? isType : TypePrime.isSpecificObject(isType);
+    };
+    TypePrime.isOptional = TypePrime.makeOptionalKeyTypeGuard;
+    TypePrime.isOptionalMemberType = function (value, member, optionalTypeGuard, listner) {
+        var result = !(member in value) || TypePrime.invokeIsType(optionalTypeGuard.isType)(value[member], listner);
+        if (!result && listner) {
+            var error = listner.errors.filter(function (i) { return i.path === listner.path; })[0];
+            if (error) {
+                error.requiredType = "never | " + error.requiredType;
+            }
+            else {
+                listner.errors.filter(function (i) { return 0 === i.path.indexOf(listner.path) && "fragment" !== i.type; }).forEach(function (i) { return i.type = "fragment"; });
+                listner.errors.push({
+                    type: "fragment",
+                    path: listner.path,
+                    requiredType: "never",
+                    actualValue: type_error_1.TypeError.valueToString(value[member]),
+                });
+            }
+        }
+        return result;
+    };
+    TypePrime.isMemberType = function (value, member, isType, listner) {
+        return TypePrime.isOptionalKeyTypeGuard(isType) ?
+            TypePrime.isOptionalMemberType(value, member, isType, listner) :
+            TypePrime.invokeIsType(isType)(value[member], listner);
+    };
+    TypePrime.mergeObjectValidator = function (target) {
+        var sources = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            sources[_i - 1] = arguments[_i];
+        }
+        return Object.assign.apply(Object, __spreadArray([{}, target], sources, true));
+    };
+    // export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
+    //     Object.assign(...[{ }, target, ...sources]) as ObjectValidator<unknown>;
+    TypePrime.isSpecificObject = function (memberValidator) { return function (value, listner) {
+        if (TypePrime.isObject(value)) {
+            var result = Object.entries("function" === typeof memberValidator ? memberValidator() : memberValidator).map(function (kv) { return TypePrime.isMemberType(value, kv[0], kv[1], type_error_1.TypeError.nextListener(kv[0], listner)); })
+                .every(function (i) { return i; });
+            if (listner) {
+                if (result) {
+                    type_error_1.TypeError.setMatch(listner);
+                }
+                else {
+                    type_error_1.TypeError.calculateMatchRate(listner);
+                }
+            }
+            return result;
+        }
+        else {
+            return undefined !== listner && type_error_1.TypeError.raiseError(listner, "object", value);
+        }
+    }; };
+    TypePrime.isDictionaryObject = function (isType) { return function (value, listner) {
+        if (TypePrime.isObject(value)) {
+            var result = Object.entries(value).map(function (kv) { return isType(kv[1], type_error_1.TypeError.nextListener(kv[0], listner)); }).every(function (i) { return i; });
+            if (listner) {
+                if (result) {
+                    type_error_1.TypeError.setMatch(listner);
+                }
+                else {
+                    type_error_1.TypeError.calculateMatchRate(listner);
+                }
+            }
+            return result;
+        }
+        else {
+            return undefined !== listner && type_error_1.TypeError.raiseError(listner, "object", value);
+        }
+    }; };
+    // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。
+    // VS Coce + TypeScript の挙動がいまよりマシになったらこれベースのコードの採用を再検討
+    // https://x.com/wraith13/status/1804464507755884969
+    // export type GuardType<T> = T extends (value: unknown) => value is infer U ? U : never;
+    // export type BuildInterface<T extends { [key: string]: (value: unknown) => value is any}> = { -readonly [key in keyof T]: GuardType<T[key]>; };
+    // export const isSpecificObjectX = <T extends { [key: string]: (value: unknown) => value is any}>(memberSpecification: { [key: string]: ((v: unknown) => boolean) }) => (value: unknown): value is BuildInterface<T> =>
+    //     isObject(value) &&
+    //     Object.entries(memberSpecification).every
+    //     (
+    //         kv => kv[0].endsWith("?") ?
+    //                 isMemberTypeOrUndefined<BuildInterface<T>>(value, kv[0].slice(0, -1) as keyof BuildInterface<T>, kv[1]):
+    //                 isMemberType<BuildInterface<T>>(value, kv[0] as keyof BuildInterface<T>, kv[1])
+    //     );
+    // export const TypeOptionsTypeSource =
+    // {
+    //     indentUnit: isOr(isNumber, isJust("\t" as const)),
+    //     indentStyle: isIndentStyleType,
+    //     validatorOption: isValidatorOptionType,
+    // } as const;
+    // export type GenericTypeOptions = BuildInterface<typeof TypeOptionsTypeSource>;
+    // export const isGenericTypeOptions = isSpecificObjectX(TypeOptionsTypeSource);
+})(TypePrime || (exports.TypePrime = TypePrime = {}));
+//# sourceMappingURL=type-prime.js.map

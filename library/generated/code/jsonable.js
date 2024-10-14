@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Jsonable = void 0;
 // This file is generated.
-var validator_1 = require("../source/validator");
+var validator_1 = require("../../source/validator");
 var Jsonable;
 (function (Jsonable) {
     Jsonable.parse = function (json) { return JSON.parse(json); };

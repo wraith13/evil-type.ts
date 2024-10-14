@@ -1,4 +1,4 @@
-export namespace TypesError
+export namespace EvilTypeError
 {
     export interface Error
     {
@@ -39,7 +39,7 @@ export namespace TypesError
         const valuePath = path.replace(/[^#]*#/, "#").replace(/\[(\d+)\]/g, ".$1");
         return valuePath.split(/[#\.]/).filter(i => 0 < i.length).length;
     };
-    export const getType = (isType: ((v: unknown, listner?: TypesError.Listener) => boolean)) =>
+    export const getType = (isType: ((v: unknown, listner?: EvilTypeError.Listener) => boolean)) =>
     {
         const transactionListner = makeListener();
         isType(undefined, transactionListner);

@@ -1,23 +1,22 @@
-import { Jsonable } from "../generated/jsonable";
-import { TypesError } from "./types-error";
-export namespace TypesPrime
+import { EvilTypeError } from "./error";
+export namespace EvilTypeValidator
 {
-    export const isJust = <T>(target: T) => (value: unknown, listner?: TypesError.Listener): value is T =>
-        TypesError.withErrorHandling(target === value, listner, () => TypesError.valueToString(target), value);
+    export const isJust = <T>(target: T) => (value: unknown, listner?: EvilTypeError.Listener): value is T =>
+        EvilTypeError.withErrorHandling(target === value, listner, () => EvilTypeError.valueToString(target), value);
     export const isUndefined = isJust(undefined);
     export const isNull = isJust(null);
-    export const isBoolean = (value: unknown, listner?: TypesError.Listener): value is boolean =>
-        TypesError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
-    export const isNumber = (value: unknown, listner?: TypesError.Listener): value is number =>
-        TypesError.withErrorHandling("number" === typeof value, listner, "number", value);
-    export const isString = (value: unknown, listner?: TypesError.Listener): value is string =>
-        TypesError.withErrorHandling("string" === typeof value, listner, "string", value);
+    export const isBoolean = (value: unknown, listner?: EvilTypeError.Listener): value is boolean =>
+        EvilTypeError.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
+    export const isNumber = (value: unknown, listner?: EvilTypeError.Listener): value is number =>
+        EvilTypeError.withErrorHandling("number" === typeof value, listner, "number", value);
+    export const isString = (value: unknown, listner?: EvilTypeError.Listener): value is string =>
+        EvilTypeError.withErrorHandling("string" === typeof value, listner, "string", value);
     export type ActualObject = Exclude<object, null>;
     export const isObject = (value: unknown): value is ActualObject =>
         null !== value && "object" === typeof value && ! Array.isArray(value);
-    export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: TypesError.Listener): value is T =>
-        TypesError.withErrorHandling(list.includes(value as T), listner, () => list.map(i => TypesError.valueToString(i)).join(" | "), value);
-    export const isArray = <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T) => (value: unknown, listner?: TypesError.Listener): value is T[] =>
+    export const isEnum = <T>(list: readonly T[]) => (value: unknown, listner?: EvilTypeError.Listener): value is T =>
+        EvilTypeError.withErrorHandling(list.includes(value as T), listner, () => list.map(i => EvilTypeError.valueToString(i)).join(" | "), value);
+    export const isArray = <T>(isType: (value: unknown, listner?: EvilTypeError.Listener) => value is T) => (value: unknown, listner?: EvilTypeError.Listener): value is T[] =>
     {
         if (Array.isArray(value))
         {
@@ -26,33 +25,31 @@ export namespace TypesPrime
             {
                 if (result)
                 {
-                    TypesError.setMatch(listner);
+                    EvilTypeError.setMatch(listner);
                 }
                 else
                 {
-                    TypesError.calculateMatchRate(listner);
+                    EvilTypeError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else
         {
-            return undefined !== listner && TypesError.raiseError(listner, "array", value);
+            return undefined !== listner && EvilTypeError.raiseError(listner, "array", value);
         }
     };
-    export const isJsonable = (value: unknown, listner?: TypesError.Listener): value is Jsonable.Jsonable =>
-        TypesError.withErrorHandling(Jsonable.isJsonable(value), listner, "jsonable", value);
-    export const makeOrTypeNameFromIsTypeList = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]) }) =>
-        isTypeList.map(i => TypesError.getType(i))
+    export const makeOrTypeNameFromIsTypeList = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: EvilTypeError.Listener) => value is T[K]) }) =>
+        isTypeList.map(i => EvilTypeError.getType(i))
             .reduce((a, b) => [...a, ...b], [])
             .filter((i, ix, list) => ix === list.indexOf(i));
-    export const getBestMatchErrors = (listeners: TypesError.Listener[]) =>
+    export const getBestMatchErrors = (listeners: EvilTypeError.Listener[]) =>
         listeners.map
         (
             listener =>
             ({
                 listener,
-                matchRate: TypesError.getMatchRate(listener),
+                matchRate: EvilTypeError.getMatchRate(listener),
             })
         )
         .sort
@@ -76,8 +73,8 @@ export namespace TypesPrime
         )
         .filter((i, _ix, list) => i.matchRate === list[0].matchRate)
         .map(i => i.listener);
-    export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]) }) =>
-        (value: unknown, listner?: TypesError.Listener): value is T[number] =>
+    export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: EvilTypeError.Listener) => value is T[K]) }) =>
+        (value: unknown, listner?: EvilTypeError.Listener): value is T[number] =>
         {
             if (listner)
             {
@@ -85,7 +82,7 @@ export namespace TypesPrime
                 (
                     i =>
                     {
-                        const transactionListner = TypesError.makeListener(listner.path);
+                        const transactionListner = EvilTypeError.makeListener(listner.path);
                         const result =
                         {
                             transactionListner,
@@ -98,7 +95,7 @@ export namespace TypesPrime
                 const result = Boolean(success);
                 if (result)
                 {
-                    TypesError.setMatch(listner);
+                    EvilTypeError.setMatch(listner);
                     //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                 }
                 else
@@ -109,7 +106,7 @@ export namespace TypesPrime
                         const bestMatchErrors = getBestMatchErrors(resultList.map(i => i.transactionListner));
                         const errors = bestMatchErrors.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
                         const fullErrors = resultList.map(i => i.transactionListner).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                        TypesError.orErros(listner, isTypeList.length, errors, fullErrors);
+                        EvilTypeError.orErros(listner, isTypeList.length, errors, fullErrors);
                         if (errors.length <= 0)
                         {
                             console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
@@ -117,12 +114,12 @@ export namespace TypesPrime
                         if (0 < bestMatchErrors.length)
                         {
                             Object.entries(bestMatchErrors[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
-                            //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
+                            //EvilTypeError.setMatchRate(listner, EvilTypeError.getMatchRate(bestMatchErrors[0]));
                         }
                     }
                     else
                     {
-                        TypesError.raiseError
+                        EvilTypeError.raiseError
                         (
                             listner,
                             requiredType.join(" | "),
@@ -138,8 +135,8 @@ export namespace TypesPrime
             }
         };
         export type OrTypeToAndType<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
-        export const isAnd = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: TypesError.Listener) => value is T[K]) }) =>
-            (value: unknown, listner?: TypesError.Listener): value is OrTypeToAndType<T[number]> =>
+        export const isAnd = <T extends any[]>(...isTypeList: { [K in keyof T]: ((value: unknown, listner?: EvilTypeError.Listener) => value is T[K]) }) =>
+            (value: unknown, listner?: EvilTypeError.Listener): value is OrTypeToAndType<T[number]> =>
             {
                 // このコードは現状、 isOr をコピーしただけのモックです。
                 if (listner)
@@ -148,7 +145,7 @@ export namespace TypesPrime
                     (
                         i =>
                         {
-                            const transactionListner = TypesError.makeListener(listner.path);
+                            const transactionListner = EvilTypeError.makeListener(listner.path);
                             const result =
                             {
                                 transactionListner,
@@ -160,7 +157,7 @@ export namespace TypesPrime
                     const result = resultList.every(i => i.result);
                     if (result)
                     {
-                        TypesError.setMatch(listner);
+                        EvilTypeError.setMatch(listner);
                         //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                     }
                     else
@@ -171,7 +168,7 @@ export namespace TypesPrime
                             const transactionListners = resultList.map(i => i.transactionListner);
                             const errors = transactionListners.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
                             const fullErrors = resultList.map(i => i.transactionListner).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                            TypesError.andErros(listner, isTypeList.length, errors, fullErrors);
+                            EvilTypeError.andErros(listner, isTypeList.length, errors, fullErrors);
                             if (errors.length <= 0)
                             {
                                 console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
@@ -179,12 +176,12 @@ export namespace TypesPrime
                             if (0 < transactionListners.length)
                             {
                                 Object.entries(transactionListners[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
-                                //TypeError.setMatchRate(listner, TypeError.getMatchRate(bestMatchErrors[0]));
+                                //EvilTypeError.setMatchRate(listner, EvilTypeError.getMatchRate(bestMatchErrors[0]));
                             }
                         }
                         else
                         {
-                            TypesError.raiseError
+                            EvilTypeError.raiseError
                             (
                                 listner,
                                 requiredType.join(" & "),
@@ -202,24 +199,24 @@ export namespace TypesPrime
     export interface OptionalKeyTypeGuard<T>
     {
         $type: "optional-type-guard";
-        isType: ((value: unknown, listner?: TypesError.Listener) => value is T) | ObjectValidator<T>;
+        isType: ((value: unknown, listner?: EvilTypeError.Listener) => value is T) | ObjectValidator<T>;
     }
-    export const isOptionalKeyTypeGuard = (value: unknown, listner?: TypesError.Listener): value is OptionalKeyTypeGuard<unknown> =>
+    export const isOptionalKeyTypeGuard = (value: unknown, listner?: EvilTypeError.Listener): value is OptionalKeyTypeGuard<unknown> =>
         isSpecificObject<OptionalKeyTypeGuard<unknown>>
         ({
             $type: isJust("optional-type-guard"),
-            isType: (value: unknown, listner?: TypesError.Listener): value is ((v: unknown, listner?: TypesError.Listener) => v is unknown) =>
-                "function" === typeof value || (undefined !== listner && TypesError.raiseError(listner, "function", value)),
+            isType: (value: unknown, listner?: EvilTypeError.Listener): value is ((v: unknown, listner?: EvilTypeError.Listener) => v is unknown) =>
+                "function" === typeof value || (undefined !== listner && EvilTypeError.raiseError(listner, "function", value)),
         })(value, listner);
-    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown, listner?: TypesError.Listener) => value is T): OptionalKeyTypeGuard<T> =>
+    export const makeOptionalKeyTypeGuard = <T>(isType: (value: unknown, listner?: EvilTypeError.Listener) => value is T): OptionalKeyTypeGuard<T> =>
     ({
         $type: "optional-type-guard",
         isType,
     });
-    export const invokeIsType = <T>(isType: ((value: unknown, listner?: TypesError.Listener) => value is T) | ObjectValidator<T>) =>
+    export const invokeIsType = <T>(isType: ((value: unknown, listner?: EvilTypeError.Listener) => value is T) | ObjectValidator<T>) =>
         "function" === typeof isType ? isType: isSpecificObject(isType);
     export const isOptional = makeOptionalKeyTypeGuard;
-    export const isOptionalMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener): boolean =>
+    export const isOptionalMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: EvilTypeError.Listener): boolean =>
     {
         const result = ! (member in value) || invokeIsType(optionalTypeGuard.isType)((value as ObjectType)[member], listner);
         if ( ! result && listner)
@@ -237,13 +234,13 @@ export namespace TypesPrime
                     type: "fragment",
                     path: listner.path,
                     requiredType: "never",
-                    actualValue: TypesError.valueToString((value as ObjectType)[member]),
+                    actualValue: EvilTypeError.valueToString((value as ObjectType)[member]),
                 });
             }
         }
         return result;
     };
-    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: TypesError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: TypesError.Listener): boolean =>
+    export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: ((v: unknown, listner?: EvilTypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>, listner?: EvilTypeError.Listener): boolean =>
         isOptionalKeyTypeGuard(isType) ?
             isOptionalMemberType(value, member, isType, listner):
             invokeIsType(isType)((value as ObjectType)[member], listner);
@@ -266,7 +263,7 @@ export namespace TypesPrime
         Object.assign(...[{ }, target, ...sources]) as MergeMultipleType<ObjectValidator<A>, B>;
     // export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
     //     Object.assign(...[{ }, target, ...sources]) as ObjectValidator<unknown>;
-    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: TypesError.Listener): value is ObjectType =>
+    export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>)) => (value: unknown, listner?: EvilTypeError.Listener): value is ObjectType =>
     {
         if (isObject(value))
         {
@@ -276,8 +273,8 @@ export namespace TypesPrime
                 (
                     value,
                     kv[0] as keyof ObjectType,
-                    kv[1] as ((v: unknown, listner?: TypesError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>,
-                    TypesError.nextListener(kv[0], listner)
+                    kv[1] as ((v: unknown, listner?: EvilTypeError.Listener) => boolean) | OptionalKeyTypeGuard<unknown>,
+                    EvilTypeError.nextListener(kv[0], listner)
                 )
             )
             .every(i => i);
@@ -285,41 +282,41 @@ export namespace TypesPrime
             {
                 if (result)
                 {
-                    TypesError.setMatch(listner);
+                    EvilTypeError.setMatch(listner);
                 }
                 else
                 {
-                    TypesError.calculateMatchRate(listner);
+                    EvilTypeError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else
         {
-            return undefined !== listner && TypesError.raiseError(listner, "object", value);
+            return undefined !== listner && EvilTypeError.raiseError(listner, "object", value);
         }
     };
-    export const isDictionaryObject = <MemberType>(isType: ((m: unknown, listner?: TypesError.Listener) => m is MemberType)) => (value: unknown, listner?: TypesError.Listener): value is { [key: string]: MemberType } =>
+    export const isDictionaryObject = <MemberType>(isType: ((m: unknown, listner?: EvilTypeError.Listener) => m is MemberType)) => (value: unknown, listner?: EvilTypeError.Listener): value is { [key: string]: MemberType } =>
     {
         if (isObject(value))
         {
-            const result = Object.entries(value).map(kv => isType(kv[1], TypesError.nextListener(kv[0], listner))).every(i => i);
+            const result = Object.entries(value).map(kv => isType(kv[1], EvilTypeError.nextListener(kv[0], listner))).every(i => i);
             if (listner)
             {
                 if (result)
                 {
-                    TypesError.setMatch(listner);
+                    EvilTypeError.setMatch(listner);
                 }
                 else
                 {
-                    TypesError.calculateMatchRate(listner);
+                    EvilTypeError.calculateMatchRate(listner);
                 }
             }
             return result;
         }
         else
         {
-            return undefined !== listner && TypesError.raiseError(listner, "object", value);
+            return undefined !== listner && EvilTypeError.raiseError(listner, "object", value);
         }
     }
     // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。

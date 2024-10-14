@@ -1,4 +1,4 @@
-import { EvilTypeError } from "../source/error";
+import { EvilTypeError } from "../../source/error";
 export declare namespace Jsonable {
     type JsonableValue = null | boolean | number | string;
     type JsonableArray = Jsonable[];

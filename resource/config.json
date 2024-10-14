@@ -1,4 +1,5 @@
 {
+    "repository": "https://github.com/wraith13/evil-type.ts",
     "maxLineLength": 140,
     "lineUnbreakableTokens": {
         "heads": [

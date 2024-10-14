@@ -1,12 +1,12 @@
 {
-    "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/types-schema.json#",
+    "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#",
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/Types.TypeSchema",
+    "$ref": "#/definitions/Type.TypeSchema",
     "definitions": {
-        "Types.schema": {
-            "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/types-schema.json#"
+        "Type.schema": {
+            "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#"
         },
-        "Types.CommentProperty": {
+        "Type.CommentProperty": {
             "type": "object",
             "properties": {
                 "comment": {
@@ -18,38 +18,38 @@
             },
             "required": []
         },
-        "Types.TypeSchema": {
+        "Type.TypeSchema": {
             "type": "object",
             "properties": {
-                "$ref": {
-                    "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/resource/types-schema.json#"
+                "$schema": {
+                    "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#"
                 },
                 "imports": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Types.ImportDefinition"
+                        "$ref": "#/definitions/Type.ImportDefinition"
                     }
                 },
                 "defines": {
-                    "$ref": "#/definitions/Types.DefinitionMap"
+                    "$ref": "#/definitions/Type.DefinitionMap"
                 },
                 "options": {
-                    "$ref": "#/definitions/Types.OutputOptions"
+                    "$ref": "#/definitions/Type.OutputOptions"
                 }
             },
             "required": [
-                "$ref",
+                "$schema",
                 "defines",
                 "options"
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.CommentProperty"
+                    "$ref": "#/definitions/Type.CommentProperty"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.OutputOptions": {
+        "Type.OutputOptions": {
             "type": "object",
             "properties": {
                 "outputFile": {
@@ -66,10 +66,10 @@
                     ]
                 },
                 "indentStyle": {
-                    "$ref": "#/definitions/Types.IndentStyleType"
+                    "$ref": "#/definitions/Type.IndentStyleType"
                 },
                 "validatorOption": {
-                    "$ref": "#/definitions/Types.ValidatorOptionType"
+                    "$ref": "#/definitions/Type.ValidatorOptionType"
                 },
                 "maxLineLength": {
                     "oneOf": [
@@ -82,17 +82,18 @@
                     ]
                 },
                 "schema": {
-                    "$ref": "#/definitions/Types.SchemaOptions"
+                    "$ref": "#/definitions/Type.SchemaOptions"
                 }
             },
             "required": [
+                "outputFile",
                 "indentUnit",
                 "indentStyle",
                 "validatorOption"
             ],
             "additionalProperties": true
         },
-        "Types.SchemaOptions": {
+        "Type.SchemaOptions": {
             "type": "object",
             "properties": {
                 "outputFile": {
@@ -117,26 +118,26 @@
             ],
             "additionalProperties": true
         },
-        "Types.indentStyleTypeMember": {
+        "Type.indentStyleTypeMember": {
             "const": [
                 "allman",
                 "egyptian"
             ]
         },
-        "Types.IndentStyleType": {
+        "Type.IndentStyleType": {
             "enum": [
                 "allman",
                 "egyptian"
             ]
         },
-        "Types.ValidatorOptionType": {
+        "Type.ValidatorOptionType": {
             "enum": [
                 "none",
                 "simple",
                 "full"
             ]
         },
-        "Types.AlphaElement": {
+        "Type.AlphaElement": {
             "type": "object",
             "properties": {
                 "$type": {
@@ -147,7 +148,7 @@
                 "$type"
             ]
         },
-        "Types.AlphaDefinition": {
+        "Type.AlphaDefinition": {
             "type": "object",
             "properties": {
                 "export": {
@@ -157,14 +158,14 @@
             "required": [],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaElement"
+                    "$ref": "#/definitions/Type.AlphaElement"
                 },
                 {
-                    "$ref": "#/definitions/Types.CommentProperty"
+                    "$ref": "#/definitions/Type.CommentProperty"
                 }
             ]
         },
-        "Types.ImportDefinition": {
+        "Type.ImportDefinition": {
             "type": "object",
             "properties": {
                 "$type": {
@@ -184,35 +185,35 @@
             ],
             "additionalProperties": true
         },
-        "Types.Definition": {
+        "Type.Definition": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/Types.CodeDefinition"
+                    "$ref": "#/definitions/Type.CodeDefinition"
                 },
                 {
-                    "$ref": "#/definitions/Types.NamespaceDefinition"
+                    "$ref": "#/definitions/Type.NamespaceDefinition"
                 },
                 {
-                    "$ref": "#/definitions/Types.ValueDefinition"
+                    "$ref": "#/definitions/Type.ValueDefinition"
                 },
                 {
-                    "$ref": "#/definitions/Types.TypeDefinition"
+                    "$ref": "#/definitions/Type.TypeDefinition"
                 },
                 {
-                    "$ref": "#/definitions/Types.InterfaceDefinition"
+                    "$ref": "#/definitions/Type.InterfaceDefinition"
                 },
                 {
-                    "$ref": "#/definitions/Types.DictionaryDefinition"
+                    "$ref": "#/definitions/Type.DictionaryDefinition"
                 }
             ]
         },
-        "Types.DefinitionMap": {
+        "Type.DefinitionMap": {
             "type": "object",
             "additionalProperties": {
-                "$ref": "#/definitions/Types.Definition"
+                "$ref": "#/definitions/Type.Definition"
             }
         },
-        "Types.CodeDefinition": {
+        "Type.CodeDefinition": {
             "type": "object",
             "properties": {
                 "$type": {
@@ -231,19 +232,19 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaDefinition"
+                    "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.NamespaceDefinition": {
+        "Type.NamespaceDefinition": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "namespace"
                 },
                 "members": {
-                    "$ref": "#/definitions/Types.DefinitionMap"
+                    "$ref": "#/definitions/Type.DefinitionMap"
                 }
             },
             "required": [
@@ -252,12 +253,12 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaDefinition"
+                    "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.ValueDefinition": {
+        "Type.ValueDefinition": {
             "type": "object",
             "properties": {
                 "$type": {
@@ -266,10 +267,10 @@
                 "value": {
                     "oneOf": [
                         {
-                            "$ref": "#/definitions/Types.LiteralElement"
+                            "$ref": "#/definitions/Type.LiteralElement"
                         },
                         {
-                            "$ref": "#/definitions/Types.ReferElement"
+                            "$ref": "#/definitions/Type.ReferElement"
                         }
                     ]
                 },
@@ -283,19 +284,19 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaDefinition"
+                    "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.TypeDefinition": {
+        "Type.TypeDefinition": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "type"
                 },
                 "define": {
-                    "$ref": "#/definitions/Types.TypeOrRefer"
+                    "$ref": "#/definitions/Type.TypeOrRefer"
                 }
             },
             "required": [
@@ -304,12 +305,12 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaDefinition"
+                    "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.InterfaceDefinition": {
+        "Type.InterfaceDefinition": {
             "type": "object",
             "properties": {
                 "$type": {
@@ -318,13 +319,13 @@
                 "extends": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Types.ReferElement"
+                        "$ref": "#/definitions/Type.ReferElement"
                     }
                 },
                 "members": {
                     "type": "object",
                     "additionalProperties": {
-                        "$ref": "#/definitions/Types.TypeOrRefer"
+                        "$ref": "#/definitions/Type.TypeOrRefer"
                     }
                 },
                 "additionalProperties": {
@@ -337,19 +338,19 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaDefinition"
+                    "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.DictionaryDefinition": {
+        "Type.DictionaryDefinition": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "dictionary"
                 },
                 "valueType": {
-                    "$ref": "#/definitions/Types.TypeOrRefer"
+                    "$ref": "#/definitions/Type.TypeOrRefer"
                 }
             },
             "required": [
@@ -358,19 +359,19 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaDefinition"
+                    "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.ArrayElement": {
+        "Type.ArrayElement": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "array"
                 },
                 "items": {
-                    "$ref": "#/definitions/Types.TypeOrRefer"
+                    "$ref": "#/definitions/Type.TypeOrRefer"
                 }
             },
             "required": [
@@ -379,11 +380,11 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaElement"
+                    "$ref": "#/definitions/Type.AlphaElement"
                 }
             ]
         },
-        "Types.OrElement": {
+        "Type.OrElement": {
             "type": "object",
             "properties": {
                 "$type": {
@@ -392,7 +393,7 @@
                 "types": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Types.TypeOrRefer"
+                        "$ref": "#/definitions/Type.TypeOrRefer"
                     }
                 }
             },
@@ -402,11 +403,11 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaElement"
+                    "$ref": "#/definitions/Type.AlphaElement"
                 }
             ]
         },
-        "Types.AndElement": {
+        "Type.AndElement": {
             "type": "object",
             "properties": {
                 "$type": {
@@ -415,7 +416,7 @@
                 "types": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Types.TypeOrRefer"
+                        "$ref": "#/definitions/Type.TypeOrRefer"
                     }
                 }
             },
@@ -425,18 +426,18 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaElement"
+                    "$ref": "#/definitions/Type.AlphaElement"
                 }
             ]
         },
-        "Types.LiteralElement": {
+        "Type.LiteralElement": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "literal"
                 },
                 "literal": {
-                    "$ref": "jsonable-schema.json#/definitions/Jsonable.Jsonable"
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable"
                 }
             },
             "required": [
@@ -445,12 +446,12 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaElement"
+                    "$ref": "#/definitions/Type.AlphaElement"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.ReferElement": {
+        "Type.ReferElement": {
             "type": "object",
             "properties": {
                 "$ref": {
@@ -462,7 +463,7 @@
             ],
             "additionalProperties": true
         },
-        "Types.PrimitiveTypeEnumMembers": {
+        "Type.PrimitiveTypeEnumMembers": {
             "const": [
                 "null",
                 "boolean",
@@ -470,7 +471,7 @@
                 "string"
             ]
         },
-        "Types.PrimitiveTypeEnum": {
+        "Type.PrimitiveTypeEnum": {
             "enum": [
                 "null",
                 "boolean",
@@ -478,14 +479,14 @@
                 "string"
             ]
         },
-        "Types.PrimitiveTypeElement": {
+        "Type.PrimitiveTypeElement": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "primitive-type"
                 },
                 "type": {
-                    "$ref": "#/definitions/Types.PrimitiveTypeEnum"
+                    "$ref": "#/definitions/Type.PrimitiveTypeEnum"
                 }
             },
             "required": [
@@ -494,49 +495,49 @@
             ],
             "allOf": [
                 {
-                    "$ref": "#/definitions/Types.AlphaElement"
+                    "$ref": "#/definitions/Type.AlphaElement"
                 }
             ],
             "additionalProperties": true
         },
-        "Types.Type": {
+        "Type.Type": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/Types.PrimitiveTypeElement"
+                    "$ref": "#/definitions/Type.PrimitiveTypeElement"
                 },
                 {
-                    "$ref": "#/definitions/Types.TypeDefinition"
+                    "$ref": "#/definitions/Type.TypeDefinition"
                 },
                 {
-                    "$ref": "#/definitions/Types.EnumTypeElement"
+                    "$ref": "#/definitions/Type.EnumTypeElement"
                 },
                 {
-                    "$ref": "#/definitions/Types.TypeofElement"
+                    "$ref": "#/definitions/Type.TypeofElement"
                 },
                 {
-                    "$ref": "#/definitions/Types.ItemofElement"
+                    "$ref": "#/definitions/Type.ItemofElement"
                 },
                 {
-                    "$ref": "#/definitions/Types.InterfaceDefinition"
+                    "$ref": "#/definitions/Type.InterfaceDefinition"
                 },
                 {
-                    "$ref": "#/definitions/Types.DictionaryDefinition"
+                    "$ref": "#/definitions/Type.DictionaryDefinition"
                 },
                 {
-                    "$ref": "#/definitions/Types.ArrayElement"
+                    "$ref": "#/definitions/Type.ArrayElement"
                 },
                 {
-                    "$ref": "#/definitions/Types.OrElement"
+                    "$ref": "#/definitions/Type.OrElement"
                 },
                 {
-                    "$ref": "#/definitions/Types.AndElement"
+                    "$ref": "#/definitions/Type.AndElement"
                 },
                 {
-                    "$ref": "#/definitions/Types.LiteralElement"
+                    "$ref": "#/definitions/Type.LiteralElement"
                 }
             ]
         },
-        "Types.EnumTypeElement": {
+        "Type.EnumTypeElement": {
             "type": "object",
             "properties": {
                 "$type": {
@@ -568,14 +569,14 @@
             ],
             "additionalProperties": true
         },
-        "Types.TypeofElement": {
+        "Type.TypeofElement": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "typeof"
                 },
                 "value": {
-                    "$ref": "#/definitions/Types.ReferElement"
+                    "$ref": "#/definitions/Type.ReferElement"
                 }
             },
             "required": [
@@ -584,14 +585,14 @@
             ],
             "additionalProperties": true
         },
-        "Types.ItemofElement": {
+        "Type.ItemofElement": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "itemof"
                 },
                 "value": {
-                    "$ref": "#/definitions/Types.ReferElement"
+                    "$ref": "#/definitions/Type.ReferElement"
                 }
             },
             "required": [
@@ -600,33 +601,33 @@
             ],
             "additionalProperties": true
         },
-        "Types.TypeOrRefer": {
+        "Type.TypeOrRefer": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/Types.Type"
+                    "$ref": "#/definitions/Type.Type"
                 },
                 {
-                    "$ref": "#/definitions/Types.ReferElement"
+                    "$ref": "#/definitions/Type.ReferElement"
                 }
             ]
         },
-        "Types.TypeOrValue": {
+        "Type.TypeOrValue": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/Types.Type"
+                    "$ref": "#/definitions/Type.Type"
                 },
                 {
-                    "$ref": "#/definitions/Types.ValueDefinition"
+                    "$ref": "#/definitions/Type.ValueDefinition"
                 }
             ]
         },
-        "Types.TypeOrValueOfRefer": {
+        "Type.TypeOrValueOfRefer": {
             "oneOf": [
                 {
-                    "$ref": "#/definitions/Types.TypeOrValue"
+                    "$ref": "#/definitions/Type.TypeOrValue"
                 },
                 {
-                    "$ref": "#/definitions/Types.ReferElement"
+                    "$ref": "#/definitions/Type.ReferElement"
                 }
             ]
         }

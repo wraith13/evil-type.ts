@@ -1,4 +1,4 @@
-export declare namespace TypesError {
+export declare namespace EvilTypeError {
     interface Error {
         type: "solid" | "fragment";
         path: string;
@@ -16,7 +16,7 @@ export declare namespace TypesError {
     const nextListener: (name: string | number, listner: Listener | undefined) => Listener | undefined;
     const makePath: (path: string, name: string | number) => string;
     const getPathDepth: (path: string) => number;
-    const getType: (isType: ((v: unknown, listner?: TypesError.Listener) => boolean)) => string[];
+    const getType: (isType: ((v: unknown, listner?: EvilTypeError.Listener) => boolean)) => string[];
     const isMtached: (matchRate: boolean | number) => matchRate is true;
     const matchRateToNumber: (matchRate: boolean | number) => number;
     const setMatchRate: (listner: Listener | undefined, matchRate: boolean | number) => matchRate is true;

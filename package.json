@@ -4,8 +4,8 @@
     "description": "... for TypeScript",
     "main": "./library/source/index.js",
     "scripts": {
-        "generate types.ts": "node ./ ./resource/types.json",
-        "generate jsonable.ts": "node ./ ./resource/jsonable.json",
+        "generate type": "node . ./resource/type.json",
+        "generate jsonable": "node . ./resource/jsonable.json",
         "build script": "tsc -p ./source/tsconfig.json",
         "watch script": "tsc --watch -p ./source/tsconfig.json"
     },
