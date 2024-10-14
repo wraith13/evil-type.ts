@@ -755,7 +755,10 @@ export namespace Build
         {
             if (data.schema.externalReferMapping)
             {
-                const key = Object.keys(data.schema.externalReferMapping).filter(i => i === absolutePath || absolutePath.startsWith(`${i}.`))[0];
+                const key = Object.keys(data.schema.externalReferMapping)
+                    .filter(i => i === absolutePath || absolutePath.startsWith(`${i}.`))
+                    .sort((a, b) => a.length < b.length ? 1: b.length < a.length ? -1: 0)
+                    [0];
                 if (key)
                 {
                     return data.schema.externalReferMapping[key] +absolutePath.slice(key.length);
@@ -902,6 +905,10 @@ export namespace Build
             if (data.value.extends)
             {
                 result["allOf"] = data.value.extends.map(i => buildRefer(nextProcess(data, null, i)));
+            }
+            if ("boolean" === typeof data.value.additionalProperties)
+            {
+                result["additionalProperties"] = data.value.additionalProperties;
             }
             Object.entries(data.value.members).forEach
             (

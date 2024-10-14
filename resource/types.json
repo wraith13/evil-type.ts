@@ -74,7 +74,8 @@
                         "options": {
                             "$ref": "OutputOptions"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "OutputOptions": {
                     "export": true,
@@ -119,7 +120,8 @@
                         "schema?": {
                             "$ref": "SchemaOptions"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "SchemaOptions": {
                     "export": true,
@@ -144,7 +146,8 @@
                                 "type": "string"
                             }
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "indentStyleTypeMember": {
                     "export": true,
@@ -224,7 +227,8 @@
                             "$type": "primitive-type",
                             "type": "string"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "Definition": {
                     "export": true,
@@ -280,7 +284,8 @@
                                 "type": "string"
                             }
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "NamespaceDefinition": {
                     "export": true,
@@ -298,7 +303,8 @@
                         "members": {
                             "$ref": "DefinitionMap"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "ValueDefinition": {
                     "export": true,
@@ -328,7 +334,8 @@
                             "$type": "primitive-type",
                             "type": "boolean"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "TypeDefinition": {
                     "export": true,
@@ -346,7 +353,8 @@
                         "define": {
                             "$ref": "TypeOrRefer"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "InterfaceDefinition": {
                     "export": true,
@@ -372,8 +380,13 @@
                             "valueType": {
                                 "$ref": "TypeOrRefer"
                             }
+                        },
+                        "additionalProperties?": {
+                            "$type": "primitive-type",
+                            "type": "boolean"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "DictionaryDefinition": {
                     "export": true,
@@ -391,7 +404,8 @@
                         "valueType": {
                             "$ref": "TypeOrRefer"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "ArrayElement": {
                     "export": true,
@@ -469,7 +483,8 @@
                         "literal": {
                             "$ref": "Jsonable.Jsonable"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "ReferElement": {
                     "export": true,
@@ -479,7 +494,8 @@
                             "$type": "primitive-type",
                             "type": "string"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "PrimitiveTypeEnumMembers": {
                     "export": true,
@@ -521,7 +537,8 @@
                         "type": {
                             "$ref": "PrimitiveTypeEnum"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "Type": {
                     "export": true,
@@ -597,7 +614,8 @@
                                 ]
                             }
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "TypeofElement": {
                     "export": true,
@@ -610,7 +628,8 @@
                         "value": {
                             "$ref": "ReferElement"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "ItemofElement": {
                     "export": true,
@@ -623,7 +642,8 @@
                         "value": {
                             "$ref": "ReferElement"
                         }
-                    }
+                    },
+                    "additionalProperties": true
                 },
                 "TypeOrRefer": {
                     "export": true,

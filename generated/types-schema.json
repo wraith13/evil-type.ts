@@ -46,7 +46,8 @@
                 {
                     "$ref": "#/definitions/Types.CommentProperty"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.OutputOptions": {
             "type": "object",
@@ -88,7 +89,8 @@
                 "indentUnit",
                 "indentStyle",
                 "validatorOption"
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.SchemaOptions": {
             "type": "object",
@@ -112,7 +114,8 @@
             "required": [
                 "outputFile",
                 "$id"
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.indentStyleTypeMember": {
             "const": [
@@ -178,7 +181,8 @@
                 "$type",
                 "target",
                 "from"
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.Definition": {
             "oneOf": [
@@ -229,7 +233,8 @@
                 {
                     "$ref": "#/definitions/Types.AlphaDefinition"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.NamespaceDefinition": {
             "type": "object",
@@ -249,7 +254,8 @@
                 {
                     "$ref": "#/definitions/Types.AlphaDefinition"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.ValueDefinition": {
             "type": "object",
@@ -279,7 +285,8 @@
                 {
                     "$ref": "#/definitions/Types.AlphaDefinition"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.TypeDefinition": {
             "type": "object",
@@ -299,7 +306,8 @@
                 {
                     "$ref": "#/definitions/Types.AlphaDefinition"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.InterfaceDefinition": {
             "type": "object",
@@ -318,6 +326,9 @@
                     "additionalProperties": {
                         "$ref": "#/definitions/Types.TypeOrRefer"
                     }
+                },
+                "additionalProperties": {
+                    "type": "boolean"
                 }
             },
             "required": [
@@ -328,7 +339,8 @@
                 {
                     "$ref": "#/definitions/Types.AlphaDefinition"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.DictionaryDefinition": {
             "type": "object",
@@ -348,7 +360,8 @@
                 {
                     "$ref": "#/definitions/Types.AlphaDefinition"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.ArrayElement": {
             "type": "object",
@@ -434,7 +447,8 @@
                 {
                     "$ref": "#/definitions/Types.AlphaElement"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.ReferElement": {
             "type": "object",
@@ -445,7 +459,8 @@
             },
             "required": [
                 "$ref"
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.PrimitiveTypeEnumMembers": {
             "const": [
@@ -481,7 +496,8 @@
                 {
                     "$ref": "#/definitions/Types.AlphaElement"
                 }
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.Type": {
             "oneOf": [
@@ -549,7 +565,8 @@
             "required": [
                 "$type",
                 "members"
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.TypeofElement": {
             "type": "object",
@@ -564,7 +581,8 @@
             "required": [
                 "$type",
                 "value"
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.ItemofElement": {
             "type": "object",
@@ -579,7 +597,8 @@
             "required": [
                 "$type",
                 "value"
-            ]
+            ],
+            "additionalProperties": true
         },
         "Types.TypeOrRefer": {
             "oneOf": [

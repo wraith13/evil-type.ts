@@ -576,7 +576,9 @@ var Build;
         };
         Schema.resolveExternalRefer = function (data, absolutePath) {
             if (data.schema.externalReferMapping) {
-                var key = Object.keys(data.schema.externalReferMapping).filter(function (i) { return i === absolutePath || absolutePath.startsWith("".concat(i, ".")); })[0];
+                var key = Object.keys(data.schema.externalReferMapping)
+                    .filter(function (i) { return i === absolutePath || absolutePath.startsWith("".concat(i, ".")); })
+                    .sort(function (a, b) { return a.length < b.length ? 1 : b.length < a.length ? -1 : 0; })[0];
                 if (key) {
                     return data.schema.externalReferMapping[key] + absolutePath.slice(key.length);
                 }
@@ -697,6 +699,9 @@ var Build;
             };
             if (data.value.extends) {
                 result["allOf"] = data.value.extends.map(function (i) { return Schema.buildRefer(Schema.nextProcess(data, null, i)); });
+            }
+            if ("boolean" === typeof data.value.additionalProperties) {
+                result["additionalProperties"] = data.value.additionalProperties;
             }
             Object.entries(data.value.members).forEach(function (i) {
                 var key = text_1.Text.getPrimaryKeyName(i[0]);

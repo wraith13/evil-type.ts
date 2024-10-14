@@ -81,6 +81,7 @@ export namespace Types
         $type: "interface";
         extends?: ReferElement[];
         members: { [key: string]: TypeOrRefer, };
+        additionalProperties?: boolean;
     }
     export interface DictionaryDefinition extends AlphaDefinition
     {
@@ -197,7 +198,8 @@ export namespace Types
         TypesPrime.isSpecificObject<TypeDefinition>(getTypeDefinitionValidator())(value, listner);
     export const getInterfaceDefinitionValidator = () => <TypesPrime.ObjectValidator<InterfaceDefinition>> TypesPrime.mergeObjectValidator(
         getAlphaDefinitionValidator(), { $type: TypesPrime.isJust("interface"), extends: TypesPrime.isOptional(TypesPrime.isArray(
-        isReferElement)), members: TypesPrime.isDictionaryObject(isTypeOrRefer), });
+        isReferElement)), members: TypesPrime.isDictionaryObject(isTypeOrRefer), additionalProperties: TypesPrime.isOptional(
+        TypesPrime.isBoolean), });
     export const isInterfaceDefinition = (value: unknown, listner?: TypesError.Listener): value is InterfaceDefinition =>
         TypesPrime.isSpecificObject<InterfaceDefinition>(getInterfaceDefinitionValidator())(value, listner);
     export const getDictionaryDefinitionValidator = () => <TypesPrime.ObjectValidator<DictionaryDefinition>>

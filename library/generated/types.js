@@ -61,7 +61,7 @@ var Types;
     Types.isTypeDefinition = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getTypeDefinitionValidator())(value, listner);
     };
-    Types.getInterfaceDefinitionValidator = function () { return types_prime_1.TypesPrime.mergeObjectValidator(Types.getAlphaDefinitionValidator(), { $type: types_prime_1.TypesPrime.isJust("interface"), extends: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isReferElement)), members: types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer), }); };
+    Types.getInterfaceDefinitionValidator = function () { return types_prime_1.TypesPrime.mergeObjectValidator(Types.getAlphaDefinitionValidator(), { $type: types_prime_1.TypesPrime.isJust("interface"), extends: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isArray(Types.isReferElement)), members: types_prime_1.TypesPrime.isDictionaryObject(Types.isTypeOrRefer), additionalProperties: types_prime_1.TypesPrime.isOptional(types_prime_1.TypesPrime.isBoolean), }); };
     Types.isInterfaceDefinition = function (value, listner) {
         return types_prime_1.TypesPrime.isSpecificObject(Types.getInterfaceDefinitionValidator())(value, listner);
     };

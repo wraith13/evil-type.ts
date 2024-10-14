@@ -69,6 +69,7 @@ export declare namespace Types {
         members: {
             [key: string]: TypeOrRefer;
         };
+        additionalProperties?: boolean;
     }
     interface DictionaryDefinition extends AlphaDefinition {
         $type: "dictionary";
