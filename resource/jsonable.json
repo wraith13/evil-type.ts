@@ -6,8 +6,8 @@
     "imports": [
         {
             "$type": "import",
-            "target": "{ EvilTypeValidator }",
-            "from": "../../source/validator"
+            "target": "{ EvilType }",
+            "from": "../../common/evil-type"
         }
     ],
     "defines": {

@@ -1,7 +1,7 @@
 'use strict';
 const startAt = new Date();
 import fs from "fs";
-import { EvilTypeValidator } from "./validator";
+import { EvilType } from "../common/evil-type";
 import { Jsonable } from "../generated/code/jsonable";
 import { Type } from "../generated/code/type";
 import { Text } from "./text";
@@ -92,11 +92,15 @@ export namespace Build
         ("export" in define && (define.export ?? true)) ? [$expression("export")]: [];
     export const buildExtends = (define: Type.InterfaceDefinition): CodeExpression[] =>
         undefined !== define.extends ? [$expression("extends"), ...define.extends.map((i, ix, list) => $expression(ix < (list.length -1) ? `${i.$ref},`: `${i.$ref}`))]: [];
+    export const asConst = [ $expression("as"), $expression("const"), ];
+    export const buildLiteralAsConst = (literal: Jsonable.Jsonable) =>
+        [ $expression(Jsonable.stringify(literal)), ...asConst, ];
     export namespace Define
     {
         export const buildDefineLine = (declarator: string, name: string, define: Type.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
             $line([ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineDefine(define)), ...postEpressions, ]);
-        export const buildInlineDefineLiteral = (define: Type.LiteralElement) => [$expression(Jsonable.stringify(define.literal))];
+        export const buildInlineDefineLiteral = (define: Type.LiteralElement) =>
+            [ $expression(Jsonable.stringify(define.literal)) ];
         export const buildInlineDefinePrimitiveType = (value: Type.PrimitiveTypeElement) =>
             $expression(value.type);
         export const buildDefinePrimitiveType = (name: string, value: Type.PrimitiveTypeElement): CodeLine =>
@@ -210,7 +214,7 @@ export namespace Build
             case "type":
                 return [ ...$comment(define), buildDefineLine("type", name, define), ];
             case "value":
-                return [ ...$comment(define), buildDefineLine("const", name, define, [ $expression("as"), $expression("const"), ]), ];
+                return [ ...$comment(define), buildDefineLine("const", name, define, Type.isLiteralElement(define.value) ? asConst: []), ];
             }
         };
         export const buildInlineDefine = (define: Type.TypeOrValueOfRefer): (CodeExpression | CodeInlineBlock)[] =>
@@ -357,7 +361,7 @@ export namespace Build
                     (
                         define.types.map
                         (
-                            i => EvilTypeValidator.isObject(i) ?
+                            i => EvilType.Validator.isObject(i) ?
                                 Define.enParenthesis(buildValidatorExpression(name, i)):
                                 buildValidatorExpression(name, i)
                         ),
@@ -473,40 +477,40 @@ export namespace Build
                 switch(define.$type)
                 {
                 case "literal":
-                    return buildCall([ $expression("EvilTypeValidator.isJust"), ], [ [ $expression(Jsonable.stringify(define.literal)), $expression("as"), $expression("const"), ], ]);
+                    return buildCall([ $expression("EvilType.Validator.isJust"), ], [ buildLiteralAsConst(define.literal), ]);
                 case "typeof":
                     return [ $expression(buildValidatorName(define.value.$ref)), ];
                 case "itemof":
-                    return buildCall([ $expression("EvilTypeValidator.isEnum"), ], [ $expression(define.value.$ref), ]);
+                    return buildCall([ $expression("EvilType.Validator.isEnum"), ], [ $expression(define.value.$ref), ]);
                 case "primitive-type":
                     switch(define.type)
                     {
                     case "null":
-                        return [ $expression("EvilTypeValidator.isNull"), ];
+                        return [ $expression("EvilType.Validator.isNull"), ];
                     case "boolean":
-                        return [ $expression("EvilTypeValidator.isBoolean"), ];
+                        return [ $expression("EvilType.Validator.isBoolean"), ];
                     case "number":
-                        return [ $expression("EvilTypeValidator.isNumber"), ];
+                        return [ $expression("EvilType.Validator.isNumber"), ];
                     case "string":
-                        return [ $expression("EvilTypeValidator.isString"), ];
+                        return [ $expression("EvilType.Validator.isString"), ];
                     }
-                    return [ $expression(`EvilTypeValidator.is${Text.toUpperCamelCase(define.type)}`), ];
+                    return [ $expression(`EvilType.Validator.is${Text.toUpperCamelCase(define.type)}`), ];
                 case "type":
                     return buildObjectValidatorGetterCoreEntry(define.define);
                 case "enum-type":
-                    return buildCall([ $expression("EvilTypeValidator.isEnum"), ], [ [ $expression(Jsonable.stringify(define.members)), $expression("as"), $expression("const"), ], ]);
+                    return buildCall([ $expression("EvilType.Validator.isEnum"), ], [ buildLiteralAsConst(define.members), ]);
                 case "array":
-                    return buildCall([ $expression("EvilTypeValidator.isArray"), ], [ buildObjectValidatorGetterCoreEntry(define.items), ]);
+                    return buildCall([ $expression("EvilType.Validator.isArray"), ], [ buildObjectValidatorGetterCoreEntry(define.items), ]);
                 case "and":
                     return buildCall
                     (
-                        [ $expression("EvilTypeValidator.isAnd"), ],
+                        [ $expression("EvilType.Validator.isAnd"), ],
                         define.types.map(i => buildObjectValidatorGetterCoreEntry(i))
                     );
                 case "or":
                     return buildCall
                     (
-                        [ $expression("EvilTypeValidator.isOr"), ],
+                        [ $expression("EvilType.Validator.isOr"), ],
                         define.types.map(i => buildObjectValidatorGetterCoreEntry(i))
                     );
                 case "interface":
@@ -514,7 +518,7 @@ export namespace Build
                 case "dictionary":
                     return buildCall
                     (
-                        [ $expression("EvilTypeValidator.isDictionaryObject"), ],
+                        [ $expression("EvilType.Validator.isDictionaryObject"), ],
                         [ buildObjectValidatorGetterCoreEntry(define.valueType), ]
                     );
                 }
@@ -528,13 +532,13 @@ export namespace Build
                 {
                     const key = Text.getPrimaryKeyName(i[0]);
                     const value = buildObjectValidatorGetterCoreEntry(i[1]);
-                    return $line([ $expression(`${key}`), $expression(":"), ...(key === i[0] ? value: buildCall([ $expression("EvilTypeValidator.isOptional"), ], [ value, ])) ])
+                    return $line([ $expression(`${key}`), $expression(":"), ...(key === i[0] ? value: buildCall([ $expression("EvilType.Validator.isOptional"), ], [ value, ])) ])
                 }
             )
         );
         export const buildObjectValidator = (define: Type.InterfaceDefinition & { members: { [key: string]: Type.TypeOrRefer; }; }) => (define.extends ?? []).some(_ => true) ?
             [
-                $expression("EvilTypeValidator.mergeObjectValidator"),
+                $expression("EvilType.Validator.mergeObjectValidator"),
                 ...Define.enParenthesis
                 ([
                     ...(define.extends ?? []).map(i => $expression(`${buildObjectValidatorObjectName(i.$ref)},`)),
@@ -571,7 +575,12 @@ export namespace Build
         };
         export const buildFullValidator = (name: string, define: Type.Type) => isLazyValidator(define) ?
             [
-                $expression(`(value: unknown, listner?: EvilTypeValidator.ErrorListener): value is ${Type.isValueDefinition(define) ? "typeof " +name: name} =>`),
+                // ...buildCall
+                // (
+                //     [ $expression("EvilType.Validator.isTypeLazy"), ],
+                //     [ [ $expression("()"), $expression("=>"), ...buildObjectValidatorGetterCoreEntry(define), ] , ]
+                // ),
+                $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${Type.isValueDefinition(define) ? "typeof " +name: name} =>`),
                 ...buildCall
                 (
                     buildObjectValidatorGetterCoreEntry(define),
@@ -605,18 +614,18 @@ export namespace Build
                     ...buildExport(define),
                     $expression("const"),
                     $expression(buildValidatorName(name)),
-                    $expression("="),
                 ];
                 if ("interface" === define.$type)
                 {
                     result.push
                     (
-                        $expression(`(value: unknown, listner?: EvilTypeValidator.ErrorListener): value is ${name} =>`),
+                        $expression("="),
+                        $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${name} =>`),
                         ...buildCall
                         (
                             buildCall
                             (
-                                [ $expression(`EvilTypeValidator.isSpecificObject<${name}>`), ],
+                                [ $expression(`EvilType.Validator.isSpecificObject<${name}>`), ],
                                 [ $expression(buildObjectValidatorObjectName(name)) ]
                             ),
                             [ $expression("value"), $expression("listner"), ]
@@ -628,16 +637,25 @@ export namespace Build
                 {
                     if (Type.isReferElement(define.value))
                     {
-                        result.push($expression(buildValidatorName(define.value.$ref)));
+                        result.push
+                        (
+                            $expression("="),
+                            $expression(buildValidatorName(define.value.$ref))
+                        );
                     }
                     else
                     {
-                        result.push(...buildCall([ $expression("EvilTypeValidator.isJust"), ], [ $expression(name), ]));
+                        result.push($expression("="), ...buildCall([ $expression("EvilType.Validator.isJust"), ], [ $expression(name), ]));
                     }
                 }
                 else
                 {
-                    result.push(...buildFullValidator(name, define));
+                    result.push
+                    (
+                        ...(! isLazyValidator(define) ? [ $expression(":"), $expression(`EvilType.Validator.IsType<${name}>`) ]: []),
+                        $expression("="),
+                        ...buildFullValidator(name, define)
+                    );
                 }
                 return [ $line(result) ];
             }
@@ -655,7 +673,7 @@ export namespace Build
                         $expression("const"),
                         $expression(buildObjectValidatorObjectName(name)),
                         $expression(":"),
-                        $expression(`EvilTypeValidator.ObjectValidator<${name}>`),
+                        $expression(`EvilType.Validator.ObjectValidator<${name}>`),
                         $expression("="),
                         ...buildObjectValidator(define),
                     ])
@@ -1009,10 +1027,10 @@ export namespace Format
 {
 // data:code(object) to data:output(text)
     export const getMaxLineLength = (options: Type.OutputOptions): null | number =>
-        EvilTypeValidator.isUndefined(options.maxLineLength) ? config.maxLineLength: options.maxLineLength;
+        EvilType.Validator.isUndefined(options.maxLineLength) ? config.maxLineLength: options.maxLineLength;
     export const buildIndent = (options: Type.OutputOptions, indentDepth: number) =>
         Array.from({ length: indentDepth, })
-        .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): options.indentUnit)
+        .map(_ => "number" === typeof options.indentUnit ? Array.from({ length: options.indentUnit, }).map(_ => " ").join(""): "\t")
         .join("");
     export const getReturnCode = (_options: Type.OutputOptions) => "\n";
     export const expressions = (code: CodeExpression[]): string =>
@@ -1171,46 +1189,46 @@ export namespace Format
         }
     }
 }
-const showResult = (result: "success" | "fail") =>
+const build = (jsonPath: string) =>
 {
-    const emoji = "success" === result ? "✅": "🚫";
-    const text = "success" === result ? "end": "failed";
-    console.log(`${emoji} ${jsonPath} build ${text}: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
-}
-try
-{
-    const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
-    const rawSource = fget(jsonPath);
-    const typeSource = Jsonable.parse(rawSource);
-    const errorListner = EvilTypeValidator.makeErrorListener(jsonPath);
-    if (Type.isTypeSchema(typeSource, errorListner))
+    try
     {
-        const code =
-        [
-            ...$comment(typeSource),
-            ...Build.Define.buildImports(typeSource.imports),
-            ...Build.Define.buildDefineNamespaceCore(typeSource.options, typeSource.defines),
-        ];
-        const result = Format.text(typeSource.options, 0, code);
-        fs.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
-        if (typeSource.options.schema)
+        const fget = (path: string) => fs.readFileSync(path, { encoding: "utf-8" });
+        const rawSource = fget(jsonPath);
+        const typeSource = Jsonable.parse(rawSource);
+        const errorListner = EvilType.Validator.makeErrorListener(jsonPath);
+        if (Type.isTypeSchema(typeSource, errorListner))
         {
-            const schema = Build.Schema.build(Build.Schema.makeProcess(typeSource, typeSource.options.schema));
-            fs.writeFileSync(typeSource.options.schema.outputFile, Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
+            const code =
+            [
+                ...$comment(typeSource),
+                ...Build.Define.buildImports(typeSource.imports),
+                ...Build.Define.buildDefineNamespaceCore(typeSource.options, typeSource.defines),
+            ];
+            const result = Format.text(typeSource.options, 0, code);
+            fs.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
+            if (typeSource.options.schema)
+            {
+                const schema = Build.Schema.build(Build.Schema.makeProcess(typeSource, typeSource.options.schema));
+                fs.writeFileSync(typeSource.options.schema.outputFile, Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
+            }
+            return true;
         }
-        showResult("success");
+        else
+        {
+            console.error("🚫 Invalid TypeSchema");
+            console.error(errorListner);
+            console.error(`See ${config.repository}`);
+        }
     }
-    else
+    catch(error)
     {
-        console.error("🚫 Invalid TypeSchema");
-        console.error(errorListner);
-        console.error(`See ${config.repository}`);
-        showResult("fail");
+        console.error(error);
     }
+    return false;
 }
-catch(error)
-{
-    console.error(error);
-    showResult("fail");
-}
+const result = build(jsonPath);
+const emoji = result ? "✅": "🚫";
+const text = result ? "end": "failed";
+console.log(`${emoji} ${jsonPath} build ${text}: ${new Date()} ( ${(getBuildTime() / 1000).toLocaleString()}s )`);
 // how to run: `node . YOUR-TYPE.JSON`

@@ -33,6 +33,8 @@ export declare namespace Build {
         export?: boolean;
     } | {}) => CodeExpression[];
     const buildExtends: (define: Type.InterfaceDefinition) => CodeExpression[];
+    const asConst: CodeExpression[];
+    const buildLiteralAsConst: (literal: Jsonable.Jsonable) => CodeExpression[];
     namespace Define {
         const buildDefineLine: (declarator: string, name: string, define: Type.TypeOrValue, postEpressions?: CodeExpression[]) => CodeLine;
         const buildInlineDefineLiteral: (define: Type.LiteralElement) => CodeExpression[];

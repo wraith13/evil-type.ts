@@ -1,5 +1,5 @@
 // This file is generated.
-import { EvilTypeValidator } from "../../source/validator";
+import { EvilType } from "../../common/evil-type";
 export namespace Jsonable
 {
     export type JsonableValue = null | boolean | number | string;
@@ -14,12 +14,12 @@ export namespace Jsonable
         (value: Jsonable, replacer?: ((this: any, key: string, value: any) => any) | (number | string)[] | null, space?: string | number):
         string => JSON.stringify(value, replacer as any, space);
     export type JsonablePartial<Target extends JsonableObject> = { [key in keyof Target]?: Target[key] } & JsonableObject;
-    export const isJsonableValue = EvilTypeValidator.isOr(EvilTypeValidator.isNull, EvilTypeValidator.isBoolean, EvilTypeValidator.isNumber
-        , EvilTypeValidator.isString);
-    export const isJsonableArray = (value: unknown, listner?: EvilTypeValidator.ErrorListener): value is JsonableArray =>
-        EvilTypeValidator.isArray(isJsonable)(value, listner);
-    export const isJsonableObject = (value: unknown, listner?: EvilTypeValidator.ErrorListener): value is JsonableObject =>
-        EvilTypeValidator.isDictionaryObject(isJsonable)(value, listner);
-    export const isJsonable = (value: unknown, listner?: EvilTypeValidator.ErrorListener): value is Jsonable => EvilTypeValidator.isOr(
+    export const isJsonableValue: EvilType.Validator.IsType<JsonableValue> = EvilType.Validator.isOr(EvilType.Validator.isNull,
+        EvilType.Validator.isBoolean, EvilType.Validator.isNumber, EvilType.Validator.isString);
+    export const isJsonableArray = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is JsonableArray =>
+        EvilType.Validator.isArray(isJsonable)(value, listner);
+    export const isJsonableObject = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is JsonableObject =>
+        EvilType.Validator.isDictionaryObject(isJsonable)(value, listner);
+    export const isJsonable = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is Jsonable => EvilType.Validator.isOr(
         isJsonableValue, isJsonableArray, isJsonableObject)(value, listner);
 }
