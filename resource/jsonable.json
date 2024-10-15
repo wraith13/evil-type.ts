@@ -8,11 +8,6 @@
             "$type": "import",
             "target": "{ EvilTypeValidator }",
             "from": "../../source/validator"
-        },
-        {
-            "$type": "import",
-            "target": "{ EvilTypeError }",
-            "from": "../../source/error"
         }
     ],
     "defines": {

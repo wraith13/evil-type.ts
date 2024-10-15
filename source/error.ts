@@ -39,7 +39,7 @@ export namespace EvilTypeError
         const valuePath = path.replace(/[^#]*#/, "#").replace(/\[(\d+)\]/g, ".$1");
         return valuePath.split(/[#\.]/).filter(i => 0 < i.length).length;
     };
-    export const getType = (isType: ((v: unknown, listner?: EvilTypeError.Listener) => boolean)) =>
+    export const getType = (isType: ((v: unknown, listner?: Listener) => boolean)) =>
     {
         const transactionListner = makeListener();
         isType(undefined, transactionListner);

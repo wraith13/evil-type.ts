@@ -16,10 +16,9 @@ exports.Format = exports.Build = exports.$block = exports.$iblock = exports.$com
 var startAt = new Date();
 var fs_1 = __importDefault(require("fs"));
 var validator_1 = require("./validator");
-var error_1 = require("./error");
-var text_1 = require("./text");
 var jsonable_1 = require("../generated/code/jsonable");
 var type_1 = require("../generated/code/type");
+var text_1 = require("./text");
 var config_json_1 = __importDefault(require("../resource/config.json"));
 if (3 !== process.argv.length) {
     console.error("🚫 Unmatch command parameter.");
@@ -159,9 +158,10 @@ var Build;
             return (0, exports.$block)(header, [(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(value.valueType), true))]);
         };
         Define.buildDefineNamespaceCore = function (options, members) {
-            return __spreadArray(__spreadArray([], Object.entries(members)
+            return __spreadArray(__spreadArray(__spreadArray([], Object.entries(members)
                 .map(function (i) { return Build.Define.buildDefine(options, i[0], i[1]); }), true), Object.entries(members)
-                .map(function (i) { return type_1.Type.isNamespaceDefinition(i[1]) || type_1.Type.isCodeDefinition(i[1]) || !Build.Validator.isValidatorTarget(i[1]) ? [] : Build.Validator.buildValidator(options, i[0], i[1]); }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                .map(function (i) { return type_1.Type.isTypeOrValue(i[1]) && Build.Validator.isValidatorTarget(i[1]) ? Build.Validator.buildValidator(options, i[0], i[1]) : []; }), true), Object.entries(members)
+                .map(function (i) { return type_1.Type.isInterfaceDefinition(i[1]) ? Build.Validator.buildValidatorObject(options, i[0], i[1]) : []; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
         Define.buildDefineNamespace = function (options, name, value) {
             var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("namespace"), (0, exports.$expression)(name),], false);
@@ -266,8 +266,8 @@ var Build;
         Validator.buildValidatorLine = function (declarator, name, define) {
             return __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Validator.buildInlineValidator(name, define)), true);
         };
-        Validator.buildObjectValidatorGetterName = function (name) {
-            return __spreadArray(__spreadArray([], text_1.Text.getNameSpace(name).split("."), true), ["get".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name)), "Validator"),], false).filter(function (i) { return "" !== i; }).join(".");
+        Validator.buildObjectValidatorObjectName = function (name) {
+            return __spreadArray(__spreadArray([], text_1.Text.getNameSpace(name).split("."), true), ["".concat(text_1.Text.toLowerCamelCase(text_1.Text.getNameBody(name)), "ValidatorObject"),], false).filter(function (i) { return "" !== i; }).join(".");
         };
         Validator.buildValidatorName = function (name) {
             return __spreadArray(__spreadArray([], text_1.Text.getNameSpace(name).split("."), true), ["is".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name))),], false).filter(function (i) { return "" !== i; }).join(".");
@@ -393,7 +393,7 @@ var Build;
             else {
                 switch (define.$type) {
                     case "literal":
-                        return Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isJust"),], [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.literal)),]);
+                        return Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isJust"),], [[(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.literal)), (0, exports.$expression)("as"), (0, exports.$expression)("const"),],]);
                     case "typeof":
                         return [(0, exports.$expression)(Validator.buildValidatorName(define.value.$ref)),];
                     case "itemof":
@@ -413,7 +413,7 @@ var Build;
                     case "type":
                         return Validator.buildObjectValidatorGetterCoreEntry(define.define);
                     case "enum-type":
-                        return Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isEnum"),], [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.members)),]);
+                        return Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isEnum"),], [[(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.members)), (0, exports.$expression)("as"), (0, exports.$expression)("const"),],]);
                     case "array":
                         return Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isArray"),], [Validator.buildObjectValidatorGetterCoreEntry(define.items),]);
                     case "and":
@@ -421,7 +421,7 @@ var Build;
                     case "or":
                         return Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isOr"),], define.types.map(function (i) { return Validator.buildObjectValidatorGetterCoreEntry(i); }));
                     case "interface":
-                        return Validator.buildObjectValidatorGetter(define);
+                        return Validator.buildObjectValidator(define);
                     case "dictionary":
                         return Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isDictionaryObject"),], [Validator.buildObjectValidatorGetterCoreEntry(define.valueType),]);
                 }
@@ -432,20 +432,43 @@ var Build;
             var value = Validator.buildObjectValidatorGetterCoreEntry(i[1]);
             return (0, exports.$line)(__spreadArray([(0, exports.$expression)("".concat(key)), (0, exports.$expression)(":")], (key === i[0] ? value : Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isOptional"),], [value,])), true));
         })); };
-        Validator.buildObjectValidatorGetter = function (define) {
+        Validator.buildObjectValidator = function (define) {
             var _a, _b;
             return ((_a = define.extends) !== null && _a !== void 0 ? _a : []).some(function (_) { return true; }) ? __spreadArray([
                 (0, exports.$expression)("EvilTypeValidator.mergeObjectValidator")
-            ], Define.enParenthesis(__spreadArray(__spreadArray([], ((_b = define.extends) !== null && _b !== void 0 ? _b : []).map(function (i) { return (0, exports.$expression)("".concat(Validator.buildObjectValidatorGetterName(i.$ref), "(),")); }), true), [
+            ], Define.enParenthesis(__spreadArray(__spreadArray([], ((_b = define.extends) !== null && _b !== void 0 ? _b : []).map(function (i) { return (0, exports.$expression)("".concat(Validator.buildObjectValidatorObjectName(i.$ref), ",")); }), true), [
                 Validator.buildObjectValidatorGetterCore(define),
             ], false)), true) :
                 Define.enParenthesis([Validator.buildObjectValidatorGetterCore(define),]);
         };
-        Validator.buildFullValidator = function (name, define) {
-            return __spreadArray([
-                (0, exports.$expression)("(value: unknown, listner?: EvilTypeError.Listener): value is ".concat(type_1.Type.isValueDefinition(define) ? "typeof " + name : name, " =>"))
-            ], Validator.buildCall(Validator.buildObjectValidatorGetterCoreEntry(define), [(0, exports.$expression)("value"), (0, exports.$expression)("listner"),]), true);
+        Validator.isLazyValidator = function (define) {
+            if (type_1.Type.isType(define)) {
+                switch (define.$type) {
+                    case "enum-type":
+                    case "itemof":
+                    case "literal":
+                    case "primitive-type":
+                    case "typeof":
+                        return false;
+                    case "type":
+                        return Validator.isLazyValidator(define.define);
+                    case "array":
+                        return Validator.isLazyValidator(define.items);
+                    case "dictionary":
+                        return Validator.isLazyValidator(define.valueType);
+                    case "and":
+                    case "or":
+                        return define.types.some(function (i) { return Validator.isLazyValidator(i); });
+                    case "interface":
+                        return true;
+                }
+            }
+            return true;
         };
+        Validator.buildFullValidator = function (name, define) { return Validator.isLazyValidator(define) ? __spreadArray([
+            (0, exports.$expression)("(value: unknown, listner?: EvilTypeValidator.ErrorListener): value is ".concat(type_1.Type.isValueDefinition(define) ? "typeof " + name : name, " =>"))
+        ], Validator.buildCall(Validator.buildObjectValidatorGetterCoreEntry(define), [(0, exports.$expression)("value"), (0, exports.$expression)("listner"),]), true) :
+            Validator.buildObjectValidatorGetterCoreEntry(define); };
         Validator.isValidatorTarget = function (define) {
             return !(type_1.Type.isValueDefinition(define) && false === define.validator);
         };
@@ -461,61 +484,41 @@ var Build;
                 return result;
             }
             if ("full" === options.validatorOption) {
+                var result = __spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                    (0, exports.$expression)("const"),
+                    (0, exports.$expression)(Validator.buildValidatorName(name)),
+                    (0, exports.$expression)("="),
+                ], false);
                 if ("interface" === define.$type) {
-                    var result = __spreadArray(__spreadArray([], ("interface" === define.$type ?
-                        [
-                            (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
-                                (0, exports.$expression)("const"),
-                                (0, exports.$expression)(Validator.buildObjectValidatorGetterName(name)),
-                                (0, exports.$expression)("="),
-                                (0, exports.$expression)("()"),
-                                (0, exports.$expression)("=>"),
-                                (0, exports.$expression)("<EvilTypeValidator.ObjectValidator<".concat(name, ">>"))
-                            ], false), Validator.buildObjectValidatorGetter(define), true))
-                        ] :
-                        []), true), [
-                        (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
-                            (0, exports.$expression)("const"),
-                            (0, exports.$expression)(Validator.buildValidatorName(name)),
-                            (0, exports.$expression)("="),
-                            (0, exports.$expression)("(value: unknown, listner?: EvilTypeError.Listener): value is ".concat(name, " =>"))
-                        ], false), Validator.buildCall(Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isSpecificObject<".concat(name, ">")),], [Validator.buildCall([(0, exports.$expression)(Validator.buildObjectValidatorGetterName(name)),], [])]), [(0, exports.$expression)("value"), (0, exports.$expression)("listner"),]), true))
-                    ], false);
-                    return result;
+                    result.push.apply(result, __spreadArray([(0, exports.$expression)("(value: unknown, listner?: EvilTypeValidator.ErrorListener): value is ".concat(name, " =>"))], Validator.buildCall(Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isSpecificObject<".concat(name, ">")),], [(0, exports.$expression)(Validator.buildObjectValidatorObjectName(name))]), [(0, exports.$expression)("value"), (0, exports.$expression)("listner"),]), false));
                 }
                 else if ("value" === define.$type) {
                     if (type_1.Type.isReferElement(define.value)) {
-                        var result = [
-                            (0, exports.$line)(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
-                                (0, exports.$expression)("const"),
-                                (0, exports.$expression)(Validator.buildValidatorName(name)),
-                                (0, exports.$expression)("="),
-                                (0, exports.$expression)(Validator.buildValidatorName(define.value.$ref)),
-                            ], false))
-                        ];
-                        return result;
+                        result.push((0, exports.$expression)(Validator.buildValidatorName(define.value.$ref)));
                     }
                     else {
-                        var result = [
-                            (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
-                                (0, exports.$expression)("const"),
-                                (0, exports.$expression)(Validator.buildValidatorName(name)),
-                                (0, exports.$expression)("=")
-                            ], false), Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isJust"),], [(0, exports.$expression)(name),]), true))
-                        ];
-                        return result;
+                        result.push.apply(result, Validator.buildCall([(0, exports.$expression)("EvilTypeValidator.isJust"),], [(0, exports.$expression)(name),]));
                     }
                 }
                 else {
-                    var result = [
-                        (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
-                            (0, exports.$expression)("const"),
-                            (0, exports.$expression)(Validator.buildValidatorName(name)),
-                            (0, exports.$expression)("=")
-                        ], false), Validator.buildFullValidator(name, define), true))
-                    ];
-                    return result;
+                    result.push.apply(result, Validator.buildFullValidator(name, define));
                 }
+                return [(0, exports.$line)(result)];
+            }
+            return [];
+        };
+        Validator.buildValidatorObject = function (options, name, define) {
+            if ("full" === options.validatorOption) {
+                var result = [
+                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                        (0, exports.$expression)("const"),
+                        (0, exports.$expression)(Validator.buildObjectValidatorObjectName(name)),
+                        (0, exports.$expression)(":"),
+                        (0, exports.$expression)("EvilTypeValidator.ObjectValidator<".concat(name, ">")),
+                        (0, exports.$expression)("=")
+                    ], false), Validator.buildObjectValidator(define), true))
+                ];
+                return result;
             }
             return [];
         };
@@ -932,7 +935,7 @@ try {
     var fget = function (path) { return fs_1.default.readFileSync(path, { encoding: "utf-8" }); };
     var rawSource = fget(jsonPath);
     var typeSource = jsonable_1.Jsonable.parse(rawSource);
-    var errorListner = error_1.EvilTypeError.makeListener(jsonPath);
+    var errorListner = validator_1.EvilTypeValidator.makeErrorListener(jsonPath);
     if (type_1.Type.isTypeSchema(typeSource, errorListner)) {
         var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineNamespaceCore(typeSource.options, typeSource.defines), true);
         var result = Format.text(typeSource.options, 0, code);

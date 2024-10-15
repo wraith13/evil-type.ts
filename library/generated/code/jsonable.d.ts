@@ -1,4 +1,4 @@
-import { EvilTypeError } from "../../source/error";
+import { EvilTypeValidator } from "../../source/validator";
 export declare namespace Jsonable {
     type JsonableValue = null | boolean | number | string;
     type JsonableArray = Jsonable[];
@@ -11,8 +11,8 @@ export declare namespace Jsonable {
     type JsonablePartial<Target extends JsonableObject> = {
         [key in keyof Target]?: Target[key];
     } & JsonableObject;
-    const isJsonableValue: (value: unknown, listner?: EvilTypeError.Listener) => value is JsonableValue;
-    const isJsonableArray: (value: unknown, listner?: EvilTypeError.Listener) => value is JsonableArray;
-    const isJsonableObject: (value: unknown, listner?: EvilTypeError.Listener) => value is JsonableObject;
-    const isJsonable: (value: unknown, listner?: EvilTypeError.Listener) => value is Jsonable;
+    const isJsonableValue: (value: unknown, listner?: EvilTypeValidator.ErrorListener) => value is string | number | boolean | null;
+    const isJsonableArray: (value: unknown, listner?: EvilTypeValidator.ErrorListener) => value is JsonableArray;
+    const isJsonableObject: (value: unknown, listner?: EvilTypeValidator.ErrorListener) => value is JsonableObject;
+    const isJsonable: (value: unknown, listner?: EvilTypeValidator.ErrorListener) => value is Jsonable;
 }

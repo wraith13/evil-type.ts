@@ -11,11 +11,6 @@
         },
         {
             "$type": "import",
-            "target": "{ EvilTypeError }",
-            "from": "../../source/error"
-        },
-        {
-            "$type": "import",
             "target": "{ Jsonable }",
             "from": "./jsonable"
         }

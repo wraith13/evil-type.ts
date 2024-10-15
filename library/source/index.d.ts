@@ -62,7 +62,7 @@ export declare namespace Build {
         const buildLiterarlValidatorExpression: (name: string, value: Jsonable.Jsonable) => CodeExpression[];
         const buildInlineLiteralValidator: (define: Type.LiteralElement) => CodeExpression;
         const buildValidatorLine: (declarator: string, name: string, define: Type.Type) => CodeExpression[];
-        const buildObjectValidatorGetterName: (name: string) => string;
+        const buildObjectValidatorObjectName: (name: string) => string;
         const buildValidatorName: (name: string) => string;
         const buildValidatorExpression: (name: string, define: Type.TypeOrValueOfRefer) => CodeExpression[];
         const buildInterfaceValidator: (name: string, define: Type.InterfaceDefinition) => CodeExpression[];
@@ -73,14 +73,16 @@ export declare namespace Build {
                 [key: string]: Type.TypeOrRefer;
             };
         }) => CodeInlineBlock;
-        const buildObjectValidatorGetter: (define: Type.InterfaceDefinition & {
+        const buildObjectValidator: (define: Type.InterfaceDefinition & {
             members: {
                 [key: string]: Type.TypeOrRefer;
             };
         }) => (CodeExpression | CodeInlineBlock)[];
+        const isLazyValidator: (define: Type.TypeOrRefer) => boolean;
         const buildFullValidator: (name: string, define: Type.Type) => CodeInlineEntry[];
         const isValidatorTarget: (define: Type.TypeOrValue) => boolean;
         const buildValidator: (options: Type.OutputOptions, name: string, define: Type.TypeOrValue) => CodeLine[];
+        const buildValidatorObject: (options: Type.OutputOptions, name: string, define: Type.InterfaceDefinition) => CodeLine[];
     }
     namespace Schema {
         namespace Const {

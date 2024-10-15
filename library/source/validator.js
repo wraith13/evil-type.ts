@@ -13,6 +13,7 @@ exports.EvilTypeValidator = void 0;
 var error_1 = require("./error");
 var EvilTypeValidator;
 (function (EvilTypeValidator) {
+    EvilTypeValidator.makeErrorListener = error_1.EvilTypeError.makeListener;
     EvilTypeValidator.isJust = function (target) { return function (value, listner) {
         return error_1.EvilTypeError.withErrorHandling(target === value, listner, function () { return error_1.EvilTypeError.valueToString(target); }, value);
     }; };

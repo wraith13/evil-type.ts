@@ -16,7 +16,7 @@ export declare namespace EvilTypeError {
     const nextListener: (name: string | number, listner: Listener | undefined) => Listener | undefined;
     const makePath: (path: string, name: string | number) => string;
     const getPathDepth: (path: string) => number;
-    const getType: (isType: ((v: unknown, listner?: EvilTypeError.Listener) => boolean)) => string[];
+    const getType: (isType: ((v: unknown, listner?: Listener) => boolean)) => string[];
     const isMtached: (matchRate: boolean | number) => matchRate is true;
     const matchRateToNumber: (matchRate: boolean | number) => number;
     const setMatchRate: (listner: Listener | undefined, matchRate: boolean | number) => matchRate is true;
