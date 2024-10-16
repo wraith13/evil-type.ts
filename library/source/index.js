@@ -605,7 +605,7 @@ var Build;
             if (data.schema.externalReferMapping) {
                 var key = Object.keys(data.schema.externalReferMapping)
                     .filter(function (i) { return i === absolutePath || absolutePath.startsWith("".concat(i, ".")); })
-                    .sort(function (a, b) { return a.length < b.length ? 1 : b.length < a.length ? -1 : 0; })[0];
+                    .sort(evil_type_1.EvilType.comparer(function (i) { return -i.length; }))[0];
                 if (key) {
                     return data.schema.externalReferMapping[key] + absolutePath.slice(key.length);
                 }

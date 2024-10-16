@@ -1,27 +1,27 @@
 // Original: https://github.com/wraith13/evil-type.ts/blob/master/common/evil-type.ts
 export namespace EvilType
 {
-    export const comparer = <Item, Focus>(focus: (i: Item) => Focus) =>
+    export const comparer = <Item, T extends ((i: Item) => any)[]>(...args: T) =>
         (a: Item, b: Item) =>
         {
-            const af = focus(a);
-            const bf = focus(b);
-            if (af < bf)
+            for(let i = 0; i < args.length; ++i)
             {
-                return -1;
+                const focus = args[i];
+                const af = focus(a);
+                const bf = focus(b);
+                if (af < bf)
+                {
+                    return -1;
+                }
+                if (bf < af)
+                {
+                    return 1;
+                }
             }
-            else
-            if (bf < af)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            return 0;
         };
-    export const lazy = <T extends (...args: any[]) => any>(invoker: () => T): T =>
-        ((...args: any[]): any => invoker()(...args)) as T;
+    export const lazy = <T extends (...args: any[]) => any>(invoker: () => T) =>
+        ((...args: Parameters<T>): ReturnType<T> => invoker()(...args)) as T;
     export namespace Error
     {
         export interface Item
@@ -275,7 +275,7 @@ export namespace EvilType
                     matchRate: Error.getMatchRate(listener),
                 })
             )
-            .sort((a, b) => a.matchRate < b.matchRate ? 1: b.matchRate < a.matchRate ? -1: 0)
+            .sort(comparer(i => -Error.matchRateToNumber(i.matchRate)))
             .filter((i, _ix, list) => i.matchRate === list[0].matchRate)
             .map(i => i.listener);
         export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) =>

@@ -778,7 +778,7 @@ export namespace Build
             {
                 const key = Object.keys(data.schema.externalReferMapping)
                     .filter(i => i === absolutePath || absolutePath.startsWith(`${i}.`))
-                    .sort((a, b) => a.length < b.length ? 1: b.length < a.length ? -1: 0)
+                    .sort(EvilType.comparer(i => -i.length))
                     [0];
                 if (key)
                 {

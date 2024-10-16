@@ -13,19 +13,24 @@ exports.EvilType = void 0;
 // Original: https://github.com/wraith13/evil-type.ts/blob/master/common/evil-type.ts
 var EvilType;
 (function (EvilType) {
-    EvilType.comparer = function (focus) {
+    EvilType.comparer = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
         return function (a, b) {
-            var af = focus(a);
-            var bf = focus(b);
-            if (af < bf) {
-                return -1;
+            for (var i = 0; i < args.length; ++i) {
+                var focus = args[i];
+                var af = focus(a);
+                var bf = focus(b);
+                if (af < bf) {
+                    return -1;
+                }
+                if (bf < af) {
+                    return 1;
+                }
             }
-            else if (bf < af) {
-                return 1;
-            }
-            else {
-                return 0;
-            }
+            return 0;
         };
     };
     EvilType.lazy = function (invoker) {
@@ -252,7 +257,7 @@ var EvilType;
                     matchRate: Error.getMatchRate(listener),
                 });
             })
-                .sort(function (a, b) { return a.matchRate < b.matchRate ? 1 : b.matchRate < a.matchRate ? -1 : 0; })
+                .sort(EvilType.comparer(function (i) { return -Error.matchRateToNumber(i.matchRate); }))
                 .filter(function (i, _ix, list) { return i.matchRate === list[0].matchRate; })
                 .map(function (i) { return i.listener; });
         };
