@@ -139,68 +139,49 @@ export namespace Type
     export type TypeOrValue = Type | ValueDefinition;
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export const isSchema = EvilType.Validator.isJust(schema);
-    export const isCommentProperty = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is CommentProperty =>
-        EvilType.Validator.isSpecificObject<CommentProperty>(commentPropertyValidatorObject)(value, listner);
-    export const isTypeSchema = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is TypeSchema =>
-        EvilType.Validator.isSpecificObject<TypeSchema>(typeSchemaValidatorObject)(value, listner);
-    export const isOutputOptions = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is OutputOptions =>
-        EvilType.Validator.isSpecificObject<OutputOptions>(outputOptionsValidatorObject)(value, listner);
-    export const isSchemaOptions = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is SchemaOptions =>
-        EvilType.Validator.isSpecificObject<SchemaOptions>(schemaOptionsValidatorObject)(value, listner);
+    export const isCommentProperty = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commentPropertyValidatorObject));
+    export const isTypeSchema = EvilType.lazy(() => EvilType.Validator.isSpecificObject(typeSchemaValidatorObject, false));
+    export const isOutputOptions = EvilType.lazy(() => EvilType.Validator.isSpecificObject(outputOptionsValidatorObject, false));
+    export const isSchemaOptions = EvilType.lazy(() => EvilType.Validator.isSpecificObject(schemaOptionsValidatorObject, false));
     export const isIndentStyleType: EvilType.Validator.IsType<IndentStyleType> = EvilType.Validator.isEnum(indentStyleTypeMember);
     export const isValidatorOptionType: EvilType.Validator.IsType<ValidatorOptionType> = EvilType.Validator.isEnum(
         ["none","simple","full"] as const);
-    export const isAlphaElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is AlphaElement =>
-        EvilType.Validator.isSpecificObject<AlphaElement>(alphaElementValidatorObject)(value, listner);
-    export const isAlphaDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is AlphaDefinition =>
-        EvilType.Validator.isSpecificObject<AlphaDefinition>(alphaDefinitionValidatorObject)(value, listner);
-    export const isImportDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is ImportDefinition =>
-        EvilType.Validator.isSpecificObject<ImportDefinition>(importDefinitionValidatorObject)(value, listner);
-    export const isDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is Definition =>
-        EvilType.Validator.isOr(isCodeDefinition, isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition,
-        isDictionaryDefinition)(value, listner);
-    export const isDefinitionMap = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is DefinitionMap =>
-        EvilType.Validator.isDictionaryObject(isDefinition)(value, listner);
-    export const isCodeDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is CodeDefinition =>
-        EvilType.Validator.isSpecificObject<CodeDefinition>(codeDefinitionValidatorObject)(value, listner);
-    export const isNamespaceDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is NamespaceDefinition =>
-        EvilType.Validator.isSpecificObject<NamespaceDefinition>(namespaceDefinitionValidatorObject)(value, listner);
-    export const isValueDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is ValueDefinition =>
-        EvilType.Validator.isSpecificObject<ValueDefinition>(valueDefinitionValidatorObject)(value, listner);
-    export const isTypeDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is TypeDefinition =>
-        EvilType.Validator.isSpecificObject<TypeDefinition>(typeDefinitionValidatorObject)(value, listner);
-    export const isInterfaceDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is InterfaceDefinition =>
-        EvilType.Validator.isSpecificObject<InterfaceDefinition>(interfaceDefinitionValidatorObject)(value, listner);
-    export const isDictionaryDefinition = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is DictionaryDefinition =>
-        EvilType.Validator.isSpecificObject<DictionaryDefinition>(dictionaryDefinitionValidatorObject)(value, listner);
-    export const isArrayElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is ArrayElement =>
-        EvilType.Validator.isSpecificObject<ArrayElement>(arrayElementValidatorObject)(value, listner);
-    export const isOrElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is OrElement =>
-        EvilType.Validator.isSpecificObject<OrElement>(orElementValidatorObject)(value, listner);
-    export const isAndElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is AndElement =>
-        EvilType.Validator.isSpecificObject<AndElement>(andElementValidatorObject)(value, listner);
-    export const isLiteralElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is LiteralElement =>
-        EvilType.Validator.isSpecificObject<LiteralElement>(literalElementValidatorObject)(value, listner);
-    export const isReferElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is ReferElement =>
-        EvilType.Validator.isSpecificObject<ReferElement>(referElementValidatorObject)(value, listner);
+    export const isAlphaElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(alphaElementValidatorObject));
+    export const isAlphaDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(alphaDefinitionValidatorObject));
+    export const isImportDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(importDefinitionValidatorObject, false));
+    export const isDefinition: EvilType.Validator.IsType<Definition> = EvilType.lazy(() => EvilType.Validator.isOr(isCodeDefinition,
+        isNamespaceDefinition, isValueDefinition, isTypeDefinition, isInterfaceDefinition, isDictionaryDefinition));
+    export const isDefinitionMap: EvilType.Validator.IsType<DefinitionMap> = EvilType.lazy(() => EvilType.Validator.isDictionaryObject(
+        isDefinition));
+    export const isCodeDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(codeDefinitionValidatorObject, false));
+    export const isNamespaceDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(namespaceDefinitionValidatorObject, false)
+        );
+    export const isValueDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(valueDefinitionValidatorObject, false));
+    export const isTypeDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(typeDefinitionValidatorObject, false));
+    export const isInterfaceDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(interfaceDefinitionValidatorObject, false)
+        );
+    export const isDictionaryDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(dictionaryDefinitionValidatorObject,
+        false));
+    export const isArrayElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(arrayElementValidatorObject));
+    export const isOrElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(orElementValidatorObject));
+    export const isAndElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(andElementValidatorObject));
+    export const isLiteralElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(literalElementValidatorObject, false));
+    export const isReferElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(referElementValidatorObject, false));
     export const isPrimitiveTypeEnum: EvilType.Validator.IsType<PrimitiveTypeEnum> = EvilType.Validator.isEnum(PrimitiveTypeEnumMembers);
-    export const isPrimitiveTypeElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is PrimitiveTypeElement =>
-        EvilType.Validator.isSpecificObject<PrimitiveTypeElement>(primitiveTypeElementValidatorObject)(value, listner);
-    export const isType = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is Type => EvilType.Validator.isOr(
-        isPrimitiveTypeElement, isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition,
-        isDictionaryDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement)(value, listner);
-    export const isEnumTypeElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is EnumTypeElement =>
-        EvilType.Validator.isSpecificObject<EnumTypeElement>(enumTypeElementValidatorObject)(value, listner);
-    export const isTypeofElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is TypeofElement =>
-        EvilType.Validator.isSpecificObject<TypeofElement>(typeofElementValidatorObject)(value, listner);
-    export const isItemofElement = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is ItemofElement =>
-        EvilType.Validator.isSpecificObject<ItemofElement>(itemofElementValidatorObject)(value, listner);
-    export const isTypeOrRefer = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is TypeOrRefer =>
-        EvilType.Validator.isOr(isType, isReferElement)(value, listner);
-    export const isTypeOrValue = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is TypeOrValue =>
-        EvilType.Validator.isOr(isType, isValueDefinition)(value, listner);
-    export const isTypeOrValueOfRefer = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is TypeOrValueOfRefer =>
-        EvilType.Validator.isOr(isTypeOrValue, isReferElement)(value, listner);
+    export const isPrimitiveTypeElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(primitiveTypeElementValidatorObject,
+        false));
+    export const isType: EvilType.Validator.IsType<Type> = EvilType.lazy(() => EvilType.Validator.isOr(isPrimitiveTypeElement,
+        isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryDefinition,
+        isArrayElement, isOrElement, isAndElement, isLiteralElement));
+    export const isEnumTypeElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(enumTypeElementValidatorObject, false));
+    export const isTypeofElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(typeofElementValidatorObject, false));
+    export const isItemofElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(itemofElementValidatorObject, false));
+    export const isTypeOrRefer: EvilType.Validator.IsType<TypeOrRefer> = EvilType.lazy(() => EvilType.Validator.isOr(isType, isReferElement
+        ));
+    export const isTypeOrValue: EvilType.Validator.IsType<TypeOrValue> = EvilType.lazy(() => EvilType.Validator.isOr(isType,
+        isValueDefinition));
+    export const isTypeOrValueOfRefer: EvilType.Validator.IsType<TypeOrValueOfRefer> = EvilType.lazy(() => EvilType.Validator.isOr(
+        isTypeOrValue, isReferElement));
     export const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty> = ({ comment:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString)), });
     export const typeSchemaValidatorObject: EvilType.Validator.ObjectValidator<TypeSchema> = EvilType.Validator.mergeObjectValidator(

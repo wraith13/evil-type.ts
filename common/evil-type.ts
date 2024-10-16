@@ -1,6 +1,27 @@
 // Original: https://github.com/wraith13/evil-type.ts/blob/master/common/evil-type.ts
 export namespace EvilType
 {
+    export const comparer = <Item, Focus>(focus: (i: Item) => Focus) =>
+        (a: Item, b: Item) =>
+        {
+            const af = focus(a);
+            const bf = focus(b);
+            if (af < bf)
+            {
+                return -1;
+            }
+            else
+            if (bf < af)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        };
+    export const lazy = <T extends (...args: any[]) => any>(invoker: () => T): T =>
+        ((...args: any[]): any => invoker()(...args)) as T;
     export namespace Error
     {
         export interface Item
@@ -201,11 +222,6 @@ export namespace EvilType
         export type ErrorListener = Error.Listener;
         export const makeErrorListener = Error.makeListener;
         export type IsType<T> = (value: unknown, listner?: ErrorListener) => value is T;
-        // TypeScript さんが残念で Type Guard 関数の戻り型がすぐにただの boolean 扱いになってしまい、いちいち value is T を明示する羽目になって、記述をコンパクトにする為に isTypeLazy を使おうとしても全然コンパクトにできないので、これは使用を断念。
-        // export const isTypeLazy= <T>(invoker: () => IsType<T>) =>
-        //     (value: unknown, listner?: ErrorListener): value is T => invoker()(value, listner);
-        // export const lazy = <T extends (...args: any[]) => any>(invoker: () => T): T =>
-        //     ((...args: any[]): any => invoker()(...args)) as T;
         export const isJust = <T>(target: T) => (value: unknown, listner?: ErrorListener): value is T =>
             Error.withErrorHandling(target === value, listner, () => Error.valueToString(target), value);
         export const isUndefined = isJust(undefined);
@@ -259,25 +275,7 @@ export namespace EvilType
                     matchRate: Error.getMatchRate(listener),
                 })
             )
-            .sort
-            (
-                (a, b) =>
-                {
-                    if (a.matchRate < b.matchRate)
-                    {
-                        return 1;
-                    }
-                    else
-                    if (b.matchRate < a.matchRate)
-                    {
-                        return -1;
-                    }
-                    else
-                    {
-                        return 0;
-                    }
-                }
-            )
+            .sort((a, b) => a.matchRate < b.matchRate ? 1: b.matchRate < a.matchRate ? -1: 0)
             .filter((i, _ix, list) => i.matchRate === list[0].matchRate)
             .map(i => i.listener);
         export const isOr = <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) =>
@@ -435,14 +433,15 @@ export namespace EvilType
                 }
                 else
                 {
-                    listner.errors.filter(i => 0 === i.path.indexOf(listner.path) && "fragment" !== i.type).forEach(i => i.type = "fragment");
-                    listner.errors.push
-                    ({
-                        type: "fragment",
-                        path: listner.path,
-                        requiredType: "never",
-                        actualValue: Error.valueToString((value as ObjectType)[member]),
-                    });
+                    // Not wrong, but noisy!
+                    // listner.errors.filter(i => 0 === i.path.indexOf(listner.path) && "fragment" !== i.type).forEach(i => i.type = "fragment");
+                    // listner.errors.push
+                    // ({
+                    //     type: "fragment",
+                    //     path: listner.path,
+                    //     requiredType: "never",
+                    //     actualValue: Error.valueToString((value as ObjectType)[member]),
+                    // });
                 }
             }
             return result;

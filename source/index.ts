@@ -573,19 +573,19 @@ export namespace Build
             }
             return true;
         };
-        export const buildFullValidator = (name: string, define: Type.Type) => isLazyValidator(define) ?
+        export const buildFullValidator = (_name: string, define: Type.Type) => isLazyValidator(define) ?
             [
-                // ...buildCall
-                // (
-                //     [ $expression("EvilType.Validator.isTypeLazy"), ],
-                //     [ [ $expression("()"), $expression("=>"), ...buildObjectValidatorGetterCoreEntry(define), ] , ]
-                // ),
-                $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${Type.isValueDefinition(define) ? "typeof " +name: name} =>`),
                 ...buildCall
                 (
-                    buildObjectValidatorGetterCoreEntry(define),
-                    [ $expression("value"), $expression("listner"), ]
+                    [ $expression("EvilType.lazy"), ],
+                    [ [ $expression("()"), $expression("=>"), ...buildObjectValidatorGetterCoreEntry(define), ] , ]
                 ),
+                // $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${Type.isValueDefinition(define) ? "typeof " +name: name} =>`),
+                // ...buildCall
+                // (
+                //     buildObjectValidatorGetterCoreEntry(define),
+                //     [ $expression("value"), $expression("listner"), ]
+                // ),
             ]:
             buildObjectValidatorGetterCoreEntry(define);
         export const isValidatorTarget = (define: Type.TypeOrValue) =>
@@ -620,16 +620,31 @@ export namespace Build
                     result.push
                     (
                         $expression("="),
-                        $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${name} =>`),
                         ...buildCall
                         (
-                            buildCall
-                            (
-                                [ $expression(`EvilType.Validator.isSpecificObject<${name}>`), ],
-                                [ $expression(buildObjectValidatorObjectName(name)) ]
-                            ),
-                            [ $expression("value"), $expression("listner"), ]
+                            [ $expression("EvilType.lazy"), ],
+                            [
+                                [
+                                    $expression("()"),
+                                    $expression("=>"),
+                                    ...buildCall
+                                    (
+                                        [ $expression("EvilType.Validator.isSpecificObject"), ],
+                                        [ $expression(buildObjectValidatorObjectName(name)), ...(undefined !== define.additionalProperties ? [ $expression(Jsonable.stringify(define.additionalProperties)), ]: []) ]
+                                    ),
+                                ]
+                            ]
                         )
+                        // $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${name} =>`),
+                        // ...buildCall
+                        // (
+                        //     buildCall
+                        //     (
+                        //         [ $expression(`EvilType.Validator.isSpecificObject<${name}>`), ],
+                        //         [ $expression(buildObjectValidatorObjectName(name)), ...(undefined !== define.additionalProperties ? [ $expression(Jsonable.stringify(define.additionalProperties)), ]: []) ]
+                        //     ),
+                        //     [ $expression("value"), $expression("listner"), ]
+                        // )
                     );
                 }
                 else
@@ -652,7 +667,7 @@ export namespace Build
                 {
                     result.push
                     (
-                        ...(! isLazyValidator(define) ? [ $expression(":"), $expression(`EvilType.Validator.IsType<${name}>`) ]: []),
+                        ...[ $expression(":"), $expression(`EvilType.Validator.IsType<${name}>`) ],
                         $expression("="),
                         ...buildFullValidator(name, define)
                     );

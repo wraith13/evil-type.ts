@@ -47,7 +47,7 @@
                     "$ref": "#/definitions/Type.CommentProperty"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.OutputOptions": {
             "type": "object",
@@ -95,7 +95,7 @@
                 "indentStyle",
                 "validatorOption"
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.SchemaOptions": {
             "type": "object",
@@ -120,7 +120,7 @@
                 "outputFile",
                 "$id"
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.indentStyleTypeMember": {
             "const": [
@@ -187,7 +187,7 @@
                 "target",
                 "from"
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.Definition": {
             "oneOf": [
@@ -239,7 +239,7 @@
                     "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.NamespaceDefinition": {
             "type": "object",
@@ -260,7 +260,7 @@
                     "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.ValueDefinition": {
             "type": "object",
@@ -291,7 +291,7 @@
                     "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.TypeDefinition": {
             "type": "object",
@@ -312,7 +312,7 @@
                     "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.InterfaceDefinition": {
             "type": "object",
@@ -345,7 +345,7 @@
                     "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.DictionaryDefinition": {
             "type": "object",
@@ -366,7 +366,7 @@
                     "$ref": "#/definitions/Type.AlphaDefinition"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.ArrayElement": {
             "type": "object",
@@ -453,7 +453,7 @@
                     "$ref": "#/definitions/Type.AlphaElement"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.ReferElement": {
             "type": "object",
@@ -465,7 +465,7 @@
             "required": [
                 "$ref"
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.PrimitiveTypeEnumMembers": {
             "const": [
@@ -502,7 +502,7 @@
                     "$ref": "#/definitions/Type.AlphaElement"
                 }
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.Type": {
             "oneOf": [
@@ -571,7 +571,7 @@
                 "$type",
                 "members"
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.TypeofElement": {
             "type": "object",
@@ -587,7 +587,7 @@
                 "$type",
                 "value"
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.ItemofElement": {
             "type": "object",
@@ -603,7 +603,7 @@
                 "$type",
                 "value"
             ],
-            "additionalProperties": true
+            "additionalProperties": false
         },
         "Type.TypeOrRefer": {
             "oneOf": [

@@ -12,7 +12,7 @@ export declare namespace Jsonable {
         [key in keyof Target]?: Target[key];
     } & JsonableObject;
     const isJsonableValue: EvilType.Validator.IsType<JsonableValue>;
-    const isJsonableArray: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is JsonableArray;
-    const isJsonableObject: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is JsonableObject;
-    const isJsonable: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is Jsonable;
+    const isJsonableArray: EvilType.Validator.IsType<JsonableArray>;
+    const isJsonableObject: EvilType.Validator.IsType<JsonableObject>;
+    const isJsonable: EvilType.Validator.IsType<Jsonable>;
 }

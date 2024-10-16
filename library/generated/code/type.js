@@ -10,91 +10,37 @@ var Type;
     Type.indentStyleTypeMember = ["allman", "egyptian"];
     Type.PrimitiveTypeEnumMembers = ["null", "boolean", "number", "string"];
     Type.isSchema = evil_type_1.EvilType.Validator.isJust(Type.schema);
-    Type.isCommentProperty = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.commentPropertyValidatorObject)(value, listner);
-    };
-    Type.isTypeSchema = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.typeSchemaValidatorObject)(value, listner);
-    };
-    Type.isOutputOptions = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.outputOptionsValidatorObject)(value, listner);
-    };
-    Type.isSchemaOptions = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.schemaOptionsValidatorObject)(value, listner);
-    };
+    Type.isCommentProperty = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.commentPropertyValidatorObject); });
+    Type.isTypeSchema = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.typeSchemaValidatorObject, false); });
+    Type.isOutputOptions = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.outputOptionsValidatorObject, false); });
+    Type.isSchemaOptions = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.schemaOptionsValidatorObject, false); });
     Type.isIndentStyleType = evil_type_1.EvilType.Validator.isEnum(Type.indentStyleTypeMember);
     Type.isValidatorOptionType = evil_type_1.EvilType.Validator.isEnum(["none", "simple", "full"]);
-    Type.isAlphaElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.alphaElementValidatorObject)(value, listner);
-    };
-    Type.isAlphaDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.alphaDefinitionValidatorObject)(value, listner);
-    };
-    Type.isImportDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.importDefinitionValidatorObject)(value, listner);
-    };
-    Type.isDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isOr(Type.isCodeDefinition, Type.isNamespaceDefinition, Type.isValueDefinition, Type.isTypeDefinition, Type.isInterfaceDefinition, Type.isDictionaryDefinition)(value, listner);
-    };
-    Type.isDefinitionMap = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isDictionaryObject(Type.isDefinition)(value, listner);
-    };
-    Type.isCodeDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.codeDefinitionValidatorObject)(value, listner);
-    };
-    Type.isNamespaceDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.namespaceDefinitionValidatorObject)(value, listner);
-    };
-    Type.isValueDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.valueDefinitionValidatorObject)(value, listner);
-    };
-    Type.isTypeDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.typeDefinitionValidatorObject)(value, listner);
-    };
-    Type.isInterfaceDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.interfaceDefinitionValidatorObject)(value, listner);
-    };
-    Type.isDictionaryDefinition = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.dictionaryDefinitionValidatorObject)(value, listner);
-    };
-    Type.isArrayElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.arrayElementValidatorObject)(value, listner);
-    };
-    Type.isOrElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.orElementValidatorObject)(value, listner);
-    };
-    Type.isAndElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.andElementValidatorObject)(value, listner);
-    };
-    Type.isLiteralElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.literalElementValidatorObject)(value, listner);
-    };
-    Type.isReferElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.referElementValidatorObject)(value, listner);
-    };
+    Type.isAlphaElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.alphaElementValidatorObject); });
+    Type.isAlphaDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.alphaDefinitionValidatorObject); });
+    Type.isImportDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.importDefinitionValidatorObject, false); });
+    Type.isDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isCodeDefinition, Type.isNamespaceDefinition, Type.isValueDefinition, Type.isTypeDefinition, Type.isInterfaceDefinition, Type.isDictionaryDefinition); });
+    Type.isDefinitionMap = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isDictionaryObject(Type.isDefinition); });
+    Type.isCodeDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.codeDefinitionValidatorObject, false); });
+    Type.isNamespaceDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.namespaceDefinitionValidatorObject, false); });
+    Type.isValueDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.valueDefinitionValidatorObject, false); });
+    Type.isTypeDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.typeDefinitionValidatorObject, false); });
+    Type.isInterfaceDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.interfaceDefinitionValidatorObject, false); });
+    Type.isDictionaryDefinition = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.dictionaryDefinitionValidatorObject, false); });
+    Type.isArrayElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.arrayElementValidatorObject); });
+    Type.isOrElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.orElementValidatorObject); });
+    Type.isAndElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.andElementValidatorObject); });
+    Type.isLiteralElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.literalElementValidatorObject, false); });
+    Type.isReferElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.referElementValidatorObject, false); });
     Type.isPrimitiveTypeEnum = evil_type_1.EvilType.Validator.isEnum(Type.PrimitiveTypeEnumMembers);
-    Type.isPrimitiveTypeElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.primitiveTypeElementValidatorObject)(value, listner);
-    };
-    Type.isType = function (value, listner) { return evil_type_1.EvilType.Validator.isOr(Type.isPrimitiveTypeElement, Type.isTypeDefinition, Type.isEnumTypeElement, Type.isTypeofElement, Type.isItemofElement, Type.isInterfaceDefinition, Type.isDictionaryDefinition, Type.isArrayElement, Type.isOrElement, Type.isAndElement, Type.isLiteralElement)(value, listner); };
-    Type.isEnumTypeElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.enumTypeElementValidatorObject)(value, listner);
-    };
-    Type.isTypeofElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.typeofElementValidatorObject)(value, listner);
-    };
-    Type.isItemofElement = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isSpecificObject(Type.itemofElementValidatorObject)(value, listner);
-    };
-    Type.isTypeOrRefer = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isOr(Type.isType, Type.isReferElement)(value, listner);
-    };
-    Type.isTypeOrValue = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isOr(Type.isType, Type.isValueDefinition)(value, listner);
-    };
-    Type.isTypeOrValueOfRefer = function (value, listner) {
-        return evil_type_1.EvilType.Validator.isOr(Type.isTypeOrValue, Type.isReferElement)(value, listner);
-    };
+    Type.isPrimitiveTypeElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.primitiveTypeElementValidatorObject, false); });
+    Type.isType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isPrimitiveTypeElement, Type.isTypeDefinition, Type.isEnumTypeElement, Type.isTypeofElement, Type.isItemofElement, Type.isInterfaceDefinition, Type.isDictionaryDefinition, Type.isArrayElement, Type.isOrElement, Type.isAndElement, Type.isLiteralElement); });
+    Type.isEnumTypeElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.enumTypeElementValidatorObject, false); });
+    Type.isTypeofElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.typeofElementValidatorObject, false); });
+    Type.isItemofElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.itemofElementValidatorObject, false); });
+    Type.isTypeOrRefer = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isType, Type.isReferElement); });
+    Type.isTypeOrValue = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isType, Type.isValueDefinition); });
+    Type.isTypeOrValueOfRefer = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isTypeOrValue, Type.isReferElement); });
     Type.commentPropertyValidatorObject = ({ comment: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)), });
     Type.typeSchemaValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commentPropertyValidatorObject, { $schema: Type.isSchema, imports: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isArray(Type.isImportDefinition)), defines: Type.isDefinitionMap, options: Type.isOutputOptions, });
     Type.outputOptionsValidatorObject = ({ outputFile: evil_type_1.EvilType.Validator.isString, indentUnit: evil_type_1.EvilType.Validator.isEnum([0, 1, 2, 3, 4, 5, 6, 7, 8, "tab"]), indentStyle: Type.isIndentStyleType, validatorOption: Type.isValidatorOptionType, maxLineLength: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isOr(evil_type_1.EvilType.Validator.isNull, evil_type_1.EvilType.Validator.isNumber)), schema: evil_type_1.EvilType.Validator.isOptional(Type.isSchemaOptions), });

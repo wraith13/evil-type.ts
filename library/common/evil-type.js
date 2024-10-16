@@ -13,6 +13,30 @@ exports.EvilType = void 0;
 // Original: https://github.com/wraith13/evil-type.ts/blob/master/common/evil-type.ts
 var EvilType;
 (function (EvilType) {
+    EvilType.comparer = function (focus) {
+        return function (a, b) {
+            var af = focus(a);
+            var bf = focus(b);
+            if (af < bf) {
+                return -1;
+            }
+            else if (bf < af) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        };
+    };
+    EvilType.lazy = function (invoker) {
+        return (function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            return invoker().apply(void 0, args);
+        });
+    };
     var Error;
     (function (Error) {
         Error.makeListener = function (path) {
@@ -171,11 +195,6 @@ var EvilType;
     var Validator;
     (function (Validator) {
         Validator.makeErrorListener = Error.makeListener;
-        // TypeScript さんが残念で Type Guard 関数の戻り型がすぐにただの boolean 扱いになってしまい、いちいち value is T を明示する羽目になって、記述をコンパクトにする為に isTypeLazy を使おうとしても全然コンパクトにできないので、これは使用を断念。
-        // export const isTypeLazy= <T>(invoker: () => IsType<T>) =>
-        //     (value: unknown, listner?: ErrorListener): value is T => invoker()(value, listner);
-        // export const lazy = <T extends (...args: any[]) => any>(invoker: () => T): T =>
-        //     ((...args: any[]): any => invoker()(...args)) as T;
         Validator.isJust = function (target) { return function (value, listner) {
             return Error.withErrorHandling(target === value, listner, function () { return Error.valueToString(target); }, value);
         }; };
@@ -233,17 +252,7 @@ var EvilType;
                     matchRate: Error.getMatchRate(listener),
                 });
             })
-                .sort(function (a, b) {
-                if (a.matchRate < b.matchRate) {
-                    return 1;
-                }
-                else if (b.matchRate < a.matchRate) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }
-            })
+                .sort(function (a, b) { return a.matchRate < b.matchRate ? 1 : b.matchRate < a.matchRate ? -1 : 0; })
                 .filter(function (i, _ix, list) { return i.matchRate === list[0].matchRate; })
                 .map(function (i) { return i.listener; });
         };
@@ -367,13 +376,15 @@ var EvilType;
                     error.requiredType = "never | " + error.requiredType;
                 }
                 else {
-                    listner.errors.filter(function (i) { return 0 === i.path.indexOf(listner.path) && "fragment" !== i.type; }).forEach(function (i) { return i.type = "fragment"; });
-                    listner.errors.push({
-                        type: "fragment",
-                        path: listner.path,
-                        requiredType: "never",
-                        actualValue: Error.valueToString(value[member]),
-                    });
+                    // Not wrong, but noisy!
+                    // listner.errors.filter(i => 0 === i.path.indexOf(listner.path) && "fragment" !== i.type).forEach(i => i.type = "fragment");
+                    // listner.errors.push
+                    // ({
+                    //     type: "fragment",
+                    //     path: listner.path,
+                    //     requiredType: "never",
+                    //     actualValue: Error.valueToString((value as ObjectType)[member]),
+                    // });
                 }
             }
             return result;

@@ -16,10 +16,9 @@ export namespace Jsonable
     export type JsonablePartial<Target extends JsonableObject> = { [key in keyof Target]?: Target[key] } & JsonableObject;
     export const isJsonableValue: EvilType.Validator.IsType<JsonableValue> = EvilType.Validator.isOr(EvilType.Validator.isNull,
         EvilType.Validator.isBoolean, EvilType.Validator.isNumber, EvilType.Validator.isString);
-    export const isJsonableArray = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is JsonableArray =>
-        EvilType.Validator.isArray(isJsonable)(value, listner);
-    export const isJsonableObject = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is JsonableObject =>
-        EvilType.Validator.isDictionaryObject(isJsonable)(value, listner);
-    export const isJsonable = (value: unknown, listner?: EvilType.Validator.ErrorListener): value is Jsonable => EvilType.Validator.isOr(
-        isJsonableValue, isJsonableArray, isJsonableObject)(value, listner);
+    export const isJsonableArray: EvilType.Validator.IsType<JsonableArray> = EvilType.lazy(() => EvilType.Validator.isArray(isJsonable));
+    export const isJsonableObject: EvilType.Validator.IsType<JsonableObject> = EvilType.lazy(() => EvilType.Validator.isDictionaryObject(
+        isJsonable));
+    export const isJsonable: EvilType.Validator.IsType<Jsonable> = EvilType.lazy(() => EvilType.Validator.isOr(isJsonableValue,
+        isJsonableArray, isJsonableObject));
 }

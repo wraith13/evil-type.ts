@@ -1,4 +1,6 @@
 export declare namespace EvilType {
+    const comparer: <Item, Focus>(focus: (i: Item) => Focus) => (a: Item, b: Item) => 0 | 1 | -1;
+    const lazy: <T extends (...args: any[]) => any>(invoker: () => T) => T;
     namespace Error {
         interface Item {
             type: "solid" | "fragment";

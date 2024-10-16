@@ -125,8 +125,8 @@ export declare namespace Type {
     const isAlphaElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is AlphaElement;
     const isAlphaDefinition: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is AlphaDefinition;
     const isImportDefinition: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is ImportDefinition;
-    const isDefinition: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is Definition;
-    const isDefinitionMap: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is DefinitionMap;
+    const isDefinition: EvilType.Validator.IsType<Definition>;
+    const isDefinitionMap: EvilType.Validator.IsType<DefinitionMap>;
     const isCodeDefinition: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is CodeDefinition;
     const isNamespaceDefinition: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NamespaceDefinition;
     const isValueDefinition: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is ValueDefinition;
@@ -140,13 +140,13 @@ export declare namespace Type {
     const isReferElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is ReferElement;
     const isPrimitiveTypeEnum: EvilType.Validator.IsType<PrimitiveTypeEnum>;
     const isPrimitiveTypeElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is PrimitiveTypeElement;
-    const isType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is Type;
+    const isType: EvilType.Validator.IsType<Type>;
     const isEnumTypeElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is EnumTypeElement;
     const isTypeofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is TypeofElement;
     const isItemofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is ItemofElement;
-    const isTypeOrRefer: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is TypeOrRefer;
-    const isTypeOrValue: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is TypeOrValue;
-    const isTypeOrValueOfRefer: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is TypeOrValueOfRefer;
+    const isTypeOrRefer: EvilType.Validator.IsType<TypeOrRefer>;
+    const isTypeOrValue: EvilType.Validator.IsType<TypeOrValue>;
+    const isTypeOrValueOfRefer: EvilType.Validator.IsType<TypeOrValueOfRefer>;
     const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty>;
     const typeSchemaValidatorObject: EvilType.Validator.ObjectValidator<TypeSchema>;
     const outputOptionsValidatorObject: EvilType.Validator.ObjectValidator<OutputOptions>;

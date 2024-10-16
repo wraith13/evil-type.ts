@@ -81,7 +81,7 @@ export declare namespace Build {
             };
         }) => (CodeExpression | CodeInlineBlock)[];
         const isLazyValidator: (define: Type.TypeOrRefer) => boolean;
-        const buildFullValidator: (name: string, define: Type.Type) => CodeInlineEntry[];
+        const buildFullValidator: (_name: string, define: Type.Type) => CodeInlineEntry[];
         const isValidatorTarget: (define: Type.TypeOrValue) => boolean;
         const buildValidator: (options: Type.OutputOptions, name: string, define: Type.TypeOrValue) => CodeLine[];
         const buildValidatorObject: (options: Type.OutputOptions, name: string, define: Type.InterfaceDefinition) => CodeLine[];

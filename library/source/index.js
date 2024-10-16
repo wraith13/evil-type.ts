@@ -471,14 +471,7 @@ var Build;
             }
             return true;
         };
-        Validator.buildFullValidator = function (name, define) { return Validator.isLazyValidator(define) ? __spreadArray([
-            // ...buildCall
-            // (
-            //     [ $expression("EvilType.Validator.isTypeLazy"), ],
-            //     [ [ $expression("()"), $expression("=>"), ...buildObjectValidatorGetterCoreEntry(define), ] , ]
-            // ),
-            (0, exports.$expression)("(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ".concat(type_1.Type.isValueDefinition(define) ? "typeof " + name : name, " =>"))
-        ], Validator.buildCall(Validator.buildObjectValidatorGetterCoreEntry(define), [(0, exports.$expression)("value"), (0, exports.$expression)("listner"),]), true) :
+        Validator.buildFullValidator = function (_name, define) { return Validator.isLazyValidator(define) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(define), true),]), true) :
             Validator.buildObjectValidatorGetterCoreEntry(define); };
         Validator.isValidatorTarget = function (define) {
             return !(type_1.Type.isValueDefinition(define) && false === define.validator);
@@ -500,8 +493,23 @@ var Build;
                     (0, exports.$expression)(Validator.buildValidatorName(name)),
                 ], false);
                 if ("interface" === define.$type) {
-                    result_3.push.apply(result_3, __spreadArray([(0, exports.$expression)("="),
-                        (0, exports.$expression)("(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ".concat(name, " =>"))], Validator.buildCall(Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject<".concat(name, ">")),], [(0, exports.$expression)(Validator.buildObjectValidatorObjectName(name))]), [(0, exports.$expression)("value"), (0, exports.$expression)("listner"),]), false));
+                    result_3.push.apply(result_3, __spreadArray([(0, exports.$expression)("=")], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [
+                        __spreadArray([
+                            (0, exports.$expression)("()"),
+                            (0, exports.$expression)("=>")
+                        ], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject"),], __spreadArray([(0, exports.$expression)(Validator.buildObjectValidatorObjectName(name))], (undefined !== define.additionalProperties ? [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.additionalProperties)),] : []), true)), true)
+                    ])
+                    // $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${name} =>`),
+                    // ...buildCall
+                    // (
+                    //     buildCall
+                    //     (
+                    //         [ $expression(`EvilType.Validator.isSpecificObject<${name}>`), ],
+                    //         [ $expression(buildObjectValidatorObjectName(name)), ...(undefined !== define.additionalProperties ? [ $expression(Jsonable.stringify(define.additionalProperties)), ]: []) ]
+                    //     ),
+                    //     [ $expression("value"), $expression("listner"), ]
+                    // )
+                    , false));
                 }
                 else if ("value" === define.$type) {
                     if (type_1.Type.isReferElement(define.value)) {
@@ -512,7 +520,7 @@ var Build;
                     }
                 }
                 else {
-                    result_3.push.apply(result_3, __spreadArray(__spreadArray(__spreadArray([], (!Validator.isLazyValidator(define) ? [(0, exports.$expression)(":"), (0, exports.$expression)("EvilType.Validator.IsType<".concat(name, ">"))] : []), false), [(0, exports.$expression)("=")], false), Validator.buildFullValidator(name, define), false));
+                    result_3.push.apply(result_3, __spreadArray(__spreadArray(__spreadArray([], [(0, exports.$expression)(":"), (0, exports.$expression)("EvilType.Validator.IsType<".concat(name, ">"))], false), [(0, exports.$expression)("=")], false), Validator.buildFullValidator(name, define), false));
                 }
                 return [(0, exports.$line)(result_3)];
             }
