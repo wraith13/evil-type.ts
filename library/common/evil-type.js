@@ -11,6 +11,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EvilType = void 0;
 // Original: https://github.com/wraith13/evil-type.ts/blob/master/common/evil-type.ts
+// License: https://github.com/wraith13/evil-type.ts/blob/master/LICENSE_1_0.txt
 var EvilType;
 (function (EvilType) {
     EvilType.comparer = function () {

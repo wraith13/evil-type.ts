@@ -1,4 +1,5 @@
 // Original: https://github.com/wraith13/evil-type.ts/blob/master/common/evil-type.ts
+// License: https://github.com/wraith13/evil-type.ts/blob/master/LICENSE_1_0.txt
 export namespace EvilType
 {
     export const comparer = <Item, T extends ((i: Item) => any)[]>(...args: T) =>

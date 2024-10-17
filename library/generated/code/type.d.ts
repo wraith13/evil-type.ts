@@ -32,6 +32,8 @@ export declare namespace Type {
     type ValidatorOptionType = "none" | "simple" | "full";
     interface AlphaElement {
         $type: string;
+        title?: string;
+        description?: string;
     }
     interface AlphaDefinition extends AlphaElement, CommentProperty {
         export?: boolean;
@@ -92,6 +94,8 @@ export declare namespace Type {
     }
     interface ReferElement {
         $ref: string;
+        title?: string;
+        description?: string;
     }
     const PrimitiveTypeEnumMembers: readonly ["null", "boolean", "number", "string"];
     type PrimitiveTypeEnum = typeof PrimitiveTypeEnumMembers[number];
@@ -103,14 +107,20 @@ export declare namespace Type {
     interface EnumTypeElement {
         $type: "enum-type";
         members: (null | boolean | number | string)[];
+        title?: string;
+        description?: string;
     }
     interface TypeofElement {
         $type: "typeof";
         value: ReferElement;
+        title?: string;
+        description?: string;
     }
     interface ItemofElement {
         $type: "itemof";
         value: ReferElement;
+        title?: string;
+        description?: string;
     }
     type TypeOrRefer = Type | ReferElement;
     type TypeOrValue = Type | ValueDefinition;

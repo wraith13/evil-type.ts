@@ -37,6 +37,8 @@ export namespace Type
     export interface AlphaElement
     {
         $type: string;
+        title?: string;
+        description?: string;
     }
     export interface AlphaDefinition extends AlphaElement, CommentProperty
     {
@@ -110,6 +112,8 @@ export namespace Type
     export interface ReferElement
     {
         $ref: string;
+        title?: string;
+        description?: string;
     }
     export const PrimitiveTypeEnumMembers = ["null","boolean","number","string"] as const;
     export type PrimitiveTypeEnum = typeof PrimitiveTypeEnumMembers[number];
@@ -124,16 +128,22 @@ export namespace Type
     {
         $type: "enum-type";
         members:(null | boolean | number | string)[];
+        title?: string;
+        description?: string;
     }
     export interface TypeofElement
     {
         $type: "typeof";
         value: ReferElement;
+        title?: string;
+        description?: string;
     }
     export interface ItemofElement
     {
         $type: "itemof";
         value: ReferElement;
+        title?: string;
+        description?: string;
     }
     export type TypeOrRefer = Type | ReferElement;
     export type TypeOrValue = Type | ValueDefinition;
@@ -162,9 +172,9 @@ export namespace Type
         );
     export const isDictionaryDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(dictionaryDefinitionValidatorObject,
         false));
-    export const isArrayElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(arrayElementValidatorObject));
-    export const isOrElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(orElementValidatorObject));
-    export const isAndElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(andElementValidatorObject));
+    export const isArrayElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(arrayElementValidatorObject, false));
+    export const isOrElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(orElementValidatorObject, false));
+    export const isAndElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(andElementValidatorObject, false));
     export const isLiteralElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(literalElementValidatorObject, false));
     export const isReferElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(referElementValidatorObject, false));
     export const isPrimitiveTypeEnum: EvilType.Validator.IsType<PrimitiveTypeEnum> = EvilType.Validator.isEnum(PrimitiveTypeEnumMembers);
@@ -194,7 +204,9 @@ export namespace Type
     export const schemaOptionsValidatorObject: EvilType.Validator.ObjectValidator<SchemaOptions> = ({ outputFile:
         EvilType.Validator.isString, $id: EvilType.Validator.isString, $ref: EvilType.Validator.isOptional(EvilType.Validator.isString),
         externalReferMapping: EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(EvilType.Validator.isString)), });
-    export const alphaElementValidatorObject: EvilType.Validator.ObjectValidator<AlphaElement> = ({ $type: EvilType.Validator.isString, });
+    export const alphaElementValidatorObject: EvilType.Validator.ObjectValidator<AlphaElement> = ({ $type: EvilType.Validator.isString,
+        title: EvilType.Validator.isOptional(EvilType.Validator.isString), description: EvilType.Validator.isOptional(
+        EvilType.Validator.isString), });
     export const alphaDefinitionValidatorObject: EvilType.Validator.ObjectValidator<AlphaDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaElementValidatorObject, commentPropertyValidatorObject, { export:
         EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
@@ -231,15 +243,20 @@ export namespace Type
     export const literalElementValidatorObject: EvilType.Validator.ObjectValidator<LiteralElement> =
         EvilType.Validator.mergeObjectValidator(alphaElementValidatorObject, { $type: EvilType.Validator.isJust("literal" as const),
         literal: Jsonable.isJsonable, });
-    export const referElementValidatorObject: EvilType.Validator.ObjectValidator<ReferElement> = ({ $ref: EvilType.Validator.isString, });
+    export const referElementValidatorObject: EvilType.Validator.ObjectValidator<ReferElement> = ({ $ref: EvilType.Validator.isString,
+        title: EvilType.Validator.isOptional(EvilType.Validator.isString), description: EvilType.Validator.isOptional(
+        EvilType.Validator.isString), });
     export const primitiveTypeElementValidatorObject: EvilType.Validator.ObjectValidator<PrimitiveTypeElement> =
         EvilType.Validator.mergeObjectValidator(alphaElementValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const),
         type: isPrimitiveTypeEnum, });
     export const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement> = ({ $type: EvilType.Validator.isJust(
         "enum-type" as const), members: EvilType.Validator.isArray(EvilType.Validator.isOr(EvilType.Validator.isNull,
-        EvilType.Validator.isBoolean, EvilType.Validator.isNumber, EvilType.Validator.isString)), });
+        EvilType.Validator.isBoolean, EvilType.Validator.isNumber, EvilType.Validator.isString)), title: EvilType.Validator.isOptional(
+        EvilType.Validator.isString), description: EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement> = ({ $type: EvilType.Validator.isJust(
-        "typeof" as const), value: isReferElement, });
+        "typeof" as const), value: isReferElement, title: EvilType.Validator.isOptional(EvilType.Validator.isString), description:
+        EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const itemofElementValidatorObject: EvilType.Validator.ObjectValidator<ItemofElement> = ({ $type: EvilType.Validator.isJust(
-        "itemof" as const), value: isReferElement, });
+        "itemof" as const), value: isReferElement, title: EvilType.Validator.isOptional(EvilType.Validator.isString), description:
+        EvilType.Validator.isOptional(EvilType.Validator.isString), });
 }

@@ -905,13 +905,25 @@ export namespace Build
             };
             return result;
         };
+        export const setCommonProperties = (result: Jsonable.JsonableObject, data: SchemaProcess<{ title?: string, description?: string }>) =>
+        {
+            if (data.value.title)
+            {
+                result["title"] = data.value.title;
+            }
+            if (data.value.description)
+            {
+                result["description"] = data.value.description;
+            }
+            return result;
+        };
         export const buildPrimitiveType = (data: SchemaProcess<Type.PrimitiveTypeElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
                 type: data.value.type,
             };
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildInterface = (data: SchemaProcess<Type.InterfaceDefinition>):Jsonable.JsonableObject =>
         {
@@ -963,7 +975,7 @@ export namespace Build
             {
                 result["additionalProperties"] = data.value.additionalProperties;
             }
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildDictionary = (data: SchemaProcess<Type.DictionaryDefinition>):Jsonable.JsonableObject =>
         {
@@ -972,7 +984,7 @@ export namespace Build
                 type: "object",
                 additionalProperties: buildTypeOrRefer(nextProcess(data, null, data.value.valueType)),
             };
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildEnumType = (data: SchemaProcess<Type.EnumTypeElement>):Jsonable.JsonableObject =>
         {
@@ -980,7 +992,7 @@ export namespace Build
             {
                 enum: data.value.members,
             };
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildTypeOf = (data: SchemaProcess<Type.TypeofElement>):Jsonable.JsonableObject =>
         {
@@ -996,7 +1008,7 @@ export namespace Build
             {
                 console.error(`🚫 Can not resolve refer: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref }) }`);
             }
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildItemOf = (data: SchemaProcess<Type.ItemofElement>):Jsonable.JsonableObject =>
         {
@@ -1019,7 +1031,7 @@ export namespace Build
             {
                 console.error(`🚫 Can not resolve refer: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref }) }`);
             }
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildRefer = (data: SchemaProcess<Type.ReferElement>):Jsonable.JsonableObject =>
         {
@@ -1028,7 +1040,7 @@ export namespace Build
             {
                 $ref: resolveExternalRefer(data, path) ?? `#/${Const.definitions}/${path}`,
             };
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildArray = (data: SchemaProcess<Type.ArrayElement>):Jsonable.JsonableObject =>
         {
@@ -1037,7 +1049,7 @@ export namespace Build
                 type: "array",
                 items: buildTypeOrRefer(nextProcess(data, null, data.value.items)),
             };
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildOr = (data: SchemaProcess<Type.OrElement>):Jsonable.JsonableObject =>
         {
@@ -1045,7 +1057,7 @@ export namespace Build
             {
                 oneOf: data.value.types.map(i => buildTypeOrRefer(nextProcess(data, null, i))),
             };
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildAnd = (data: SchemaProcess<Type.AndElement>):Jsonable.JsonableObject =>
         {
@@ -1053,7 +1065,7 @@ export namespace Build
             {
                 allOf: data.value.types.map(i => buildTypeOrRefer(nextProcess(data, null, i))),
             };
-            return result;
+            return setCommonProperties(result, data);
         };
         export const buildTypeOrRefer = (data: SchemaProcess<Type.TypeOrRefer>):Jsonable.JsonableObject =>
             Type.isReferElement(data.value) ?

@@ -110,6 +110,10 @@ export declare namespace Build {
         const buildLiteral: (data: SchemaProcess<Type.LiteralElement>) => Jsonable.JsonableObject;
         const buildValue: (data: SchemaProcess<Type.ValueDefinition>) => Jsonable.JsonableObject;
         const buildType: (data: SchemaProcess<Type.Type>) => Jsonable.JsonableObject;
+        const setCommonProperties: (result: Jsonable.JsonableObject, data: SchemaProcess<{
+            title?: string;
+            description?: string;
+        }>) => Jsonable.JsonableObject;
         const buildPrimitiveType: (data: SchemaProcess<Type.PrimitiveTypeElement>) => Jsonable.JsonableObject;
         const buildInterface: (data: SchemaProcess<Type.InterfaceDefinition>) => Jsonable.JsonableObject;
         const buildDictionary: (data: SchemaProcess<Type.DictionaryDefinition>) => Jsonable.JsonableObject;

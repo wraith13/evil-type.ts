@@ -710,11 +710,20 @@ var Build;
             var result = {};
             return result;
         };
+        Schema.setCommonProperties = function (result, data) {
+            if (data.value.title) {
+                result["title"] = data.value.title;
+            }
+            if (data.value.description) {
+                result["description"] = data.value.description;
+            }
+            return result;
+        };
         Schema.buildPrimitiveType = function (data) {
             var result = {
                 type: data.value.type,
             };
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildInterface = function (data) {
             var properties = {};
@@ -751,20 +760,20 @@ var Build;
             if ("boolean" === typeof data.value.additionalProperties) {
                 result["additionalProperties"] = data.value.additionalProperties;
             }
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildDictionary = function (data) {
             var result = {
                 type: "object",
                 additionalProperties: Schema.buildTypeOrRefer(Schema.nextProcess(data, null, data.value.valueType)),
             };
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildEnumType = function (data) {
             var result = {
                 enum: data.value.members,
             };
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildTypeOf = function (data) {
             var result = {};
@@ -775,7 +784,7 @@ var Build;
             else {
                 console.error("\uD83D\uDEAB Can not resolve refer: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref })));
             }
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildItemOf = function (data) {
             var result = {};
@@ -791,7 +800,7 @@ var Build;
             else {
                 console.error("\uD83D\uDEAB Can not resolve refer: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref })));
             }
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildRefer = function (data) {
             var _a;
@@ -799,26 +808,26 @@ var Build;
             var result = {
                 $ref: (_a = Schema.resolveExternalRefer(data, path)) !== null && _a !== void 0 ? _a : "#/".concat(Const.definitions, "/").concat(path),
             };
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildArray = function (data) {
             var result = {
                 type: "array",
                 items: Schema.buildTypeOrRefer(Schema.nextProcess(data, null, data.value.items)),
             };
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildOr = function (data) {
             var result = {
                 oneOf: data.value.types.map(function (i) { return Schema.buildTypeOrRefer(Schema.nextProcess(data, null, i)); }),
             };
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildAnd = function (data) {
             var result = {
                 allOf: data.value.types.map(function (i) { return Schema.buildTypeOrRefer(Schema.nextProcess(data, null, i)); }),
             };
-            return result;
+            return Schema.setCommonProperties(result, data);
         };
         Schema.buildTypeOrRefer = function (data) {
             return type_1.Type.isReferElement(data.value) ?

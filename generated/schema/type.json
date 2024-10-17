@@ -13,7 +13,8 @@
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 }
             },
             "required": []
@@ -25,7 +26,8 @@
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 },
                 "$schema": {
                     "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#"
@@ -34,10 +36,12 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/Type.ImportDefinition"
-                    }
+                    },
+                    "description": "[CODE] Specify imports that your code depends on. If you use `full` for `validatorOption`, you need to specify import as `evil-type` as `{ EvilType }` here."
                 },
                 "defines": {
-                    "$ref": "#/definitions/Type.DefinitionMap"
+                    "$ref": "#/definitions/Type.DefinitionMap",
+                    "description": "Your type definitions"
                 },
                 "options": {
                     "$ref": "#/definitions/Type.OutputOptions"
@@ -54,7 +58,8 @@
             "type": "object",
             "properties": {
                 "outputFile": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "[CODE]"
                 },
                 "indentUnit": {
                     "enum": [
@@ -68,13 +73,16 @@
                         7,
                         8,
                         "tab"
-                    ]
+                    ],
+                    "description": "[CODE]"
                 },
                 "indentStyle": {
-                    "$ref": "#/definitions/Type.IndentStyleType"
+                    "$ref": "#/definitions/Type.IndentStyleType",
+                    "description": "[CODE]"
                 },
                 "validatorOption": {
-                    "$ref": "#/definitions/Type.ValidatorOptionType"
+                    "$ref": "#/definitions/Type.ValidatorOptionType",
+                    "description": "[CODE]"
                 },
                 "maxLineLength": {
                     "oneOf": [
@@ -84,10 +92,12 @@
                         {
                             "type": "number"
                         }
-                    ]
+                    ],
+                    "description": "[CODE]"
                 },
                 "schema": {
-                    "$ref": "#/definitions/Type.SchemaOptions"
+                    "$ref": "#/definitions/Type.SchemaOptions",
+                    "description": "[SCHEMA] If you want to generate JSON Schema, specify this option."
                 }
             },
             "required": [
@@ -102,19 +112,23 @@
             "type": "object",
             "properties": {
                 "outputFile": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 },
                 "$id": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "[SCHEMA] Schema ID"
                 },
                 "$ref": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "[SCHEMA] Root Schema"
                 },
                 "externalReferMapping": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[SCHEMA] Mapping of external schemas to reference"
                 }
             },
             "required": [
@@ -147,6 +161,14 @@
             "properties": {
                 "$type": {
                     "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 }
             },
             "required": [
@@ -159,11 +181,20 @@
                 "$type": {
                     "type": "string"
                 },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "comment": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 },
                 "export": {
                     "type": "boolean"
@@ -227,11 +258,20 @@
                 "$type": {
                     "const": "code"
                 },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "comment": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 },
                 "export": {
                     "type": "boolean"
@@ -247,7 +287,8 @@
                 "$type",
                 "tokens"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "description": "[CODE]"
         },
         "Type.NamespaceDefinition": {
             "type": "object",
@@ -255,11 +296,20 @@
                 "$type": {
                     "const": "namespace"
                 },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "comment": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 },
                 "export": {
                     "type": "boolean"
@@ -280,11 +330,20 @@
                 "$type": {
                     "const": "value"
                 },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "comment": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 },
                 "export": {
                     "type": "boolean"
@@ -315,11 +374,20 @@
                 "$type": {
                     "const": "type"
                 },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "comment": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 },
                 "export": {
                     "type": "boolean"
@@ -340,11 +408,20 @@
                 "$type": {
                     "const": "interface"
                 },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "comment": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 },
                 "export": {
                     "type": "boolean"
@@ -377,11 +454,20 @@
                 "$type": {
                     "const": "dictionary"
                 },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "comment": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "description": "[CODE]"
                 },
                 "export": {
                     "type": "boolean"
@@ -402,6 +488,14 @@
                 "$type": {
                     "const": "array"
                 },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "items": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
                 }
@@ -409,7 +503,8 @@
             "required": [
                 "$type",
                 "items"
-            ]
+            ],
+            "additionalProperties": false
         },
         "Type.OrElement": {
             "type": "object",
@@ -417,23 +512,13 @@
                 "$type": {
                     "const": "or"
                 },
-                "types": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/Type.TypeOrRefer"
-                    }
-                }
-            },
-            "required": [
-                "$type",
-                "types"
-            ]
-        },
-        "Type.AndElement": {
-            "type": "object",
-            "properties": {
-                "$type": {
-                    "const": "and"
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 },
                 "types": {
                     "type": "array",
@@ -445,13 +530,49 @@
             "required": [
                 "$type",
                 "types"
-            ]
+            ],
+            "additionalProperties": false
+        },
+        "Type.AndElement": {
+            "type": "object",
+            "properties": {
+                "$type": {
+                    "const": "and"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Type.TypeOrRefer"
+                    }
+                }
+            },
+            "required": [
+                "$type",
+                "types"
+            ],
+            "additionalProperties": false
         },
         "Type.LiteralElement": {
             "type": "object",
             "properties": {
                 "$type": {
                     "const": "literal"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 },
                 "literal": {
                     "$ref": "jsonable.json#/definitions/Jsonable.Jsonable"
@@ -468,6 +589,14 @@
             "properties": {
                 "$ref": {
                     "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 }
             },
             "required": [
@@ -496,6 +625,14 @@
             "properties": {
                 "$type": {
                     "const": "primitive-type"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 },
                 "type": {
                     "$ref": "#/definitions/Type.PrimitiveTypeEnum"
@@ -568,6 +705,14 @@
                             }
                         ]
                     }
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 }
             },
             "required": [
@@ -584,6 +729,14 @@
                 },
                 "value": {
                     "$ref": "#/definitions/Type.ReferElement"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 }
             },
             "required": [
@@ -600,6 +753,14 @@
                 },
                 "value": {
                     "$ref": "#/definitions/Type.ReferElement"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
                 }
             },
             "required": [
