@@ -21,6 +21,12 @@
         "Type.TypeSchema": {
             "type": "object",
             "properties": {
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "$schema": {
                     "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#"
                 },
@@ -41,11 +47,6 @@
                 "$schema",
                 "defines",
                 "options"
-            ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.CommentProperty"
-                }
             ],
             "additionalProperties": false
         },
@@ -155,18 +156,21 @@
         "Type.AlphaDefinition": {
             "type": "object",
             "properties": {
+                "$type": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "export": {
                     "type": "boolean"
                 }
             },
-            "required": [],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaElement"
-                },
-                {
-                    "$ref": "#/definitions/Type.CommentProperty"
-                }
+            "required": [
+                "$type"
             ]
         },
         "Type.ImportDefinition": {
@@ -223,6 +227,15 @@
                 "$type": {
                     "const": "code"
                 },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "export": {
+                    "type": "boolean"
+                },
                 "tokens": {
                     "type": "array",
                     "items": {
@@ -234,11 +247,6 @@
                 "$type",
                 "tokens"
             ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaDefinition"
-                }
-            ],
             "additionalProperties": false
         },
         "Type.NamespaceDefinition": {
@@ -246,6 +254,15 @@
             "properties": {
                 "$type": {
                     "const": "namespace"
+                },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "export": {
+                    "type": "boolean"
                 },
                 "members": {
                     "$ref": "#/definitions/Type.DefinitionMap"
@@ -255,11 +272,6 @@
                 "$type",
                 "members"
             ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaDefinition"
-                }
-            ],
             "additionalProperties": false
         },
         "Type.ValueDefinition": {
@@ -267,6 +279,15 @@
             "properties": {
                 "$type": {
                     "const": "value"
+                },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "export": {
+                    "type": "boolean"
                 },
                 "value": {
                     "oneOf": [
@@ -286,11 +307,6 @@
                 "$type",
                 "value"
             ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaDefinition"
-                }
-            ],
             "additionalProperties": false
         },
         "Type.TypeDefinition": {
@@ -298,6 +314,15 @@
             "properties": {
                 "$type": {
                     "const": "type"
+                },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "export": {
+                    "type": "boolean"
                 },
                 "define": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
@@ -307,11 +332,6 @@
                 "$type",
                 "define"
             ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaDefinition"
-                }
-            ],
             "additionalProperties": false
         },
         "Type.InterfaceDefinition": {
@@ -319,6 +339,15 @@
             "properties": {
                 "$type": {
                     "const": "interface"
+                },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "export": {
+                    "type": "boolean"
                 },
                 "extends": {
                     "type": "array",
@@ -340,11 +369,6 @@
                 "$type",
                 "members"
             ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaDefinition"
-                }
-            ],
             "additionalProperties": false
         },
         "Type.DictionaryDefinition": {
@@ -353,6 +377,15 @@
                 "$type": {
                     "const": "dictionary"
                 },
+                "comment": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "export": {
+                    "type": "boolean"
+                },
                 "valueType": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
                 }
@@ -360,11 +393,6 @@
             "required": [
                 "$type",
                 "valueType"
-            ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaDefinition"
-                }
             ],
             "additionalProperties": false
         },
@@ -381,11 +409,6 @@
             "required": [
                 "$type",
                 "items"
-            ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaElement"
-                }
             ]
         },
         "Type.OrElement": {
@@ -404,11 +427,6 @@
             "required": [
                 "$type",
                 "types"
-            ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaElement"
-                }
             ]
         },
         "Type.AndElement": {
@@ -427,11 +445,6 @@
             "required": [
                 "$type",
                 "types"
-            ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaElement"
-                }
             ]
         },
         "Type.LiteralElement": {
@@ -447,11 +460,6 @@
             "required": [
                 "$type",
                 "literal"
-            ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaElement"
-                }
             ],
             "additionalProperties": false
         },
@@ -496,11 +504,6 @@
             "required": [
                 "$type",
                 "type"
-            ],
-            "allOf": [
-                {
-                    "$ref": "#/definitions/Type.AlphaElement"
-                }
             ],
             "additionalProperties": false
         },

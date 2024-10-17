@@ -119,12 +119,12 @@
         }
     },
     "options": {
-        "outputFile": "./generated/code/jsonable.ts",
+        "outputFile": "../generated/code/jsonable.ts",
         "indentUnit": 4,
         "indentStyle": "allman",
         "validatorOption": "full",
         "schema": {
-            "outputFile": "./generated/schema/jsonable.json",
+            "outputFile": "../generated/schema/jsonable.json",
             "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/jsonable.json#"
         }
     }

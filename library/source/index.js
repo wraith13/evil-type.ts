@@ -725,16 +725,32 @@ var Build;
                 required: Object.keys(data.value.members).filter(function (i) { return !i.endsWith("?"); }),
             };
             if (data.value.extends) {
-                result["allOf"] = data.value.extends.map(function (i) { return Schema.buildRefer(Schema.nextProcess(data, null, i)); });
-            }
-            if ("boolean" === typeof data.value.additionalProperties) {
-                result["additionalProperties"] = data.value.additionalProperties;
+                // additionalProperties: false と allOf の組み合わせは残念な事になるので極力使わない。( additionalProperties: false が、 allOf の参照先の properties も参照元の Properties も使えなくしてしまうので、この組み合わせは使えたもんじゃない。 )
+                var allOf_1 = [];
+                data.value.extends.forEach(function (i) {
+                    var current = Schema.getDefinition(data, i);
+                    if (type_1.Type.isInterfaceDefinition(current.value)) {
+                        var base = Schema.buildInterface(current);
+                        Object.assign(properties, base["properties"]);
+                        var required_1 = result["required"];
+                        required_1.push.apply(required_1, base["required"].filter(function (j) { return !required_1.includes(j); }));
+                    }
+                    else {
+                        allOf_1.push(Schema.buildRefer(Schema.nextProcess(data, null, i)));
+                    }
+                });
+                if (allOf_1.some(function (_i) { return true; })) {
+                    result["allOf"] = allOf_1;
+                }
             }
             Object.entries(data.value.members).forEach(function (i) {
                 var key = text_1.Text.getPrimaryKeyName(i[0]);
                 var value = i[1];
                 properties[key] = Schema.buildTypeOrRefer(Schema.nextProcess(data, null, value));
             });
+            if ("boolean" === typeof data.value.additionalProperties) {
+                result["additionalProperties"] = data.value.additionalProperties;
+            }
             return result;
         };
         Schema.buildDictionary = function (data) {
@@ -951,13 +967,34 @@ var build = function (jsonPath) {
         var rawSource = fget(jsonPath);
         var typeSource = jsonable_1.Jsonable.parse(rawSource);
         var errorListner = evil_type_1.EvilType.Validator.makeErrorListener(jsonPath);
+        var resolvePath = function (path) {
+            if (path.startsWith("./") || path.startsWith("../")) {
+                var base = jsonPath.split("/").slice(0, -1);
+                var current = path;
+                while (true) {
+                    if (current.startsWith("./")) {
+                        current = current.slice(2);
+                    }
+                    else if (current.startsWith("../")) {
+                        current = current.slice(3);
+                        base = base.slice(0, -1);
+                    }
+                    else {
+                        return __spreadArray(__spreadArray([], base, true), [current], false).join("/");
+                    }
+                }
+            }
+            else {
+                return path;
+            }
+        };
         if (type_1.Type.isTypeSchema(typeSource, errorListner)) {
             var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineNamespaceCore(typeSource.options, typeSource.defines), true);
             var result_6 = Format.text(typeSource.options, 0, code);
-            fs_1.default.writeFileSync(typeSource.options.outputFile, result_6, { encoding: "utf-8" });
+            fs_1.default.writeFileSync(resolvePath(typeSource.options.outputFile), result_6, { encoding: "utf-8" });
             if (typeSource.options.schema) {
                 var schema = Build.Schema.build(Build.Schema.makeProcess(typeSource, typeSource.options.schema));
-                fs_1.default.writeFileSync(typeSource.options.schema.outputFile, jsonable_1.Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
+                fs_1.default.writeFileSync(resolvePath(typeSource.options.schema.outputFile), jsonable_1.Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
             }
             return true;
         }

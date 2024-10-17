@@ -925,11 +925,30 @@ export namespace Build
             };
             if (data.value.extends)
             {
-                result["allOf"] = data.value.extends.map(i => buildRefer(nextProcess(data, null, i)));
-            }
-            if ("boolean" === typeof data.value.additionalProperties)
-            {
-                result["additionalProperties"] = data.value.additionalProperties;
+                // additionalProperties: false と allOf の組み合わせは残念な事になるので極力使わない。( additionalProperties: false が、 allOf の参照先の properties も参照元の Properties も使えなくしてしまうので、この組み合わせは使えたもんじゃない。 )
+                const allOf: Jsonable.Jsonable[] = [];
+                data.value.extends.forEach
+                (
+                    i =>
+                    {
+                        const current = getDefinition(data, i);
+                        if (Type.isInterfaceDefinition(current.value))
+                        {
+                            const base = buildInterface(<SchemaProcess<Type.InterfaceDefinition>>current);
+                            Object.assign(properties, base["properties"]);
+                            const required = result["required"] as string[];
+                            required.push(...(base["required"] as string[]).filter(j => ! required.includes(j)));
+                        }
+                        else
+                        {
+                            allOf.push(buildRefer(nextProcess(data, null, i)));
+                        }
+                    }
+                );
+                if (allOf.some(_i => true))
+                {
+                    result["allOf"] = allOf;
+                }
             }
             Object.entries(data.value.members).forEach
             (
@@ -940,6 +959,10 @@ export namespace Build
                     properties[key] = buildTypeOrRefer(nextProcess(data, null, value));
                 }
             );
+            if ("boolean" === typeof data.value.additionalProperties)
+            {
+                result["additionalProperties"] = data.value.additionalProperties;
+            }
             return result;
         };
         export const buildDictionary = (data: SchemaProcess<Type.DictionaryDefinition>):Jsonable.JsonableObject =>
@@ -1212,6 +1235,35 @@ const build = (jsonPath: string) =>
         const rawSource = fget(jsonPath);
         const typeSource = Jsonable.parse(rawSource);
         const errorListner = EvilType.Validator.makeErrorListener(jsonPath);
+        const resolvePath = (path: string) =>
+        {
+            if (path.startsWith("./") || path.startsWith("../"))
+            {
+                let base = jsonPath.split("/").slice(0, -1);
+                let current = path;
+                while(true)
+                {
+                    if (current.startsWith("./"))
+                    {
+                        current = current.slice(2);
+                    }
+                    else
+                    if (current.startsWith("../"))
+                    {
+                        current = current.slice(3);
+                        base = base.slice(0, -1);
+                    }
+                    else
+                    {
+                        return [ ...base, current ].join("/");
+                    }
+                }
+            }
+            else
+            {
+                return path;
+            }
+        };
         if (Type.isTypeSchema(typeSource, errorListner))
         {
             const code =
@@ -1221,11 +1273,11 @@ const build = (jsonPath: string) =>
                 ...Build.Define.buildDefineNamespaceCore(typeSource.options, typeSource.defines),
             ];
             const result = Format.text(typeSource.options, 0, code);
-            fs.writeFileSync(typeSource.options.outputFile, result, { encoding: "utf-8" });
+            fs.writeFileSync(resolvePath(typeSource.options.outputFile), result, { encoding: "utf-8" });
             if (typeSource.options.schema)
             {
                 const schema = Build.Schema.build(Build.Schema.makeProcess(typeSource, typeSource.options.schema));
-                fs.writeFileSync(typeSource.options.schema.outputFile, Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
+                fs.writeFileSync(resolvePath(typeSource.options.schema.outputFile), Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
             }
             return true;
         }
