@@ -42,6 +42,22 @@
                         }
                     }
                 },
+                "CommonProperties": {
+                    "export": true,
+                    "$type": "interface",
+                    "members": {
+                        "title?": {
+                            "$type": "primitive-type",
+                            "type": "string",
+                            "description": "[SCHEMA]"
+                        },
+                        "description?": {
+                            "$type": "primitive-type",
+                            "type": "string",
+                            "description": "[SCHEMA]"
+                        }
+                    }
+                },
                 "TypeSchema": {
                     "export": true,
                     "$type": "interface",
@@ -116,7 +132,7 @@
                                 },
                                 {
                                     "$type": "primitive-type",
-                                    "type": "number"
+                                    "type": "integer"
                                 }
                             ],
                             "description": "[CODE]"
@@ -195,20 +211,15 @@
                 "AlphaElement": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
                     "members": {
                         "$type": {
                             "$type": "primitive-type",
                             "type": "string"
-                        },
-                        "title?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
-                        },
-                        "description?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
                         }
                     }
                 },
@@ -512,54 +523,24 @@
                 "ReferElement": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
                     "members": {
                         "$ref": {
                             "$type": "primitive-type",
                             "type": "string"
-                        },
-                        "title?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
-                        },
-                        "description?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
                         }
                     },
                     "additionalProperties": false
                 },
-                "PrimitiveTypeEnumMembers": {
-                    "export": true,
-                    "$type": "value",
-                    "value": {
-                        "$type": "literal",
-                        "literal": [
-                            "null",
-                            "boolean",
-                            "number",
-                            "string"
-                        ]
-                    },
-                    "validator": false
-                },
-                "PrimitiveTypeEnum": {
-                    "export": true,
-                    "$type": "type",
-                    "define": {
-                        "$type": "itemof",
-                        "value": {
-                            "$ref": "PrimitiveTypeEnumMembers"
-                        }
-                    }
-                },
-                "PrimitiveTypeElement": {
-                    "export": true,
+                "NullType": {
                     "$type": "interface",
                     "extends": [
                         {
-                            "$ref": "AlphaElement"
+                            "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
@@ -568,10 +549,115 @@
                             "literal": "primitive-type"
                         },
                         "type": {
-                            "$ref": "PrimitiveTypeEnum"
+                            "$type": "literal",
+                            "literal": "null"
                         }
                     },
                     "additionalProperties": false
+                },
+                "BooleanType": {
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "primitive-type"
+                        },
+                        "type": {
+                            "$type": "literal",
+                            "literal": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "NumberType": {
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "primitive-type"
+                        },
+                        "type": {
+                            "$type": "literal",
+                            "literal": "number"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "IntegerType": {
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "primitive-type"
+                        },
+                        "type": {
+                            "$type": "literal",
+                            "literal": "integer"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "StringType": {
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "primitive-type"
+                        },
+                        "type": {
+                            "$type": "literal",
+                            "literal": "string"
+                        },
+                        "pattern?": {
+                            "$type": "primitive-type",
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "PrimitiveTypeElement": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "or",
+                        "types": [
+                            {
+                                "$ref": "NullType"
+                            },
+                            {
+                                "$ref": "BooleanType"
+                            },
+                            {
+                                "$ref": "NumberType"
+                            },
+                            {
+                                "$ref": "IntegerType"
+                            },
+                            {
+                                "$ref": "StringType"
+                            }
+                        ]
+                    }
                 },
                 "Type": {
                     "export": true,

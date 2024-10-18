@@ -19,6 +19,20 @@
             },
             "required": []
         },
+        "Type.CommonProperties": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                }
+            },
+            "required": []
+        },
         "Type.TypeSchema": {
             "type": "object",
             "properties": {
@@ -90,7 +104,7 @@
                             "type": "null"
                         },
                         {
-                            "type": "number"
+                            "type": "integer"
                         }
                     ],
                     "description": "[CODE]"
@@ -159,9 +173,6 @@
         "Type.AlphaElement": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "type": "string"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -169,6 +180,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "type": "string"
                 }
             },
             "required": [
@@ -178,9 +192,6 @@
         "Type.AlphaDefinition": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "type": "string"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -188,6 +199,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "type": "string"
                 },
                 "comment": {
                     "type": "array",
@@ -255,9 +269,6 @@
         "Type.CodeDefinition": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "code"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -265,6 +276,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "code"
                 },
                 "comment": {
                     "type": "array",
@@ -293,9 +307,6 @@
         "Type.NamespaceDefinition": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "namespace"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -303,6 +314,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "namespace"
                 },
                 "comment": {
                     "type": "array",
@@ -327,9 +341,6 @@
         "Type.ValueDefinition": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "value"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -337,6 +348,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "value"
                 },
                 "comment": {
                     "type": "array",
@@ -371,9 +385,6 @@
         "Type.TypeDefinition": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "type"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -381,6 +392,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "type"
                 },
                 "comment": {
                     "type": "array",
@@ -405,9 +419,6 @@
         "Type.InterfaceDefinition": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "interface"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -415,6 +426,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "interface"
                 },
                 "comment": {
                     "type": "array",
@@ -451,9 +465,6 @@
         "Type.DictionaryDefinition": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "dictionary"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -461,6 +472,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "dictionary"
                 },
                 "comment": {
                     "type": "array",
@@ -485,9 +499,6 @@
         "Type.ArrayElement": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "array"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -495,6 +506,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "array"
                 },
                 "items": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
@@ -509,9 +523,6 @@
         "Type.OrElement": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "or"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -519,6 +530,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "or"
                 },
                 "types": {
                     "type": "array",
@@ -536,9 +550,6 @@
         "Type.AndElement": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "and"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -546,6 +557,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "and"
                 },
                 "types": {
                     "type": "array",
@@ -563,9 +577,6 @@
         "Type.LiteralElement": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "literal"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -573,6 +584,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "literal"
                 },
                 "literal": {
                     "$ref": "jsonable.json#/definitions/Jsonable.Jsonable"
@@ -587,9 +601,6 @@
         "Type.ReferElement": {
             "type": "object",
             "properties": {
-                "$ref": {
-                    "type": "string"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -597,6 +608,9 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$ref": {
+                    "type": "string"
                 }
             },
             "required": [
@@ -604,28 +618,9 @@
             ],
             "additionalProperties": false
         },
-        "Type.PrimitiveTypeEnumMembers": {
-            "const": [
-                "null",
-                "boolean",
-                "number",
-                "string"
-            ]
-        },
-        "Type.PrimitiveTypeEnum": {
-            "enum": [
-                "null",
-                "boolean",
-                "number",
-                "string"
-            ]
-        },
-        "Type.PrimitiveTypeElement": {
+        "Type.NullType": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "primitive-type"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -634,8 +629,11 @@
                     "type": "string",
                     "description": "[SCHEMA]"
                 },
+                "$type": {
+                    "const": "primitive-type"
+                },
                 "type": {
-                    "$ref": "#/definitions/Type.PrimitiveTypeEnum"
+                    "const": "null"
                 }
             },
             "required": [
@@ -643,6 +641,124 @@
                 "type"
             ],
             "additionalProperties": false
+        },
+        "Type.BooleanType": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "primitive-type"
+                },
+                "type": {
+                    "const": "boolean"
+                }
+            },
+            "required": [
+                "$type",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "Type.NumberType": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "primitive-type"
+                },
+                "type": {
+                    "const": "number"
+                }
+            },
+            "required": [
+                "$type",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "Type.IntegerType": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "primitive-type"
+                },
+                "type": {
+                    "const": "integer"
+                }
+            },
+            "required": [
+                "$type",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "Type.StringType": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "primitive-type"
+                },
+                "type": {
+                    "const": "string"
+                },
+                "pattern": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "$type",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "Type.PrimitiveTypeElement": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/Type.NullType"
+                },
+                {
+                    "$ref": "#/definitions/Type.BooleanType"
+                },
+                {
+                    "$ref": "#/definitions/Type.NumberType"
+                },
+                {
+                    "$ref": "#/definitions/Type.IntegerType"
+                },
+                {
+                    "$ref": "#/definitions/Type.StringType"
+                }
+            ]
         },
         "Type.Type": {
             "oneOf": [

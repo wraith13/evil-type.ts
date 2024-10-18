@@ -231,6 +231,8 @@ export namespace EvilType
             Error.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
         export const isNumber = (value: unknown, listner?: ErrorListener): value is number =>
             Error.withErrorHandling("number" === typeof value, listner, "number", value);
+        export const isInteger = (value: unknown, listner?: ErrorListener): value is number =>
+            Error.withErrorHandling(Number.isInteger(value), listner, "integer", value);
         export const isString = (value: unknown, listner?: ErrorListener): value is string =>
             Error.withErrorHandling("string" === typeof value, listner, "string", value);
         export type ActualObject = Exclude<object, null>;

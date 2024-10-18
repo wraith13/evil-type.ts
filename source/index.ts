@@ -102,7 +102,15 @@ export namespace Build
         export const buildInlineDefineLiteral = (define: Type.LiteralElement) =>
             [ $expression(Jsonable.stringify(define.literal)) ];
         export const buildInlineDefinePrimitiveType = (value: Type.PrimitiveTypeElement) =>
-            $expression(value.type);
+        {
+            switch(value.type)
+            {
+            case "integer":
+                return $expression("number");
+            default:
+                return $expression(value.type);
+            }
+        };
         export const buildDefinePrimitiveType = (name: string, value: Type.PrimitiveTypeElement): CodeLine =>
             buildDefineLine("type", name, value);
         export const enParenthesis = <T extends CodeInlineEntry>(expressions: T[]) =>
@@ -334,14 +342,15 @@ export namespace Build
                 case "value":
                     return buildValidatorExpression(name, define.value);
                 case "primitive-type":
-                    return [
-                        $expression
-                        (
-                            "null" === define.type ?
-                                `"${define.type}" === ${name}`:
-                                `"${define.type}" === typeof ${name}`
-                        ),
-                    ];
+                    switch(define.type)
+                    {
+                    case "null":
+                        return [ $expression(`"${define.type}" === ${name}`), ];
+                    case "integer":
+                        return [ $expression("Number.isInteger"), $expression("("), $expression(name), $expression(")"), ];
+                    default:
+                        return [ $expression(`"${define.type}" === typeof ${name}`), ];
+                    }
                 case "type":
                     return buildValidatorExpression(name, define.define);
                 case "enum-type":
@@ -491,10 +500,12 @@ export namespace Build
                         return [ $expression("EvilType.Validator.isBoolean"), ];
                     case "number":
                         return [ $expression("EvilType.Validator.isNumber"), ];
+                    case "integer":
+                        return [ $expression("EvilType.Validator.isInteger"), ];
                     case "string":
                         return [ $expression("EvilType.Validator.isString"), ];
                     }
-                    return [ $expression(`EvilType.Validator.is${Text.toUpperCamelCase(define.type)}`), ];
+                    //return [ $expression(`EvilType.Validator.is${Text.toUpperCamelCase(define.type)}`), ];
                 case "type":
                     return buildObjectValidatorGetterCoreEntry(define.define);
                 case "enum-type":
@@ -1122,16 +1133,20 @@ export namespace Format
         }
         else
         {
-            if
-            (
-                [ ")", "[]", ":", ".", ",", ";", ].includes(token) ||
-                ( ! data.buffer.endsWith("=") && ! data.buffer.endsWith("=>") && "(" === token) ||
-                data.buffer.endsWith("(") ||
-                data.buffer.endsWith(".")
-                // data.buffer.endsWith("...")
-            )
+
+            if ( ! data.buffer.endsWith("|") && ! data.buffer.endsWith("&") && ! token.startsWith("!"))
             {
-                return "";
+                if
+                (
+                    [ ")", "[]", ":", ".", ",", ";", ].includes(token) ||
+                    ( ! data.buffer.endsWith("=") && ! data.buffer.endsWith("=>") && "(" === token) ||
+                    data.buffer.endsWith("(") ||
+                    data.buffer.endsWith(".")
+                    // data.buffer.endsWith("...")
+                )
+                {
+                    return "";
+                }
             }
         }
         return " ";

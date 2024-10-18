@@ -1,0 +1,11 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/resource/type.json",
+                "/resource/jsonable.json"
+            ],
+            "url": "./generated/schema/type.json"
+        }
+    ]
+}

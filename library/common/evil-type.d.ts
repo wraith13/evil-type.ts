@@ -41,6 +41,7 @@ export declare namespace EvilType {
         const isNull: (value: unknown, listner?: ErrorListener) => value is null;
         const isBoolean: (value: unknown, listner?: ErrorListener) => value is boolean;
         const isNumber: (value: unknown, listner?: ErrorListener) => value is number;
+        const isInteger: (value: unknown, listner?: ErrorListener) => value is number;
         const isString: (value: unknown, listner?: ErrorListener) => value is string;
         type ActualObject = Exclude<object, null>;
         const isObject: (value: unknown) => value is ActualObject;

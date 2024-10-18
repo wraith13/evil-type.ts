@@ -212,6 +212,9 @@ var EvilType;
         Validator.isNumber = function (value, listner) {
             return Error.withErrorHandling("number" === typeof value, listner, "number", value);
         };
+        Validator.isInteger = function (value, listner) {
+            return Error.withErrorHandling(Number.isInteger(value), listner, "integer", value);
+        };
         Validator.isString = function (value, listner) {
             return Error.withErrorHandling("string" === typeof value, listner, "string", value);
         };
