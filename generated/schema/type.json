@@ -800,6 +800,14 @@
         "Type.EnumTypeElement": {
             "type": "object",
             "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
                 "$type": {
                     "const": "enum-type"
                 },
@@ -821,14 +829,6 @@
                             }
                         ]
                     }
-                },
-                "title": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
                 }
             },
             "required": [
@@ -840,12 +840,6 @@
         "Type.TypeofElement": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "typeof"
-                },
-                "value": {
-                    "$ref": "#/definitions/Type.ReferElement"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -853,6 +847,12 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "typeof"
+                },
+                "value": {
+                    "$ref": "#/definitions/Type.ReferElement"
                 }
             },
             "required": [
@@ -864,12 +864,6 @@
         "Type.ItemofElement": {
             "type": "object",
             "properties": {
-                "$type": {
-                    "const": "itemof"
-                },
-                "value": {
-                    "$ref": "#/definitions/Type.ReferElement"
-                },
                 "title": {
                     "type": "string",
                     "description": "[SCHEMA]"
@@ -877,6 +871,12 @@
                 "description": {
                     "type": "string",
                     "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "itemof"
+                },
+                "value": {
+                    "$ref": "#/definitions/Type.ReferElement"
                 }
             },
             "required": [

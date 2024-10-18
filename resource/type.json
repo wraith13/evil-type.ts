@@ -704,6 +704,11 @@
                 "EnumTypeElement": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
                     "members": {
                         "$type": {
                             "$type": "literal",
@@ -732,16 +737,6 @@
                                     }
                                 ]
                             }
-                        },
-                        "title?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
-                        },
-                        "description?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
                         }
                     },
                     "additionalProperties": false
@@ -749,6 +744,11 @@
                 "TypeofElement": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
                     "members": {
                         "$type": {
                             "$type": "literal",
@@ -756,16 +756,6 @@
                         },
                         "value": {
                             "$ref": "ReferElement"
-                        },
-                        "title?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
-                        },
-                        "description?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
                         }
                     },
                     "additionalProperties": false
@@ -773,6 +763,11 @@
                 "ItemofElement": {
                     "export": true,
                     "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
                     "members": {
                         "$type": {
                             "$type": "literal",
@@ -780,16 +775,6 @@
                         },
                         "value": {
                             "$ref": "ReferElement"
-                        },
-                        "title?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
-                        },
-                        "description?": {
-                            "$type": "primitive-type",
-                            "type": "string",
-                            "description": "[SCHEMA]"
                         }
                     },
                     "additionalProperties": false

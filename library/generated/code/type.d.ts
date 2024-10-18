@@ -120,23 +120,17 @@ export declare namespace Type {
     }
     export type PrimitiveTypeElement = NullType | BooleanType | NumberType | IntegerType | StringType;
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
-    export interface EnumTypeElement {
+    export interface EnumTypeElement extends CommonProperties {
         $type: "enum-type";
         members: (null | boolean | number | string)[];
-        title?: string;
-        description?: string;
     }
-    export interface TypeofElement {
+    export interface TypeofElement extends CommonProperties {
         $type: "typeof";
         value: ReferElement;
-        title?: string;
-        description?: string;
     }
-    export interface ItemofElement {
+    export interface ItemofElement extends CommonProperties {
         $type: "itemof";
         value: ReferElement;
-        title?: string;
-        description?: string;
     }
     export type TypeOrRefer = Type | ReferElement;
     export type TypeOrValue = Type | ValueDefinition;
