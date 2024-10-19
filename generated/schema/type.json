@@ -775,6 +775,9 @@
                     "$ref": "#/definitions/Type.TypeofElement"
                 },
                 {
+                    "$ref": "#/definitions/Type.KeyofElement"
+                },
+                {
                     "$ref": "#/definitions/Type.ItemofElement"
                 },
                 {
@@ -861,6 +864,30 @@
             ],
             "additionalProperties": false
         },
+        "Type.KeyofElement": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "keyof"
+                },
+                "value": {
+                    "$ref": "#/definitions/Type.ReferElement"
+                }
+            },
+            "required": [
+                "$type",
+                "value"
+            ],
+            "additionalProperties": false
+        },
         "Type.ItemofElement": {
             "type": "object",
             "properties": {
@@ -912,6 +939,16 @@
                 },
                 {
                     "$ref": "#/definitions/Type.ReferElement"
+                }
+            ]
+        },
+        "Type.TypeOrLiteralOfRefer": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/Type.TypeOrRefer"
+                },
+                {
+                    "$ref": "#/definitions/Type.LiteralElement"
                 }
             ]
         }

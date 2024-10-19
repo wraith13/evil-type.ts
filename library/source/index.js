@@ -83,11 +83,115 @@ var Build;
     Build.buildLiteralAsConst = function (literal) {
         return __spreadArray([(0, exports.$expression)(jsonable_1.Jsonable.stringify(literal))], Build.asConst, true);
     };
+    ;
+    Build.nextProcess = function (current, key, value) {
+        return null === key ?
+            Object.assign({}, current, { value: value, }) :
+            Object.assign({}, current, { path: Build.nextPath(current.path, key), key: key, value: value, });
+    };
+    Build.nextPath = function (path, key) {
+        return null === key ?
+            path :
+            "" === path ?
+                key :
+                "".concat(path, ".").concat(key);
+    };
+    Build.makeDefinitionFlatMap = function (defines) {
+        var result = {};
+        Object.entries(defines).forEach(function (i) {
+            var key = i[0];
+            var value = i[1];
+            if (type_1.Type.isDefinition(value)) {
+                result[key] = value;
+                if (type_1.Type.isNamespaceDefinition(value)) {
+                    Object.entries(Build.makeDefinitionFlatMap(value.members))
+                        .forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
+                }
+            }
+        });
+        return result;
+    };
+    Build.getAbsolutePath = function (data, value, context) {
+        if (context === void 0) { context = data.path; }
+        if ("" === context) {
+            return value.$ref;
+        }
+        else {
+            var path = "".concat(context, ".").concat(value.$ref);
+            if (data.definitions[path]) {
+                return path;
+            }
+            return Build.getAbsolutePath(data, value, text_1.Text.getNameSpace(context));
+        }
+    };
+    Build.getDefinition = function (data) {
+        var path = Build.getAbsolutePath(data, data.value);
+        return Object.assign({}, data, { path: path, value: data.definitions[path], });
+    };
+    Build.getTarget = function (data) {
+        if (type_1.Type.isReferElement(data.value)) {
+            var next = Build.getDefinition(Build.nextProcess(data, null, data.value));
+            if (type_1.Type.isTypeOrValueOfRefer(next.value)) {
+                return Build.getTarget(next);
+            }
+            else {
+                return Build.nextProcess(data, null, data.value);
+            }
+        }
+        if (type_1.Type.isValueDefinition(data.value)) {
+            if (type_1.Type.isReferElement(data.value.value)) {
+                return Build.getTarget(Build.nextProcess(data, null, data.value.value));
+            }
+            else {
+                return Build.nextProcess(data, null, data.value.value);
+            }
+        }
+        if (type_1.Type.isTypeDefinition(data.value)) {
+            return Build.getTarget(Build.nextProcess(data, null, data.value.define));
+        }
+        return Build.nextProcess(data, null, data.value);
+    };
+    Build.getLiteral = function (data) {
+        var definition = Build.getDefinition(data);
+        if (type_1.Type.isValueDefinition(definition.value)) {
+            if (type_1.Type.isLiteralElement(definition.value.value)) {
+                return definition.value.value;
+            }
+            else {
+                return Build.getLiteral(Build.nextProcess(definition, null, definition.value.value));
+            }
+        }
+        return null;
+    };
+    Build.getKeys = function (data) {
+        var result = [];
+        if (data.value.extends) {
+            data.value.extends.forEach(function (i) {
+                var current = Build.getTarget(Build.nextProcess(data, null, i));
+                if (type_1.Type.isInterfaceDefinition(current.value)) {
+                    result.push.apply(result, Build.getKeys(Build.nextProcess(current, null, current.value)));
+                }
+            });
+        }
+        result.push.apply(result, Object.keys(data.value.members));
+        return result;
+    };
     var Define;
     (function (Define) {
-        Define.buildDefineLine = function (declarator, name, define, postEpressions) {
+        Define.makeProcess = function (source) {
+            return ({
+                source: source,
+                options: source.options,
+                definitions: Build.makeDefinitionFlatMap(source.defines),
+                path: "",
+                key: "",
+                value: source.defines,
+            });
+        };
+        //export const buildDefineLine = (declarator: string, name: string, define: Type.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
+        Define.buildDefineLine = function (declarator, data, postEpressions) {
             if (postEpressions === void 0) { postEpressions = []; }
-            return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Define.buildInlineDefine(define)), true), postEpressions, true));
+            return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(data.key), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Define.buildInlineDefine(data)), true), postEpressions, true));
         };
         Define.buildInlineDefineLiteral = function (define) {
             return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.literal))];
@@ -100,8 +204,9 @@ var Build;
                     return (0, exports.$expression)(value.type);
             }
         };
-        Define.buildDefinePrimitiveType = function (name, value) {
-            return Define.buildDefineLine("type", name, value);
+        //export const buildDefinePrimitiveType = (name: string, value: Type.PrimitiveTypeElement): CodeLine =>
+        Define.buildDefinePrimitiveType = function (data) {
+            return Define.buildDefineLine("type", data);
         };
         Define.enParenthesis = function (expressions) {
             return __spreadArray(__spreadArray([(0, exports.$expression)("(")], expressions, true), [(0, exports.$expression)(")"),], false);
@@ -144,90 +249,92 @@ var Build;
         Define.buildInlineDefineEnum = function (value) {
             return kindofJoinExpression(value.members.map(function (i) { return (0, exports.$expression)(jsonable_1.Jsonable.stringify(i)); }), (0, exports.$expression)("|"));
         };
-        Define.buildInlineDefineArray = function (value) {
-            return __spreadArray(__spreadArray([], Define.enParenthesisIfNeed(Define.buildInlineDefine(value.items)), true), [(0, exports.$expression)("[]"),], false);
+        Define.buildInlineDefineArray = function (data) {
+            return __spreadArray(__spreadArray([], Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, data.value.items))), true), [(0, exports.$expression)("[]"),], false);
         };
-        Define.buildInlineDefineDictionary = function (value) {
-            return (0, exports.$iblock)([(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(value.valueType), true))]);
+        Define.buildInlineDefineDictionary = function (data) {
+            return (0, exports.$iblock)([(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true))]);
         };
-        Define.buildInlineDefineAnd = function (value) {
-            return kindofJoinExpression(value.types.map(function (i) { return Define.enParenthesisIfNeed(Define.buildInlineDefine(i)); }), (0, exports.$expression)("&"));
+        Define.buildInlineDefineAnd = function (data) {
+            return kindofJoinExpression(data.value.types.map(function (i) { return Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, i))); }), (0, exports.$expression)("&"));
         };
-        Define.buildInlineDefineOr = function (value) {
-            return kindofJoinExpression(value.types.map(function (i) { return Define.enParenthesisIfNeed(Define.buildInlineDefine(i)); }), (0, exports.$expression)("|"));
+        Define.buildInlineDefineOr = function (data) {
+            return kindofJoinExpression(data.value.types.map(function (i) { return Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, i))); }), (0, exports.$expression)("|"));
         };
-        Define.buildDefineInlineInterface = function (value) { return (0, exports.$iblock)(Object.keys(value.members)
-            .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); })); };
-        Define.buildDefineInterface = function (name, value) {
-            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(value), true), ["interface", name].map(function (i) { return (0, exports.$expression)(i); }), true), Build.buildExtends(value), true);
-            var lines = Object.keys(value.members)
-                .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(value.members[name]), true)); });
+        Define.buildDefineInlineInterface = function (data) { return (0, exports.$iblock)(Object.keys(data.value.members)
+            .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(Build.nextProcess(data, name, data.value.members[name])), true)); })); };
+        Define.buildDefineInterface = function (data) {
+            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), ["interface", data.key].map(function (i) { return (0, exports.$expression)(i); }), true), Build.buildExtends(data.value), true);
+            var lines = Object.keys(data.value.members)
+                .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(Build.nextProcess(data, name, data.value.members[name])), true)); });
             return (0, exports.$block)(header, lines);
         };
-        Define.buildDefineDictionary = function (name, value) {
-            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(value), true), ["type", name].map(function (i) { return (0, exports.$expression)(i); }), true), [(0, exports.$expression)("=")], false);
-            return (0, exports.$block)(header, [(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(value.valueType), true))]);
+        Define.buildDefineDictionary = function (data) {
+            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), ["type", data.key].map(function (i) { return (0, exports.$expression)(i); }), true), [(0, exports.$expression)("=")], false);
+            return (0, exports.$block)(header, [(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true))]);
         };
-        Define.buildDefineNamespaceCore = function (options, members) {
-            return __spreadArray(__spreadArray(__spreadArray([], Object.entries(members)
-                .map(function (i) { return Build.Define.buildDefine(options, i[0], i[1]); }), true), Object.entries(members)
-                .map(function (i) { return type_1.Type.isTypeOrValue(i[1]) && Build.Validator.isValidatorTarget(i[1]) ? Build.Validator.buildValidator(options, i[0], i[1]) : []; }), true), Object.entries(members)
-                .map(function (i) { return type_1.Type.isInterfaceDefinition(i[1]) ? Build.Validator.buildValidatorObject(options, i[0], i[1]) : []; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+        Define.buildDefineNamespaceCore = function (data) {
+            return __spreadArray(__spreadArray(__spreadArray([], Object.entries(data.value)
+                .map(function (i) { return Build.Define.buildDefine(Build.nextProcess(data, i[0], i[1])); }), true), Object.entries(data.value)
+                .map(function (i) { return type_1.Type.isTypeOrValue(i[1]) && Build.Validator.isValidatorTarget(i[1]) ? Build.Validator.buildValidator(Build.nextProcess(data, i[0], i[1])) : []; }), true), Object.entries(data.value)
+                .map(function (i) { return type_1.Type.isInterfaceDefinition(i[1]) ? Build.Validator.buildValidatorObject(Build.nextProcess(data, i[0], i[1])) : []; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
-        Define.buildDefineNamespace = function (options, name, value) {
-            var header = __spreadArray(__spreadArray([], Build.buildExport(value), true), [(0, exports.$expression)("namespace"), (0, exports.$expression)(name),], false);
-            var lines = Define.buildDefineNamespaceCore(options, value.members);
+        Define.buildDefineNamespace = function (data) {
+            var header = __spreadArray(__spreadArray([], Build.buildExport(data.value), true), [(0, exports.$expression)("namespace"), (0, exports.$expression)(data.key),], false);
+            var lines = Define.buildDefineNamespaceCore(Build.nextProcess(data, null, data.value.members));
             return (0, exports.$block)(header, lines);
         };
         Define.buildImports = function (imports) {
             return undefined === imports ? [] : imports.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("import"), (0, exports.$expression)(i.target), (0, exports.$expression)("from"), (0, exports.$expression)(jsonable_1.Jsonable.stringify(i.from))]); });
         };
-        Define.buildDefine = function (options, name, define) {
-            switch (define.$type) {
+        Define.buildDefine = function (data) {
+            switch (data.value.$type) {
                 case "code":
-                    return [(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(define), true), Build.buildExport(define), true), define.tokens.map(function (i) { return (0, exports.$expression)(i); }), true)),];
+                    return [(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), Build.buildExport(data.value), true), data.value.tokens.map(function (i) { return (0, exports.$expression)(i); }), true)),];
                 case "interface":
-                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineInterface(name, define),], false);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), [Define.buildDefineInterface(Build.nextProcess(data, null, data.value)),], false);
                 case "dictionary":
-                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineDictionary(name, define),], false);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), [Define.buildDefineDictionary(Build.nextProcess(data, null, data.value)),], false);
                 case "namespace":
-                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineNamespace(options, name, define),], false);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), [Define.buildDefineNamespace(Build.nextProcess(data, null, data.value)),], false);
                 case "type":
-                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineLine("type", name, define),], false);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), [Define.buildDefineLine("type", Build.nextProcess(data, null, data.value)),], false);
                 case "value":
-                    return __spreadArray(__spreadArray([], (0, exports.$comment)(define), true), [Define.buildDefineLine("const", name, define, type_1.Type.isLiteralElement(define.value) ? Build.asConst : []),], false);
+                    return __spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), [Define.buildDefineLine("const", Build.nextProcess(data, null, data.value), type_1.Type.isLiteralElement(data.value.value) ? Build.asConst : []),], false);
             }
         };
-        Define.buildInlineDefine = function (define) {
-            if (type_1.Type.isReferElement(define)) {
-                return [(0, exports.$expression)(define.$ref),];
+        Define.buildInlineDefine = function (data) {
+            if (type_1.Type.isReferElement(data.value)) {
+                return [(0, exports.$expression)(data.value.$ref),];
             }
             else {
-                switch (define.$type) {
+                switch (data.value.$type) {
                     case "literal":
-                        return Define.buildInlineDefineLiteral(define);
+                        return Define.buildInlineDefineLiteral(data.value);
                     case "typeof":
-                        return __spreadArray([(0, exports.$expression)("typeof")], Define.buildInlineDefine(define.value), true);
+                        return __spreadArray([(0, exports.$expression)("typeof")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.value)), true);
+                    case "keyof":
+                        return __spreadArray([(0, exports.$expression)("keyof")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.value)), true);
                     case "itemof":
-                        return [(0, exports.$expression)("typeof"), (0, exports.$expression)("".concat(define.value.$ref, "[number]")),];
+                        return [(0, exports.$expression)("typeof"), (0, exports.$expression)("".concat(data.value.value.$ref, "[number]")),];
                     case "value":
-                        return Define.buildInlineDefine(define.value);
+                        return Define.buildInlineDefine(Build.nextProcess(data, null, data.value.value));
                     case "primitive-type":
-                        return [Define.buildInlineDefinePrimitiveType(define),];
+                        return [Define.buildInlineDefinePrimitiveType(data.value),];
                     case "type":
-                        return Define.buildInlineDefine(define.define);
+                        return Define.buildInlineDefine(Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
-                        return Define.buildInlineDefineEnum(define);
+                        return Define.buildInlineDefineEnum(data.value);
                     case "array":
-                        return Define.buildInlineDefineArray(define);
+                        return Define.buildInlineDefineArray(Build.nextProcess(data, null, data.value));
                     case "and":
-                        return Define.buildInlineDefineAnd(define);
+                        return Define.buildInlineDefineAnd(Build.nextProcess(data, null, data.value));
                     case "or":
-                        return Define.buildInlineDefineOr(define);
+                        return Define.buildInlineDefineOr(Build.nextProcess(data, null, data.value));
                     case "interface":
-                        return [Define.buildDefineInlineInterface(define),];
+                        return [Define.buildDefineInlineInterface(Build.nextProcess(data, null, data.value)),];
                     case "dictionary":
-                        return [Define.buildInlineDefineDictionary(define),];
+                        return [Define.buildInlineDefineDictionary(Build.nextProcess(data, null, data.value)),];
                 }
             }
         };
@@ -274,42 +381,43 @@ var Build;
         Validator.buildInlineLiteralValidator = function (define) {
             return (0, exports.$expression)("(value: unknown): value is ".concat(Define.buildInlineDefineLiteral(define), " => ").concat(Validator.buildLiterarlValidatorExpression("value", define.literal), ";"));
         };
-        Validator.buildValidatorLine = function (declarator, name, define) {
-            return __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(name), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Validator.buildInlineValidator(name, define)), true);
-        };
+        // export const buildValidatorLine = (declarator: string, name: string, define: Type.Type): CodeExpression[] =>
+        //     [ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define)), ];
         Validator.buildObjectValidatorObjectName = function (name) {
             return __spreadArray(__spreadArray([], text_1.Text.getNameSpace(name).split("."), true), ["".concat(text_1.Text.toLowerCamelCase(text_1.Text.getNameBody(name)), "ValidatorObject"),], false).filter(function (i) { return "" !== i; }).join(".");
         };
         Validator.buildValidatorName = function (name) {
             return __spreadArray(__spreadArray([], text_1.Text.getNameSpace(name).split("."), true), ["is".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name))),], false).filter(function (i) { return "" !== i; }).join(".");
         };
-        Validator.buildValidatorExpression = function (name, define) {
-            if (type_1.Type.isReferElement(define)) {
-                return [(0, exports.$expression)("".concat(Validator.buildValidatorName(define.$ref), "(").concat(name, ")")),];
+        Validator.buildValidatorExpression = function (name, data) {
+            if (type_1.Type.isReferElement(data.value)) {
+                return [(0, exports.$expression)("".concat(Validator.buildValidatorName(data.value.$ref), "(").concat(name, ")")),];
             }
             else {
-                switch (define.$type) {
+                switch (data.value.$type) {
                     case "literal":
-                        return Validator.buildLiterarlValidatorExpression(name, define.literal);
+                        return Validator.buildLiterarlValidatorExpression(name, data.value.literal);
                     case "typeof":
-                        return Validator.buildValidatorExpression(name, define.value);
+                        return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.value));
+                    case "keyof":
+                        return Validator.buildKeyofValidator(name, Build.nextProcess(data, null, data.value));
                     case "itemof":
-                        return [(0, exports.$expression)("".concat(define.value.$ref, ".includes(").concat(name, " as any)")),];
+                        return [(0, exports.$expression)("".concat(data.value.value.$ref, ".includes(").concat(name, " as any)")),];
                     case "value":
-                        return Validator.buildValidatorExpression(name, define.value);
+                        return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.value));
                     case "primitive-type":
-                        switch (define.type) {
+                        switch (data.value.type) {
                             case "null":
-                                return [(0, exports.$expression)("\"".concat(define.type, "\" === ").concat(name)),];
+                                return [(0, exports.$expression)("\"".concat(data.value.type, "\" === ").concat(name)),];
                             case "integer":
                                 return [(0, exports.$expression)("Number.isInteger"), (0, exports.$expression)("("), (0, exports.$expression)(name), (0, exports.$expression)(")"),];
                             default:
-                                return [(0, exports.$expression)("\"".concat(define.type, "\" === typeof ").concat(name)),];
+                                return [(0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name)),];
                         }
                     case "type":
-                        return Validator.buildValidatorExpression(name, define.define);
+                        return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
-                        return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(define.members), ".includes(").concat(name, " as any)")),];
+                        return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(data.value.members), ".includes(").concat(name, " as any)")),];
                     case "array":
                         return __spreadArray(__spreadArray([
                             (0, exports.$expression)("Array.isArray(".concat(name, ")")),
@@ -317,17 +425,17 @@ var Build;
                             (0, exports.$expression)("".concat(name, ".every(")),
                             (0, exports.$expression)("i"),
                             (0, exports.$expression)("=>")
-                        ], Validator.buildValidatorExpression("i", define.items), true), [
+                        ], Validator.buildValidatorExpression("i", Build.nextProcess(data, null, data.value.items)), true), [
                             (0, exports.$expression)(")")
                         ], false);
                     case "and":
-                        return kindofJoinExpression(define.types.map(function (i) { return evil_type_1.EvilType.Validator.isObject(i) ?
-                            Define.enParenthesis(Validator.buildValidatorExpression(name, i)) :
+                        return kindofJoinExpression(data.value.types.map(function (i) { return evil_type_1.EvilType.Validator.isObject(i) ?
+                            Define.enParenthesis(Validator.buildValidatorExpression(name, Build.nextProcess(data, null, i))) :
                             Validator.buildValidatorExpression(name, i); }), (0, exports.$expression)("&&"));
                     case "or":
-                        return kindofJoinExpression(define.types.map(function (i) { return Validator.buildValidatorExpression(name, i); }), (0, exports.$expression)("||"));
+                        return kindofJoinExpression(data.value.types.map(function (i) { return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, i)); }), (0, exports.$expression)("||"));
                     case "interface":
-                        return Validator.buildInterfaceValidator(name, define);
+                        return Validator.buildInterfaceValidator(name, Build.nextProcess(data, null, data.value));
                     case "dictionary":
                         return __spreadArray(__spreadArray([
                             (0, exports.$expression)("null !== ".concat(name)),
@@ -337,33 +445,42 @@ var Build;
                             (0, exports.$expression)("Object.values(".concat(name, ").every(")),
                             (0, exports.$expression)("i"),
                             (0, exports.$expression)("=>")
-                        ], Validator.buildValidatorExpression("i", define.valueType), true), [
+                        ], Validator.buildValidatorExpression("i", Build.nextProcess(data, null, data.value.valueType)), true), [
                             (0, exports.$expression)(")")
                         ], false);
                 }
             }
         };
-        Validator.buildInterfaceValidator = function (name, define) {
+        Validator.buildKeyofValidator = function (name, data) {
+            var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
+            if (type_1.Type.isInterfaceDefinition(target.value)) {
+                return [(0, exports.$expression)("".concat(Build.getKeys(Build.nextProcess(data, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); }), ".includes(").concat(name, " as any)")),];
+            }
+            else {
+                return [(0, exports.$expression)("\"string\" === typeof ".concat(name)),];
+            }
+        };
+        Validator.buildInterfaceValidator = function (name, data) {
             var list = [];
-            var members = define.members;
-            if (undefined !== define.extends) {
-                define.extends.forEach(function (i, ix, _l) {
+            var members = data.value.members;
+            if (undefined !== data.value.extends) {
+                data.value.extends.forEach(function (i, ix, _l) {
                     if (0 < ix) {
                         list.push((0, exports.$expression)("&&"));
                     }
-                    list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression(name, i)));
+                    list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression(name, Build.nextProcess(data, null, i))));
                 });
             }
             if (type_1.Type.isDictionaryDefinition(members)) {
-                if (undefined !== define.extends) {
+                if (undefined !== data.value.extends) {
                     list.push((0, exports.$expression)("&&"));
                 }
                 else {
                 }
-                list.push.apply(list, Validator.buildValidatorExpression(name, members));
+                list.push.apply(list, Validator.buildValidatorExpression(name, Build.nextProcess(data, null, members)));
             }
             else {
-                if (undefined !== define.extends) {
+                if (undefined !== data.value.extends) {
                 }
                 else {
                     list.push((0, exports.$expression)("null !== ".concat(name)));
@@ -373,7 +490,7 @@ var Build;
                 Object.keys(members).forEach(function (k) {
                     var key = text_1.Text.getPrimaryKeyName(k);
                     var value = members[k];
-                    var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), value));
+                    var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), Build.nextProcess(data, key, value)));
                     var current = type_1.Type.isOrElement(value) ?
                         Define.enParenthesis(base) :
                         base;
@@ -395,25 +512,35 @@ var Build;
             }
             return list;
         };
-        Validator.buildInlineValidator = function (name, define) {
+        Validator.buildInlineValidator = function (name, data) {
             return __spreadArray([
-                (0, exports.$expression)("(value: unknown): value is ".concat(type_1.Type.isValueDefinition(define) ? "typeof " + name : name, " =>"))
-            ], Validator.buildValidatorExpression("value", define), true);
+                (0, exports.$expression)("(value: unknown): value is ".concat(type_1.Type.isValueDefinition(data.value) ? "typeof " + name : name, " =>"))
+            ], Validator.buildValidatorExpression("value", data), true);
         };
-        Validator.buildObjectValidatorGetterCoreEntry = function (define) {
-            if (type_1.Type.isReferElement(define)) {
-                return [(0, exports.$expression)(Validator.buildValidatorName(define.$ref)),];
+        Validator.buildObjectValidatorGetterCoreEntry = function (data) {
+            if (type_1.Type.isReferElement(data.value)) {
+                return [(0, exports.$expression)(Validator.buildValidatorName(data.value.$ref)),];
             }
             else {
-                switch (define.$type) {
+                switch (data.value.$type) {
                     case "literal":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isJust"),], [Build.buildLiteralAsConst(define.literal),]);
+                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isJust"),], [Build.buildLiteralAsConst(data.value.literal),]);
                     case "typeof":
-                        return [(0, exports.$expression)(Validator.buildValidatorName(define.value.$ref)),];
+                        return [(0, exports.$expression)(Validator.buildValidatorName(data.value.value.$ref)),];
+                    case "keyof":
+                        {
+                            var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
+                            if (type_1.Type.isInterfaceDefinition(target.value)) {
+                                return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })),]);
+                            }
+                            else {
+                                return [(0, exports.$expression)("EvilType.Validator.isString"),];
+                            }
+                        }
                     case "itemof":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [(0, exports.$expression)(define.value.$ref),]);
+                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [(0, exports.$expression)(data.value.value.$ref),]);
                     case "primitive-type":
-                        switch (define.type) {
+                        switch (data.value.type) {
                             case "null":
                                 return [(0, exports.$expression)("EvilType.Validator.isNull"),];
                             case "boolean":
@@ -427,35 +554,35 @@ var Build;
                         }
                     //return [ $expression(`EvilType.Validator.is${Text.toUpperCamelCase(define.type)}`), ];
                     case "type":
-                        return Validator.buildObjectValidatorGetterCoreEntry(define.define);
+                        return Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(define.members),]);
+                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(data.value.members),]);
                     case "array":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isArray"),], [Validator.buildObjectValidatorGetterCoreEntry(define.items),]);
+                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isArray"),], [Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.items)),]);
                     case "and":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isAnd"),], define.types.map(function (i) { return Validator.buildObjectValidatorGetterCoreEntry(i); }));
+                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isAnd"),], data.value.types.map(function (i) { return Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, i)); }));
                     case "or":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isOr"),], define.types.map(function (i) { return Validator.buildObjectValidatorGetterCoreEntry(i); }));
+                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isOr"),], data.value.types.map(function (i) { return Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, i)); }));
                     case "interface":
-                        return Validator.buildObjectValidator(define);
+                        return Validator.buildObjectValidator(Build.nextProcess(data, null, data.value));
                     case "dictionary":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isDictionaryObject"),], [Validator.buildObjectValidatorGetterCoreEntry(define.valueType),]);
+                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isDictionaryObject"),], [Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.valueType)),]);
                 }
             }
         };
-        Validator.buildObjectValidatorGetterCore = function (define) { return (0, exports.$iblock)(Object.entries(define.members).map(function (i) {
+        Validator.buildObjectValidatorGetterCore = function (data) { return (0, exports.$iblock)(Object.entries(data.value.members).map(function (i) {
             var key = text_1.Text.getPrimaryKeyName(i[0]);
-            var value = Validator.buildObjectValidatorGetterCoreEntry(i[1]);
+            var value = Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, key, i[1]));
             return (0, exports.$line)(__spreadArray([(0, exports.$expression)("".concat(key)), (0, exports.$expression)(":")], (key === i[0] ? value : Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isOptional"),], [value,])), true));
         })); };
-        Validator.buildObjectValidator = function (define) {
+        Validator.buildObjectValidator = function (data) {
             var _a, _b;
-            return ((_a = define.extends) !== null && _a !== void 0 ? _a : []).some(function (_) { return true; }) ? __spreadArray([
+            return ((_a = data.value.extends) !== null && _a !== void 0 ? _a : []).some(function (_) { return true; }) ? __spreadArray([
                 (0, exports.$expression)("EvilType.Validator.mergeObjectValidator")
-            ], Define.enParenthesis(__spreadArray(__spreadArray([], ((_b = define.extends) !== null && _b !== void 0 ? _b : []).map(function (i) { return (0, exports.$expression)("".concat(Validator.buildObjectValidatorObjectName(i.$ref), ",")); }), true), [
-                Validator.buildObjectValidatorGetterCore(define),
+            ], Define.enParenthesis(__spreadArray(__spreadArray([], ((_b = data.value.extends) !== null && _b !== void 0 ? _b : []).map(function (i) { return (0, exports.$expression)("".concat(Validator.buildObjectValidatorObjectName(i.$ref), ",")); }), true), [
+                Validator.buildObjectValidatorGetterCore(data),
             ], false)), true) :
-                Define.enParenthesis([Validator.buildObjectValidatorGetterCore(define),]);
+                Define.enParenthesis([Validator.buildObjectValidatorGetterCore(data),]);
         };
         Validator.isLazyValidator = function (define) {
             if (type_1.Type.isType(define)) {
@@ -472,6 +599,8 @@ var Build;
                         return Validator.isLazyValidator(define.items);
                     case "dictionary":
                         return Validator.isLazyValidator(define.valueType);
+                    case "keyof":
+                        return false;
                     case "and":
                     case "or":
                         return define.types.some(function (i) { return Validator.isLazyValidator(i); });
@@ -481,33 +610,34 @@ var Build;
             }
             return true;
         };
-        Validator.buildFullValidator = function (_name, define) { return Validator.isLazyValidator(define) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(define), true),]), true) :
-            Validator.buildObjectValidatorGetterCoreEntry(define); };
+        Validator.buildFullValidator = function (data) { return Validator.isLazyValidator(data.value) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(data), true),]), true) :
+            Validator.buildObjectValidatorGetterCoreEntry(data); };
         Validator.isValidatorTarget = function (define) {
             return !(type_1.Type.isValueDefinition(define) && false === define.validator);
         };
-        Validator.buildValidator = function (options, name, define) {
-            if ("simple" === options.validatorOption) {
+        //export const buildValidator = (options: Type.OutputOptions, name: string, define: Type.TypeOrValue): CodeLine[] =>
+        Validator.buildValidator = function (data) {
+            if ("simple" === data.options.validatorOption) {
                 var result_2 = [
-                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), [
                         (0, exports.$expression)("const"),
-                        (0, exports.$expression)(Validator.buildValidatorName(name)),
+                        (0, exports.$expression)(Validator.buildValidatorName(data.key)),
                         (0, exports.$expression)("=")
-                    ], false), Validator.buildInlineValidator(name, define), true))
+                    ], false), Validator.buildInlineValidator(data.key, data), true))
                 ];
                 return result_2;
             }
-            if ("full" === options.validatorOption) {
-                var result_3 = __spreadArray(__spreadArray([], Build.buildExport(define), true), [
+            if ("full" === data.options.validatorOption) {
+                var result_3 = __spreadArray(__spreadArray([], Build.buildExport(data.value), true), [
                     (0, exports.$expression)("const"),
-                    (0, exports.$expression)(Validator.buildValidatorName(name)),
+                    (0, exports.$expression)(Validator.buildValidatorName(data.key)),
                 ], false);
-                if ("interface" === define.$type) {
+                if ("interface" === data.value.$type) {
                     result_3.push.apply(result_3, __spreadArray([(0, exports.$expression)("=")], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [
                         __spreadArray([
                             (0, exports.$expression)("()"),
                             (0, exports.$expression)("=>")
-                        ], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject"),], __spreadArray([(0, exports.$expression)(Validator.buildObjectValidatorObjectName(name))], (undefined !== define.additionalProperties ? [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.additionalProperties)),] : []), true)), true)
+                        ], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject"),], __spreadArray([(0, exports.$expression)(Validator.buildObjectValidatorObjectName(data.key))], (undefined !== data.value.additionalProperties ? [(0, exports.$expression)(jsonable_1.Jsonable.stringify(data.value.additionalProperties)),] : []), true)), true)
                     ])
                     // $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${name} =>`),
                     // ...buildCall
@@ -515,37 +645,38 @@ var Build;
                     //     buildCall
                     //     (
                     //         [ $expression(`EvilType.Validator.isSpecificObject<${name}>`), ],
-                    //         [ $expression(buildObjectValidatorObjectName(name)), ...(undefined !== define.additionalProperties ? [ $expression(Jsonable.stringify(define.additionalProperties)), ]: []) ]
+                    //         [ $expression(buildObjectValidatorObjectName(name)), ...(undefined !== data.value.additionalProperties ? [ $expression(Jsonable.stringify(define.additionalProperties)), ]: []) ]
                     //     ),
                     //     [ $expression("value"), $expression("listner"), ]
                     // )
                     , false));
                 }
-                else if ("value" === define.$type) {
-                    if (type_1.Type.isReferElement(define.value)) {
-                        result_3.push((0, exports.$expression)("="), (0, exports.$expression)(Validator.buildValidatorName(define.value.$ref)));
+                else if ("value" === data.value.$type) {
+                    if (type_1.Type.isReferElement(data.value.value)) {
+                        result_3.push((0, exports.$expression)("="), (0, exports.$expression)(Validator.buildValidatorName(data.value.value.$ref)));
                     }
                     else {
-                        result_3.push.apply(result_3, __spreadArray([(0, exports.$expression)("=")], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isJust"),], [(0, exports.$expression)(name),]), false));
+                        result_3.push.apply(result_3, __spreadArray([(0, exports.$expression)("=")], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isJust"),], [(0, exports.$expression)(data.key),]), false));
                     }
                 }
                 else {
-                    result_3.push.apply(result_3, __spreadArray(__spreadArray(__spreadArray([], [(0, exports.$expression)(":"), (0, exports.$expression)("EvilType.Validator.IsType<".concat(name, ">"))], false), [(0, exports.$expression)("=")], false), Validator.buildFullValidator(name, define), false));
+                    result_3.push.apply(result_3, __spreadArray(__spreadArray(__spreadArray([], [(0, exports.$expression)(":"), (0, exports.$expression)("EvilType.Validator.IsType<".concat(data.key, ">"))], false), [(0, exports.$expression)("=")], false), Validator.buildFullValidator(Build.nextProcess(data, null, data.value)), false));
                 }
                 return [(0, exports.$line)(result_3)];
             }
             return [];
         };
-        Validator.buildValidatorObject = function (options, name, define) {
-            if ("full" === options.validatorOption) {
+        //export const buildValidatorObject = (options: Type.OutputOptions, name: string, define: Type.InterfaceDefinition): CodeLine[] =>
+        Validator.buildValidatorObject = function (data) {
+            if ("full" === data.options.validatorOption) {
                 var result_4 = [
-                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(define), true), [
+                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), [
                         (0, exports.$expression)("const"),
-                        (0, exports.$expression)(Validator.buildObjectValidatorObjectName(name)),
+                        (0, exports.$expression)(Validator.buildObjectValidatorObjectName(data.key)),
                         (0, exports.$expression)(":"),
-                        (0, exports.$expression)("EvilType.Validator.ObjectValidator<".concat(name, ">")),
+                        (0, exports.$expression)("EvilType.Validator.ObjectValidator<".concat(data.key, ">")),
                         (0, exports.$expression)("=")
-                    ], false), Validator.buildObjectValidator(define), true))
+                    ], false), Validator.buildObjectValidator(data), true))
                 ];
                 return result_4;
             }
@@ -562,54 +693,11 @@ var Build;
             return ({
                 source: source,
                 schema: schema,
-                definitions: Schema.makeDefinitionFlatMap(source.defines),
+                definitions: Build.makeDefinitionFlatMap(source.defines),
                 path: "",
+                key: "",
                 value: source.defines,
             });
-        };
-        Schema.nextProcess = function (current, key, value) {
-            return ({
-                source: current.source,
-                schema: current.schema,
-                definitions: current.definitions,
-                path: Schema.nextPath(current.path, key),
-                value: value,
-            });
-        };
-        Schema.nextPath = function (path, key) {
-            return null === key ?
-                path :
-                "" === path ?
-                    key :
-                    "".concat(path, ".").concat(key);
-        };
-        Schema.makeDefinitionFlatMap = function (defines) {
-            var result = {};
-            Object.entries(defines).forEach(function (i) {
-                var key = i[0];
-                var value = i[1];
-                if (type_1.Type.isDefinition(value)) {
-                    result[key] = value;
-                    if (type_1.Type.isNamespaceDefinition(value)) {
-                        Object.entries(Schema.makeDefinitionFlatMap(value.members))
-                            .forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
-                    }
-                }
-            });
-            return result;
-        };
-        Schema.getAbsolutePath = function (data, value, context) {
-            if (context === void 0) { context = data.path; }
-            if ("" === context) {
-                return value.$ref;
-            }
-            else {
-                var path = "".concat(context, ".").concat(value.$ref);
-                if (data.definitions[path]) {
-                    return path;
-                }
-                return Schema.getAbsolutePath(data, value, text_1.Text.getNameSpace(context));
-            }
         };
         Schema.resolveExternalRefer = function (data, absolutePath) {
             if (data.schema.externalReferMapping) {
@@ -618,29 +706,6 @@ var Build;
                     .sort(evil_type_1.EvilType.comparer(function (i) { return -i.length; }))[0];
                 if (key) {
                     return data.schema.externalReferMapping[key] + absolutePath.slice(key.length);
-                }
-            }
-            return null;
-        };
-        Schema.getDefinition = function (data, value) {
-            var path = Schema.getAbsolutePath(data, value);
-            var result = {
-                source: data.source,
-                schema: data.schema,
-                definitions: data.definitions,
-                path: path,
-                value: data.definitions[path],
-            };
-            return result;
-        };
-        Schema.getLiteral = function (data, value) {
-            var definition = Schema.getDefinition(data, value);
-            if (type_1.Type.isValueDefinition(definition.value)) {
-                if (type_1.Type.isLiteralElement(definition.value.value)) {
-                    return definition.value.value;
-                }
-                else {
-                    return Schema.getLiteral(definition, definition.value.value);
                 }
             }
             return null;
@@ -663,19 +728,19 @@ var Build;
                 var value = i[1];
                 switch (value.$type) {
                     case "value":
-                        result[key] = Schema.buildValue(Schema.nextProcess(data, null, value));
+                        result[key] = Schema.buildValue(Build.nextProcess(data, null, value));
                         break;
                     case "code":
                         //  nothing
                         break;
                     case "namespace":
                         {
-                            var members = Schema.buildDefinitions(Schema.nextProcess(data, key, value.members));
+                            var members = Schema.buildDefinitions(Build.nextProcess(data, key, value.members));
                             Object.entries(members).forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
                         }
                         break;
                     default:
-                        result[key] = Schema.buildType(Schema.nextProcess(data, null, value));
+                        result[key] = Schema.buildType(Build.nextProcess(data, null, value));
                 }
             });
             return result;
@@ -689,33 +754,35 @@ var Build;
         };
         Schema.buildValue = function (data) {
             return type_1.Type.isLiteralElement(data.value.value) ?
-                Schema.buildLiteral(Schema.nextProcess(data, null, data.value.value)) :
-                Schema.buildRefer(Schema.nextProcess(data, null, data.value.value));
+                Schema.buildLiteral(Build.nextProcess(data, null, data.value.value)) :
+                Schema.buildRefer(Build.nextProcess(data, null, data.value.value));
         };
         Schema.buildType = function (data) {
             switch (data.value.$type) {
                 case "primitive-type":
-                    return Schema.buildPrimitiveType(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildPrimitiveType(Build.nextProcess(data, null, data.value));
                 case "type":
-                    return Schema.buildTypeOrRefer(Schema.nextProcess(data, null, data.value.define));
+                    return Schema.buildTypeOrRefer(Build.nextProcess(data, null, data.value.define));
                 case "interface":
-                    return Schema.buildInterface(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildInterface(Build.nextProcess(data, null, data.value));
                 case "dictionary":
-                    return Schema.buildDictionary(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildDictionary(Build.nextProcess(data, null, data.value));
                 case "enum-type":
-                    return Schema.buildEnumType(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildEnumType(Build.nextProcess(data, null, data.value));
                 case "typeof":
-                    return Schema.buildTypeOf(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildTypeOf(Build.nextProcess(data, null, data.value));
+                case "keyof":
+                    return Schema.buildKeyOf(Build.nextProcess(data, null, data.value));
                 case "itemof":
-                    return Schema.buildItemOf(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildItemOf(Build.nextProcess(data, null, data.value));
                 case "array":
-                    return Schema.buildArray(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildArray(Build.nextProcess(data, null, data.value));
                 case "or":
-                    return Schema.buildOr(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildOr(Build.nextProcess(data, null, data.value));
                 case "and":
-                    return Schema.buildAnd(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildAnd(Build.nextProcess(data, null, data.value));
                 case "literal":
-                    return Schema.buildLiteral(Schema.nextProcess(data, null, data.value));
+                    return Schema.buildLiteral(Build.nextProcess(data, null, data.value));
             }
             var result = {};
             return result;
@@ -747,7 +814,7 @@ var Build;
                 // additionalProperties: false と allOf の組み合わせは残念な事になるので極力使わない。( additionalProperties: false が、 allOf の参照先の properties も参照元の Properties も使えなくしてしまうので、この組み合わせは使えたもんじゃない。 )
                 var allOf_1 = [];
                 data.value.extends.forEach(function (i) {
-                    var current = Schema.getDefinition(data, i);
+                    var current = Build.getTarget(Build.nextProcess(data, null, i));
                     if (type_1.Type.isInterfaceDefinition(current.value)) {
                         var base = Schema.buildInterface(current);
                         Object.assign(properties, base["properties"]);
@@ -755,7 +822,7 @@ var Build;
                         required_1.push.apply(required_1, base["required"].filter(function (j) { return !required_1.includes(j); }));
                     }
                     else {
-                        allOf_1.push(Schema.buildRefer(Schema.nextProcess(data, null, i)));
+                        allOf_1.push(Schema.buildRefer(Build.nextProcess(data, null, i)));
                     }
                 });
                 if (allOf_1.some(function (_i) { return true; })) {
@@ -765,7 +832,7 @@ var Build;
             Object.entries(data.value.members).forEach(function (i) {
                 var key = text_1.Text.getPrimaryKeyName(i[0]);
                 var value = i[1];
-                properties[key] = Schema.buildTypeOrRefer(Schema.nextProcess(data, null, value));
+                properties[key] = Schema.buildTypeOrRefer(Build.nextProcess(data, null, value));
             });
             if ("boolean" === typeof data.value.additionalProperties) {
                 result["additionalProperties"] = data.value.additionalProperties;
@@ -775,7 +842,7 @@ var Build;
         Schema.buildDictionary = function (data) {
             var result = {
                 type: "object",
-                additionalProperties: Schema.buildTypeOrRefer(Schema.nextProcess(data, null, data.value.valueType)),
+                additionalProperties: Schema.buildTypeOrRefer(Build.nextProcess(data, null, data.value.valueType)),
             };
             return Schema.setCommonProperties(result, data);
         };
@@ -787,7 +854,7 @@ var Build;
         };
         Schema.buildTypeOf = function (data) {
             var result = {};
-            var literal = Schema.getLiteral(data, data.value.value);
+            var literal = Build.getLiteral(Build.nextProcess(data, null, data.value.value));
             if (literal) {
                 result["const"] = literal.literal;
             }
@@ -796,9 +863,20 @@ var Build;
             }
             return Schema.setCommonProperties(result, data);
         };
+        Schema.buildKeyOf = function (data) {
+            var result = {};
+            var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
+            if (type_1.Type.isInterfaceDefinition(target.value)) {
+                result["enum"] = Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
+            }
+            else {
+                result["type"] = "string";
+            }
+            return Schema.setCommonProperties(result, data);
+        };
         Schema.buildItemOf = function (data) {
             var result = {};
-            var literal = Schema.getLiteral(data, data.value.value);
+            var literal = Build.getLiteral(Build.nextProcess(data, null, data.value.value));
             if (literal) {
                 if (Array.isArray(literal.literal)) {
                     result["enum"] = literal.literal;
@@ -814,7 +892,7 @@ var Build;
         };
         Schema.buildRefer = function (data) {
             var _a;
-            var path = Schema.getAbsolutePath(data, data.value);
+            var path = Build.getAbsolutePath(data, data.value);
             var result = {
                 $ref: (_a = Schema.resolveExternalRefer(data, path)) !== null && _a !== void 0 ? _a : "#/".concat(Const.definitions, "/").concat(path),
             };
@@ -823,26 +901,26 @@ var Build;
         Schema.buildArray = function (data) {
             var result = {
                 type: "array",
-                items: Schema.buildTypeOrRefer(Schema.nextProcess(data, null, data.value.items)),
+                items: Schema.buildTypeOrRefer(Build.nextProcess(data, null, data.value.items)),
             };
             return Schema.setCommonProperties(result, data);
         };
         Schema.buildOr = function (data) {
             var result = {
-                oneOf: data.value.types.map(function (i) { return Schema.buildTypeOrRefer(Schema.nextProcess(data, null, i)); }),
+                oneOf: data.value.types.map(function (i) { return Schema.buildTypeOrRefer(Build.nextProcess(data, null, i)); }),
             };
             return Schema.setCommonProperties(result, data);
         };
         Schema.buildAnd = function (data) {
             var result = {
-                allOf: data.value.types.map(function (i) { return Schema.buildTypeOrRefer(Schema.nextProcess(data, null, i)); }),
+                allOf: data.value.types.map(function (i) { return Schema.buildTypeOrRefer(Build.nextProcess(data, null, i)); }),
             };
             return Schema.setCommonProperties(result, data);
         };
         Schema.buildTypeOrRefer = function (data) {
             return type_1.Type.isReferElement(data.value) ?
-                Schema.buildRefer(Schema.nextProcess(data, null, data.value)) :
-                Schema.buildType(Schema.nextProcess(data, null, data.value));
+                Schema.buildRefer(Build.nextProcess(data, null, data.value)) :
+                Schema.buildType(Build.nextProcess(data, null, data.value));
         };
     })(Schema = Build.Schema || (Build.Schema = {}));
 })(Build || (exports.Build = Build = {}));
@@ -1010,7 +1088,7 @@ var build = function (jsonPath) {
             }
         };
         if (type_1.Type.isTypeSchema(typeSource, errorListner)) {
-            var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineNamespaceCore(typeSource.options, typeSource.defines), true);
+            var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineNamespaceCore(Build.Define.makeProcess(typeSource)), true);
             var result_6 = Format.text(typeSource.options, 0, code);
             fs_1.default.writeFileSync(resolvePath(typeSource.options.outputFile), result_6, { encoding: "utf-8" });
             if (typeSource.options.schema) {

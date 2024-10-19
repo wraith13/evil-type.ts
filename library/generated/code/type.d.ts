@@ -119,13 +119,17 @@ export declare namespace Type {
         pattern?: string;
     }
     export type PrimitiveTypeElement = NullType | BooleanType | NumberType | IntegerType | StringType;
-    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     export interface EnumTypeElement extends CommonProperties {
         $type: "enum-type";
         members: (null | boolean | number | string)[];
     }
     export interface TypeofElement extends CommonProperties {
         $type: "typeof";
+        value: ReferElement;
+    }
+    export interface KeyofElement extends CommonProperties {
+        $type: "keyof";
         value: ReferElement;
     }
     export interface ItemofElement extends CommonProperties {
@@ -135,6 +139,7 @@ export declare namespace Type {
     export type TypeOrRefer = Type | ReferElement;
     export type TypeOrValue = Type | ValueDefinition;
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
+    export type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
     export const isSchema: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";
     export const isCommentProperty: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is CommentProperty;
     export const isCommonProperties: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is CommonProperties;
@@ -163,10 +168,12 @@ export declare namespace Type {
     export const isType: EvilType.Validator.IsType<Type>;
     export const isEnumTypeElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is EnumTypeElement;
     export const isTypeofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is TypeofElement;
+    export const isKeyofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is KeyofElement;
     export const isItemofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is ItemofElement;
     export const isTypeOrRefer: EvilType.Validator.IsType<TypeOrRefer>;
     export const isTypeOrValue: EvilType.Validator.IsType<TypeOrValue>;
     export const isTypeOrValueOfRefer: EvilType.Validator.IsType<TypeOrValueOfRefer>;
+    export const isTypeOrLiteralOfRefer: EvilType.Validator.IsType<TypeOrLiteralOfRefer>;
     export const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty>;
     export const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties>;
     export const typeSchemaValidatorObject: EvilType.Validator.ObjectValidator<TypeSchema>;
@@ -188,6 +195,7 @@ export declare namespace Type {
     export const referElementValidatorObject: EvilType.Validator.ObjectValidator<ReferElement>;
     export const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement>;
     export const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement>;
+    export const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement>;
     export const itemofElementValidatorObject: EvilType.Validator.ObjectValidator<ItemofElement>;
     export {};
 }

@@ -143,8 +143,8 @@ export namespace Type
         pattern?: string;
     }
     export type PrimitiveTypeElement = NullType | BooleanType | NumberType | IntegerType | StringType;
-    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | ItemofElement | InterfaceDefinition |
-        DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement |
+        InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     export interface EnumTypeElement extends CommonProperties
     {
         $type: "enum-type";
@@ -155,6 +155,11 @@ export namespace Type
         $type: "typeof";
         value: ReferElement;
     }
+    export interface KeyofElement extends CommonProperties
+    {
+        $type: "keyof";
+        value: ReferElement;
+    }
     export interface ItemofElement extends CommonProperties
     {
         $type: "itemof";
@@ -163,6 +168,7 @@ export namespace Type
     export type TypeOrRefer = Type | ReferElement;
     export type TypeOrValue = Type | ValueDefinition;
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
+    export type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
     export const isSchema = EvilType.Validator.isJust(schema);
     export const isCommentProperty = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commentPropertyValidatorObject));
     export const isCommonProperties = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commonPropertiesValidatorObject));
@@ -201,10 +207,11 @@ export namespace Type
     export const isPrimitiveTypeElement: EvilType.Validator.IsType<PrimitiveTypeElement> = EvilType.lazy(() => EvilType.Validator.isOr(
         isNullType, isBooleanType, isNumberType, isIntegerType, isStringType));
     export const isType: EvilType.Validator.IsType<Type> = EvilType.lazy(() => EvilType.Validator.isOr(isPrimitiveTypeElement,
-        isTypeDefinition, isEnumTypeElement, isTypeofElement, isItemofElement, isInterfaceDefinition, isDictionaryDefinition,
-        isArrayElement, isOrElement, isAndElement, isLiteralElement));
+        isTypeDefinition, isEnumTypeElement, isTypeofElement, isKeyofElement, isItemofElement, isInterfaceDefinition,
+        isDictionaryDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement));
     export const isEnumTypeElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(enumTypeElementValidatorObject, false));
     export const isTypeofElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(typeofElementValidatorObject, false));
+    export const isKeyofElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(keyofElementValidatorObject, false));
     export const isItemofElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(itemofElementValidatorObject, false));
     export const isTypeOrRefer: EvilType.Validator.IsType<TypeOrRefer> = EvilType.lazy(() => EvilType.Validator.isOr(isType, isReferElement
         ));
@@ -212,6 +219,8 @@ export namespace Type
         isValueDefinition));
     export const isTypeOrValueOfRefer: EvilType.Validator.IsType<TypeOrValueOfRefer> = EvilType.lazy(() => EvilType.Validator.isOr(
         isTypeOrValue, isReferElement));
+    export const isTypeOrLiteralOfRefer: EvilType.Validator.IsType<TypeOrLiteralOfRefer> = EvilType.lazy(() => EvilType.Validator.isOr(
+        isTypeOrRefer, isLiteralElement));
     export const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty> = ({ comment:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString)), });
     export const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties> = ({ title:
@@ -288,6 +297,8 @@ export namespace Type
         EvilType.Validator.isNumber, EvilType.Validator.isString)), });
     export const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("typeof" as const), value: isReferElement, });
+    export const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement> = EvilType.Validator.mergeObjectValidator(
+        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("keyof" as const), value: isReferElement, });
     export const itemofElementValidatorObject: EvilType.Validator.ObjectValidator<ItemofElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("itemof" as const), value: isReferElement, });
 }
