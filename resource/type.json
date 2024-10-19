@@ -678,6 +678,9 @@
                                 "$ref": "TypeofElement"
                             },
                             {
+                                "$ref": "KeyofElement"
+                            },
+                            {
                                 "$ref": "ItemofElement"
                             },
                             {
@@ -753,6 +756,25 @@
                         "$type": {
                             "$type": "literal",
                             "literal": "typeof"
+                        },
+                        "value": {
+                            "$ref": "ReferElement"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "KeyofElement": {
+                    "export": true,
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "keyof"
                         },
                         "value": {
                             "$ref": "ReferElement"

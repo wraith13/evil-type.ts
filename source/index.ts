@@ -239,6 +239,8 @@ export namespace Build
                     return buildInlineDefineLiteral(define);
                 case "typeof":
                     return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), ...buildInlineDefine(define.value), ];
+                case "keyof":
+                    return [ <CodeExpression | CodeInlineBlock>$expression("keyof"), ...buildInlineDefine(define.value), ];
                 case "itemof":
                     return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), $expression(`${define.value.$ref}[number]`), ];
                 case "value":
@@ -337,6 +339,8 @@ export namespace Build
                     return buildLiterarlValidatorExpression(name, define.literal);
                 case "typeof":
                     return buildValidatorExpression(name, define.value);
+                case "keyof":
+                    return buildKeyofValidator(name, define);
                 case "itemof":
                     return [ $expression(`${define.value.$ref}.includes(${name} as any)`), ];
                 case "value":
@@ -377,7 +381,7 @@ export namespace Build
                         $expression("&&")
                     );
                 case "or":
-                    return  kindofJoinExpression
+                    return kindofJoinExpression
                     (
                         define.types.map(i => buildValidatorExpression(name, i)),
                         $expression("||")
@@ -399,6 +403,29 @@ export namespace Build
                 }
             }
         };
+        export const getMemberTypes = (define: Type.TypeOrRefer): Type.TypeOrRefer[] =>
+        {
+
+        };
+        export const buildKeyofValidator = (name: string, define: Type.KeyofElement): CodeExpression[] =>
+        {
+            const members = getMemberTypes(define.value);
+            switch(members.length)
+            {
+            case 0:
+                // never: ここに到達してる時点でダメ。この前の段階で判定する必要がある。
+                return [ $expression("false"), ];
+            case 1:
+                return buildValidatorExpression(name, members[0])
+            default:
+                return kindofJoinExpression
+                (
+                    members.map(i => buildValidatorExpression(name, i)),
+                    $expression("||")
+                );
+            }
+        };
+
         export const buildInterfaceValidator = (name: string, define: Type.InterfaceDefinition): CodeExpression[] =>
         {
             const list: CodeExpression[] = [];
@@ -575,6 +602,8 @@ export namespace Build
                     return isLazyValidator(define.items);
                 case "dictionary":
                     return isLazyValidator(define.valueType);
+                case "keyof":
+                    return getMemberTypes(define.value).some(i => isLazyValidator(i));
                 case "and":
                 case "or":
                     return define.types.some(i => isLazyValidator(i));
@@ -900,6 +929,8 @@ export namespace Build
                 return buildEnumType(nextProcess(data, null, data.value));
             case "typeof":
                 return buildTypeOf(nextProcess(data, null, data.value));
+            case "keyof":
+                return buildKeyOf(nextProcess(data, null, data.value));
             case "itemof":
                 return buildItemOf(nextProcess(data, null, data.value));
             case "array":
@@ -1020,6 +1051,24 @@ export namespace Build
                 console.error(`🚫 Can not resolve refer: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref }) }`);
             }
             return setCommonProperties(result, data);
+        };
+        export const buildKeyOf = (data: SchemaProcess<Type.KeyofElement>):Jsonable.JsonableObject =>
+        {
+            const members = getMemberTypes(define.value);
+            switch(members.length)
+            {
+            case 0:
+                // never: ここに到達してる時点でダメ。この前の段階で判定する必要がある。
+                return [ $expression("false"), ];
+            case 1:
+                return setCommonProperties(buildType(nextProcess(data, null, members[0])), data);
+            default:
+                const result: Jsonable.JsonableObject =
+                {
+                    oneOf: members.map(i => buildTypeOrRefer(nextProcess(data, null, i))),
+                };
+                return setCommonProperties(result, data);
+            }
         };
         export const buildItemOf = (data: SchemaProcess<Type.ItemofElement>):Jsonable.JsonableObject =>
         {
