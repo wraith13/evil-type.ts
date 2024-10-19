@@ -845,6 +845,21 @@
                             }
                         ]
                     }
+                },
+                "TypeOrLiteralOfRefer": {
+                    "export": true,
+                    "$type": "type",
+                    "define": {
+                        "$type": "or",
+                        "types": [
+                            {
+                                "$ref": "TypeOrRefer"
+                            },
+                            {
+                                "$ref": "LiteralElement"
+                            }
+                        ]
+                    }
                 }
             }
         }

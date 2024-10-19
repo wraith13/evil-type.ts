@@ -403,29 +403,10 @@ export namespace Build
                 }
             }
         };
-        export const getMemberTypes = (define: Type.TypeOrRefer): Type.TypeOrRefer[] =>
-        {
-
-        };
         export const buildKeyofValidator = (name: string, define: Type.KeyofElement): CodeExpression[] =>
         {
-            const members = getMemberTypes(define.value);
-            switch(members.length)
-            {
-            case 0:
-                // never: ここに到達してる時点でダメ。この前の段階で判定する必要がある。
-                return [ $expression("false"), ];
-            case 1:
-                return buildValidatorExpression(name, members[0])
-            default:
-                return kindofJoinExpression
-                (
-                    members.map(i => buildValidatorExpression(name, i)),
-                    $expression("||")
-                );
-            }
+            NYI
         };
-
         export const buildInterfaceValidator = (name: string, define: Type.InterfaceDefinition): CodeExpression[] =>
         {
             const list: CodeExpression[] = [];
@@ -516,6 +497,8 @@ export namespace Build
                     return buildCall([ $expression("EvilType.Validator.isJust"), ], [ buildLiteralAsConst(define.literal), ]);
                 case "typeof":
                     return [ $expression(buildValidatorName(define.value.$ref)), ];
+                case "keyof":
+                    return buildCall([ $expression("EvilType.Validator.isEnum"), ], [ NYI $expression(define.value.$ref), ]);
                 case "itemof":
                     return buildCall([ $expression("EvilType.Validator.isEnum"), ], [ $expression(define.value.$ref), ]);
                 case "primitive-type":
@@ -603,7 +586,7 @@ export namespace Build
                 case "dictionary":
                     return isLazyValidator(define.valueType);
                 case "keyof":
-                    return getMemberTypes(define.value).some(i => isLazyValidator(i));
+                    return false;
                 case "and":
                 case "or":
                     return define.types.some(i => isLazyValidator(i));
@@ -825,6 +808,7 @@ export namespace Build
                     return data.schema.externalReferMapping[key] +absolutePath.slice(key.length);
                 }
             }
+            console.error(`🚫 Can not resolve refer: ${ JSON.stringify({ path: data.path, absolutePath, }) }`);
             return null;
         };
         export const getDefinition = (data: SchemaProcess<unknown>, value: Type.ReferElement): SchemaProcess<Type.Definition> =>
@@ -839,6 +823,37 @@ export namespace Build
                 value: data.definitions[path],
             };
             return result;
+        };
+        export const getTarget = (data: SchemaProcess<Type.TypeOrValueOfRefer>): SchemaProcess<Type.TypeOrLiteralOfRefer> =>
+        {
+            if (Type.isReferElement(data.value))
+            {
+                const next = getDefinition(data, data.value);
+                if (Type.isTypeOrValueOfRefer(next.value))
+                {
+                    return getTarget(nextProcess(next, null, next.value));
+                }
+                else
+                {
+                    return nextProcess(data, null, data.value);
+                }
+            }
+            if (Type.isValueDefinition(data.value))
+            {
+                if (Type.isReferElement(data.value.value))
+                {
+                    return getTarget(nextProcess(data, null, data.value.value));
+                }
+                else
+                {
+                    return nextProcess(data, null, data.value.value);
+                }
+            }
+            if (Type.isTypeDefinition(data.value))
+            {
+                return getTarget(nextProcess(data, null, data.value.define));
+            }
+            return nextProcess(data, null, data.value);
         };
         export const getLiteral = (data: SchemaProcess<unknown>, value: Type.ReferElement): Type.LiteralElement | null =>
         {
@@ -985,7 +1000,7 @@ export namespace Build
                 (
                     i =>
                     {
-                        const current = getDefinition(data, i);
+                        const current = getTarget(nextProcess(data, null, i));
                         if (Type.isInterfaceDefinition(current.value))
                         {
                             const base = buildInterface(<SchemaProcess<Type.InterfaceDefinition>>current);
@@ -1052,23 +1067,41 @@ export namespace Build
             }
             return setCommonProperties(result, data);
         };
-        export const buildKeyOf = (data: SchemaProcess<Type.KeyofElement>):Jsonable.JsonableObject =>
+        export const getKeys = (data: SchemaProcess<Type.InterfaceDefinition>): string[] =>
         {
-            const members = getMemberTypes(define.value);
-            switch(members.length)
+            const result: string[] = [];
+            if (data.value.extends)
             {
-            case 0:
-                // never: ここに到達してる時点でダメ。この前の段階で判定する必要がある。
-                return [ $expression("false"), ];
-            case 1:
-                return setCommonProperties(buildType(nextProcess(data, null, members[0])), data);
-            default:
-                const result: Jsonable.JsonableObject =
-                {
-                    oneOf: members.map(i => buildTypeOrRefer(nextProcess(data, null, i))),
-                };
-                return setCommonProperties(result, data);
+                data.value.extends.forEach
+                (
+                    i =>
+                    {
+                        const current = getTarget(nextProcess(data, null, i));
+                        if (Type.isInterfaceDefinition(current.value))
+                        {
+                            result.push(...getKeys(nextProcess(current, null, current.value)));
+                        }
+                    }
+                )
             }
+            result.push(...Object.keys(data.value.members));
+            return result;
+        };
+        export const buildKeyOf = (data: SchemaProcess<Type.KeyofElement>): Jsonable.JsonableObject =>
+        {
+            const result: Jsonable.JsonableObject =
+            {
+            };
+            let target = getTarget(nextProcess(data, null, data.value.value));
+            if (Type.isInterfaceDefinition(target.value))
+            {
+                result["enum"] = getKeys(nextProcess(target, null, target.value));
+            }
+            else
+            {
+                result["type"] = "string";
+            }
+            return setCommonProperties(result, data);
         };
         export const buildItemOf = (data: SchemaProcess<Type.ItemofElement>):Jsonable.JsonableObject =>
         {
