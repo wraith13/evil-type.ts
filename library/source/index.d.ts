@@ -29,14 +29,18 @@ export declare const $comment: (define: Type.CommentProperty) => CodeLine[];
 export declare const $iblock: (lines: CodeInlineBlock["lines"]) => CodeInlineBlock;
 export declare const $block: (header: CodeBlock["header"], lines: CodeBlock["lines"]) => CodeBlock;
 export declare namespace Build {
-    const buildExport: (define: {
+    const buildExport: (data: BaseProcess<{
         export?: boolean;
-    } | {}) => CodeExpression[];
+    }>) => CodeExpression[];
+    const getAdditionalProperties: (data: BaseProcess<{
+        additionalProperties?: boolean;
+    }>) => boolean | undefined;
     const buildExtends: (define: Type.InterfaceDefinition) => CodeExpression[];
     const asConst: CodeExpression[];
     const buildLiteralAsConst: (literal: Jsonable.Jsonable) => CodeExpression[];
     interface BaseProcess<ValueType> {
         source: Type.TypeSchema;
+        options: Type.OutputOptions;
         definitions: Type.DefinitionMap;
         path: string;
         key: string;
@@ -55,13 +59,11 @@ export declare namespace Build {
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
     namespace Define {
         interface DefineProcess<ValueType> extends BaseProcess<ValueType> {
-            options: Type.OutputOptions;
         }
         const makeProcess: (source: Type.TypeSchema) => DefineProcess<Type.DefinitionMap>;
-        const buildDefineLine: (declarator: string, data: DefineProcess<Type.TypeOrValue>, postEpressions?: CodeExpression[]) => CodeLine;
+        const buildDefineLine: (declarator: string, data: DefineProcess<Type.TypeOrValue & Type.Definition>, postEpressions?: CodeExpression[]) => CodeLine;
         const buildInlineDefineLiteral: (define: Type.LiteralElement) => CodeExpression[];
         const buildInlineDefinePrimitiveType: (value: Type.PrimitiveTypeElement) => CodeExpression;
-        const buildDefinePrimitiveType: (data: DefineProcess<Type.PrimitiveTypeElement>) => CodeLine;
         const enParenthesis: <T extends CodeInlineEntry>(expressions: T[]) => (CodeExpression | T)[];
         const isNeedParenthesis: (expressions: (CodeExpression | CodeInlineBlock)[]) => boolean;
         const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | CodeInlineBlock)[];
@@ -95,7 +97,7 @@ export declare namespace Build {
         const isLazyValidator: (define: Type.TypeOrRefer) => boolean;
         const buildFullValidator: (data: Define.DefineProcess<Type.Type>) => CodeInlineEntry[];
         const isValidatorTarget: (define: Type.TypeOrValue) => boolean;
-        const buildValidator: (data: Define.DefineProcess<Type.TypeOrValue>) => CodeLine[];
+        const buildValidator: (data: Define.DefineProcess<Type.TypeOrValue & Type.Definition>) => CodeLine[];
         const buildValidatorObject: (data: Define.DefineProcess<Type.InterfaceDefinition>) => CodeLine[];
     }
     namespace Schema {

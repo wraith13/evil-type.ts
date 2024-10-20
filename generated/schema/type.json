@@ -17,7 +17,8 @@
                     "description": "[CODE]"
                 }
             },
-            "required": []
+            "required": [],
+            "additionalProperties": false
         },
         "Type.CommonProperties": {
             "type": "object",
@@ -31,7 +32,8 @@
                     "description": "[SCHEMA]"
                 }
             },
-            "required": []
+            "required": [],
+            "additionalProperties": false
         },
         "Type.TypeSchema": {
             "type": "object",
@@ -109,6 +111,21 @@
                     ],
                     "description": "[CODE]"
                 },
+                "default": {
+                    "type": "object",
+                    "properties": {
+                        "export": {
+                            "type": "boolean",
+                            "description": "[CODE]"
+                        },
+                        "additionalProperties": {
+                            "type": "boolean",
+                            "description": "[SCHEMA]"
+                        }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                },
                 "schema": {
                     "$ref": "#/definitions/Type.SchemaOptions",
                     "description": "[SCHEMA] If you want to generate JSON Schema, specify this option."
@@ -146,8 +163,7 @@
                 }
             },
             "required": [
-                "outputFile",
-                "$id"
+                "outputFile"
             ],
             "additionalProperties": false
         },
@@ -187,7 +203,8 @@
             },
             "required": [
                 "$type"
-            ]
+            ],
+            "additionalProperties": false
         },
         "Type.AlphaDefinition": {
             "type": "object",
@@ -216,7 +233,8 @@
             },
             "required": [
                 "$type"
-            ]
+            ],
+            "additionalProperties": false
         },
         "Type.ImportDefinition": {
             "type": "object",
@@ -618,6 +636,30 @@
             ],
             "additionalProperties": false
         },
+        "Type.UnknownType": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "primitive-type"
+                },
+                "type": {
+                    "const": "unknown"
+                }
+            },
+            "required": [
+                "$type",
+                "type"
+            ],
+            "additionalProperties": false
+        },
         "Type.NullType": {
             "type": "object",
             "properties": {
@@ -743,6 +785,9 @@
         },
         "Type.PrimitiveTypeElement": {
             "oneOf": [
+                {
+                    "$ref": "#/definitions/Type.UnknownType"
+                },
                 {
                     "$ref": "#/definitions/Type.NullType"
                 },

@@ -205,6 +205,8 @@ var EvilType;
             return Error.withErrorHandling(target === value, listner, function () { return Error.valueToString(target); }, value);
         }; };
         Validator.isUndefined = Validator.isJust(undefined);
+        Validator.isUnknown = function (_value, _listner) { return true; };
+        Validator.isAny = function (_value, _listner) { return true; };
         Validator.isNull = Validator.isJust(null);
         Validator.isBoolean = function (value, listner) {
             return Error.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
@@ -362,8 +364,9 @@ var EvilType;
         Validator.isOptionalKeyTypeGuard = function (value, listner) {
             return Validator.isSpecificObject({
                 $type: Validator.isJust("optional-type-guard"),
-                isType: function (value, listner) {
-                    return "function" === typeof value || (undefined !== listner && Error.raiseError(listner, "function", value));
+                isType: function (_value, _listner) {
+                    //"function" === typeof value || (undefined !== listner && Error.raiseError(listner, "IsType<unknown> | ObjectValidator<unknown>", value)),
+                    return true;
                 },
             })(value, listner);
         };

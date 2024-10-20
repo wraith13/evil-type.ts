@@ -88,8 +88,10 @@ export const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ 
 export const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
 export namespace Build
 {
-    export const buildExport = (define: { export?: boolean } | { }): CodeExpression[] =>
-        ("export" in define && (define.export ?? true)) ? [$expression("export")]: [];
+    export const buildExport = (data: BaseProcess<{ export?: boolean; }>): CodeExpression[] =>
+        (data.value.export ?? data.options.default?.export ?? true) ? [ $expression("export"), ]: [];
+    export const getAdditionalProperties = (data: BaseProcess<{ additionalProperties?: boolean; }>) =>
+        data.value.additionalProperties ?? data.options.default?.additionalProperties;
     export const buildExtends = (define: Type.InterfaceDefinition): CodeExpression[] =>
         undefined !== define.extends ? [$expression("extends"), ...define.extends.map((i, ix, list) => $expression(ix < (list.length -1) ? `${i.$ref},`: `${i.$ref}`))]: [];
     export const asConst = [ $expression("as"), $expression("const"), ];
@@ -98,6 +100,7 @@ export namespace Build
     export interface BaseProcess<ValueType>
     {
         source: Type.TypeSchema;
+        options: Type.OutputOptions;
         definitions: Type.DefinitionMap;
         path: string;
         key: string;
@@ -228,7 +231,6 @@ export namespace Build
     {
         export interface DefineProcess<ValueType> extends BaseProcess<ValueType>
         {
-            options: Type.OutputOptions;
         }
         export const makeProcess = (source: Type.TypeSchema): DefineProcess<Type.DefinitionMap> =>
         ({
@@ -240,8 +242,8 @@ export namespace Build
             value: source.defines,
         });
         //export const buildDefineLine = (declarator: string, name: string, define: Type.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
-        export const buildDefineLine = (declarator: string, data: DefineProcess<Type.TypeOrValue>, postEpressions: CodeExpression[] = []): CodeLine =>
-            $line([ ...buildExport(data.value), $expression(declarator), $expression(data.key), $expression("="), ...convertToExpression(buildInlineDefine(data)), ...postEpressions, ]);
+        export const buildDefineLine = (declarator: string, data: DefineProcess<Type.TypeOrValue & Type.Definition>, postEpressions: CodeExpression[] = []): CodeLine =>
+            $line([ ...buildExport(data), $expression(declarator), $expression(data.key), $expression("="), ...convertToExpression(buildInlineDefine(data)), ...postEpressions, ]);
         export const buildInlineDefineLiteral = (define: Type.LiteralElement) =>
             [ $expression(Jsonable.stringify(define.literal)) ];
         export const buildInlineDefinePrimitiveType = (value: Type.PrimitiveTypeElement) =>
@@ -255,8 +257,8 @@ export namespace Build
             }
         };
         //export const buildDefinePrimitiveType = (name: string, value: Type.PrimitiveTypeElement): CodeLine =>
-        export const buildDefinePrimitiveType = (data: DefineProcess<Type.PrimitiveTypeElement>): CodeLine =>
-            buildDefineLine("type", data);
+        // export const buildDefinePrimitiveType = (data: DefineProcess<Type.PrimitiveTypeElement>): CodeLine =>
+        //     buildDefineLine("type", data);
         export const enParenthesis = <T extends CodeInlineEntry>(expressions: T[]) =>
             [ $expression("("), ...expressions, $expression(")"), ];
         export const isNeedParenthesis = (expressions: (CodeExpression | CodeInlineBlock)[]) =>
@@ -323,14 +325,14 @@ export namespace Build
         );
         export const buildDefineInterface = (data: DefineProcess<Type.InterfaceDefinition>): CodeBlock =>
         {
-            const header = [ ...buildExport(data.value), ...["interface", data.key].map(i => $expression(i)), ...buildExtends(data.value), ];
+            const header = [ ...buildExport(data), ...["interface", data.key].map(i => $expression(i)), ...buildExtends(data.value), ];
             const lines = Object.keys(data.value.members)
                 .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(nextProcess(data, name, data.value.members[name])), ]));
             return $block(header, lines);
         };
         export const buildDefineDictionary = (data: DefineProcess<Type.DictionaryDefinition>): CodeBlock =>
         {
-            const header = [ ...buildExport(data.value), ...["type", data.key].map(i => $expression(i)), $expression("=")];
+            const header = [ ...buildExport(data), ...["type", data.key].map(i => $expression(i)), $expression("=")];
             return $block(header, [ $line([ $expression("[key: string]:"), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), ]) ]);
         };
         export const buildDefineNamespaceCore = (data: DefineProcess<Type.DefinitionMap>): CodeEntry[] =>
@@ -345,7 +347,7 @@ export namespace Build
         .reduce((a, b) => [...a, ...b], []);
         export const buildDefineNamespace = (data: DefineProcess<Type.NamespaceDefinition>): CodeBlock =>
         {
-            const header = [...buildExport(data.value), $expression("namespace"), $expression(data.key), ];
+            const header = [...buildExport(data), $expression("namespace"), $expression(data.key), ];
             const lines = buildDefineNamespaceCore(nextProcess(data, null, data.value.members));
             return $block(header, lines);
         };
@@ -356,7 +358,7 @@ export namespace Build
             switch(data.value.$type)
             {
             case "code":
-                return [ $line([ ...$comment(data.value), ...buildExport(data.value), ...data.value.tokens.map(i => $expression(i)), ]), ];
+                return [ $line([ ...$comment(data.value), ...buildExport(data), ...data.value.tokens.map(i => $expression(i)), ]), ];
             case "interface":
                 return [ ...$comment(data.value), buildDefineInterface(nextProcess(data, null, data.value)), ];
             case "dictionary":
@@ -492,6 +494,8 @@ export namespace Build
                 case "primitive-type":
                     switch(data.value.type)
                     {
+                    case "unknown":
+                        return [ $expression("true"), ];
                     case "null":
                         return [ $expression(`"${data.value.type}" === ${name}`), ];
                     case "integer":
@@ -670,6 +674,8 @@ export namespace Build
                 case "primitive-type":
                     switch(data.value.type)
                     {
+                    case "unknown":
+                        return [ $expression("EvilType.Validator.isUnknown"), ];
                     case "null":
                         return [ $expression("EvilType.Validator.isNull"), ];
                     case "boolean":
@@ -788,7 +794,7 @@ export namespace Build
         export const isValidatorTarget = (define: Type.TypeOrValue) =>
             ! (Type.isValueDefinition(define) && false === define.validator);
         //export const buildValidator = (options: Type.OutputOptions, name: string, define: Type.TypeOrValue): CodeLine[] =>
-        export const buildValidator = (data: Define.DefineProcess<Type.TypeOrValue>): CodeLine[] =>
+        export const buildValidator = (data: Define.DefineProcess<Type.TypeOrValue & Type.Definition>): CodeLine[] =>
         {
             if ("simple" === data.options.validatorOption)
             {
@@ -796,7 +802,7 @@ export namespace Build
                 [
                     $line
                     ([
-                        ...buildExport(data.value),
+                        ...buildExport(data),
                         $expression("const"),
                         $expression(buildValidatorName(data.key)),
                         $expression("="),
@@ -809,7 +815,7 @@ export namespace Build
             {
                 const result: CodeLine["expressions"] =
                 [
-                    ...buildExport(data.value),
+                    ...buildExport(data),
                     $expression("const"),
                     $expression(buildValidatorName(data.key)),
                 ];
@@ -828,7 +834,7 @@ export namespace Build
                                     ...buildCall
                                     (
                                         [ $expression("EvilType.Validator.isSpecificObject"), ],
-                                        [ $expression(buildObjectValidatorObjectName(data.key)), ...(undefined !== data.value.additionalProperties ? [ $expression(Jsonable.stringify(data.value.additionalProperties)), ]: []) ]
+                                        [ $expression(buildObjectValidatorObjectName(data.key)), ...(false === getAdditionalProperties(nextProcess(data, null, data.value)) ? [ $expression("false"), ]: []) ]
                                     ),
                                 ]
                             ]
@@ -883,7 +889,7 @@ export namespace Build
                 [
                     $line
                     ([
-                        ...buildExport(data.value),
+                        ...buildExport(data),
                         $expression("const"),
                         $expression(buildObjectValidatorObjectName(data.key)),
                         $expression(":"),
@@ -914,6 +920,7 @@ export namespace Build
         export const makeProcess = (source: Type.TypeSchema, schema: Type.SchemaOptions): SchemaProcess<Type.DefinitionMap> =>
         ({
             source,
+            options: source.options,
             schema,
             definitions: makeDefinitionFlatMap(source.defines),
             path: "",
@@ -939,9 +946,12 @@ export namespace Build
         {
             const result: Jsonable.JsonableObject =
             {
-                $id: data.schema.$id,
-                $schema: "http://json-schema.org/draft-07/schema#",
             };
+            if (data.schema.$id)
+            {
+                result["$id"] = data.schema.$id;
+            }
+            result["$schema"] = "http://json-schema.org/draft-07/schema#";
             if (data.schema.$ref)
             {
                 result["$ref"] = `#/${Const.definitions}/${data.schema.$ref}`;
@@ -1092,9 +1102,10 @@ export namespace Build
                     properties[key] = buildTypeOrRefer(nextProcess(data, null, value));
                 }
             );
-            if ("boolean" === typeof data.value.additionalProperties)
+            const additionalProperties = getAdditionalProperties(data);
+            if ("boolean" === typeof additionalProperties)
             {
-                result["additionalProperties"] = data.value.additionalProperties;
+                result["additionalProperties"] = additionalProperties;
             }
             return setCommonProperties(result, data);
         };

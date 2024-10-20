@@ -17,11 +17,9 @@
     ],
     "defines": {
         "Type": {
-            "export": true,
             "$type": "namespace",
             "members": {
                 "schema": {
-                    "export": true,
                     "$type": "value",
                     "value": {
                         "$type": "literal",
@@ -29,7 +27,6 @@
                     }
                 },
                 "CommentProperty": {
-                    "export": true,
                     "$type": "interface",
                     "members": {
                         "comment?": {
@@ -43,7 +40,6 @@
                     }
                 },
                 "CommonProperties": {
-                    "export": true,
                     "$type": "interface",
                     "members": {
                         "title?": {
@@ -59,7 +55,6 @@
                     }
                 },
                 "TypeSchema": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -91,7 +86,6 @@
                     "additionalProperties": false
                 },
                 "OutputOptions": {
-                    "export": true,
                     "$type": "interface",
                     "members": {
                         "outputFile": {
@@ -137,6 +131,21 @@
                             ],
                             "description": "[CODE]"
                         },
+                        "default?": {
+                            "$type": "interface",
+                            "members": {
+                                "export?": {
+                                    "$type": "primitive-type",
+                                    "type": "boolean",
+                                    "description": "[CODE]"
+                                },
+                                "additionalProperties?": {
+                                    "$type": "primitive-type",
+                                    "type": "boolean",
+                                    "description": "[SCHEMA]"
+                                }
+                            }
+                        },
                         "schema?": {
                             "$ref": "SchemaOptions",
                             "description": "[SCHEMA] If you want to generate JSON Schema, specify this option."
@@ -145,7 +154,6 @@
                     "additionalProperties": false
                 },
                 "SchemaOptions": {
-                    "export": true,
                     "$type": "interface",
                     "members": {
                         "outputFile": {
@@ -153,7 +161,7 @@
                             "type": "string",
                             "description": "[SCHEMA]"
                         },
-                        "$id": {
+                        "$id?": {
                             "$type": "primitive-type",
                             "type": "string",
                             "description": "[SCHEMA] Schema ID"
@@ -175,7 +183,6 @@
                     "additionalProperties": false
                 },
                 "indentStyleTypeMember": {
-                    "export": true,
                     "$type": "value",
                     "value": {
                         "$type": "literal",
@@ -187,7 +194,6 @@
                     "validator": false
                 },
                 "IndentStyleType": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "itemof",
@@ -197,7 +203,6 @@
                     }
                 },
                 "ValidatorOptionType": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "enum-type",
@@ -209,7 +214,6 @@
                     }
                 },
                 "AlphaElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -224,7 +228,6 @@
                     }
                 },
                 "AlphaDefinition": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -242,7 +245,6 @@
                     }
                 },
                 "ImportDefinition": {
-                    "export": true,
                     "$type": "interface",
                     "members": {
                         "$type": {
@@ -261,7 +263,6 @@
                     "additionalProperties": false
                 },
                 "Definition": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
@@ -288,14 +289,12 @@
                     }
                 },
                 "DefinitionMap": {
-                    "export": true,
                     "$type": "dictionary",
                     "valueType": {
                         "$ref": "Definition"
                     }
                 },
                 "CodeDefinition": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -319,7 +318,6 @@
                     "description": "[CODE]"
                 },
                 "NamespaceDefinition": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -338,7 +336,6 @@
                     "additionalProperties": false
                 },
                 "ValueDefinition": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -369,7 +366,6 @@
                     "additionalProperties": false
                 },
                 "TypeDefinition": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -388,7 +384,6 @@
                     "additionalProperties": false
                 },
                 "InterfaceDefinition": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -420,7 +415,6 @@
                     "additionalProperties": false
                 },
                 "DictionaryDefinition": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -439,7 +433,6 @@
                     "additionalProperties": false
                 },
                 "ArrayElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -458,7 +451,6 @@
                     "additionalProperties": false
                 },
                 "OrElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -480,7 +472,6 @@
                     "additionalProperties": false
                 },
                 "AndElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -502,7 +493,6 @@
                     "additionalProperties": false
                 },
                 "LiteralElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -521,7 +511,6 @@
                     "additionalProperties": false
                 },
                 "ReferElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -532,6 +521,25 @@
                         "$ref": {
                             "$type": "primitive-type",
                             "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "UnknownType": {
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "primitive-type"
+                        },
+                        "type": {
+                            "$type": "literal",
+                            "literal": "unknown"
                         }
                     },
                     "additionalProperties": false
@@ -636,11 +644,13 @@
                     "additionalProperties": false
                 },
                 "PrimitiveTypeElement": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
                         "types": [
+                            {
+                                "$ref": "UnknownType"
+                            },
                             {
                                 "$ref": "NullType"
                             },
@@ -660,7 +670,6 @@
                     }
                 },
                 "Type": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
@@ -705,7 +714,6 @@
                     }
                 },
                 "EnumTypeElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -745,7 +753,6 @@
                     "additionalProperties": false
                 },
                 "TypeofElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -764,7 +771,6 @@
                     "additionalProperties": false
                 },
                 "KeyofElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -783,7 +789,6 @@
                     "additionalProperties": false
                 },
                 "ItemofElement": {
-                    "export": true,
                     "$type": "interface",
                     "extends": [
                         {
@@ -802,7 +807,6 @@
                     "additionalProperties": false
                 },
                 "TypeOrRefer": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
@@ -817,7 +821,6 @@
                     }
                 },
                 "TypeOrValue": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
@@ -832,7 +835,6 @@
                     }
                 },
                 "TypeOrValueOfRefer": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
@@ -847,7 +849,6 @@
                     }
                 },
                 "TypeOrLiteralOfRefer": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
@@ -869,6 +870,10 @@
         "indentUnit": 4,
         "indentStyle": "allman",
         "validatorOption": "full",
+        "default": {
+            "export": true,
+            "additionalProperties": false
+        },
         "schema": {
             "outputFile": "../generated/schema/type.json",
             "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#",

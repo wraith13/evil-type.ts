@@ -1,0 +1,22 @@
+{
+    "$schema": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#",
+    "comment": [
+    ],
+    "imports": [
+    ],
+    "defines": {
+    },
+    "options": {
+        "outputFile": "./GENERATED-YOUR-TYPE-DEFINE.ts",
+        "indentUnit": 4,
+        "indentStyle": "allman",
+        "validatorOption": "simple",
+        "default": {
+            "export": true,
+            "additionalProperties": false
+        },
+        "schema": {
+            "outputFile": "./GENERATED-YOUR-JSON-SCHEMA.json"
+        }
+    }
+}

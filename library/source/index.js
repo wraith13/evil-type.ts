@@ -75,7 +75,8 @@ var $block = function (header, lines) { return ({ $code: "block", header: header
 exports.$block = $block;
 var Build;
 (function (Build) {
-    Build.buildExport = function (define) { var _a; return ("export" in define && ((_a = define.export) !== null && _a !== void 0 ? _a : true)) ? [(0, exports.$expression)("export")] : []; };
+    Build.buildExport = function (data) { var _a, _b, _c; return ((_c = (_a = data.value.export) !== null && _a !== void 0 ? _a : (_b = data.options.default) === null || _b === void 0 ? void 0 : _b.export) !== null && _c !== void 0 ? _c : true) ? [(0, exports.$expression)("export"),] : []; };
+    Build.getAdditionalProperties = function (data) { var _a, _b; return (_a = data.value.additionalProperties) !== null && _a !== void 0 ? _a : (_b = data.options.default) === null || _b === void 0 ? void 0 : _b.additionalProperties; };
     Build.buildExtends = function (define) {
         return undefined !== define.extends ? __spreadArray([(0, exports.$expression)("extends")], define.extends.map(function (i, ix, list) { return (0, exports.$expression)(ix < (list.length - 1) ? "".concat(i.$ref, ",") : "".concat(i.$ref)); }), true) : [];
     };
@@ -191,7 +192,7 @@ var Build;
         //export const buildDefineLine = (declarator: string, name: string, define: Type.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
         Define.buildDefineLine = function (declarator, data, postEpressions) {
             if (postEpressions === void 0) { postEpressions = []; }
-            return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(data.key), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Define.buildInlineDefine(data)), true), postEpressions, true));
+            return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(data.key), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Define.buildInlineDefine(data)), true), postEpressions, true));
         };
         Define.buildInlineDefineLiteral = function (define) {
             return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.literal))];
@@ -205,9 +206,8 @@ var Build;
             }
         };
         //export const buildDefinePrimitiveType = (name: string, value: Type.PrimitiveTypeElement): CodeLine =>
-        Define.buildDefinePrimitiveType = function (data) {
-            return Define.buildDefineLine("type", data);
-        };
+        // export const buildDefinePrimitiveType = (data: DefineProcess<Type.PrimitiveTypeElement>): CodeLine =>
+        //     buildDefineLine("type", data);
         Define.enParenthesis = function (expressions) {
             return __spreadArray(__spreadArray([(0, exports.$expression)("(")], expressions, true), [(0, exports.$expression)(")"),], false);
         };
@@ -264,13 +264,13 @@ var Build;
         Define.buildDefineInlineInterface = function (data) { return (0, exports.$iblock)(Object.keys(data.value.members)
             .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(Build.nextProcess(data, name, data.value.members[name])), true)); })); };
         Define.buildDefineInterface = function (data) {
-            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), ["interface", data.key].map(function (i) { return (0, exports.$expression)(i); }), true), Build.buildExtends(data.value), true);
+            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), ["interface", data.key].map(function (i) { return (0, exports.$expression)(i); }), true), Build.buildExtends(data.value), true);
             var lines = Object.keys(data.value.members)
                 .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(Build.nextProcess(data, name, data.value.members[name])), true)); });
             return (0, exports.$block)(header, lines);
         };
         Define.buildDefineDictionary = function (data) {
-            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), ["type", data.key].map(function (i) { return (0, exports.$expression)(i); }), true), [(0, exports.$expression)("=")], false);
+            var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), ["type", data.key].map(function (i) { return (0, exports.$expression)(i); }), true), [(0, exports.$expression)("=")], false);
             return (0, exports.$block)(header, [(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true))]);
         };
         Define.buildDefineNamespaceCore = function (data) {
@@ -280,7 +280,7 @@ var Build;
                 .map(function (i) { return type_1.Type.isInterfaceDefinition(i[1]) ? Build.Validator.buildValidatorObject(Build.nextProcess(data, i[0], i[1])) : []; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
         Define.buildDefineNamespace = function (data) {
-            var header = __spreadArray(__spreadArray([], Build.buildExport(data.value), true), [(0, exports.$expression)("namespace"), (0, exports.$expression)(data.key),], false);
+            var header = __spreadArray(__spreadArray([], Build.buildExport(data), true), [(0, exports.$expression)("namespace"), (0, exports.$expression)(data.key),], false);
             var lines = Define.buildDefineNamespaceCore(Build.nextProcess(data, null, data.value.members));
             return (0, exports.$block)(header, lines);
         };
@@ -290,7 +290,7 @@ var Build;
         Define.buildDefine = function (data) {
             switch (data.value.$type) {
                 case "code":
-                    return [(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), Build.buildExport(data.value), true), data.value.tokens.map(function (i) { return (0, exports.$expression)(i); }), true)),];
+                    return [(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), Build.buildExport(data), true), data.value.tokens.map(function (i) { return (0, exports.$expression)(i); }), true)),];
                 case "interface":
                     return __spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), [Define.buildDefineInterface(Build.nextProcess(data, null, data.value)),], false);
                 case "dictionary":
@@ -407,6 +407,8 @@ var Build;
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.value));
                     case "primitive-type":
                         switch (data.value.type) {
+                            case "unknown":
+                                return [(0, exports.$expression)("true"),];
                             case "null":
                                 return [(0, exports.$expression)("\"".concat(data.value.type, "\" === ").concat(name)),];
                             case "integer":
@@ -541,6 +543,8 @@ var Build;
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [(0, exports.$expression)(data.value.value.$ref),]);
                     case "primitive-type":
                         switch (data.value.type) {
+                            case "unknown":
+                                return [(0, exports.$expression)("EvilType.Validator.isUnknown"),];
                             case "null":
                                 return [(0, exports.$expression)("EvilType.Validator.isNull"),];
                             case "boolean":
@@ -619,7 +623,7 @@ var Build;
         Validator.buildValidator = function (data) {
             if ("simple" === data.options.validatorOption) {
                 var result_2 = [
-                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), [
+                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), [
                         (0, exports.$expression)("const"),
                         (0, exports.$expression)(Validator.buildValidatorName(data.key)),
                         (0, exports.$expression)("=")
@@ -628,7 +632,7 @@ var Build;
                 return result_2;
             }
             if ("full" === data.options.validatorOption) {
-                var result_3 = __spreadArray(__spreadArray([], Build.buildExport(data.value), true), [
+                var result_3 = __spreadArray(__spreadArray([], Build.buildExport(data), true), [
                     (0, exports.$expression)("const"),
                     (0, exports.$expression)(Validator.buildValidatorName(data.key)),
                 ], false);
@@ -637,7 +641,7 @@ var Build;
                         __spreadArray([
                             (0, exports.$expression)("()"),
                             (0, exports.$expression)("=>")
-                        ], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject"),], __spreadArray([(0, exports.$expression)(Validator.buildObjectValidatorObjectName(data.key))], (undefined !== data.value.additionalProperties ? [(0, exports.$expression)(jsonable_1.Jsonable.stringify(data.value.additionalProperties)),] : []), true)), true)
+                        ], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject"),], __spreadArray([(0, exports.$expression)(Validator.buildObjectValidatorObjectName(data.key))], (false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? [(0, exports.$expression)("false"),] : []), true)), true)
                     ])
                     // $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${name} =>`),
                     // ...buildCall
@@ -670,7 +674,7 @@ var Build;
         Validator.buildValidatorObject = function (data) {
             if ("full" === data.options.validatorOption) {
                 var result_4 = [
-                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data.value), true), [
+                    (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), [
                         (0, exports.$expression)("const"),
                         (0, exports.$expression)(Validator.buildObjectValidatorObjectName(data.key)),
                         (0, exports.$expression)(":"),
@@ -692,6 +696,7 @@ var Build;
         Schema.makeProcess = function (source, schema) {
             return ({
                 source: source,
+                options: source.options,
                 schema: schema,
                 definitions: Build.makeDefinitionFlatMap(source.defines),
                 path: "",
@@ -711,10 +716,11 @@ var Build;
             return null;
         };
         Schema.build = function (data) {
-            var result = {
-                $id: data.schema.$id,
-                $schema: "http://json-schema.org/draft-07/schema#",
-            };
+            var result = {};
+            if (data.schema.$id) {
+                result["$id"] = data.schema.$id;
+            }
+            result["$schema"] = "http://json-schema.org/draft-07/schema#";
             if (data.schema.$ref) {
                 result["$ref"] = "#/".concat(Const.definitions, "/").concat(data.schema.$ref);
             }
@@ -834,8 +840,9 @@ var Build;
                 var value = i[1];
                 properties[key] = Schema.buildTypeOrRefer(Build.nextProcess(data, null, value));
             });
-            if ("boolean" === typeof data.value.additionalProperties) {
-                result["additionalProperties"] = data.value.additionalProperties;
+            var additionalProperties = Build.getAdditionalProperties(data);
+            if ("boolean" === typeof additionalProperties) {
+                result["additionalProperties"] = additionalProperties;
             }
             return Schema.setCommonProperties(result, data);
         };

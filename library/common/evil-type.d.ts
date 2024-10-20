@@ -38,6 +38,8 @@ export declare namespace EvilType {
         type IsType<T> = (value: unknown, listner?: ErrorListener) => value is T;
         const isJust: <T>(target: T) => (value: unknown, listner?: ErrorListener) => value is T;
         const isUndefined: (value: unknown, listner?: ErrorListener) => value is undefined;
+        const isUnknown: (_value: unknown, _listner?: ErrorListener) => _value is boolean;
+        const isAny: (_value: unknown, _listner?: ErrorListener) => _value is boolean;
         const isNull: (value: unknown, listner?: ErrorListener) => value is null;
         const isBoolean: (value: unknown, listner?: ErrorListener) => value is boolean;
         const isNumber: (value: unknown, listner?: ErrorListener) => value is number;
@@ -46,7 +48,7 @@ export declare namespace EvilType {
         type ActualObject = Exclude<object, null>;
         const isObject: (value: unknown) => value is ActualObject;
         const isEnum: <T>(list: readonly T[]) => (value: unknown, listner?: ErrorListener) => value is T;
-        const isArray: <T>(isType: (value: unknown, listner?: ErrorListener) => value is T) => (value: unknown, listner?: ErrorListener) => value is T[];
+        const isArray: <T>(isType: IsType<T>) => (value: unknown, listner?: ErrorListener) => value is T[];
         const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) => string[];
         const getBestMatchErrors: (listeners: ErrorListener[]) => Error.Listener[];
         const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) => (value: unknown, listner?: ErrorListener) => value is T[number];
@@ -57,9 +59,9 @@ export declare namespace EvilType {
             isType: IsType<T> | ObjectValidator<T>;
         }
         const isOptionalKeyTypeGuard: (value: unknown, listner?: ErrorListener) => value is OptionalKeyTypeGuard<unknown>;
-        const makeOptionalKeyTypeGuard: <T>(isType: (value: unknown, listner?: ErrorListener) => value is T) => OptionalKeyTypeGuard<T>;
+        const makeOptionalKeyTypeGuard: <T>(isType: IsType<T> | ObjectValidator<T>) => OptionalKeyTypeGuard<T>;
         const invokeIsType: <T>(isType: IsType<T> | ObjectValidator<T>) => IsType<T> | ((value: unknown, listner?: ErrorListener) => value is object);
-        const isOptional: <T>(isType: (value: unknown, listner?: ErrorListener) => value is T) => OptionalKeyTypeGuard<T>;
+        const isOptional: <T>(isType: IsType<T> | ObjectValidator<T>) => OptionalKeyTypeGuard<T>;
         const isOptionalMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: ErrorListener) => boolean;
         const isMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: IsType<unknown> | OptionalKeyTypeGuard<unknown>, listner?: ErrorListener) => boolean;
         type OptionalKeys<T> = {
@@ -71,7 +73,7 @@ export declare namespace EvilType {
         type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
         type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
         type ObjectValidator<ObjectType> = {
-            [key in NonOptionalKeys<ObjectType>]: ((v: unknown) => v is ObjectType[key]) | ObjectValidator<ObjectType[key]>;
+            [key in NonOptionalKeys<ObjectType>]: IsType<ObjectType[key]> | ObjectValidator<ObjectType[key]>;
         } & {
             [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
         };

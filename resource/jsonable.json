@@ -12,11 +12,9 @@
     ],
     "defines": {
         "Jsonable": {
-            "export": true,
             "$type": "namespace",
             "members": {
                 "JsonableValue": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
@@ -41,7 +39,6 @@
                     }
                 },
                 "JsonableArray": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "array",
@@ -51,14 +48,12 @@
                     }
                 },
                 "JsonableObject": {
-                    "export": true,
                     "$type": "dictionary",
                     "valueType": {
                         "$ref": "Jsonable"
                     }
                 },
                 "Jsonable": {
-                    "export": true,
                     "$type": "type",
                     "define": {
                         "$type": "or",
@@ -76,7 +71,6 @@
                     }
                 },
                 "parse": {
-                    "export": true,
                     "$type": "code",
                     "tokens": [
                         "const",
@@ -90,7 +84,6 @@
                     ]
                 },
                 "stringify": {
-                    "export": true,
                     "$type": "code",
                     "tokens": [
                         "const",
@@ -104,7 +97,6 @@
                     ]
                 },
                 "JsonablePartial": {
-                    "export": true,
                     "$type": "code",
                     "tokens": [
                         "type",
@@ -123,6 +115,10 @@
         "indentUnit": 4,
         "indentStyle": "allman",
         "validatorOption": "full",
+        "default": {
+            "export": true,
+            "additionalProperties": false
+        },
         "schema": {
             "outputFile": "../generated/schema/jsonable.json",
             "$id": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/jsonable.json#"

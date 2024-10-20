@@ -4,16 +4,32 @@
 
 ## Features
 
-Generate the following TypeScript code from the JSON definition file.
+Generate the following TypeScript code and JSON Schema from the Type Definition Json file.
 
 - type definitions
 - validator functions
+
+## Overview
+
+```mermaid
+graph LR;
+    T[Your Type Definition JSON]-->J(evil-type.ts);
+    J(evil-type.ts)-->O[Your Type Definition TypeScript Code];
+    J(evil-type.ts)-->S[Your JSON Schema];
+```
 
 ## How to install for your project by npm
 
 ```sh
 npm install @wraith13/evil-type.ts --save-dev
 ```
+
+## Type Define JSON
+
+- [template: simple validator](./template/simple.json)
+- [template: full validator](./template/full.json)
+- [example: Jsonable](./resource/jsonable.json)
+- [example: Type](./resource/type.json)
 
 ## How to use
 
@@ -114,6 +130,11 @@ requires: [Node.js](https://nodejs.org/), [TypeScript Compiler](https://www.npmj
   "errors": []
 }
 ```
+
+## Related references
+
+- JSON Schema: https://json-schema.org/
+- JSON Schema with VS Code: https://code.visualstudio.com/docs/languages/json#_json-schemas-and-settings
 
 ## License
 
