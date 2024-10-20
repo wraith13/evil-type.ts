@@ -415,9 +415,8 @@ export namespace EvilType
             isSpecificObject<OptionalKeyTypeGuard<unknown>>
             ({
                 $type: isJust("optional-type-guard"),
-                isType: (_value: unknown, _listner?: ErrorListener): _value is IsType<unknown> | ObjectValidator<unknown> =>
-                    //"function" === typeof value || (undefined !== listner && Error.raiseError(listner, "IsType<unknown> | ObjectValidator<unknown>", value)),
-                    true,
+                isType: (value: unknown, listner?: ErrorListener): value is (IsType<unknown> | ObjectValidator<unknown>) =>
+                    "function" === typeof value || (null !== value && "object" === typeof value) || (undefined !== listner && Error.raiseError(listner, "IsType<unknown> | ObjectValidator<unknown>", value)),
             })(value, listner);
         export const makeOptionalKeyTypeGuard = <T>(isType: IsType<T> | ObjectValidator<T>): OptionalKeyTypeGuard<T> =>
         ({

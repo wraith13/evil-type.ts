@@ -42,6 +42,10 @@
                 "CommonProperties": {
                     "$type": "interface",
                     "members": {
+                        "default?": {
+                            "$ref": "Jsonable.Jsonable",
+                            "description": "[SCHEMA]"
+                        },
                         "title?": {
                             "$type": "primitive-type",
                             "type": "string",
@@ -107,14 +111,17 @@
                                 8,
                                 "tab"
                             ],
+                            "default": 4,
                             "description": "[CODE]"
                         },
                         "indentStyle": {
                             "$ref": "IndentStyleType",
+                            "default": "allman",
                             "description": "[CODE]"
                         },
                         "validatorOption": {
                             "$ref": "ValidatorOptionType",
+                            "default": "simple",
                             "description": "[CODE]"
                         },
                         "maxLineLength?": {
@@ -129,6 +136,7 @@
                                     "type": "integer"
                                 }
                             ],
+                            "default": 160,
                             "description": "[CODE]"
                         },
                         "default?": {
@@ -137,11 +145,13 @@
                                 "export?": {
                                     "$type": "primitive-type",
                                     "type": "boolean",
+                                    "default": true,
                                     "description": "[CODE]"
                                 },
                                 "additionalProperties?": {
                                     "$type": "primitive-type",
                                     "type": "boolean",
+                                    "default": false,
                                     "description": "[SCHEMA]"
                                 }
                             }
@@ -360,7 +370,8 @@
                         },
                         "validator?": {
                             "$type": "primitive-type",
-                            "type": "boolean"
+                            "type": "boolean",
+                            "default": true
                         }
                     },
                     "additionalProperties": false

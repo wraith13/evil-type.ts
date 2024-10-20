@@ -794,6 +794,9 @@ var Build;
             return result;
         };
         Schema.setCommonProperties = function (result, data) {
+            if (data.value.default) {
+                result["default"] = data.value.default;
+            }
             if (data.value.title) {
                 result["title"] = data.value.title;
             }

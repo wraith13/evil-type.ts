@@ -364,9 +364,8 @@ var EvilType;
         Validator.isOptionalKeyTypeGuard = function (value, listner) {
             return Validator.isSpecificObject({
                 $type: Validator.isJust("optional-type-guard"),
-                isType: function (_value, _listner) {
-                    //"function" === typeof value || (undefined !== listner && Error.raiseError(listner, "IsType<unknown> | ObjectValidator<unknown>", value)),
-                    return true;
+                isType: function (value, listner) {
+                    return "function" === typeof value || (null !== value && "object" === typeof value) || (undefined !== listner && Error.raiseError(listner, "IsType<unknown> | ObjectValidator<unknown>", value));
                 },
             })(value, listner);
         };

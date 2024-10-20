@@ -10,6 +10,7 @@ export namespace Type
     }
     export interface CommonProperties
     {
+        default?: Jsonable.Jsonable;
         title?: string;
         description?: string;
     }
@@ -230,9 +231,9 @@ export namespace Type
         isTypeOrRefer, isLiteralElement));
     export const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty> = ({ comment:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString)), });
-    export const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties> = ({ title:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), description: EvilType.Validator.isOptional(EvilType.Validator.isString)
-        , });
+    export const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties> = ({ default:
+        EvilType.Validator.isOptional(Jsonable.isJsonable), title: EvilType.Validator.isOptional(EvilType.Validator.isString), description:
+        EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const typeSchemaValidatorObject: EvilType.Validator.ObjectValidator<TypeSchema> = EvilType.Validator.mergeObjectValidator(
         commentPropertyValidatorObject, { $schema: isSchema, imports: EvilType.Validator.isOptional(EvilType.Validator.isArray(
         isImportDefinition)), defines: isDefinitionMap, options: isOutputOptions, });

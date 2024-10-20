@@ -1036,8 +1036,12 @@ export namespace Build
             };
             return result;
         };
-        export const setCommonProperties = (result: Jsonable.JsonableObject, data: SchemaProcess<{ title?: string, description?: string }>) =>
+        export const setCommonProperties = (result: Jsonable.JsonableObject, data: SchemaProcess<Type.CommonProperties>) =>
         {
+            if (data.value.default)
+            {
+                result["default"] = data.value.default;
+            }
             if (data.value.title)
             {
                 result["title"] = data.value.title;

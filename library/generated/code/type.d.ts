@@ -6,6 +6,7 @@ export declare namespace Type {
         comment?: string[];
     }
     interface CommonProperties {
+        default?: Jsonable.Jsonable;
         title?: string;
         description?: string;
     }
