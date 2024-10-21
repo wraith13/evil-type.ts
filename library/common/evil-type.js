@@ -204,6 +204,9 @@ var EvilType;
         Validator.isJust = function (target) { return function (value, listner) {
             return Error.withErrorHandling(target === value, listner, function () { return Error.valueToString(target); }, value);
         }; };
+        Validator.isNever = function (value, listner) {
+            return Error.withErrorHandling(false, listner, "never", value);
+        };
         Validator.isUndefined = Validator.isJust(undefined);
         Validator.isUnknown = function (_value, _listner) { return true; };
         Validator.isAny = function (_value, _listner) { return true; };
@@ -361,7 +364,15 @@ var EvilType;
                 }
             };
         };
-        Validator.isOptionalKeyTypeGuard = function (value, listner) {
+        Validator.isNeverTypeGuard = function (value, listner) {
+            return Validator.isSpecificObject({
+                $type: Validator.isJust("never-type-guard"),
+            })(value, listner);
+        };
+        Validator.isNeverMemberType = function (value, member, _neverTypeGuard, listner) {
+            return !(member in value) || Validator.isNever(value[member], listner);
+        };
+        Validator.isOptionalTypeGuard = function (value, listner) {
             return Validator.isSpecificObject({
                 $type: Validator.isJust("optional-type-guard"),
                 isType: function (value, listner) {
@@ -369,7 +380,7 @@ var EvilType;
                 },
             })(value, listner);
         };
-        Validator.makeOptionalKeyTypeGuard = function (isType) {
+        Validator.makeOptionalTypeGuard = function (isType) {
             return ({
                 $type: "optional-type-guard",
                 isType: isType,
@@ -378,7 +389,7 @@ var EvilType;
         Validator.invokeIsType = function (isType) {
             return "function" === typeof isType ? isType : Validator.isSpecificObject(isType);
         };
-        Validator.isOptional = Validator.makeOptionalKeyTypeGuard;
+        Validator.isOptional = Validator.makeOptionalTypeGuard;
         Validator.isOptionalMemberType = function (value, member, optionalTypeGuard, listner) {
             var result = !(member in value) || Validator.invokeIsType(optionalTypeGuard.isType)(value[member], listner);
             if (!result && listner) {
@@ -401,9 +412,11 @@ var EvilType;
             return result;
         };
         Validator.isMemberType = function (value, member, isType, listner) {
-            return Validator.isOptionalKeyTypeGuard(isType) ?
-                Validator.isOptionalMemberType(value, member, isType, listner) :
-                Validator.invokeIsType(isType)(value[member], listner);
+            return Validator.isNeverTypeGuard(isType) ?
+                Validator.isNeverMemberType(value, member, isType, listner) :
+                Validator.isOptionalTypeGuard(isType) ?
+                    Validator.isOptionalMemberType(value, member, isType, listner) :
+                    Validator.invokeIsType(isType)(value[member], listner);
         };
         Validator.mergeObjectValidator = function (target) {
             var sources = [];

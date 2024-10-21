@@ -86,8 +86,7 @@
                         "options": {
                             "$ref": "OutputOptions"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "OutputOptions": {
                     "$type": "interface",
@@ -536,6 +535,25 @@
                     },
                     "additionalProperties": false
                 },
+                "NeverType": {
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "primitive-type"
+                        },
+                        "type": {
+                            "$type": "literal",
+                            "literal": "never"
+                        }
+                    },
+                    "additionalProperties": false
+                },
                 "AnyType": {
                     "$type": "interface",
                     "extends": [
@@ -678,6 +696,9 @@
                     "define": {
                         "$type": "or",
                         "types": [
+                            {
+                                "$ref": "NeverType"
+                            },
                             {
                                 "$ref": "AnyType"
                             },

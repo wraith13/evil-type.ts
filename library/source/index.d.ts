@@ -57,6 +57,7 @@ export declare namespace Build {
     const getTarget: <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process) => NextProcess<Process, Type.TypeOrLiteralOfRefer>;
     const getLiteral: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => Type.LiteralElement | null;
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
+    const isKindofNeverType: (data: BaseProcess<Type.TypeOrRefer>) => boolean;
     namespace Define {
         interface DefineProcess<ValueType> extends BaseProcess<ValueType> {
         }

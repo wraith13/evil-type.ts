@@ -227,6 +227,69 @@ export namespace Build
         result.push(...Object.keys(data.value.members));
         return result;
     };
+    export const isKindofNeverType = (data: BaseProcess<Type.TypeOrRefer>): boolean =>
+    {
+        const target = getTarget(data);
+        if (Type.isType(target.value))
+        {
+            switch(target.value.$type)
+            {
+            case "literal":
+                return false;
+            case "typeof":
+                return false;
+            case "keyof":
+                {
+                    const entry = getTarget(nextProcess(target, null, target.value.value));
+                    if (Type.isInterfaceDefinition(entry.value))
+                    {
+                        return 0 === Object.entries(entry.value.members).filter(i => ! isKindofNeverType(nextProcess(entry, i[0], i[1]))).length;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                break;
+            case "itemof":
+                {
+                    const literal = getLiteral(nextProcess(target, null, target.value.value));
+                    if (literal)
+                    {
+                        return ! Array.isArray(literal.literal) || 0 === literal.literal.length;
+                    }
+                    else
+                    {
+                        // 厳密に不明だが、ここでは false としておく。
+                        return false;
+                    }
+                }
+            case "primitive-type":
+                switch(target.value.type)
+                {
+                case "never":
+                    return true;
+                default:
+                    return false;
+                }
+            case "type":
+                return isKindofNeverType(nextProcess(target, null, target.value.define));
+            case "enum-type":
+                return 0 === target.value.members.length;
+            case "array":
+                return false;
+            case "and":
+                return 0 === target.value.types.length || target.value.types.some(i => isKindofNeverType(nextProcess(target, null, i)));
+            case "or":
+                return 0 === target.value.types.length || target.value.types.every(i => isKindofNeverType(nextProcess(target, null, i)));
+            case "interface":
+                return target.value.extends?.some?.(i => isKindofNeverType(nextProcess(target, null, i))) ?? false;
+            case "dictionary":
+                return false;
+            }
+        }
+        return false;
+    }
     export namespace Define
     {
         export interface DefineProcess<ValueType> extends BaseProcess<ValueType>
@@ -494,6 +557,8 @@ export namespace Build
                 case "primitive-type":
                     switch(data.value.type)
                     {
+                    case "never":
+                        return [ $expression("false"), ];
                     case "any":
                         return [ $expression("true"), ];
                     case "unknown":
@@ -583,19 +648,19 @@ export namespace Build
                     }
                 )
             }
-            if (Type.isDictionaryDefinition(members))
-            {
-                if (undefined !== data.value.extends)
-                {
-                    list.push($expression("&&"));
-                }
-                else
-                {
-                }
-                list.push(...buildValidatorExpression(name, nextProcess(data, null, members)));
-            }
-            else
-            {
+            // if (Type.isDictionaryDefinition(members))
+            // {
+            //     if (undefined !== data.value.extends)
+            //     {
+            //         list.push($expression("&&"));
+            //     }
+            //     else
+            //     {
+            //     }
+            //     list.push(...buildValidatorExpression(name, nextProcess(data, null, members)));
+            // }
+            // else
+            // {
                 if (undefined !== data.value.extends)
                 {
                 }
@@ -611,29 +676,37 @@ export namespace Build
                     {
                         const key = Text.getPrimaryKeyName(k);
                         const value = members[k];
-                        const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, nextProcess(data, key, value)));
-                        const current = Type.isOrElement(value) ?
-                            Define.enParenthesis(base):
-                            base;
-                        if (k === key)
+                        if (isKindofNeverType(nextProcess(data, key, value)))
                         {
                             list.push($expression("&&"));
-                            list.push($expression(`"${key}" in ${name}`));
-                            list.push($expression("&&"));
-                            list.push(...current);
+                            list.push($expression(`! "${key}" in ${name}`));
                         }
                         else
                         {
-                            list.push($expression("&&"));
-                            list.push($expression("("));
-                            list.push($expression(`! ("${key}" in ${name})`));
-                            list.push($expression("||"));
-                            list.push(...current);
-                            list.push($expression(")"));
+                            const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, nextProcess(data, key, value)));
+                            const current = Type.isOrElement(value) ?
+                            Define.enParenthesis(base):
+                            base;
+                            if (k === key)
+                            {
+                                list.push($expression("&&"));
+                                list.push($expression(`"${key}" in ${name}`));
+                                list.push($expression("&&"));
+                                list.push(...current);
+                            }
+                            else
+                            {
+                                list.push($expression("&&"));
+                                list.push($expression("("));
+                                list.push($expression(`! ("${key}" in ${name})`));
+                                list.push($expression("||"));
+                                list.push(...current);
+                                list.push($expression(")"));
+                            }
                         }
                     }
                 );
-            }
+            // }
             return list;
         };
         export const buildInlineValidator = (name: string, data: Define.DefineProcess<Type.TypeOrValue>) =>
@@ -676,6 +749,8 @@ export namespace Build
                 case "primitive-type":
                     switch(data.value.type)
                     {
+                    case "never":
+                        return [ $expression("EvilType.Validator.isNever"), ];
                     case "any":
                         return [ $expression("EvilType.Validator.isAny"), ];
                     case "unknown":
@@ -736,8 +811,16 @@ export namespace Build
                 i =>
                 {
                     const key = Text.getPrimaryKeyName(i[0]);
-                    const value = buildObjectValidatorGetterCoreEntry(nextProcess(data, key, i[1]));
-                    return $line([ $expression(`${key}`), $expression(":"), ...(key === i[0] ? value: buildCall([ $expression("EvilType.Validator.isOptional"), ], [ value, ])) ])
+                    const value =
+                        isKindofNeverType(nextProcess(data, key, i[1])) ?
+                            buildLiteralAsConst({ $type: "never-type-guard", }):
+                            buildObjectValidatorGetterCoreEntry(nextProcess(data, key, i[1]));
+                    return $line
+                    ([
+                        $expression(`${key}`),
+                        $expression(":"),
+                        ...(key === i[0] ? value: buildCall([ $expression("EvilType.Validator.isOptional"), ], [ value, ])),
+                    ])
                 }
             )
         );
@@ -838,7 +921,10 @@ export namespace Build
                                     ...buildCall
                                     (
                                         [ $expression("EvilType.Validator.isSpecificObject"), ],
-                                        [ $expression(buildObjectValidatorObjectName(data.key)), ...(false === getAdditionalProperties(nextProcess(data, null, data.value)) ? [ $expression("false"), ]: []) ]
+                                        [
+                                            $expression(buildObjectValidatorObjectName(data.key)),
+                                            ...(false === getAdditionalProperties(nextProcess(data, null, data.value)) ? [ $expression("false"), ]: [])
+                                        ]
                                     ),
                                 ]
                             ]
@@ -1080,8 +1166,9 @@ export namespace Build
                 type: "object",
                 properties,
                 //additionalProperties: false,
-                required: Object.keys(data.value.members).filter(i => ! i.endsWith("?")),
+                required: Object.keys(data.value.members).filter(i => ! (i.endsWith("?") || isKindofNeverType(nextProcess(data, i, data.value.members[i])))),
             };
+            const notRequired: string[] = [];
             if (data.value.extends)
             {
                 // additionalProperties: false と allOf の組み合わせは残念な事になるので極力使わない。( additionalProperties: false が、 allOf の参照先の properties も参照元の Properties も使えなくしてしまうので、この組み合わせは使えたもんじゃない。 )
@@ -1097,6 +1184,15 @@ export namespace Build
                             Object.assign(properties, base["properties"]);
                             const required = result["required"] as string[];
                             required.push(...(base["required"] as string[]).filter(j => ! required.includes(j)));
+                            const not = base["not"];
+                            if (Jsonable.isJsonableObject(not))
+                            {
+                                const baseNotRequired = not["required"];
+                                if (EvilType.Validator.isArray(EvilType.Validator.isString)(baseNotRequired))
+                                {
+                                    notRequired.push(...baseNotRequired);
+                                }
+                            }
                         }
                         else
                         {
@@ -1115,13 +1211,27 @@ export namespace Build
                 {
                     const key = Text.getPrimaryKeyName(i[0]);
                     const value = i[1];
-                    properties[key] = buildTypeOrRefer(nextProcess(data, null, value));
+                    if (isKindofNeverType(nextProcess(data, key, value)))
+                    {
+                        notRequired.push(key);
+                    }
+                    else
+                    {
+                        properties[key] = buildTypeOrRefer(nextProcess(data, key, value));
+                    }
                 }
             );
             const additionalProperties = getAdditionalProperties(data);
             if ("boolean" === typeof additionalProperties)
             {
                 result["additionalProperties"] = additionalProperties;
+            }
+            if (notRequired.some(_ => true))
+            {
+                result["not"] =
+                {
+                    required: notRequired,
+                };
             }
             return setCommonProperties(result, data);
         };

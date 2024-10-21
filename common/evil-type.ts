@@ -225,9 +225,11 @@ export namespace EvilType
         export type IsType<T> = (value: unknown, listner?: ErrorListener) => value is T;
         export const isJust = <T>(target: T) => (value: unknown, listner?: ErrorListener): value is T =>
             Error.withErrorHandling(target === value, listner, () => Error.valueToString(target), value);
+        export const isNever = (value: unknown, listner?: ErrorListener): value is never =>
+            Error.withErrorHandling(false, listner, "never", value);
         export const isUndefined = isJust(undefined);
-        export const isUnknown = (_value: unknown, _listner?: ErrorListener): _value is boolean => true;
-        export const isAny = (_value: unknown, _listner?: ErrorListener): _value is boolean => true;
+        export const isUnknown = (_value: unknown, _listner?: ErrorListener): _value is unknown => true;
+        export const isAny = (_value: unknown, _listner?: ErrorListener): _value is any => true;
         export const isNull = isJust(null);
         export const isBoolean = (value: unknown, listner?: ErrorListener): value is boolean =>
             Error.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
@@ -406,27 +408,38 @@ export namespace EvilType
                         return isTypeList.some(i => i(value));
                     }
                 };
-        export interface OptionalKeyTypeGuard<T>
+        export interface NeverTypeGuard
+        {
+            $type: "never-type-guard";
+        }
+        export const isNeverTypeGuard = (value: unknown, listner?: ErrorListener): value is NeverTypeGuard =>
+            isSpecificObject<NeverTypeGuard>
+            ({
+                $type: isJust("never-type-guard"),
+            })(value, listner);
+        export const isNeverMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, _neverTypeGuard: NeverTypeGuard, listner?: ErrorListener): boolean =>
+            ! (member in value) || isNever((value as ObjectType)[member], listner);
+        export interface OptionalTypeGuard<T>
         {
             $type: "optional-type-guard";
             isType: IsType<T> | ObjectValidator<T>;
         }
-        export const isOptionalKeyTypeGuard = (value: unknown, listner?: ErrorListener): value is OptionalKeyTypeGuard<unknown> =>
-            isSpecificObject<OptionalKeyTypeGuard<unknown>>
+        export const isOptionalTypeGuard = (value: unknown, listner?: ErrorListener): value is OptionalTypeGuard<unknown> =>
+            isSpecificObject<OptionalTypeGuard<unknown>>
             ({
                 $type: isJust("optional-type-guard"),
                 isType: (value: unknown, listner?: ErrorListener): value is (IsType<unknown> | ObjectValidator<unknown>) =>
                     "function" === typeof value || (null !== value && "object" === typeof value) || (undefined !== listner && Error.raiseError(listner, "IsType<unknown> | ObjectValidator<unknown>", value)),
             })(value, listner);
-        export const makeOptionalKeyTypeGuard = <T>(isType: IsType<T> | ObjectValidator<T>): OptionalKeyTypeGuard<T> =>
+        export const makeOptionalTypeGuard = <T>(isType: IsType<T> | ObjectValidator<T>): OptionalTypeGuard<T> =>
         ({
             $type: "optional-type-guard",
             isType,
         });
         export const invokeIsType = <T>(isType: IsType<T> | ObjectValidator<T>) =>
             "function" === typeof isType ? isType: isSpecificObject(isType);
-        export const isOptional = makeOptionalKeyTypeGuard;
-        export const isOptionalMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: ErrorListener): boolean =>
+        export const isOptional = makeOptionalTypeGuard;
+        export const isOptionalMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalTypeGuard<unknown>, listner?: ErrorListener): boolean =>
         {
             const result = ! (member in value) || invokeIsType(optionalTypeGuard.isType)((value as ObjectType)[member], listner);
             if ( ! result && listner)
@@ -451,20 +464,23 @@ export namespace EvilType
             }
             return result;
         };
-        export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: IsType<unknown> | OptionalKeyTypeGuard<unknown>, listner?: ErrorListener): boolean =>
-            isOptionalKeyTypeGuard(isType) ?
-                isOptionalMemberType(value, member, isType, listner):
-                invokeIsType(isType)((value as ObjectType)[member], listner);
+        export const isMemberType = <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: IsType<unknown> | OptionalTypeGuard<unknown>, listner?: ErrorListener): boolean =>
+            isNeverTypeGuard(isType) ?
+                isNeverMemberType(value, member, isType, listner):
+                isOptionalTypeGuard(isType) ?
+                    isOptionalMemberType(value, member, isType, listner):
+                    invokeIsType(isType)((value as ObjectType)[member], listner);
+        export type NeverKeys<T> = { [K in keyof T]: T[K] extends never ? K : never }[keyof T];
         export type OptionalKeys<T> =
-            { [K in keyof T]: T extends Record<K, T[K]> ? never : K } extends { [_ in keyof T]: infer U }
-            ? U : never;
+            Exclude<{ [K in keyof T]: T extends Record<K, T[K]> ? never : K; } extends { [_ in keyof T]: infer U; } ? U : never, NeverKeys<T>>;
         export type OptionalType<T> = Required<Pick<T, OptionalKeys<T>>>;
-        export type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
+        export type NonOptionalKeys<T> = Exclude<keyof T, NeverKeys<T> | OptionalKeys<T>>;
         export type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
         export type ObjectValidator<ObjectType> =
-            { [key in NonOptionalKeys<ObjectType>]: IsType<ObjectType[key]> | ObjectValidator<ObjectType[key]> } &
-            { [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>> };
-            // { [key in keyof ObjectType]: IsType<ObjectType[key]> | OptionalKeyTypeGuard<ObjectType[key]> };
+            { [key in NeverKeys<ObjectType>]: NeverTypeGuard; } &
+            { [key in NonOptionalKeys<ObjectType>]: IsType<ObjectType[key]> | ObjectValidator<ObjectType[key]>; } &
+            { [key in OptionalKeys<ObjectType>]: OptionalTypeGuard<Exclude<ObjectType[key], undefined>>; };
+            // { [key in keyof ObjectType]: IsType<ObjectType[key]> | OptionalTypeGuard<ObjectType[key]>; };
         export type MergeType<A, B> = Omit<A, keyof B> & B;
         export type MergeMultipleType<A, B extends any[]> =
             B extends [infer Head, ...infer Tail ] ? MergeMultipleType<MergeType<A, Head>, Tail>:
@@ -485,7 +501,7 @@ export namespace EvilType
                         (
                             value,
                             kv[0] as keyof ObjectType,
-                            kv[1] as IsType<unknown> | OptionalKeyTypeGuard<unknown>,
+                            kv[1] as IsType<unknown> | OptionalTypeGuard<unknown>,
                             Error.nextListener(kv[0], listner)
                         )
                     )

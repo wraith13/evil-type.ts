@@ -37,9 +37,10 @@ export declare namespace EvilType {
         const makeErrorListener: (path?: string) => Error.Listener;
         type IsType<T> = (value: unknown, listner?: ErrorListener) => value is T;
         const isJust: <T>(target: T) => (value: unknown, listner?: ErrorListener) => value is T;
+        const isNever: (value: unknown, listner?: ErrorListener) => value is never;
         const isUndefined: (value: unknown, listner?: ErrorListener) => value is undefined;
-        const isUnknown: (_value: unknown, _listner?: ErrorListener) => _value is boolean;
-        const isAny: (_value: unknown, _listner?: ErrorListener) => _value is boolean;
+        const isUnknown: (_value: unknown, _listner?: ErrorListener) => _value is unknown;
+        const isAny: (_value: unknown, _listner?: ErrorListener) => _value is any;
         const isNull: (value: unknown, listner?: ErrorListener) => value is null;
         const isBoolean: (value: unknown, listner?: ErrorListener) => value is boolean;
         const isNumber: (value: unknown, listner?: ErrorListener) => value is number;
@@ -54,28 +55,38 @@ export declare namespace EvilType {
         const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) => (value: unknown, listner?: ErrorListener) => value is T[number];
         type OrTypeToAndType<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
         const isAnd: <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) => (value: unknown, listner?: ErrorListener) => value is OrTypeToAndType<T[number]>;
-        interface OptionalKeyTypeGuard<T> {
+        interface NeverTypeGuard {
+            $type: "never-type-guard";
+        }
+        const isNeverTypeGuard: (value: unknown, listner?: ErrorListener) => value is NeverTypeGuard;
+        const isNeverMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, _neverTypeGuard: NeverTypeGuard, listner?: ErrorListener) => boolean;
+        interface OptionalTypeGuard<T> {
             $type: "optional-type-guard";
             isType: IsType<T> | ObjectValidator<T>;
         }
-        const isOptionalKeyTypeGuard: (value: unknown, listner?: ErrorListener) => value is OptionalKeyTypeGuard<unknown>;
-        const makeOptionalKeyTypeGuard: <T>(isType: IsType<T> | ObjectValidator<T>) => OptionalKeyTypeGuard<T>;
+        const isOptionalTypeGuard: (value: unknown, listner?: ErrorListener) => value is OptionalTypeGuard<unknown>;
+        const makeOptionalTypeGuard: <T>(isType: IsType<T> | ObjectValidator<T>) => OptionalTypeGuard<T>;
         const invokeIsType: <T>(isType: IsType<T> | ObjectValidator<T>) => IsType<T> | ((value: unknown, listner?: ErrorListener) => value is object);
-        const isOptional: <T>(isType: IsType<T> | ObjectValidator<T>) => OptionalKeyTypeGuard<T>;
-        const isOptionalMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalKeyTypeGuard<unknown>, listner?: ErrorListener) => boolean;
-        const isMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: IsType<unknown> | OptionalKeyTypeGuard<unknown>, listner?: ErrorListener) => boolean;
-        type OptionalKeys<T> = {
+        const isOptional: <T>(isType: IsType<T> | ObjectValidator<T>) => OptionalTypeGuard<T>;
+        const isOptionalMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, optionalTypeGuard: OptionalTypeGuard<unknown>, listner?: ErrorListener) => boolean;
+        const isMemberType: <ObjectType extends ActualObject>(value: ActualObject, member: keyof ObjectType, isType: IsType<unknown> | OptionalTypeGuard<unknown>, listner?: ErrorListener) => boolean;
+        type NeverKeys<T> = {
+            [K in keyof T]: T[K] extends never ? K : never;
+        }[keyof T];
+        type OptionalKeys<T> = Exclude<{
             [K in keyof T]: T extends Record<K, T[K]> ? never : K;
         } extends {
             [_ in keyof T]: infer U;
-        } ? U : never;
+        } ? U : never, NeverKeys<T>>;
         type OptionalType<T> = Required<Pick<T, OptionalKeys<T>>>;
-        type NonOptionalKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
+        type NonOptionalKeys<T> = Exclude<keyof T, NeverKeys<T> | OptionalKeys<T>>;
         type NonOptionalType<T> = Pick<T, NonOptionalKeys<T>>;
         type ObjectValidator<ObjectType> = {
+            [key in NeverKeys<ObjectType>]: NeverTypeGuard;
+        } & {
             [key in NonOptionalKeys<ObjectType>]: IsType<ObjectType[key]> | ObjectValidator<ObjectType[key]>;
         } & {
-            [key in OptionalKeys<ObjectType>]: OptionalKeyTypeGuard<Exclude<ObjectType[key], undefined>>;
+            [key in OptionalKeys<ObjectType>]: OptionalTypeGuard<Exclude<ObjectType[key], undefined>>;
         };
         type MergeType<A, B> = Omit<A, keyof B> & B;
         type MergeMultipleType<A, B extends any[]> = B extends [infer Head, ...infer Tail] ? MergeMultipleType<MergeType<A, Head>, Tail> : B extends [infer Last] ? MergeType<A, Last> : A;

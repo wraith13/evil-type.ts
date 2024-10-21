@@ -177,6 +177,62 @@ var Build;
         result.push.apply(result, Object.keys(data.value.members));
         return result;
     };
+    Build.isKindofNeverType = function (data) {
+        var _a, _b, _c;
+        var target = Build.getTarget(data);
+        if (type_1.Type.isType(target.value)) {
+            switch (target.value.$type) {
+                case "literal":
+                    return false;
+                case "typeof":
+                    return false;
+                case "keyof":
+                    {
+                        var entry_1 = Build.getTarget(Build.nextProcess(target, null, target.value.value));
+                        if (type_1.Type.isInterfaceDefinition(entry_1.value)) {
+                            return 0 === Object.entries(entry_1.value.members).filter(function (i) { return !Build.isKindofNeverType(Build.nextProcess(entry_1, i[0], i[1])); }).length;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    break;
+                case "itemof":
+                    {
+                        var literal = Build.getLiteral(Build.nextProcess(target, null, target.value.value));
+                        if (literal) {
+                            return !Array.isArray(literal.literal) || 0 === literal.literal.length;
+                        }
+                        else {
+                            // 厳密に不明だが、ここでは false としておく。
+                            return false;
+                        }
+                    }
+                case "primitive-type":
+                    switch (target.value.type) {
+                        case "never":
+                            return true;
+                        default:
+                            return false;
+                    }
+                case "type":
+                    return Build.isKindofNeverType(Build.nextProcess(target, null, target.value.define));
+                case "enum-type":
+                    return 0 === target.value.members.length;
+                case "array":
+                    return false;
+                case "and":
+                    return 0 === target.value.types.length || target.value.types.some(function (i) { return Build.isKindofNeverType(Build.nextProcess(target, null, i)); });
+                case "or":
+                    return 0 === target.value.types.length || target.value.types.every(function (i) { return Build.isKindofNeverType(Build.nextProcess(target, null, i)); });
+                case "interface":
+                    return (_c = (_b = (_a = target.value.extends) === null || _a === void 0 ? void 0 : _a.some) === null || _b === void 0 ? void 0 : _b.call(_a, function (i) { return Build.isKindofNeverType(Build.nextProcess(target, null, i)); })) !== null && _c !== void 0 ? _c : false;
+                case "dictionary":
+                    return false;
+            }
+        }
+        return false;
+    };
     var Define;
     (function (Define) {
         Define.makeProcess = function (source) {
@@ -407,6 +463,8 @@ var Build;
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.value));
                     case "primitive-type":
                         switch (data.value.type) {
+                            case "never":
+                                return [(0, exports.$expression)("false"),];
                             case "any":
                                 return [(0, exports.$expression)("true"),];
                             case "unknown":
@@ -475,25 +533,34 @@ var Build;
                     list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression(name, Build.nextProcess(data, null, i))));
                 });
             }
-            if (type_1.Type.isDictionaryDefinition(members)) {
-                if (undefined !== data.value.extends) {
-                    list.push((0, exports.$expression)("&&"));
-                }
-                else {
-                }
-                list.push.apply(list, Validator.buildValidatorExpression(name, Build.nextProcess(data, null, members)));
+            // if (Type.isDictionaryDefinition(members))
+            // {
+            //     if (undefined !== data.value.extends)
+            //     {
+            //         list.push($expression("&&"));
+            //     }
+            //     else
+            //     {
+            //     }
+            //     list.push(...buildValidatorExpression(name, nextProcess(data, null, members)));
+            // }
+            // else
+            // {
+            if (undefined !== data.value.extends) {
             }
             else {
-                if (undefined !== data.value.extends) {
+                list.push((0, exports.$expression)("null !== ".concat(name)));
+                list.push((0, exports.$expression)("&&"));
+                list.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
+            }
+            Object.keys(members).forEach(function (k) {
+                var key = text_1.Text.getPrimaryKeyName(k);
+                var value = members[k];
+                if (Build.isKindofNeverType(Build.nextProcess(data, key, value))) {
+                    list.push((0, exports.$expression)("&&"));
+                    list.push((0, exports.$expression)("! \"".concat(key, "\" in ").concat(name)));
                 }
                 else {
-                    list.push((0, exports.$expression)("null !== ".concat(name)));
-                    list.push((0, exports.$expression)("&&"));
-                    list.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
-                }
-                Object.keys(members).forEach(function (k) {
-                    var key = text_1.Text.getPrimaryKeyName(k);
-                    var value = members[k];
                     var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), Build.nextProcess(data, key, value)));
                     var current = type_1.Type.isOrElement(value) ?
                         Define.enParenthesis(base) :
@@ -512,8 +579,9 @@ var Build;
                         list.push.apply(list, current);
                         list.push((0, exports.$expression)(")"));
                     }
-                });
-            }
+                }
+            });
+            // }
             return list;
         };
         Validator.buildInlineValidator = function (name, data) {
@@ -545,6 +613,8 @@ var Build;
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [(0, exports.$expression)(data.value.value.$ref),]);
                     case "primitive-type":
                         switch (data.value.type) {
+                            case "never":
+                                return [(0, exports.$expression)("EvilType.Validator.isNever"),];
                             case "any":
                                 return [(0, exports.$expression)("EvilType.Validator.isAny"),];
                             case "unknown":
@@ -580,8 +650,13 @@ var Build;
         };
         Validator.buildObjectValidatorGetterCore = function (data) { return (0, exports.$iblock)(Object.entries(data.value.members).map(function (i) {
             var key = text_1.Text.getPrimaryKeyName(i[0]);
-            var value = Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, key, i[1]));
-            return (0, exports.$line)(__spreadArray([(0, exports.$expression)("".concat(key)), (0, exports.$expression)(":")], (key === i[0] ? value : Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isOptional"),], [value,])), true));
+            var value = Build.isKindofNeverType(Build.nextProcess(data, key, i[1])) ?
+                Build.buildLiteralAsConst({ $type: "never-type-guard", }) :
+                Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, key, i[1]));
+            return (0, exports.$line)(__spreadArray([
+                (0, exports.$expression)("".concat(key)),
+                (0, exports.$expression)(":")
+            ], (key === i[0] ? value : Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isOptional"),], [value,])), true));
         })); };
         Validator.buildObjectValidator = function (data) {
             var _a, _b;
@@ -645,7 +720,9 @@ var Build;
                         __spreadArray([
                             (0, exports.$expression)("()"),
                             (0, exports.$expression)("=>")
-                        ], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject"),], __spreadArray([(0, exports.$expression)(Validator.buildObjectValidatorObjectName(data.key))], (false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? [(0, exports.$expression)("false"),] : []), true)), true)
+                        ], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject"),], __spreadArray([
+                            (0, exports.$expression)(Validator.buildObjectValidatorObjectName(data.key))
+                        ], (false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? [(0, exports.$expression)("false"),] : []), true)), true)
                     ])
                     // $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${name} =>`),
                     // ...buildCall
@@ -827,8 +904,9 @@ var Build;
                 type: "object",
                 properties: properties,
                 //additionalProperties: false,
-                required: Object.keys(data.value.members).filter(function (i) { return !i.endsWith("?"); }),
+                required: Object.keys(data.value.members).filter(function (i) { return !(i.endsWith("?") || Build.isKindofNeverType(Build.nextProcess(data, i, data.value.members[i]))); }),
             };
+            var notRequired = [];
             if (data.value.extends) {
                 // additionalProperties: false と allOf の組み合わせは残念な事になるので極力使わない。( additionalProperties: false が、 allOf の参照先の properties も参照元の Properties も使えなくしてしまうので、この組み合わせは使えたもんじゃない。 )
                 var allOf_1 = [];
@@ -839,6 +917,13 @@ var Build;
                         Object.assign(properties, base["properties"]);
                         var required_1 = result["required"];
                         required_1.push.apply(required_1, base["required"].filter(function (j) { return !required_1.includes(j); }));
+                        var not = base["not"];
+                        if (jsonable_1.Jsonable.isJsonableObject(not)) {
+                            var baseNotRequired = not["required"];
+                            if (evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)(baseNotRequired)) {
+                                notRequired.push.apply(notRequired, baseNotRequired);
+                            }
+                        }
                     }
                     else {
                         allOf_1.push(Schema.buildRefer(Build.nextProcess(data, null, i)));
@@ -851,11 +936,22 @@ var Build;
             Object.entries(data.value.members).forEach(function (i) {
                 var key = text_1.Text.getPrimaryKeyName(i[0]);
                 var value = i[1];
-                properties[key] = Schema.buildTypeOrRefer(Build.nextProcess(data, null, value));
+                if (Build.isKindofNeverType(Build.nextProcess(data, key, value))) {
+                    notRequired.push(key);
+                }
+                else {
+                    properties[key] = Schema.buildTypeOrRefer(Build.nextProcess(data, key, value));
+                }
             });
             var additionalProperties = Build.getAdditionalProperties(data);
             if ("boolean" === typeof additionalProperties) {
                 result["additionalProperties"] = additionalProperties;
+            }
+            if (notRequired.some(function (_) { return true; })) {
+                result["not"] =
+                    {
+                        required: notRequired,
+                    };
             }
             return Schema.setCommonProperties(result, data);
         };

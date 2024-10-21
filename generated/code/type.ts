@@ -118,6 +118,11 @@ export namespace Type
     {
         $ref: string;
     }
+    export interface NeverType extends CommonProperties
+    {
+        $type: "primitive-type";
+        type: "never";
+    }
     export interface AnyType extends CommonProperties
     {
         $type: "primitive-type";
@@ -154,7 +159,7 @@ export namespace Type
         type: "string";
         pattern?: string;
     }
-    export type PrimitiveTypeElement = AnyType | UnknownType | NullType | BooleanType | NumberType | IntegerType | StringType;
+    export type PrimitiveTypeElement = NeverType | AnyType | UnknownType | NullType | BooleanType | NumberType | IntegerType | StringType;
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement |
         InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     export interface EnumTypeElement extends CommonProperties
@@ -211,6 +216,7 @@ export namespace Type
     export const isAndElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(andElementValidatorObject, false));
     export const isLiteralElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(literalElementValidatorObject, false));
     export const isReferElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(referElementValidatorObject, false));
+    export const isNeverType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(neverTypeValidatorObject, false));
     export const isAnyType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(anyTypeValidatorObject, false));
     export const isUnknownType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(unknownTypeValidatorObject, false));
     export const isNullType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(nullTypeValidatorObject, false));
@@ -219,7 +225,7 @@ export namespace Type
     export const isIntegerType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(integerTypeValidatorObject, false));
     export const isStringType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(stringTypeValidatorObject, false));
     export const isPrimitiveTypeElement: EvilType.Validator.IsType<PrimitiveTypeElement> = EvilType.lazy(() => EvilType.Validator.isOr(
-        isAnyType, isUnknownType, isNullType, isBooleanType, isNumberType, isIntegerType, isStringType));
+        isNeverType, isAnyType, isUnknownType, isNullType, isBooleanType, isNumberType, isIntegerType, isStringType));
     export const isType: EvilType.Validator.IsType<Type> = EvilType.lazy(() => EvilType.Validator.isOr(isPrimitiveTypeElement,
         isTypeDefinition, isEnumTypeElement, isTypeofElement, isKeyofElement, isItemofElement, isInterfaceDefinition,
         isDictionaryDefinition, isArrayElement, isOrElement, isAndElement, isLiteralElement));
@@ -293,6 +299,9 @@ export namespace Type
         literal: Jsonable.isJsonable, });
     export const referElementValidatorObject: EvilType.Validator.ObjectValidator<ReferElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { $ref: EvilType.Validator.isString, });
+    export const neverTypeValidatorObject: EvilType.Validator.ObjectValidator<NeverType> = EvilType.Validator.mergeObjectValidator(
+        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
+        "never" as const), });
     export const anyTypeValidatorObject: EvilType.Validator.ObjectValidator<AnyType> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
         "any" as const), });

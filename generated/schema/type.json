@@ -698,6 +698,34 @@
             ],
             "additionalProperties": false
         },
+        "Type.NeverType": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "description": "[SCHEMA]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "$type": {
+                    "const": "primitive-type"
+                },
+                "type": {
+                    "const": "never"
+                }
+            },
+            "required": [
+                "$type",
+                "type"
+            ],
+            "additionalProperties": false
+        },
         "Type.AnyType": {
             "type": "object",
             "properties": {
@@ -899,6 +927,9 @@
         },
         "Type.PrimitiveTypeElement": {
             "oneOf": [
+                {
+                    "$ref": "#/definitions/Type.NeverType"
+                },
                 {
                     "$ref": "#/definitions/Type.AnyType"
                 },
