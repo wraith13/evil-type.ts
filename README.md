@@ -1,13 +1,14 @@
 # evil-type.ts
 
-... for TypeScript
+Generates JSON type definitions and validators for TypeScript
 
 ## Features
 
-Generate the following TypeScript code and JSON Schema from the Type Definition Json file.
+Generates JSON type definitions and validators that may be handwritten by a human.
 
-- type definitions
-- validator functions
+Available in both Web browsers and Node.js.
+
+JSON Schema can also be generated.
 
 ## Overview
 

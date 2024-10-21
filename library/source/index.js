@@ -407,6 +407,8 @@ var Build;
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.value));
                     case "primitive-type":
                         switch (data.value.type) {
+                            case "any":
+                                return [(0, exports.$expression)("true"),];
                             case "unknown":
                                 return [(0, exports.$expression)("true"),];
                             case "null":
@@ -543,6 +545,8 @@ var Build;
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [(0, exports.$expression)(data.value.value.$ref),]);
                     case "primitive-type":
                         switch (data.value.type) {
+                            case "any":
+                                return [(0, exports.$expression)("EvilType.Validator.isAny"),];
                             case "unknown":
                                 return [(0, exports.$expression)("EvilType.Validator.isUnknown"),];
                             case "null":
@@ -806,9 +810,15 @@ var Build;
             return result;
         };
         Schema.buildPrimitiveType = function (data) {
-            var result = {
-                type: data.value.type,
-            };
+            var result = {};
+            switch (data.value.type) {
+                case "any":
+                case "unknown":
+                    break;
+                default:
+                    result["type"] = data.value.type;
+                    break;
+            }
             return Schema.setCommonProperties(result, data);
         };
         Schema.buildInterface = function (data) {
@@ -1040,14 +1050,21 @@ var Format;
         return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.text(options, indentDepth + 1, i); }), true), ["}",], false).join(" ");
     };
     Format.block = function (options, indentDepth, code) {
-        var _a;
+        var _a, _b;
         var currentIndent = Format.buildIndent(options, indentDepth);
         var returnCode = Format.getReturnCode(options);
         var result = "";
-        if (0 < ((_a = code.header) !== null && _a !== void 0 ? _a : []).length) {
-            result += currentIndent + Format.expressions(code.header) + returnCode;
+        if ("allman" === options.indentStyle) {
+            if (0 < ((_a = code.header) !== null && _a !== void 0 ? _a : []).length) {
+                result += currentIndent + Format.expressions(code.header) + returnCode;
+            }
+            result += currentIndent + "{" + returnCode;
         }
-        result += currentIndent + "{" + returnCode;
+        else {
+            if (0 < ((_b = code.header) !== null && _b !== void 0 ? _b : []).length) {
+                result += currentIndent + Format.expressions(code.header) + " " + "{" + returnCode;
+            }
+        }
         result += Format.text(options, indentDepth + 1, code.lines);
         result += currentIndent + "}" + returnCode;
         return result;

@@ -494,6 +494,8 @@ export namespace Build
                 case "primitive-type":
                     switch(data.value.type)
                     {
+                    case "any":
+                        return [ $expression("true"), ];
                     case "unknown":
                         return [ $expression("true"), ];
                     case "null":
@@ -674,6 +676,8 @@ export namespace Build
                 case "primitive-type":
                     switch(data.value.type)
                     {
+                    case "any":
+                        return [ $expression("EvilType.Validator.isAny"), ];
                     case "unknown":
                         return [ $expression("EvilType.Validator.isUnknown"), ];
                     case "null":
@@ -1056,8 +1060,16 @@ export namespace Build
         {
             const result: Jsonable.JsonableObject =
             {
-                type: data.value.type,
             };
+            switch(data.value.type)
+            {
+            case "any":
+            case "unknown":
+                break;
+            default:
+                result["type"] = data.value.type;
+                break;
+            }
             return setCommonProperties(result, data);
         };
         export const buildInterface = (data: SchemaProcess<Type.InterfaceDefinition>):Jsonable.JsonableObject =>
@@ -1364,11 +1376,21 @@ export namespace Format
         const currentIndent = buildIndent(options, indentDepth);
         const returnCode = getReturnCode(options);
         let result = "";
-        if (0 < (code.header ?? []).length)
+        if ("allman" === options.indentStyle)
         {
-            result += currentIndent +expressions(code.header) +returnCode;
+            if (0 < (code.header ?? []).length)
+            {
+                result += currentIndent +expressions(code.header) +returnCode;
+            }
+            result += currentIndent +"{" +returnCode;
         }
-        result += currentIndent +"{" +returnCode;
+        else
+        {
+            if (0 < (code.header ?? []).length)
+            {
+                result += currentIndent +expressions(code.header) +" " +"{" +returnCode;
+            }
+        }
         result += text(options, indentDepth +1, code.lines);
         result += currentIndent +"}" +returnCode;
         return result;

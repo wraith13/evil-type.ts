@@ -102,6 +102,10 @@ export declare namespace Type {
     interface ReferElement extends CommonProperties {
         $ref: string;
     }
+    interface AnyType extends CommonProperties {
+        $type: "primitive-type";
+        type: "any";
+    }
     interface UnknownType extends CommonProperties {
         $type: "primitive-type";
         type: "unknown";
@@ -127,7 +131,7 @@ export declare namespace Type {
         type: "string";
         pattern?: string;
     }
-    type PrimitiveTypeElement = UnknownType | NullType | BooleanType | NumberType | IntegerType | StringType;
+    type PrimitiveTypeElement = AnyType | UnknownType | NullType | BooleanType | NumberType | IntegerType | StringType;
     type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     interface EnumTypeElement extends CommonProperties {
         $type: "enum-type";
@@ -173,6 +177,7 @@ export declare namespace Type {
     const isAndElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is AndElement;
     const isLiteralElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is LiteralElement;
     const isReferElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is ReferElement;
+    const isAnyType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is AnyType;
     const isUnknownType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is UnknownType;
     const isNullType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NullType;
     const isBooleanType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is BooleanType;
@@ -208,6 +213,7 @@ export declare namespace Type {
     const andElementValidatorObject: EvilType.Validator.ObjectValidator<AndElement>;
     const literalElementValidatorObject: EvilType.Validator.ObjectValidator<LiteralElement>;
     const referElementValidatorObject: EvilType.Validator.ObjectValidator<ReferElement>;
+    const anyTypeValidatorObject: EvilType.Validator.ObjectValidator<AnyType>;
     const unknownTypeValidatorObject: EvilType.Validator.ObjectValidator<UnknownType>;
     const nullTypeValidatorObject: EvilType.Validator.ObjectValidator<NullType>;
     const booleanTypeValidatorObject: EvilType.Validator.ObjectValidator<BooleanType>;

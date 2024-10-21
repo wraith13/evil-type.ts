@@ -536,6 +536,25 @@
                     },
                     "additionalProperties": false
                 },
+                "AnyType": {
+                    "$type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "$type": {
+                            "$type": "literal",
+                            "literal": "primitive-type"
+                        },
+                        "type": {
+                            "$type": "literal",
+                            "literal": "any"
+                        }
+                    },
+                    "additionalProperties": false
+                },
                 "UnknownType": {
                     "$type": "interface",
                     "extends": [
@@ -659,6 +678,9 @@
                     "define": {
                         "$type": "or",
                         "types": [
+                            {
+                                "$ref": "AnyType"
+                            },
                             {
                                 "$ref": "UnknownType"
                             },
