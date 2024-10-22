@@ -5,58 +5,54 @@
     ],
     "imports": [
         {
-            "$type": "import",
+            "type": "import",
             "target": "{ EvilType }",
             "from": "../../common/evil-type"
         }
     ],
     "defines": {
         "Jsonable": {
-            "$type": "namespace",
+            "type": "namespace",
             "members": {
                 "JsonableValue": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
-                                "$type": "primitive-type",
                                 "type": "null"
                             },
                             {
-                                "$type": "primitive-type",
                                 "type": "boolean"
                             },
                             {
-                                "$type": "primitive-type",
                                 "type": "number"
                             },
                             {
-                                "$type": "primitive-type",
                                 "type": "string"
                             }
                         ]
                     }
                 },
                 "JsonableArray": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "array",
+                        "type": "array",
                         "items": {
                             "$ref": "Jsonable"
                         }
                     }
                 },
                 "JsonableObject": {
-                    "$type": "dictionary",
+                    "type": "dictionary",
                     "valueType": {
                         "$ref": "Jsonable"
                     }
                 },
                 "Jsonable": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
                                 "$ref": "JsonableValue"
@@ -71,7 +67,7 @@
                     }
                 },
                 "parse": {
-                    "$type": "code",
+                    "type": "code",
                     "tokens": [
                         "const",
                         "parse",
@@ -84,7 +80,7 @@
                     ]
                 },
                 "stringify": {
-                    "$type": "code",
+                    "type": "code",
                     "tokens": [
                         "const",
                         "stringify",
@@ -97,7 +93,7 @@
                     ]
                 },
                 "JsonablePartial": {
-                    "$type": "code",
+                    "type": "code",
                     "tokens": [
                         "type",
                         "JsonablePartial<Target extends JsonableObject>",

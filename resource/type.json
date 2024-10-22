@@ -5,34 +5,33 @@
     ],
     "imports": [
         {
-            "$type": "import",
+            "type": "import",
             "target": "{ EvilType }",
             "from": "../../common/evil-type"
         },
         {
-            "$type": "import",
+            "type": "import",
             "target": "{ Jsonable }",
             "from": "./jsonable"
         }
     ],
     "defines": {
         "Type": {
-            "$type": "namespace",
+            "type": "namespace",
             "members": {
                 "schema": {
-                    "$type": "value",
+                    "type": "value",
                     "value": {
-                        "$type": "literal",
+                        "type": "literal",
                         "literal": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#"
                     }
                 },
                 "CommentProperty": {
-                    "$type": "interface",
+                    "type": "interface",
                     "members": {
                         "comment?": {
-                            "$type": "array",
+                            "type": "array",
                             "items": {
-                                "$type": "primitive-type",
                                 "type": "string"
                             },
                             "description": "[CODE]"
@@ -40,26 +39,24 @@
                     }
                 },
                 "CommonProperties": {
-                    "$type": "interface",
+                    "type": "interface",
                     "members": {
                         "default?": {
                             "$ref": "Jsonable.Jsonable",
                             "description": "[SCHEMA]"
                         },
                         "title?": {
-                            "$type": "primitive-type",
                             "type": "string",
                             "description": "[SCHEMA]"
                         },
                         "description?": {
-                            "$type": "primitive-type",
                             "type": "string",
                             "description": "[SCHEMA]"
                         }
                     }
                 },
                 "TypeSchema": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommentProperty"
@@ -67,13 +64,13 @@
                     ],
                     "members": {
                         "$schema": {
-                            "$type": "typeof",
+                            "type": "typeof",
                             "value": {
                                 "$ref": "schema"
                             }
                         },
                         "imports?": {
-                            "$type": "array",
+                            "type": "array",
                             "items": {
                                 "$ref": "ImportDefinition"
                             },
@@ -89,15 +86,14 @@
                     }
                 },
                 "OutputOptions": {
-                    "$type": "interface",
+                    "type": "interface",
                     "members": {
                         "outputFile": {
-                            "$type": "primitive-type",
                             "type": "string",
                             "description": "[CODE]"
                         },
                         "indentUnit": {
-                            "$type": "enum-type",
+                            "type": "enum-type",
                             "members": [
                                 0,
                                 1,
@@ -124,14 +120,12 @@
                             "description": "[CODE]"
                         },
                         "maxLineLength?": {
-                            "$type": "or",
+                            "type": "or",
                             "types": [
                                 {
-                                    "$type": "primitive-type",
                                     "type": "null"
                                 },
                                 {
-                                    "$type": "primitive-type",
                                     "type": "integer"
                                 }
                             ],
@@ -139,16 +133,14 @@
                             "description": "[CODE]"
                         },
                         "default?": {
-                            "$type": "interface",
+                            "type": "interface",
                             "members": {
                                 "export?": {
-                                    "$type": "primitive-type",
                                     "type": "boolean",
                                     "default": true,
                                     "description": "[CODE]"
                                 },
                                 "additionalProperties?": {
-                                    "$type": "primitive-type",
                                     "type": "boolean",
                                     "default": false,
                                     "description": "[SCHEMA]"
@@ -159,42 +151,36 @@
                             "$ref": "SchemaOptions",
                             "description": "[SCHEMA] If you want to generate JSON Schema, specify this option."
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "SchemaOptions": {
-                    "$type": "interface",
+                    "type": "interface",
                     "members": {
                         "outputFile": {
-                            "$type": "primitive-type",
                             "type": "string",
                             "description": "[SCHEMA]"
                         },
                         "$id?": {
-                            "$type": "primitive-type",
                             "type": "string",
                             "description": "[SCHEMA] Schema ID"
                         },
                         "$ref?": {
-                            "$type": "primitive-type",
                             "type": "string",
                             "description": "[SCHEMA] Root Schema"
                         },
                         "externalReferMapping?": {
-                            "$type": "dictionary",
+                            "type": "dictionary",
                             "valueType": {
-                                "$type": "primitive-type",
                                 "type": "string"
                             },
                             "description": "[SCHEMA] Mapping of external schemas to reference"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "indentStyleTypeMember": {
-                    "$type": "value",
+                    "type": "value",
                     "value": {
-                        "$type": "literal",
+                        "type": "literal",
                         "literal": [
                             "allman",
                             "egyptian"
@@ -203,18 +189,18 @@
                     "validator": false
                 },
                 "IndentStyleType": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "itemof",
+                        "type": "itemof",
                         "value": {
                             "$ref": "indentStyleTypeMember"
                         }
                     }
                 },
                 "ValidatorOptionType": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "enum-type",
+                        "type": "enum-type",
                         "members": [
                             "none",
                             "simple",
@@ -223,21 +209,20 @@
                     }
                 },
                 "AlphaElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "primitive-type",
+                        "type": {
                             "type": "string"
                         }
                     }
                 },
                 "AlphaDefinition": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaElement"
@@ -248,33 +233,29 @@
                     ],
                     "members": {
                         "export?": {
-                            "$type": "primitive-type",
                             "type": "boolean"
                         }
                     }
                 },
                 "ImportDefinition": {
-                    "$type": "interface",
+                    "type": "interface",
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "import"
                         },
                         "target": {
-                            "$type": "primitive-type",
                             "type": "string"
                         },
                         "from": {
-                            "$type": "primitive-type",
                             "type": "string"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "Definition": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
                                 "$ref": "CodeDefinition"
@@ -298,66 +279,63 @@
                     }
                 },
                 "DefinitionMap": {
-                    "$type": "dictionary",
+                    "type": "dictionary",
                     "valueType": {
                         "$ref": "Definition"
                     }
                 },
                 "CodeDefinition": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaDefinition"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "code"
                         },
                         "tokens": {
-                            "$type": "array",
+                            "type": "array",
                             "items": {
-                                "$type": "primitive-type",
                                 "type": "string"
                             }
                         }
                     },
-                    "additionalProperties": false,
                     "description": "[CODE]"
                 },
                 "NamespaceDefinition": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaDefinition"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "namespace"
                         },
                         "members": {
                             "$ref": "DefinitionMap"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "ValueDefinition": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaDefinition"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "value"
                         },
                         "value": {
-                            "$type": "or",
+                            "type": "or",
                             "types": [
                                 {
                                     "$ref": "LiteralElement"
@@ -368,160 +346,150 @@
                             ]
                         },
                         "validator?": {
-                            "$type": "primitive-type",
                             "type": "boolean",
                             "default": true
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "TypeDefinition": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaDefinition"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "type"
                         },
                         "define": {
                             "$ref": "TypeOrRefer"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "InterfaceDefinition": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaDefinition"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "interface"
                         },
                         "extends?": {
-                            "$type": "array",
+                            "type": "array",
                             "items": {
                                 "$ref": "ReferElement"
                             }
                         },
                         "members": {
-                            "$type": "dictionary",
+                            "type": "dictionary",
                             "valueType": {
                                 "$ref": "TypeOrRefer"
                             }
                         },
                         "additionalProperties?": {
-                            "$type": "primitive-type",
                             "type": "boolean"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "DictionaryDefinition": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaDefinition"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "dictionary"
                         },
                         "valueType": {
                             "$ref": "TypeOrRefer"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "ArrayElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaElement"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "array"
                         },
                         "items": {
                             "$ref": "TypeOrRefer"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "OrElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaElement"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "or"
                         },
                         "types": {
-                            "$type": "array",
+                            "type": "array",
                             "items": {
                                 "$ref": "TypeOrRefer"
                             }
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "AndElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaElement"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "and"
                         },
                         "types": {
-                            "$type": "array",
+                            "type": "array",
                             "items": {
                                 "$ref": "TypeOrRefer"
                             }
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "LiteralElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "AlphaElement"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "literal"
                         },
                         "literal": {
                             "$ref": "Jsonable.Jsonable"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "ReferElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
@@ -529,172 +497,129 @@
                     ],
                     "members": {
                         "$ref": {
-                            "$type": "primitive-type",
                             "type": "string"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "NeverType": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
-                            "literal": "primitive-type"
-                        },
                         "type": {
-                            "$type": "literal",
+                            "type": "literal",
                             "literal": "never"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "AnyType": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
-                            "literal": "primitive-type"
-                        },
                         "type": {
-                            "$type": "literal",
+                            "type": "literal",
                             "literal": "any"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "UnknownType": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
-                            "literal": "primitive-type"
-                        },
                         "type": {
-                            "$type": "literal",
+                            "type": "literal",
                             "literal": "unknown"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "NullType": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
-                            "literal": "primitive-type"
-                        },
                         "type": {
-                            "$type": "literal",
+                            "type": "literal",
                             "literal": "null"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "BooleanType": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
-                            "literal": "primitive-type"
-                        },
                         "type": {
-                            "$type": "literal",
+                            "type": "literal",
                             "literal": "boolean"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "NumberType": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
-                            "literal": "primitive-type"
-                        },
                         "type": {
-                            "$type": "literal",
+                            "type": "literal",
                             "literal": "number"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "IntegerType": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
-                            "literal": "primitive-type"
-                        },
                         "type": {
-                            "$type": "literal",
+                            "type": "literal",
                             "literal": "integer"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "StringType": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
-                            "literal": "primitive-type"
-                        },
                         "type": {
-                            "$type": "literal",
+                            "type": "literal",
                             "literal": "string"
                         },
                         "pattern?": {
-                            "$type": "primitive-type",
                             "type": "string"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "PrimitiveTypeElement": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
                                 "$ref": "NeverType"
@@ -724,9 +649,9 @@
                     }
                 },
                 "Type": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
                                 "$ref": "PrimitiveTypeElement"
@@ -768,102 +693,94 @@
                     }
                 },
                 "EnumTypeElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "enum-type"
                         },
                         "members": {
-                            "$type": "array",
+                            "type": "array",
                             "items": {
-                                "$type": "or",
+                                "type": "or",
                                 "types": [
                                     {
-                                        "$type": "primitive-type",
                                         "type": "null"
                                     },
                                     {
-                                        "$type": "primitive-type",
                                         "type": "boolean"
                                     },
                                     {
-                                        "$type": "primitive-type",
                                         "type": "number"
                                     },
                                     {
-                                        "$type": "primitive-type",
                                         "type": "string"
                                     }
                                 ]
                             }
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "TypeofElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "typeof"
                         },
                         "value": {
                             "$ref": "ReferElement"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "KeyofElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "keyof"
                         },
                         "value": {
                             "$ref": "ReferElement"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "ItemofElement": {
-                    "$type": "interface",
+                    "type": "interface",
                     "extends": [
                         {
                             "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "$type": {
-                            "$type": "literal",
+                        "type": {
+                            "type": "literal",
                             "literal": "itemof"
                         },
                         "value": {
                             "$ref": "ReferElement"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 },
                 "TypeOrRefer": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
                                 "$ref": "Type"
@@ -875,9 +792,9 @@
                     }
                 },
                 "TypeOrValue": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
                                 "$ref": "Type"
@@ -889,9 +806,9 @@
                     }
                 },
                 "TypeOrValueOfRefer": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
                                 "$ref": "TypeOrValue"
@@ -903,9 +820,9 @@
                     }
                 },
                 "TypeOrLiteralOfRefer": {
-                    "$type": "type",
+                    "type": "type",
                     "define": {
-                        "$type": "or",
+                        "type": "or",
                         "types": [
                             {
                                 "$ref": "TypeOrRefer"

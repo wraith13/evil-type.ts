@@ -40,13 +40,13 @@ export declare namespace Type {
     type IndentStyleType = typeof indentStyleTypeMember[number];
     type ValidatorOptionType = "none" | "simple" | "full";
     interface AlphaElement extends CommonProperties {
-        $type: string;
+        type: string;
     }
     interface AlphaDefinition extends AlphaElement, CommentProperty {
         export?: boolean;
     }
     interface ImportDefinition {
-        $type: "import";
+        type: "import";
         target: string;
         from: string;
     }
@@ -55,24 +55,24 @@ export declare namespace Type {
         [key: string]: Definition;
     };
     interface CodeDefinition extends AlphaDefinition {
-        $type: "code";
+        type: "code";
         tokens: string[];
     }
     interface NamespaceDefinition extends AlphaDefinition {
-        $type: "namespace";
+        type: "namespace";
         members: DefinitionMap;
     }
     interface ValueDefinition extends AlphaDefinition {
-        $type: "value";
+        type: "value";
         value: LiteralElement | ReferElement;
         validator?: boolean;
     }
     interface TypeDefinition extends AlphaDefinition {
-        $type: "type";
+        type: "type";
         define: TypeOrRefer;
     }
     interface InterfaceDefinition extends AlphaDefinition {
-        $type: "interface";
+        type: "interface";
         extends?: ReferElement[];
         members: {
             [key: string]: TypeOrRefer;
@@ -80,77 +80,69 @@ export declare namespace Type {
         additionalProperties?: boolean;
     }
     interface DictionaryDefinition extends AlphaDefinition {
-        $type: "dictionary";
+        type: "dictionary";
         valueType: TypeOrRefer;
     }
     interface ArrayElement extends AlphaElement {
-        $type: "array";
+        type: "array";
         items: TypeOrRefer;
     }
     interface OrElement extends AlphaElement {
-        $type: "or";
+        type: "or";
         types: TypeOrRefer[];
     }
     interface AndElement extends AlphaElement {
-        $type: "and";
+        type: "and";
         types: TypeOrRefer[];
     }
     interface LiteralElement extends AlphaElement {
-        $type: "literal";
+        type: "literal";
         literal: Jsonable.Jsonable;
     }
     interface ReferElement extends CommonProperties {
         $ref: string;
     }
     interface NeverType extends CommonProperties {
-        $type: "primitive-type";
         type: "never";
     }
     interface AnyType extends CommonProperties {
-        $type: "primitive-type";
         type: "any";
     }
     interface UnknownType extends CommonProperties {
-        $type: "primitive-type";
         type: "unknown";
     }
     interface NullType extends CommonProperties {
-        $type: "primitive-type";
         type: "null";
     }
     interface BooleanType extends CommonProperties {
-        $type: "primitive-type";
         type: "boolean";
     }
     interface NumberType extends CommonProperties {
-        $type: "primitive-type";
         type: "number";
     }
     interface IntegerType extends CommonProperties {
-        $type: "primitive-type";
         type: "integer";
     }
     interface StringType extends CommonProperties {
-        $type: "primitive-type";
         type: "string";
         pattern?: string;
     }
     type PrimitiveTypeElement = NeverType | AnyType | UnknownType | NullType | BooleanType | NumberType | IntegerType | StringType;
     type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     interface EnumTypeElement extends CommonProperties {
-        $type: "enum-type";
+        type: "enum-type";
         members: (null | boolean | number | string)[];
     }
     interface TypeofElement extends CommonProperties {
-        $type: "typeof";
+        type: "typeof";
         value: ReferElement;
     }
     interface KeyofElement extends CommonProperties {
-        $type: "keyof";
+        type: "keyof";
         value: ReferElement;
     }
     interface ItemofElement extends CommonProperties {
-        $type: "itemof";
+        type: "itemof";
         value: ReferElement;
     }
     type TypeOrRefer = Type | ReferElement;

@@ -181,7 +181,7 @@ var Build;
         var _a, _b, _c;
         var target = Build.getTarget(data);
         if (type_1.Type.isType(target.value)) {
-            switch (target.value.$type) {
+            switch (target.value.type) {
                 case "literal":
                     return false;
                 case "typeof":
@@ -208,13 +208,22 @@ var Build;
                             return false;
                         }
                     }
-                case "primitive-type":
-                    switch (target.value.type) {
-                        case "never":
-                            return true;
-                        default:
-                            return false;
-                    }
+                case "never":
+                    return true;
+                case "any":
+                    return false;
+                case "unknown":
+                    return false;
+                case "null":
+                    return false;
+                case "boolean":
+                    return false;
+                case "integer":
+                    return false;
+                case "number":
+                    return false;
+                case "string":
+                    return false;
                 case "type":
                     return Build.isKindofNeverType(Build.nextProcess(target, null, target.value.define));
                 case "enum-type":
@@ -344,7 +353,7 @@ var Build;
             return undefined === imports ? [] : imports.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("import"), (0, exports.$expression)(i.target), (0, exports.$expression)("from"), (0, exports.$expression)(jsonable_1.Jsonable.stringify(i.from))]); });
         };
         Define.buildDefine = function (data) {
-            switch (data.value.$type) {
+            switch (data.value.type) {
                 case "code":
                     return [(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(data.value), true), Build.buildExport(data), true), data.value.tokens.map(function (i) { return (0, exports.$expression)(i); }), true)),];
                 case "interface":
@@ -364,7 +373,7 @@ var Build;
                 return [(0, exports.$expression)(data.value.$ref),];
             }
             else {
-                switch (data.value.$type) {
+                switch (data.value.type) {
                     case "literal":
                         return Define.buildInlineDefineLiteral(data.value);
                     case "typeof":
@@ -375,7 +384,14 @@ var Build;
                         return [(0, exports.$expression)("typeof"), (0, exports.$expression)("".concat(data.value.value.$ref, "[number]")),];
                     case "value":
                         return Define.buildInlineDefine(Build.nextProcess(data, null, data.value.value));
-                    case "primitive-type":
+                    case "never":
+                    case "any":
+                    case "unknown":
+                    case "null":
+                    case "boolean":
+                    case "integer":
+                    case "number":
+                    case "string":
                         return [Define.buildInlineDefinePrimitiveType(data.value),];
                     case "type":
                         return Define.buildInlineDefine(Build.nextProcess(data, null, data.value.define));
@@ -450,7 +466,7 @@ var Build;
                 return [(0, exports.$expression)("".concat(Validator.buildValidatorName(data.value.$ref), "(").concat(name, ")")),];
             }
             else {
-                switch (data.value.$type) {
+                switch (data.value.type) {
                     case "literal":
                         return Validator.buildLiterarlValidatorExpression(name, data.value.literal);
                     case "typeof":
@@ -461,21 +477,20 @@ var Build;
                         return [(0, exports.$expression)("".concat(data.value.value.$ref, ".includes(").concat(name, " as any)")),];
                     case "value":
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.value));
-                    case "primitive-type":
-                        switch (data.value.type) {
-                            case "never":
-                                return [(0, exports.$expression)("false"),];
-                            case "any":
-                                return [(0, exports.$expression)("true"),];
-                            case "unknown":
-                                return [(0, exports.$expression)("true"),];
-                            case "null":
-                                return [(0, exports.$expression)("\"".concat(data.value.type, "\" === ").concat(name)),];
-                            case "integer":
-                                return [(0, exports.$expression)("Number.isInteger"), (0, exports.$expression)("("), (0, exports.$expression)(name), (0, exports.$expression)(")"),];
-                            default:
-                                return [(0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name)),];
-                        }
+                    case "never":
+                        return [(0, exports.$expression)("false"),];
+                    case "any":
+                        return [(0, exports.$expression)("true"),];
+                    case "unknown":
+                        return [(0, exports.$expression)("true"),];
+                    case "null":
+                        return [(0, exports.$expression)("\"".concat(data.value.type, "\" === ").concat(name)),];
+                    case "integer":
+                        return [(0, exports.$expression)("Number.isInteger"), (0, exports.$expression)("("), (0, exports.$expression)(name), (0, exports.$expression)(")"),];
+                    case "boolean":
+                    case "number":
+                    case "string":
+                        return [(0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name)),];
                     case "type":
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
@@ -594,7 +609,7 @@ var Build;
                 return [(0, exports.$expression)(Validator.buildValidatorName(data.value.$ref)),];
             }
             else {
-                switch (data.value.$type) {
+                switch (data.value.type) {
                     case "literal":
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isJust"),], [Build.buildLiteralAsConst(data.value.literal),]);
                     case "typeof":
@@ -611,26 +626,22 @@ var Build;
                         }
                     case "itemof":
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [(0, exports.$expression)(data.value.value.$ref),]);
-                    case "primitive-type":
-                        switch (data.value.type) {
-                            case "never":
-                                return [(0, exports.$expression)("EvilType.Validator.isNever"),];
-                            case "any":
-                                return [(0, exports.$expression)("EvilType.Validator.isAny"),];
-                            case "unknown":
-                                return [(0, exports.$expression)("EvilType.Validator.isUnknown"),];
-                            case "null":
-                                return [(0, exports.$expression)("EvilType.Validator.isNull"),];
-                            case "boolean":
-                                return [(0, exports.$expression)("EvilType.Validator.isBoolean"),];
-                            case "number":
-                                return [(0, exports.$expression)("EvilType.Validator.isNumber"),];
-                            case "integer":
-                                return [(0, exports.$expression)("EvilType.Validator.isInteger"),];
-                            case "string":
-                                return [(0, exports.$expression)("EvilType.Validator.isString"),];
-                        }
-                    //return [ $expression(`EvilType.Validator.is${Text.toUpperCamelCase(define.type)}`), ];
+                    case "never":
+                        return [(0, exports.$expression)("EvilType.Validator.isNever"),];
+                    case "any":
+                        return [(0, exports.$expression)("EvilType.Validator.isAny"),];
+                    case "unknown":
+                        return [(0, exports.$expression)("EvilType.Validator.isUnknown"),];
+                    case "null":
+                        return [(0, exports.$expression)("EvilType.Validator.isNull"),];
+                    case "boolean":
+                        return [(0, exports.$expression)("EvilType.Validator.isBoolean"),];
+                    case "integer":
+                        return [(0, exports.$expression)("EvilType.Validator.isInteger"),];
+                    case "number":
+                        return [(0, exports.$expression)("EvilType.Validator.isNumber"),];
+                    case "string":
+                        return [(0, exports.$expression)("EvilType.Validator.isString"),];
                     case "type":
                         return Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
@@ -669,11 +680,18 @@ var Build;
         };
         Validator.isLazyValidator = function (define) {
             if (type_1.Type.isType(define)) {
-                switch (define.$type) {
+                switch (define.type) {
                     case "enum-type":
                     case "itemof":
                     case "literal":
-                    case "primitive-type":
+                    case "never":
+                    case "any":
+                    case "unknown":
+                    case "null":
+                    case "boolean":
+                    case "integer":
+                    case "number":
+                    case "string":
                     case "typeof":
                         return false;
                     case "type":
@@ -715,7 +733,7 @@ var Build;
                     (0, exports.$expression)("const"),
                     (0, exports.$expression)(Validator.buildValidatorName(data.key)),
                 ], false);
-                if ("interface" === data.value.$type) {
+                if ("interface" === data.value.type) {
                     result_3.push.apply(result_3, __spreadArray([(0, exports.$expression)("=")], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [
                         __spreadArray([
                             (0, exports.$expression)("()"),
@@ -736,7 +754,7 @@ var Build;
                     // )
                     , false));
                 }
-                else if ("value" === data.value.$type) {
+                else if ("value" === data.value.type) {
                     if (type_1.Type.isReferElement(data.value.value)) {
                         result_3.push((0, exports.$expression)("="), (0, exports.$expression)(Validator.buildValidatorName(data.value.value.$ref)));
                     }
@@ -813,7 +831,7 @@ var Build;
             Object.entries(data.value).forEach(function (i) {
                 var key = i[0];
                 var value = i[1];
-                switch (value.$type) {
+                switch (value.type) {
                     case "value":
                         result[key] = Schema.buildValue(Build.nextProcess(data, null, value));
                         break;
@@ -845,8 +863,15 @@ var Build;
                 Schema.buildRefer(Build.nextProcess(data, null, data.value.value));
         };
         Schema.buildType = function (data) {
-            switch (data.value.$type) {
-                case "primitive-type":
+            switch (data.value.type) {
+                case "never":
+                case "any":
+                case "unknown":
+                case "null":
+                case "boolean":
+                case "integer":
+                case "number":
+                case "string":
                     return Schema.buildPrimitiveType(Build.nextProcess(data, null, data.value));
                 case "type":
                     return Schema.buildTypeOrRefer(Build.nextProcess(data, null, data.value.define));

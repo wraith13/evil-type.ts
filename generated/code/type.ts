@@ -43,7 +43,7 @@ export namespace Type
     export type ValidatorOptionType = "none" | "simple" | "full";
     export interface AlphaElement extends CommonProperties
     {
-        $type: string;
+        type: string;
     }
     export interface AlphaDefinition extends AlphaElement, CommentProperty
     {
@@ -51,7 +51,7 @@ export namespace Type
     }
     export interface ImportDefinition
     {
-        $type: "import";
+        type: "import";
         target: string;
         from: string;
     }
@@ -63,55 +63,55 @@ export namespace Type
     }
     export interface CodeDefinition extends AlphaDefinition
     {
-        $type: "code";
+        type: "code";
         tokens: string[];
     }
     export interface NamespaceDefinition extends AlphaDefinition
     {
-        $type: "namespace";
+        type: "namespace";
         members: DefinitionMap;
     }
     export interface ValueDefinition extends AlphaDefinition
     {
-        $type: "value";
+        type: "value";
         value: LiteralElement | ReferElement;
         validator?: boolean;
     }
     export interface TypeDefinition extends AlphaDefinition
     {
-        $type: "type";
+        type: "type";
         define: TypeOrRefer;
     }
     export interface InterfaceDefinition extends AlphaDefinition
     {
-        $type: "interface";
+        type: "interface";
         extends?: ReferElement[];
         members: { [key: string]: TypeOrRefer, };
         additionalProperties?: boolean;
     }
     export interface DictionaryDefinition extends AlphaDefinition
     {
-        $type: "dictionary";
+        type: "dictionary";
         valueType: TypeOrRefer;
     }
     export interface ArrayElement extends AlphaElement
     {
-        $type: "array";
+        type: "array";
         items: TypeOrRefer;
     }
     export interface OrElement extends AlphaElement
     {
-        $type: "or";
+        type: "or";
         types: TypeOrRefer[];
     }
     export interface AndElement extends AlphaElement
     {
-        $type: "and";
+        type: "and";
         types: TypeOrRefer[];
     }
     export interface LiteralElement extends AlphaElement
     {
-        $type: "literal";
+        type: "literal";
         literal: Jsonable.Jsonable;
     }
     export interface ReferElement extends CommonProperties
@@ -120,42 +120,34 @@ export namespace Type
     }
     export interface NeverType extends CommonProperties
     {
-        $type: "primitive-type";
         type: "never";
     }
     export interface AnyType extends CommonProperties
     {
-        $type: "primitive-type";
         type: "any";
     }
     export interface UnknownType extends CommonProperties
     {
-        $type: "primitive-type";
         type: "unknown";
     }
     export interface NullType extends CommonProperties
     {
-        $type: "primitive-type";
         type: "null";
     }
     export interface BooleanType extends CommonProperties
     {
-        $type: "primitive-type";
         type: "boolean";
     }
     export interface NumberType extends CommonProperties
     {
-        $type: "primitive-type";
         type: "number";
     }
     export interface IntegerType extends CommonProperties
     {
-        $type: "primitive-type";
         type: "integer";
     }
     export interface StringType extends CommonProperties
     {
-        $type: "primitive-type";
         type: "string";
         pattern?: string;
     }
@@ -164,22 +156,22 @@ export namespace Type
         InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     export interface EnumTypeElement extends CommonProperties
     {
-        $type: "enum-type";
+        type: "enum-type";
         members:(null | boolean | number | string)[];
     }
     export interface TypeofElement extends CommonProperties
     {
-        $type: "typeof";
+        type: "typeof";
         value: ReferElement;
     }
     export interface KeyofElement extends CommonProperties
     {
-        $type: "keyof";
+        type: "keyof";
         value: ReferElement;
     }
     export interface ItemofElement extends CommonProperties
     {
-        $type: "itemof";
+        type: "itemof";
         value: ReferElement;
     }
     export type TypeOrRefer = Type | ReferElement;
@@ -260,77 +252,69 @@ export namespace Type
         EvilType.Validator.isString), externalReferMapping: EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(
         EvilType.Validator.isString)), });
     export const alphaElementValidatorObject: EvilType.Validator.ObjectValidator<AlphaElement> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isString, });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isString, });
     export const alphaDefinitionValidatorObject: EvilType.Validator.ObjectValidator<AlphaDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaElementValidatorObject, commentPropertyValidatorObject, { export:
         EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
-    export const importDefinitionValidatorObject: EvilType.Validator.ObjectValidator<ImportDefinition> = ({ $type:
-        EvilType.Validator.isJust("import" as const), target: EvilType.Validator.isString, from: EvilType.Validator.isString, });
+    export const importDefinitionValidatorObject: EvilType.Validator.ObjectValidator<ImportDefinition> = ({ type: EvilType.Validator.isJust
+        ("import" as const), target: EvilType.Validator.isString, from: EvilType.Validator.isString, });
     export const codeDefinitionValidatorObject: EvilType.Validator.ObjectValidator<CodeDefinition> =
-        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { $type: EvilType.Validator.isJust("code" as const), tokens
-        : EvilType.Validator.isArray(EvilType.Validator.isString), });
+        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("code" as const), tokens:
+        EvilType.Validator.isArray(EvilType.Validator.isString), });
     export const namespaceDefinitionValidatorObject: EvilType.Validator.ObjectValidator<NamespaceDefinition> =
-        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { $type: EvilType.Validator.isJust("namespace" as const),
+        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("namespace" as const),
         members: isDefinitionMap, });
     export const valueDefinitionValidatorObject: EvilType.Validator.ObjectValidator<ValueDefinition> =
-        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { $type: EvilType.Validator.isJust("value" as const), value
-        : EvilType.Validator.isOr(isLiteralElement, isReferElement), validator: EvilType.Validator.isOptional(EvilType.Validator.isBoolean)
-        , });
+        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("value" as const), value:
+        EvilType.Validator.isOr(isLiteralElement, isReferElement), validator: EvilType.Validator.isOptional(EvilType.Validator.isBoolean),
+        });
     export const typeDefinitionValidatorObject: EvilType.Validator.ObjectValidator<TypeDefinition> =
-        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { $type: EvilType.Validator.isJust("type" as const), define
-        : isTypeOrRefer, });
+        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("type" as const), define:
+        isTypeOrRefer, });
     export const interfaceDefinitionValidatorObject: EvilType.Validator.ObjectValidator<InterfaceDefinition> =
-        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { $type: EvilType.Validator.isJust("interface" as const),
+        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("interface" as const),
         extends: EvilType.Validator.isOptional(EvilType.Validator.isArray(isReferElement)), members: EvilType.Validator.isDictionaryObject(
         isTypeOrRefer), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const dictionaryDefinitionValidatorObject: EvilType.Validator.ObjectValidator<DictionaryDefinition> =
-        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { $type: EvilType.Validator.isJust("dictionary" as const),
+        EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("dictionary" as const),
         valueType: isTypeOrRefer, });
     export const arrayElementValidatorObject: EvilType.Validator.ObjectValidator<ArrayElement> = EvilType.Validator.mergeObjectValidator(
-        alphaElementValidatorObject, { $type: EvilType.Validator.isJust("array" as const), items: isTypeOrRefer, });
+        alphaElementValidatorObject, { type: EvilType.Validator.isJust("array" as const), items: isTypeOrRefer, });
     export const orElementValidatorObject: EvilType.Validator.ObjectValidator<OrElement> = EvilType.Validator.mergeObjectValidator(
-        alphaElementValidatorObject, { $type: EvilType.Validator.isJust("or" as const), types: EvilType.Validator.isArray(isTypeOrRefer), }
-        );
+        alphaElementValidatorObject, { type: EvilType.Validator.isJust("or" as const), types: EvilType.Validator.isArray(isTypeOrRefer), });
     export const andElementValidatorObject: EvilType.Validator.ObjectValidator<AndElement> = EvilType.Validator.mergeObjectValidator(
-        alphaElementValidatorObject, { $type: EvilType.Validator.isJust("and" as const), types: EvilType.Validator.isArray(isTypeOrRefer),
-        });
+        alphaElementValidatorObject, { type: EvilType.Validator.isJust("and" as const), types: EvilType.Validator.isArray(isTypeOrRefer), }
+        );
     export const literalElementValidatorObject: EvilType.Validator.ObjectValidator<LiteralElement> =
-        EvilType.Validator.mergeObjectValidator(alphaElementValidatorObject, { $type: EvilType.Validator.isJust("literal" as const),
-        literal: Jsonable.isJsonable, });
+        EvilType.Validator.mergeObjectValidator(alphaElementValidatorObject, { type: EvilType.Validator.isJust("literal" as const), literal
+        : Jsonable.isJsonable, });
     export const referElementValidatorObject: EvilType.Validator.ObjectValidator<ReferElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { $ref: EvilType.Validator.isString, });
     export const neverTypeValidatorObject: EvilType.Validator.ObjectValidator<NeverType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
-        "never" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("never" as const), });
     export const anyTypeValidatorObject: EvilType.Validator.ObjectValidator<AnyType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
-        "any" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("any" as const), });
     export const unknownTypeValidatorObject: EvilType.Validator.ObjectValidator<UnknownType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
-        "unknown" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("unknown" as const), });
     export const nullTypeValidatorObject: EvilType.Validator.ObjectValidator<NullType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
-        "null" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("null" as const), });
     export const booleanTypeValidatorObject: EvilType.Validator.ObjectValidator<BooleanType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
-        "boolean" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("boolean" as const), });
     export const numberTypeValidatorObject: EvilType.Validator.ObjectValidator<NumberType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
-        "number" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("number" as const), });
     export const integerTypeValidatorObject: EvilType.Validator.ObjectValidator<IntegerType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
-        "integer" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("integer" as const), });
     export const stringTypeValidatorObject: EvilType.Validator.ObjectValidator<StringType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("primitive-type" as const), type: EvilType.Validator.isJust(
-        "string" as const), pattern: EvilType.Validator.isOptional(EvilType.Validator.isString), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("string" as const), pattern: EvilType.Validator.isOptional(
+        EvilType.Validator.isString), });
     export const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement> =
-        EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("enum-type" as const),
+        EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("enum-type" as const),
         members: EvilType.Validator.isArray(EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isBoolean,
         EvilType.Validator.isNumber, EvilType.Validator.isString)), });
     export const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("typeof" as const), value: isReferElement, });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("typeof" as const), value: isReferElement, });
     export const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("keyof" as const), value: isReferElement, });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("keyof" as const), value: isReferElement, });
     export const itemofElementValidatorObject: EvilType.Validator.ObjectValidator<ItemofElement> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $type: EvilType.Validator.isJust("itemof" as const), value: isReferElement, });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("itemof" as const), value: isReferElement, });
 }

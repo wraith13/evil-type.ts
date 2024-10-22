@@ -232,7 +232,7 @@ export namespace Build
         const target = getTarget(data);
         if (Type.isType(target.value))
         {
-            switch(target.value.$type)
+            switch(target.value.type)
             {
             case "literal":
                 return false;
@@ -264,14 +264,22 @@ export namespace Build
                         return false;
                     }
                 }
-            case "primitive-type":
-                switch(target.value.type)
-                {
-                case "never":
-                    return true;
-                default:
-                    return false;
-                }
+            case "never":
+                return true;
+            case "any":
+                return false;
+            case "unknown":
+                return false;
+            case "null":
+                return false;
+            case "boolean":
+                return false;
+            case "integer":
+                return false;
+            case "number":
+                return false;
+            case "string":
+                return false;
             case "type":
                 return isKindofNeverType(nextProcess(target, null, target.value.define));
             case "enum-type":
@@ -418,7 +426,7 @@ export namespace Build
             undefined === imports ? []: imports.map(i => $line([ $expression("import"), $expression(i.target), $expression("from"), $expression(Jsonable.stringify(i.from)) ]));
         export const buildDefine = (data: DefineProcess<Type.Definition>): CodeEntry[] =>
         {
-            switch(data.value.$type)
+            switch(data.value.type)
             {
             case "code":
                 return [ $line([ ...$comment(data.value), ...buildExport(data), ...data.value.tokens.map(i => $expression(i)), ]), ];
@@ -442,7 +450,7 @@ export namespace Build
             }
             else
             {
-                switch(data.value.$type)
+                switch(data.value.type)
                 {
                 case "literal":
                     return buildInlineDefineLiteral(data.value);
@@ -454,7 +462,14 @@ export namespace Build
                     return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), $expression(`${data.value.value.$ref}[number]`), ];
                 case "value":
                     return buildInlineDefine(nextProcess(data, null, data.value.value));
-                case "primitive-type":
+                case "never":
+                case "any":
+                case "unknown":
+                case "null":
+                case "boolean":
+                case "integer":
+                case "number":
+                case "string":
                     return [ buildInlineDefinePrimitiveType(data.value), ];
                 case "type":
                     return buildInlineDefine(nextProcess(data, null, data.value.define));
@@ -542,7 +557,7 @@ export namespace Build
             }
             else
             {
-                switch(data.value.$type)
+                switch(data.value.type)
                 {
                 case "literal":
                     return buildLiterarlValidatorExpression(name, data.value.literal);
@@ -554,22 +569,20 @@ export namespace Build
                     return [ $expression(`${data.value.value.$ref}.includes(${name} as any)`), ];
                 case "value":
                     return buildValidatorExpression(name, nextProcess(data, null, data.value.value));
-                case "primitive-type":
-                    switch(data.value.type)
-                    {
-                    case "never":
-                        return [ $expression("false"), ];
-                    case "any":
-                        return [ $expression("true"), ];
-                    case "unknown":
-                        return [ $expression("true"), ];
-                    case "null":
-                        return [ $expression(`"${data.value.type}" === ${name}`), ];
-                    case "integer":
-                        return [ $expression("Number.isInteger"), $expression("("), $expression(name), $expression(")"), ];
-                    default:
-                        return [ $expression(`"${data.value.type}" === typeof ${name}`), ];
-                    }
+                case "never":
+                    return [ $expression("false"), ];
+                case "any":
+                    return [ $expression("true"), ];
+                case "unknown":
+                    return [ $expression("true"), ];
+                case "null":
+                    return [ $expression(`"${data.value.type}" === ${name}`), ];
+                case "integer":
+                    return [ $expression("Number.isInteger"), $expression("("), $expression(name), $expression(")"), ];
+                case "boolean":
+                case "number":
+                case "string":
+                    return [ $expression(`"${data.value.type}" === typeof ${name}`), ];
                 case "type":
                     return buildValidatorExpression(name, nextProcess(data, null, data.value.define));
                 case "enum-type":
@@ -722,7 +735,7 @@ export namespace Build
             }
             else
             {
-                switch(data.value.$type)
+                switch(data.value.type)
                 {
                 case "literal":
                     return buildCall([ $expression("EvilType.Validator.isJust"), ], [ buildLiteralAsConst(data.value.literal), ]);
@@ -746,27 +759,22 @@ export namespace Build
                     }
                 case "itemof":
                     return buildCall([ $expression("EvilType.Validator.isEnum"), ], [ $expression(data.value.value.$ref), ]);
-                case "primitive-type":
-                    switch(data.value.type)
-                    {
-                    case "never":
-                        return [ $expression("EvilType.Validator.isNever"), ];
-                    case "any":
-                        return [ $expression("EvilType.Validator.isAny"), ];
-                    case "unknown":
-                        return [ $expression("EvilType.Validator.isUnknown"), ];
-                    case "null":
-                        return [ $expression("EvilType.Validator.isNull"), ];
-                    case "boolean":
-                        return [ $expression("EvilType.Validator.isBoolean"), ];
-                    case "number":
-                        return [ $expression("EvilType.Validator.isNumber"), ];
-                    case "integer":
-                        return [ $expression("EvilType.Validator.isInteger"), ];
-                    case "string":
-                        return [ $expression("EvilType.Validator.isString"), ];
-                    }
-                    //return [ $expression(`EvilType.Validator.is${Text.toUpperCamelCase(define.type)}`), ];
+                case "never":
+                    return [ $expression("EvilType.Validator.isNever"), ];
+                case "any":
+                    return [ $expression("EvilType.Validator.isAny"), ];
+                case "unknown":
+                    return [ $expression("EvilType.Validator.isUnknown"), ];
+                case "null":
+                    return [ $expression("EvilType.Validator.isNull"), ];
+                case "boolean":
+                    return [ $expression("EvilType.Validator.isBoolean"), ];
+                case "integer":
+                    return [ $expression("EvilType.Validator.isInteger"), ];
+                case "number":
+                    return [ $expression("EvilType.Validator.isNumber"), ];
+                case "string":
+                    return [ $expression("EvilType.Validator.isString"), ];
                 case "type":
                     return buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.define));
                 case "enum-type":
@@ -838,12 +846,19 @@ export namespace Build
         {
             if (Type.isType(define))
             {
-                switch(define.$type)
+                switch(define.type)
                 {
                 case "enum-type":
                 case "itemof":
                 case "literal":
-                case "primitive-type":
+                case "never":
+                case "any":
+                case "unknown":
+                case "null":
+                case "boolean":
+                case "integer":
+                case "number":
+                case "string":
                 case "typeof":
                     return false;
                 case "type":
@@ -906,7 +921,7 @@ export namespace Build
                     $expression("const"),
                     $expression(buildValidatorName(data.key)),
                 ];
-                if ("interface" === data.value.$type)
+                if ("interface" === data.value.type)
                 {
                     result.push
                     (
@@ -942,7 +957,7 @@ export namespace Build
                     );
                 }
                 else
-                if ("value" === data.value.$type)
+                if ("value" === data.value.type)
                 {
                     if (Type.isReferElement(data.value.value))
                     {
@@ -1058,7 +1073,7 @@ export namespace Build
                 {
                     const key = i[0];
                     const value = i[1];
-                    switch(value.$type)
+                    switch(value.type)
                     {
                     case "value":
                         result[key] = buildValue(nextProcess(data, null, value));
@@ -1094,9 +1109,16 @@ export namespace Build
                 buildRefer(nextProcess(data, null, data.value.value));
         export const buildType = (data: SchemaProcess<Type.Type>):Jsonable.JsonableObject =>
         {
-            switch(data.value.$type)
+            switch(data.value.type)
             {
-            case "primitive-type":
+            case "never":
+            case "any":
+            case "unknown":
+            case "null":
+            case "boolean":
+            case "integer":
+            case "number":
+            case "string":
                 return buildPrimitiveType(nextProcess(data, null, data.value));
             case "type":
                 return buildTypeOrRefer(nextProcess(data, null, data.value.define));
