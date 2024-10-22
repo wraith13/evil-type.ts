@@ -5,13 +5,11 @@
     ],
     "imports": [
         {
-            "type": "import",
-            "target": "{ EvilType }",
+            "import": "{ EvilType }",
             "from": "../../common/evil-type"
         },
         {
-            "type": "import",
-            "target": "{ Jsonable }",
+            "import": "{ Jsonable }",
             "from": "./jsonable"
         }
     ],
@@ -22,8 +20,7 @@
                 "schema": {
                     "type": "value",
                     "value": {
-                        "type": "literal",
-                        "literal": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#"
+                        "const": "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#"
                     }
                 },
                 "CommentProperty": {
@@ -180,8 +177,7 @@
                 "indentStyleTypeMember": {
                     "type": "value",
                     "value": {
-                        "type": "literal",
-                        "literal": [
+                        "const": [
                             "allman",
                             "egyptian"
                         ]
@@ -240,11 +236,7 @@
                 "ImportDefinition": {
                     "type": "interface",
                     "members": {
-                        "type": {
-                            "type": "literal",
-                            "literal": "import"
-                        },
-                        "target": {
+                        "import": {
                             "type": "string"
                         },
                         "from": {
@@ -293,8 +285,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "code"
+                            "const": "code"
                         },
                         "tokens": {
                             "type": "array",
@@ -314,8 +305,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "namespace"
+                            "const": "namespace"
                         },
                         "members": {
                             "$ref": "DefinitionMap"
@@ -331,8 +321,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "value"
+                            "const": "value"
                         },
                         "value": {
                             "type": "or",
@@ -360,8 +349,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "type"
+                            "const": "type"
                         },
                         "define": {
                             "$ref": "TypeOrRefer"
@@ -377,8 +365,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "interface"
+                            "const": "interface"
                         },
                         "extends?": {
                             "type": "array",
@@ -406,8 +393,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "dictionary"
+                            "const": "dictionary"
                         },
                         "valueType": {
                             "$ref": "TypeOrRefer"
@@ -423,8 +409,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "array"
+                            "const": "array"
                         },
                         "items": {
                             "$ref": "TypeOrRefer"
@@ -440,8 +425,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "or"
+                            "const": "or"
                         },
                         "types": {
                             "type": "array",
@@ -460,8 +444,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "and"
+                            "const": "and"
                         },
                         "types": {
                             "type": "array",
@@ -475,15 +458,11 @@
                     "type": "interface",
                     "extends": [
                         {
-                            "$ref": "AlphaElement"
+                            "$ref": "CommonProperties"
                         }
                     ],
                     "members": {
-                        "type": {
-                            "type": "literal",
-                            "literal": "literal"
-                        },
-                        "literal": {
+                        "const": {
                             "$ref": "Jsonable.Jsonable"
                         }
                     }
@@ -510,8 +489,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "never"
+                            "const": "never"
                         }
                     }
                 },
@@ -524,8 +502,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "any"
+                            "const": "any"
                         }
                     }
                 },
@@ -538,8 +515,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "unknown"
+                            "const": "unknown"
                         }
                     }
                 },
@@ -552,8 +528,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "null"
+                            "const": "null"
                         }
                     }
                 },
@@ -566,8 +541,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "boolean"
+                            "const": "boolean"
                         }
                     }
                 },
@@ -580,8 +554,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "number"
+                            "const": "number"
                         }
                     }
                 },
@@ -594,8 +567,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "integer"
+                            "const": "integer"
                         }
                     }
                 },
@@ -608,8 +580,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "string"
+                            "const": "string"
                         },
                         "pattern?": {
                             "type": "string"
@@ -701,8 +672,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "enum-type"
+                            "const": "enum-type"
                         },
                         "members": {
                             "type": "array",
@@ -735,8 +705,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "typeof"
+                            "const": "typeof"
                         },
                         "value": {
                             "$ref": "ReferElement"
@@ -752,8 +721,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "keyof"
+                            "const": "keyof"
                         },
                         "value": {
                             "$ref": "ReferElement"
@@ -769,8 +737,7 @@
                     ],
                     "members": {
                         "type": {
-                            "type": "literal",
-                            "literal": "itemof"
+                            "const": "itemof"
                         },
                         "value": {
                             "$ref": "ReferElement"

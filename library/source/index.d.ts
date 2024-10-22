@@ -59,75 +59,74 @@ export declare namespace Build {
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
     const isKindofNeverType: (data: BaseProcess<Type.TypeOrRefer>) => boolean;
     namespace Define {
-        interface DefineProcess<ValueType> extends BaseProcess<ValueType> {
+        interface Process<ValueType> extends BaseProcess<ValueType> {
         }
-        const makeProcess: (source: Type.TypeSchema) => DefineProcess<Type.DefinitionMap>;
-        const buildDefineLine: (declarator: string, data: DefineProcess<Type.TypeOrValue & Type.Definition>, postEpressions?: CodeExpression[]) => CodeLine;
+        const makeProcess: (source: Type.TypeSchema) => Process<Type.DefinitionMap>;
+        const buildDefineLine: (declarator: string, data: Process<Type.TypeOrValue & Type.Definition>, postEpressions?: CodeExpression[]) => CodeLine;
         const buildInlineDefineLiteral: (define: Type.LiteralElement) => CodeExpression[];
         const buildInlineDefinePrimitiveType: (value: Type.PrimitiveTypeElement) => CodeExpression;
         const enParenthesis: <T extends CodeInlineEntry>(expressions: T[]) => (CodeExpression | T)[];
         const isNeedParenthesis: (expressions: (CodeExpression | CodeInlineBlock)[]) => boolean;
         const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | CodeInlineBlock)[];
         const buildInlineDefineEnum: (value: Type.EnumTypeElement) => CodeExpression[];
-        const buildInlineDefineArray: (data: DefineProcess<Type.ArrayElement>) => (CodeExpression | CodeInlineBlock)[];
-        const buildInlineDefineDictionary: (data: DefineProcess<Type.DictionaryDefinition>) => CodeInlineBlock;
-        const buildInlineDefineAnd: (data: DefineProcess<Type.AndElement>) => CodeExpression[];
-        const buildInlineDefineOr: (data: DefineProcess<Type.OrElement>) => CodeExpression[];
-        const buildDefineInlineInterface: (data: DefineProcess<Type.InterfaceDefinition>) => CodeInlineBlock;
-        const buildDefineInterface: (data: DefineProcess<Type.InterfaceDefinition>) => CodeBlock;
-        const buildDefineDictionary: (data: DefineProcess<Type.DictionaryDefinition>) => CodeBlock;
-        const buildDefineNamespaceCore: (data: DefineProcess<Type.DefinitionMap>) => CodeEntry[];
-        const buildDefineNamespace: (data: DefineProcess<Type.NamespaceDefinition>) => CodeBlock;
+        const buildInlineDefineArray: (data: Process<Type.ArrayElement>) => (CodeExpression | CodeInlineBlock)[];
+        const buildInlineDefineDictionary: (data: Process<Type.DictionaryDefinition>) => CodeInlineBlock;
+        const buildInlineDefineAnd: (data: Process<Type.AndElement>) => CodeExpression[];
+        const buildInlineDefineOr: (data: Process<Type.OrElement>) => CodeExpression[];
+        const buildDefineInlineInterface: (data: Process<Type.InterfaceDefinition>) => CodeInlineBlock;
+        const buildDefineInterface: (data: Process<Type.InterfaceDefinition>) => CodeBlock;
+        const buildDefineDictionary: (data: Process<Type.DictionaryDefinition>) => CodeBlock;
+        const buildDefineNamespaceCore: (data: Process<Type.DefinitionMap>) => CodeEntry[];
+        const buildDefineNamespace: (data: Process<Type.NamespaceDefinition>) => CodeBlock;
         const buildImports: (imports: undefined | Type.ImportDefinition[]) => CodeLine[];
-        const buildDefine: (data: DefineProcess<Type.Definition>) => CodeEntry[];
-        const buildInlineDefine: (data: DefineProcess<Type.TypeOrValueOfRefer>) => (CodeExpression | CodeInlineBlock)[];
+        const buildDefine: (data: Process<Type.Definition>) => CodeEntry[];
+        const buildInlineDefine: (data: Process<Type.TypeOrValueOfRefer>) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {
         const buildCall: (method: CodeInlineEntry[], args: (CodeInlineEntry | CodeInlineEntry[])[]) => CodeInlineEntry[];
         const buildLiterarlValidatorExpression: (name: string, value: Jsonable.Jsonable) => CodeExpression[];
-        const buildInlineLiteralValidator: (define: Type.LiteralElement) => CodeExpression;
         const buildObjectValidatorObjectName: (name: string) => string;
         const buildValidatorName: (name: string) => string;
-        const buildValidatorExpression: (name: string, data: Define.DefineProcess<Type.TypeOrValueOfRefer>) => CodeExpression[];
-        const buildKeyofValidator: (name: string, data: Define.DefineProcess<Type.KeyofElement>) => CodeExpression[];
-        const buildInterfaceValidator: (name: string, data: Define.DefineProcess<Type.InterfaceDefinition>) => CodeExpression[];
-        const buildInlineValidator: (name: string, data: Define.DefineProcess<Type.TypeOrValue>) => CodeExpression[];
-        const buildObjectValidatorGetterCoreEntry: (data: Define.DefineProcess<Type.TypeOrRefer>) => CodeInlineEntry[];
-        const buildObjectValidatorGetterCore: (data: Define.DefineProcess<Type.InterfaceDefinition>) => CodeInlineBlock;
-        const buildObjectValidator: (data: Define.DefineProcess<Type.InterfaceDefinition>) => (CodeExpression | CodeInlineBlock)[];
+        const buildValidatorExpression: (name: string, data: Define.Process<Type.TypeOrValueOfRefer>) => CodeExpression[];
+        const buildKeyofValidator: (name: string, data: Define.Process<Type.KeyofElement>) => CodeExpression[];
+        const buildInterfaceValidator: (name: string, data: Define.Process<Type.InterfaceDefinition>) => CodeExpression[];
+        const buildInlineValidator: (name: string, data: Define.Process<Type.TypeOrValue>) => CodeExpression[];
+        const buildObjectValidatorGetterCoreEntry: (data: Define.Process<Type.TypeOrRefer>) => CodeInlineEntry[];
+        const buildObjectValidatorGetterCore: (data: Define.Process<Type.InterfaceDefinition>) => CodeInlineBlock;
+        const buildObjectValidator: (data: Define.Process<Type.InterfaceDefinition>) => (CodeExpression | CodeInlineBlock)[];
         const isLazyValidator: (define: Type.TypeOrRefer) => boolean;
-        const buildFullValidator: (data: Define.DefineProcess<Type.Type>) => CodeInlineEntry[];
+        const buildFullValidator: (data: Define.Process<Type.Type>) => CodeInlineEntry[];
         const isValidatorTarget: (define: Type.TypeOrValue) => boolean;
-        const buildValidator: (data: Define.DefineProcess<Type.TypeOrValue & Type.Definition>) => CodeLine[];
-        const buildValidatorObject: (data: Define.DefineProcess<Type.InterfaceDefinition>) => CodeLine[];
+        const buildValidator: (data: Define.Process<Type.TypeOrValue & Type.Definition>) => CodeLine[];
+        const buildValidatorObject: (data: Define.Process<Type.InterfaceDefinition>) => CodeLine[];
     }
     namespace Schema {
         namespace Const {
             const definitions = "definitions";
         }
-        interface SchemaProcess<ValueType> extends BaseProcess<ValueType> {
+        interface Process<ValueType> extends BaseProcess<ValueType> {
             schema: Type.SchemaOptions;
         }
-        const makeProcess: (source: Type.TypeSchema, schema: Type.SchemaOptions) => SchemaProcess<Type.DefinitionMap>;
-        const resolveExternalRefer: (data: SchemaProcess<unknown>, absolutePath: string) => string | null;
-        const build: (data: SchemaProcess<Type.DefinitionMap>) => Jsonable.JsonableObject;
-        const buildDefinitions: (data: SchemaProcess<Type.DefinitionMap>) => Jsonable.JsonableObject;
-        const buildLiteral: (data: SchemaProcess<Type.LiteralElement>) => Jsonable.JsonableObject;
-        const buildValue: (data: SchemaProcess<Type.ValueDefinition>) => Jsonable.JsonableObject;
-        const buildType: (data: SchemaProcess<Type.Type>) => Jsonable.JsonableObject;
-        const setCommonProperties: (result: Jsonable.JsonableObject, data: SchemaProcess<Type.CommonProperties>) => Jsonable.JsonableObject;
-        const buildPrimitiveType: (data: SchemaProcess<Type.PrimitiveTypeElement>) => Jsonable.JsonableObject;
-        const buildInterface: (data: SchemaProcess<Type.InterfaceDefinition>) => Jsonable.JsonableObject;
-        const buildDictionary: (data: SchemaProcess<Type.DictionaryDefinition>) => Jsonable.JsonableObject;
-        const buildEnumType: (data: SchemaProcess<Type.EnumTypeElement>) => Jsonable.JsonableObject;
-        const buildTypeOf: (data: SchemaProcess<Type.TypeofElement>) => Jsonable.JsonableObject;
-        const buildKeyOf: (data: SchemaProcess<Type.KeyofElement>) => Jsonable.JsonableObject;
-        const buildItemOf: (data: SchemaProcess<Type.ItemofElement>) => Jsonable.JsonableObject;
-        const buildRefer: (data: SchemaProcess<Type.ReferElement>) => Jsonable.JsonableObject;
-        const buildArray: (data: SchemaProcess<Type.ArrayElement>) => Jsonable.JsonableObject;
-        const buildOr: (data: SchemaProcess<Type.OrElement>) => Jsonable.JsonableObject;
-        const buildAnd: (data: SchemaProcess<Type.AndElement>) => Jsonable.JsonableObject;
-        const buildTypeOrRefer: (data: SchemaProcess<Type.TypeOrRefer>) => Jsonable.JsonableObject;
+        const makeProcess: (source: Type.TypeSchema, schema: Type.SchemaOptions) => Process<Type.DefinitionMap>;
+        const resolveExternalRefer: (data: Process<unknown>, absolutePath: string) => string | null;
+        const build: (data: Process<Type.DefinitionMap>) => Jsonable.JsonableObject;
+        const buildDefinitions: (data: Process<Type.DefinitionMap>) => Jsonable.JsonableObject;
+        const buildLiteral: (data: Process<Type.LiteralElement>) => Jsonable.JsonableObject;
+        const buildValue: (data: Process<Type.ValueDefinition>) => Jsonable.JsonableObject;
+        const buildType: (data: Process<Type.Type>) => Jsonable.JsonableObject;
+        const setCommonProperties: (result: Jsonable.JsonableObject, data: Process<Type.CommonProperties>) => Jsonable.JsonableObject;
+        const buildPrimitiveType: (data: Process<Type.PrimitiveTypeElement>) => Jsonable.JsonableObject;
+        const buildInterface: (data: Process<Type.InterfaceDefinition>) => Jsonable.JsonableObject;
+        const buildDictionary: (data: Process<Type.DictionaryDefinition>) => Jsonable.JsonableObject;
+        const buildEnumType: (data: Process<Type.EnumTypeElement>) => Jsonable.JsonableObject;
+        const buildTypeOf: (data: Process<Type.TypeofElement>) => Jsonable.JsonableObject;
+        const buildKeyOf: (data: Process<Type.KeyofElement>) => Jsonable.JsonableObject;
+        const buildItemOf: (data: Process<Type.ItemofElement>) => Jsonable.JsonableObject;
+        const buildRefer: (data: Process<Type.ReferElement>) => Jsonable.JsonableObject;
+        const buildArray: (data: Process<Type.ArrayElement>) => Jsonable.JsonableObject;
+        const buildOr: (data: Process<Type.OrElement>) => Jsonable.JsonableObject;
+        const buildAnd: (data: Process<Type.AndElement>) => Jsonable.JsonableObject;
+        const buildTypeOrRefer: (data: Process<Type.TypeOrRefer>) => Jsonable.JsonableObject;
     }
 }
 export declare namespace Format {

@@ -5,8 +5,7 @@
     ],
     "imports": [
         {
-            "type": "import",
-            "target": "{ EvilType }",
+            "import": "{ EvilType }",
             "from": "../../common/evil-type"
         }
     ],

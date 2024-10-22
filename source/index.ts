@@ -230,12 +230,14 @@ export namespace Build
     export const isKindofNeverType = (data: BaseProcess<Type.TypeOrRefer>): boolean =>
     {
         const target = getTarget(data);
+        if (Type.isLiteralElement(target.value))
+        {
+            return false;
+        }
         if (Type.isType(target.value))
         {
             switch(target.value.type)
             {
-            case "literal":
-                return false;
             case "typeof":
                 return false;
             case "keyof":
@@ -256,7 +258,7 @@ export namespace Build
                     const literal = getLiteral(nextProcess(target, null, target.value.value));
                     if (literal)
                     {
-                        return ! Array.isArray(literal.literal) || 0 === literal.literal.length;
+                        return ! Array.isArray(literal.const) || 0 === literal.const.length;
                     }
                     else
                     {
@@ -300,10 +302,10 @@ export namespace Build
     }
     export namespace Define
     {
-        export interface DefineProcess<ValueType> extends BaseProcess<ValueType>
+        export interface Process<ValueType> extends BaseProcess<ValueType>
         {
         }
-        export const makeProcess = (source: Type.TypeSchema): DefineProcess<Type.DefinitionMap> =>
+        export const makeProcess = (source: Type.TypeSchema): Process<Type.DefinitionMap> =>
         ({
             source,
             options: source.options,
@@ -312,11 +314,10 @@ export namespace Build
             key: "",
             value: source.defines,
         });
-        //export const buildDefineLine = (declarator: string, name: string, define: Type.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
-        export const buildDefineLine = (declarator: string, data: DefineProcess<Type.TypeOrValue & Type.Definition>, postEpressions: CodeExpression[] = []): CodeLine =>
+        export const buildDefineLine = (declarator: string, data: Process<Type.TypeOrValue & Type.Definition>, postEpressions: CodeExpression[] = []): CodeLine =>
             $line([ ...buildExport(data), $expression(declarator), $expression(data.key), $expression("="), ...convertToExpression(buildInlineDefine(data)), ...postEpressions, ]);
         export const buildInlineDefineLiteral = (define: Type.LiteralElement) =>
-            [ $expression(Jsonable.stringify(define.literal)) ];
+            [ $expression(Jsonable.stringify(define.const)) ];
         export const buildInlineDefinePrimitiveType = (value: Type.PrimitiveTypeElement) =>
         {
             switch(value.type)
@@ -327,9 +328,6 @@ export namespace Build
                 return $expression(value.type);
             }
         };
-        //export const buildDefinePrimitiveType = (name: string, value: Type.PrimitiveTypeElement): CodeLine =>
-        // export const buildDefinePrimitiveType = (data: DefineProcess<Type.PrimitiveTypeElement>): CodeLine =>
-        //     buildDefineLine("type", data);
         export const enParenthesis = <T extends CodeInlineEntry>(expressions: T[]) =>
             [ $expression("("), ...expressions, $expression(")"), ];
         export const isNeedParenthesis = (expressions: (CodeExpression | CodeInlineBlock)[]) =>
@@ -381,32 +379,32 @@ export namespace Build
             isNeedParenthesis(expressions) ? enParenthesis(expressions): expressions;
         export const buildInlineDefineEnum = (value: Type.EnumTypeElement) =>
             kindofJoinExpression(value.members.map(i => $expression(Jsonable.stringify(i))), $expression("|"));
-        export const buildInlineDefineArray = (data: DefineProcess<Type.ArrayElement>) =>
+        export const buildInlineDefineArray = (data: Process<Type.ArrayElement>) =>
             [ ...enParenthesisIfNeed(buildInlineDefine(nextProcess(data, null, data.value.items))), $expression("[]"), ];
-        export const buildInlineDefineDictionary = (data: DefineProcess<Type.DictionaryDefinition>) =>
+        export const buildInlineDefineDictionary = (data: Process<Type.DictionaryDefinition>) =>
             $iblock([ $line([ $expression("[key: string]:"), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), ]) ]);
-        export const buildInlineDefineAnd = (data: DefineProcess<Type.AndElement>) =>
+        export const buildInlineDefineAnd = (data: Process<Type.AndElement>) =>
             kindofJoinExpression(data.value.types.map(i => enParenthesisIfNeed(buildInlineDefine(nextProcess(data, null, i)))), $expression("&"));
-        export const buildInlineDefineOr = (data: DefineProcess<Type.OrElement>) =>
+        export const buildInlineDefineOr = (data: Process<Type.OrElement>) =>
             kindofJoinExpression(data.value.types.map(i => enParenthesisIfNeed(buildInlineDefine(nextProcess(data, null, i)))), $expression("|"));
-        export const buildDefineInlineInterface = (data: DefineProcess<Type.InterfaceDefinition>) => $iblock
+        export const buildDefineInlineInterface = (data: Process<Type.InterfaceDefinition>) => $iblock
         (
             Object.keys(data.value.members)
                 .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(nextProcess(data, name, data.value.members[name]))]))
         );
-        export const buildDefineInterface = (data: DefineProcess<Type.InterfaceDefinition>): CodeBlock =>
+        export const buildDefineInterface = (data: Process<Type.InterfaceDefinition>): CodeBlock =>
         {
             const header = [ ...buildExport(data), ...["interface", data.key].map(i => $expression(i)), ...buildExtends(data.value), ];
             const lines = Object.keys(data.value.members)
                 .map(name => $line([ $expression(name+ ":"), ...buildInlineDefine(nextProcess(data, name, data.value.members[name])), ]));
             return $block(header, lines);
         };
-        export const buildDefineDictionary = (data: DefineProcess<Type.DictionaryDefinition>): CodeBlock =>
+        export const buildDefineDictionary = (data: Process<Type.DictionaryDefinition>): CodeBlock =>
         {
             const header = [ ...buildExport(data), ...["type", data.key].map(i => $expression(i)), $expression("=")];
             return $block(header, [ $line([ $expression("[key: string]:"), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), ]) ]);
         };
-        export const buildDefineNamespaceCore = (data: DefineProcess<Type.DefinitionMap>): CodeEntry[] =>
+        export const buildDefineNamespaceCore = (data: Process<Type.DefinitionMap>): CodeEntry[] =>
         [
             ...Object.entries(data.value)
                 .map(i => Build.Define.buildDefine(nextProcess(data, i[0], i[1]))),
@@ -416,15 +414,15 @@ export namespace Build
                 .map(i => Type.isInterfaceDefinition(i[1]) ? Build.Validator.buildValidatorObject(nextProcess(data, i[0], i[1])): []),
         ]
         .reduce((a, b) => [...a, ...b], []);
-        export const buildDefineNamespace = (data: DefineProcess<Type.NamespaceDefinition>): CodeBlock =>
+        export const buildDefineNamespace = (data: Process<Type.NamespaceDefinition>): CodeBlock =>
         {
             const header = [...buildExport(data), $expression("namespace"), $expression(data.key), ];
             const lines = buildDefineNamespaceCore(nextProcess(data, null, data.value.members));
             return $block(header, lines);
         };
         export const buildImports = (imports: undefined | Type.ImportDefinition[]) =>
-            undefined === imports ? []: imports.map(i => $line([ $expression("import"), $expression(i.target), $expression("from"), $expression(Jsonable.stringify(i.from)) ]));
-        export const buildDefine = (data: DefineProcess<Type.Definition>): CodeEntry[] =>
+            undefined === imports ? []: imports.map(i => $line([ $expression("import"), $expression(i.import), $expression("from"), $expression(Jsonable.stringify(i.from)) ]));
+        export const buildDefine = (data: Process<Type.Definition>): CodeEntry[] =>
         {
             switch(data.value.type)
             {
@@ -442,18 +440,21 @@ export namespace Build
                 return [ ...$comment(data.value), buildDefineLine("const", nextProcess(data, null, data.value), Type.isLiteralElement(data.value.value) ? asConst: []), ];
             }
         };
-        export const buildInlineDefine = (data: DefineProcess<Type.TypeOrValueOfRefer>): (CodeExpression | CodeInlineBlock)[] =>
+        export const buildInlineDefine = (data: Process<Type.TypeOrValueOfRefer>): (CodeExpression | CodeInlineBlock)[] =>
         {
             if (Type.isReferElement(data.value))
             {
                 return [ $expression(data.value.$ref), ];
             }
             else
+            if (Type.isLiteralElement(data.value))
+            {
+                return buildInlineDefineLiteral(data.value);
+            }
+            else
             {
                 switch(data.value.type)
                 {
-                case "literal":
-                    return buildInlineDefineLiteral(data.value);
                 case "typeof":
                     return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), ...buildInlineDefine(nextProcess(data, null, data.value.value)), ];
                 case "keyof":
@@ -541,26 +542,25 @@ export namespace Build
                 return [ $expression(Jsonable.stringify(value)), $expression("==="), $expression(name), ];
             }
         };
-        export const buildInlineLiteralValidator = (define: Type.LiteralElement) =>
-            $expression(`(value: unknown): value is ${Define.buildInlineDefineLiteral(define)} => ${buildLiterarlValidatorExpression("value", define.literal)};`);
-        // export const buildValidatorLine = (declarator: string, name: string, define: Type.Type): CodeExpression[] =>
-        //     [ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define)), ];
         export const buildObjectValidatorObjectName = (name: string) =>
             [ ...Text.getNameSpace(name).split("."), `${Text.toLowerCamelCase(Text.getNameBody(name))}ValidatorObject`, ].filter(i => "" !== i).join(".");
         export const buildValidatorName = (name: string) =>
             [ ...Text.getNameSpace(name).split("."), `is${Text.toUpperCamelCase(Text.getNameBody(name))}`, ].filter(i => "" !== i).join(".");
-        export const buildValidatorExpression = (name: string, data: Define.DefineProcess<Type.TypeOrValueOfRefer>): CodeExpression[] =>
+        export const buildValidatorExpression = (name: string, data: Define.Process<Type.TypeOrValueOfRefer>): CodeExpression[] =>
         {
             if (Type.isReferElement(data.value))
             {
                 return [ $expression(`${buildValidatorName(data.value.$ref)}(${name})`), ];
             }
             else
+            if (Type.isLiteralElement(data.value))
+            {
+                return buildLiterarlValidatorExpression(name, data.value.const);
+            }
+            else
             {
                 switch(data.value.type)
                 {
-                case "literal":
-                    return buildLiterarlValidatorExpression(name, data.value.literal);
                 case "typeof":
                     return buildValidatorExpression(name, nextProcess(data, null, data.value.value));
                 case "keyof":
@@ -631,7 +631,7 @@ export namespace Build
                 }
             }
         };
-        export const buildKeyofValidator = (name: string, data: Define.DefineProcess<Type.KeyofElement>): CodeExpression[] =>
+        export const buildKeyofValidator = (name: string, data: Define.Process<Type.KeyofElement>): CodeExpression[] =>
         {
             let target = getTarget(nextProcess(data, null, data.value.value));
             if (Type.isInterfaceDefinition(target.value))
@@ -643,7 +643,7 @@ export namespace Build
                 return [ $expression(`"string" === typeof ${name}`), ];
             }
         };
-        export const buildInterfaceValidator = (name: string, data: Define.DefineProcess<Type.InterfaceDefinition>): CodeExpression[] =>
+        export const buildInterfaceValidator = (name: string, data: Define.Process<Type.InterfaceDefinition>): CodeExpression[] =>
         {
             const list: CodeExpression[] = [];
             const members = data.value.members;
@@ -661,84 +661,73 @@ export namespace Build
                     }
                 )
             }
-            // if (Type.isDictionaryDefinition(members))
-            // {
-            //     if (undefined !== data.value.extends)
-            //     {
-            //         list.push($expression("&&"));
-            //     }
-            //     else
-            //     {
-            //     }
-            //     list.push(...buildValidatorExpression(name, nextProcess(data, null, members)));
-            // }
-            // else
-            // {
-                if (undefined !== data.value.extends)
+            if (undefined !== data.value.extends)
+            {
+            }
+            else
+            {
+                list.push($expression(`null !== ${name}`));
+                list.push($expression("&&"));
+                list.push($expression(`"object" === typeof ${name}`));
+            }
+            Object.keys(members).forEach
+            (
+                k =>
                 {
-                }
-                else
-                {
-                    list.push($expression(`null !== ${name}`));
-                    list.push($expression("&&"));
-                    list.push($expression(`"object" === typeof ${name}`));
-                }
-                Object.keys(members).forEach
-                (
-                    k =>
+                    const key = Text.getPrimaryKeyName(k);
+                    const value = members[k];
+                    if (isKindofNeverType(nextProcess(data, key, value)))
                     {
-                        const key = Text.getPrimaryKeyName(k);
-                        const value = members[k];
-                        if (isKindofNeverType(nextProcess(data, key, value)))
+                        list.push($expression("&&"));
+                        list.push($expression(`! "${key}" in ${name}`));
+                    }
+                    else
+                    {
+                        const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, nextProcess(data, key, value)));
+                        const current = Type.isOrElement(value) ?
+                        Define.enParenthesis(base):
+                        base;
+                        if (k === key)
                         {
                             list.push($expression("&&"));
-                            list.push($expression(`! "${key}" in ${name}`));
+                            list.push($expression(`"${key}" in ${name}`));
+                            list.push($expression("&&"));
+                            list.push(...current);
                         }
                         else
                         {
-                            const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, nextProcess(data, key, value)));
-                            const current = Type.isOrElement(value) ?
-                            Define.enParenthesis(base):
-                            base;
-                            if (k === key)
-                            {
-                                list.push($expression("&&"));
-                                list.push($expression(`"${key}" in ${name}`));
-                                list.push($expression("&&"));
-                                list.push(...current);
-                            }
-                            else
-                            {
-                                list.push($expression("&&"));
-                                list.push($expression("("));
-                                list.push($expression(`! ("${key}" in ${name})`));
-                                list.push($expression("||"));
-                                list.push(...current);
-                                list.push($expression(")"));
-                            }
+                            list.push($expression("&&"));
+                            list.push($expression("("));
+                            list.push($expression(`! ("${key}" in ${name})`));
+                            list.push($expression("||"));
+                            list.push(...current);
+                            list.push($expression(")"));
                         }
                     }
-                );
-            // }
+                }
+            );
             return list;
         };
-        export const buildInlineValidator = (name: string, data: Define.DefineProcess<Type.TypeOrValue>) =>
+        export const buildInlineValidator = (name: string, data: Define.Process<Type.TypeOrValue>) =>
         [
             $expression(`(value: unknown): value is ${Type.isValueDefinition(data.value) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", data),
         ];
-        export const buildObjectValidatorGetterCoreEntry = (data: Define.DefineProcess<Type.TypeOrRefer>): CodeInlineEntry[] =>
+        export const buildObjectValidatorGetterCoreEntry = (data: Define.Process<Type.TypeOrRefer>): CodeInlineEntry[] =>
         {
             if (Type.isReferElement(data.value))
             {
                 return [ $expression(buildValidatorName(data.value.$ref)), ];
             }
             else
+            if (Type.isLiteralElement(data.value))
+            {
+                return buildCall([ $expression("EvilType.Validator.isJust"), ], [ buildLiteralAsConst(data.value.const), ]);
+            }
+            else
             {
                 switch(data.value.type)
                 {
-                case "literal":
-                    return buildCall([ $expression("EvilType.Validator.isJust"), ], [ buildLiteralAsConst(data.value.literal), ]);
                 case "typeof":
                     return [ $expression(buildValidatorName(data.value.value.$ref)), ];
                 case "keyof":
@@ -812,7 +801,7 @@ export namespace Build
                 }
             }
         };
-        export const buildObjectValidatorGetterCore = (data: Define.DefineProcess<Type.InterfaceDefinition>) => $iblock
+        export const buildObjectValidatorGetterCore = (data: Define.Process<Type.InterfaceDefinition>) => $iblock
         (
             Object.entries(data.value.members).map
             (
@@ -832,7 +821,7 @@ export namespace Build
                 }
             )
         );
-        export const buildObjectValidator = (data: Define.DefineProcess<Type.InterfaceDefinition>) => (data.value.extends ?? []).some(_ => true) ?
+        export const buildObjectValidator = (data: Define.Process<Type.InterfaceDefinition>) => (data.value.extends ?? []).some(_ => true) ?
             [
                 $expression("EvilType.Validator.mergeObjectValidator"),
                 ...Define.enParenthesis
@@ -844,13 +833,16 @@ export namespace Build
             Define.enParenthesis([ buildObjectValidatorGetterCore(data), ]);
         export const isLazyValidator = (define: Type.TypeOrRefer): boolean =>
         {
+            if (Type.isLiteralElement(define))
+            {
+                return false;
+            }
             if (Type.isType(define))
             {
                 switch(define.type)
                 {
                 case "enum-type":
                 case "itemof":
-                case "literal":
                 case "never":
                 case "any":
                 case "unknown":
@@ -878,7 +870,7 @@ export namespace Build
             }
             return true;
         };
-        export const buildFullValidator = (data: Define.DefineProcess<Type.Type>) => isLazyValidator(data.value) ?
+        export const buildFullValidator = (data: Define.Process<Type.Type>) => isLazyValidator(data.value) ?
             [
                 ...buildCall
                 (
@@ -896,7 +888,7 @@ export namespace Build
         export const isValidatorTarget = (define: Type.TypeOrValue) =>
             ! (Type.isValueDefinition(define) && false === define.validator);
         //export const buildValidator = (options: Type.OutputOptions, name: string, define: Type.TypeOrValue): CodeLine[] =>
-        export const buildValidator = (data: Define.DefineProcess<Type.TypeOrValue & Type.Definition>): CodeLine[] =>
+        export const buildValidator = (data: Define.Process<Type.TypeOrValue & Type.Definition>): CodeLine[] =>
         {
             if ("simple" === data.options.validatorOption)
             {
@@ -986,7 +978,7 @@ export namespace Build
             return [];
         };
         //export const buildValidatorObject = (options: Type.OutputOptions, name: string, define: Type.InterfaceDefinition): CodeLine[] =>
-        export const buildValidatorObject = (data: Define.DefineProcess<Type.InterfaceDefinition>): CodeLine[] =>
+        export const buildValidatorObject = (data: Define.Process<Type.InterfaceDefinition>): CodeLine[] =>
         {
             if ("full" === data.options.validatorOption)
             {
@@ -1014,7 +1006,7 @@ export namespace Build
         {
             export const definitions = "definitions";
         }
-        export interface SchemaProcess<ValueType> extends BaseProcess<ValueType>
+        export interface Process<ValueType> extends BaseProcess<ValueType>
         {
             //source: Type.TypeSchema;
             schema: Type.SchemaOptions;
@@ -1022,7 +1014,7 @@ export namespace Build
             //path: string;
             //value: ValueType;
         }
-        export const makeProcess = (source: Type.TypeSchema, schema: Type.SchemaOptions): SchemaProcess<Type.DefinitionMap> =>
+        export const makeProcess = (source: Type.TypeSchema, schema: Type.SchemaOptions): Process<Type.DefinitionMap> =>
         ({
             source,
             options: source.options,
@@ -1032,7 +1024,7 @@ export namespace Build
             key: "",
             value: source.defines,
         });
-        export const resolveExternalRefer = (data: SchemaProcess<unknown>, absolutePath: string) =>
+        export const resolveExternalRefer = (data: Process<unknown>, absolutePath: string) =>
         {
             if (data.schema.externalReferMapping)
             {
@@ -1047,7 +1039,7 @@ export namespace Build
             }
             return null;
         };
-        export const build = (data: SchemaProcess<Type.DefinitionMap>):Jsonable.JsonableObject =>
+        export const build = (data: Process<Type.DefinitionMap>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1064,7 +1056,7 @@ export namespace Build
             result[Const.definitions] = buildDefinitions(data);
             return result;
         };
-        export const buildDefinitions = (data: SchemaProcess<Type.DefinitionMap>):Jsonable.JsonableObject =>
+        export const buildDefinitions = (data: Process<Type.DefinitionMap>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject = { };
             Object.entries(data.value).forEach
@@ -1094,21 +1086,24 @@ export namespace Build
             );
             return result;
         };
-        export const buildLiteral = (data: SchemaProcess<Type.LiteralElement>):Jsonable.JsonableObject =>
+        export const buildLiteral = (data: Process<Type.LiteralElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
-                const: data.value.literal,
-                //enum: [ value.literal, ],
+                const: data.value.const,
             };
             return result;
         };
-        export const buildValue = (data: SchemaProcess<Type.ValueDefinition>):Jsonable.JsonableObject =>
+        export const buildValue = (data: Process<Type.ValueDefinition>):Jsonable.JsonableObject =>
             Type.isLiteralElement(data.value.value) ?
                 buildLiteral(nextProcess(data, null, data.value.value)):
                 buildRefer(nextProcess(data, null, data.value.value));
-        export const buildType = (data: SchemaProcess<Type.Type>):Jsonable.JsonableObject =>
+        export const buildType = (data: Process<Type.Type>):Jsonable.JsonableObject =>
         {
+            if (Type.isLiteralElement(data.value))
+            {
+                return buildLiteral(nextProcess(data, null, data.value));
+            }
             switch(data.value.type)
             {
             case "never":
@@ -1140,15 +1135,13 @@ export namespace Build
                 return buildOr(nextProcess(data, null, data.value));
             case "and":
                 return buildAnd(nextProcess(data, null, data.value));
-            case "literal":
-                return buildLiteral(nextProcess(data, null, data.value));
             }
             const result: Jsonable.JsonableObject =
             {
             };
             return result;
         };
-        export const setCommonProperties = (result: Jsonable.JsonableObject, data: SchemaProcess<Type.CommonProperties>) =>
+        export const setCommonProperties = (result: Jsonable.JsonableObject, data: Process<Type.CommonProperties>) =>
         {
             if (data.value.default)
             {
@@ -1164,7 +1157,7 @@ export namespace Build
             }
             return result;
         };
-        export const buildPrimitiveType = (data: SchemaProcess<Type.PrimitiveTypeElement>):Jsonable.JsonableObject =>
+        export const buildPrimitiveType = (data: Process<Type.PrimitiveTypeElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1180,7 +1173,7 @@ export namespace Build
             }
             return setCommonProperties(result, data);
         };
-        export const buildInterface = (data: SchemaProcess<Type.InterfaceDefinition>):Jsonable.JsonableObject =>
+        export const buildInterface = (data: Process<Type.InterfaceDefinition>):Jsonable.JsonableObject =>
         {
             const properties: Jsonable.JsonableObject = { };
             const result: Jsonable.JsonableObject =
@@ -1202,7 +1195,7 @@ export namespace Build
                         const current = getTarget(nextProcess(data, null, i));
                         if (Type.isInterfaceDefinition(current.value))
                         {
-                            const base = buildInterface(<SchemaProcess<Type.InterfaceDefinition>>current);
+                            const base = buildInterface(<Process<Type.InterfaceDefinition>>current);
                             Object.assign(properties, base["properties"]);
                             const required = result["required"] as string[];
                             required.push(...(base["required"] as string[]).filter(j => ! required.includes(j)));
@@ -1257,7 +1250,7 @@ export namespace Build
             }
             return setCommonProperties(result, data);
         };
-        export const buildDictionary = (data: SchemaProcess<Type.DictionaryDefinition>):Jsonable.JsonableObject =>
+        export const buildDictionary = (data: Process<Type.DictionaryDefinition>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1266,7 +1259,7 @@ export namespace Build
             };
             return setCommonProperties(result, data);
         };
-        export const buildEnumType = (data: SchemaProcess<Type.EnumTypeElement>):Jsonable.JsonableObject =>
+        export const buildEnumType = (data: Process<Type.EnumTypeElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1274,7 +1267,7 @@ export namespace Build
             };
             return setCommonProperties(result, data);
         };
-        export const buildTypeOf = (data: SchemaProcess<Type.TypeofElement>):Jsonable.JsonableObject =>
+        export const buildTypeOf = (data: Process<Type.TypeofElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1282,7 +1275,7 @@ export namespace Build
             let literal = getLiteral(nextProcess(data, null, data.value.value));
             if (literal)
             {
-                result["const"] = literal.literal;
+                result["const"] = literal.const;
             }
             else
             {
@@ -1290,7 +1283,7 @@ export namespace Build
             }
             return setCommonProperties(result, data);
         };
-        export const buildKeyOf = (data: SchemaProcess<Type.KeyofElement>): Jsonable.JsonableObject =>
+        export const buildKeyOf = (data: Process<Type.KeyofElement>): Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1306,7 +1299,7 @@ export namespace Build
             }
             return setCommonProperties(result, data);
         };
-        export const buildItemOf = (data: SchemaProcess<Type.ItemofElement>):Jsonable.JsonableObject =>
+        export const buildItemOf = (data: Process<Type.ItemofElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1314,13 +1307,13 @@ export namespace Build
             let literal = getLiteral(nextProcess(data, null, data.value.value));
             if (literal)
             {
-                if (Array.isArray(literal.literal))
+                if (Array.isArray(literal.const))
                 {
-                    result["enum"] = literal.literal;
+                    result["enum"] = literal.const;
                 }
                 else
                 {
-                    console.error(`🚫 Not array itemof: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref, literal: literal.literal }) }`);
+                    console.error(`🚫 Not array itemof: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref, literal: literal.const }) }`);
                 }
             }
             else
@@ -1329,7 +1322,7 @@ export namespace Build
             }
             return setCommonProperties(result, data);
         };
-        export const buildRefer = (data: SchemaProcess<Type.ReferElement>):Jsonable.JsonableObject =>
+        export const buildRefer = (data: Process<Type.ReferElement>):Jsonable.JsonableObject =>
         {
             const path = getAbsolutePath(data, data.value);
             const result: Jsonable.JsonableObject =
@@ -1338,7 +1331,7 @@ export namespace Build
             };
             return setCommonProperties(result, data);
         };
-        export const buildArray = (data: SchemaProcess<Type.ArrayElement>):Jsonable.JsonableObject =>
+        export const buildArray = (data: Process<Type.ArrayElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1347,7 +1340,7 @@ export namespace Build
             };
             return setCommonProperties(result, data);
         };
-        export const buildOr = (data: SchemaProcess<Type.OrElement>):Jsonable.JsonableObject =>
+        export const buildOr = (data: Process<Type.OrElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1355,7 +1348,7 @@ export namespace Build
             };
             return setCommonProperties(result, data);
         };
-        export const buildAnd = (data: SchemaProcess<Type.AndElement>):Jsonable.JsonableObject =>
+        export const buildAnd = (data: Process<Type.AndElement>):Jsonable.JsonableObject =>
         {
             const result: Jsonable.JsonableObject =
             {
@@ -1363,7 +1356,7 @@ export namespace Build
             };
             return setCommonProperties(result, data);
         };
-        export const buildTypeOrRefer = (data: SchemaProcess<Type.TypeOrRefer>):Jsonable.JsonableObject =>
+        export const buildTypeOrRefer = (data: Process<Type.TypeOrRefer>):Jsonable.JsonableObject =>
             Type.isReferElement(data.value) ?
                 buildRefer(nextProcess(data, null, data.value)):
                 buildType(nextProcess(data, null, data.value));

@@ -256,10 +256,7 @@
         "Type.ImportDefinition": {
             "type": "object",
             "properties": {
-                "type": {
-                    "const": "import"
-                },
-                "target": {
+                "import": {
                     "type": "string"
                 },
                 "from": {
@@ -267,8 +264,7 @@
                 }
             },
             "required": [
-                "type",
-                "target",
+                "import",
                 "from"
             ],
             "additionalProperties": false
@@ -661,16 +657,12 @@
                     "type": "string",
                     "description": "[SCHEMA]"
                 },
-                "type": {
-                    "const": "literal"
-                },
-                "literal": {
+                "const": {
                     "$ref": "jsonable.json#/definitions/Jsonable.Jsonable"
                 }
             },
             "required": [
-                "type",
-                "literal"
+                "const"
             ],
             "additionalProperties": false
         },

@@ -46,8 +46,7 @@ export declare namespace Type {
         export?: boolean;
     }
     interface ImportDefinition {
-        type: "import";
-        target: string;
+        import: string;
         from: string;
     }
     type Definition = CodeDefinition | NamespaceDefinition | ValueDefinition | TypeDefinition | InterfaceDefinition | DictionaryDefinition;
@@ -95,9 +94,8 @@ export declare namespace Type {
         type: "and";
         types: TypeOrRefer[];
     }
-    interface LiteralElement extends AlphaElement {
-        type: "literal";
-        literal: Jsonable.Jsonable;
+    interface LiteralElement extends CommonProperties {
+        const: Jsonable.Jsonable;
     }
     interface ReferElement extends CommonProperties {
         $ref: string;

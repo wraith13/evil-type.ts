@@ -180,10 +180,11 @@ var Build;
     Build.isKindofNeverType = function (data) {
         var _a, _b, _c;
         var target = Build.getTarget(data);
+        if (type_1.Type.isLiteralElement(target.value)) {
+            return false;
+        }
         if (type_1.Type.isType(target.value)) {
             switch (target.value.type) {
-                case "literal":
-                    return false;
                 case "typeof":
                     return false;
                 case "keyof":
@@ -201,7 +202,7 @@ var Build;
                     {
                         var literal = Build.getLiteral(Build.nextProcess(target, null, target.value.value));
                         if (literal) {
-                            return !Array.isArray(literal.literal) || 0 === literal.literal.length;
+                            return !Array.isArray(literal.const) || 0 === literal.const.length;
                         }
                         else {
                             // 厳密に不明だが、ここでは false としておく。
@@ -254,13 +255,12 @@ var Build;
                 value: source.defines,
             });
         };
-        //export const buildDefineLine = (declarator: string, name: string, define: Type.TypeOrValue, postEpressions: CodeExpression[] = []): CodeLine =>
         Define.buildDefineLine = function (declarator, data, postEpressions) {
             if (postEpressions === void 0) { postEpressions = []; }
             return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(data.key), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Define.buildInlineDefine(data)), true), postEpressions, true));
         };
         Define.buildInlineDefineLiteral = function (define) {
-            return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.literal))];
+            return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.const))];
         };
         Define.buildInlineDefinePrimitiveType = function (value) {
             switch (value.type) {
@@ -270,9 +270,6 @@ var Build;
                     return (0, exports.$expression)(value.type);
             }
         };
-        //export const buildDefinePrimitiveType = (name: string, value: Type.PrimitiveTypeElement): CodeLine =>
-        // export const buildDefinePrimitiveType = (data: DefineProcess<Type.PrimitiveTypeElement>): CodeLine =>
-        //     buildDefineLine("type", data);
         Define.enParenthesis = function (expressions) {
             return __spreadArray(__spreadArray([(0, exports.$expression)("(")], expressions, true), [(0, exports.$expression)(")"),], false);
         };
@@ -350,7 +347,7 @@ var Build;
             return (0, exports.$block)(header, lines);
         };
         Define.buildImports = function (imports) {
-            return undefined === imports ? [] : imports.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("import"), (0, exports.$expression)(i.target), (0, exports.$expression)("from"), (0, exports.$expression)(jsonable_1.Jsonable.stringify(i.from))]); });
+            return undefined === imports ? [] : imports.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("import"), (0, exports.$expression)(i.import), (0, exports.$expression)("from"), (0, exports.$expression)(jsonable_1.Jsonable.stringify(i.from))]); });
         };
         Define.buildDefine = function (data) {
             switch (data.value.type) {
@@ -372,10 +369,11 @@ var Build;
             if (type_1.Type.isReferElement(data.value)) {
                 return [(0, exports.$expression)(data.value.$ref),];
             }
+            else if (type_1.Type.isLiteralElement(data.value)) {
+                return Define.buildInlineDefineLiteral(data.value);
+            }
             else {
                 switch (data.value.type) {
-                    case "literal":
-                        return Define.buildInlineDefineLiteral(data.value);
                     case "typeof":
                         return __spreadArray([(0, exports.$expression)("typeof")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.value)), true);
                     case "keyof":
@@ -450,11 +448,6 @@ var Build;
                 return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(value)), (0, exports.$expression)("==="), (0, exports.$expression)(name),];
             }
         };
-        Validator.buildInlineLiteralValidator = function (define) {
-            return (0, exports.$expression)("(value: unknown): value is ".concat(Define.buildInlineDefineLiteral(define), " => ").concat(Validator.buildLiterarlValidatorExpression("value", define.literal), ";"));
-        };
-        // export const buildValidatorLine = (declarator: string, name: string, define: Type.Type): CodeExpression[] =>
-        //     [ ...buildExport(define), $expression(declarator), $expression(name), $expression("="), ...convertToExpression(buildInlineValidator(name, define)), ];
         Validator.buildObjectValidatorObjectName = function (name) {
             return __spreadArray(__spreadArray([], text_1.Text.getNameSpace(name).split("."), true), ["".concat(text_1.Text.toLowerCamelCase(text_1.Text.getNameBody(name)), "ValidatorObject"),], false).filter(function (i) { return "" !== i; }).join(".");
         };
@@ -465,10 +458,11 @@ var Build;
             if (type_1.Type.isReferElement(data.value)) {
                 return [(0, exports.$expression)("".concat(Validator.buildValidatorName(data.value.$ref), "(").concat(name, ")")),];
             }
+            else if (type_1.Type.isLiteralElement(data.value)) {
+                return Validator.buildLiterarlValidatorExpression(name, data.value.const);
+            }
             else {
                 switch (data.value.type) {
-                    case "literal":
-                        return Validator.buildLiterarlValidatorExpression(name, data.value.literal);
                     case "typeof":
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.value));
                     case "keyof":
@@ -548,19 +542,6 @@ var Build;
                     list.push.apply(list, (0, exports.convertToExpression)(Validator.buildValidatorExpression(name, Build.nextProcess(data, null, i))));
                 });
             }
-            // if (Type.isDictionaryDefinition(members))
-            // {
-            //     if (undefined !== data.value.extends)
-            //     {
-            //         list.push($expression("&&"));
-            //     }
-            //     else
-            //     {
-            //     }
-            //     list.push(...buildValidatorExpression(name, nextProcess(data, null, members)));
-            // }
-            // else
-            // {
             if (undefined !== data.value.extends) {
             }
             else {
@@ -596,7 +577,6 @@ var Build;
                     }
                 }
             });
-            // }
             return list;
         };
         Validator.buildInlineValidator = function (name, data) {
@@ -608,10 +588,11 @@ var Build;
             if (type_1.Type.isReferElement(data.value)) {
                 return [(0, exports.$expression)(Validator.buildValidatorName(data.value.$ref)),];
             }
+            else if (type_1.Type.isLiteralElement(data.value)) {
+                return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isJust"),], [Build.buildLiteralAsConst(data.value.const),]);
+            }
             else {
                 switch (data.value.type) {
-                    case "literal":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isJust"),], [Build.buildLiteralAsConst(data.value.literal),]);
                     case "typeof":
                         return [(0, exports.$expression)(Validator.buildValidatorName(data.value.value.$ref)),];
                     case "keyof":
@@ -679,11 +660,13 @@ var Build;
                 Define.enParenthesis([Validator.buildObjectValidatorGetterCore(data),]);
         };
         Validator.isLazyValidator = function (define) {
+            if (type_1.Type.isLiteralElement(define)) {
+                return false;
+            }
             if (type_1.Type.isType(define)) {
                 switch (define.type) {
                     case "enum-type":
                     case "itemof":
-                    case "literal":
                     case "never":
                     case "any":
                     case "unknown":
@@ -852,8 +835,7 @@ var Build;
         };
         Schema.buildLiteral = function (data) {
             var result = {
-                const: data.value.literal,
-                //enum: [ value.literal, ],
+                const: data.value.const,
             };
             return result;
         };
@@ -863,6 +845,9 @@ var Build;
                 Schema.buildRefer(Build.nextProcess(data, null, data.value.value));
         };
         Schema.buildType = function (data) {
+            if (type_1.Type.isLiteralElement(data.value)) {
+                return Schema.buildLiteral(Build.nextProcess(data, null, data.value));
+            }
             switch (data.value.type) {
                 case "never":
                 case "any":
@@ -893,8 +878,6 @@ var Build;
                     return Schema.buildOr(Build.nextProcess(data, null, data.value));
                 case "and":
                     return Schema.buildAnd(Build.nextProcess(data, null, data.value));
-                case "literal":
-                    return Schema.buildLiteral(Build.nextProcess(data, null, data.value));
             }
             var result = {};
             return result;
@@ -997,7 +980,7 @@ var Build;
             var result = {};
             var literal = Build.getLiteral(Build.nextProcess(data, null, data.value.value));
             if (literal) {
-                result["const"] = literal.literal;
+                result["const"] = literal.const;
             }
             else {
                 console.error("\uD83D\uDEAB Can not resolve refer: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref })));
@@ -1019,11 +1002,11 @@ var Build;
             var result = {};
             var literal = Build.getLiteral(Build.nextProcess(data, null, data.value.value));
             if (literal) {
-                if (Array.isArray(literal.literal)) {
-                    result["enum"] = literal.literal;
+                if (Array.isArray(literal.const)) {
+                    result["enum"] = literal.const;
                 }
                 else {
-                    console.error("\uD83D\uDEAB Not array itemof: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref, literal: literal.literal })));
+                    console.error("\uD83D\uDEAB Not array itemof: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref, literal: literal.const })));
                 }
             }
             else {

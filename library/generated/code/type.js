@@ -57,7 +57,7 @@ var Type;
     Type.schemaOptionsValidatorObject = ({ outputFile: evil_type_1.EvilType.Validator.isString, $id: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), $ref: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), externalReferMapping: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isDictionaryObject(evil_type_1.EvilType.Validator.isString)), });
     Type.alphaElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isString, });
     Type.alphaDefinitionValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.alphaElementValidatorObject, Type.commentPropertyValidatorObject, { export: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isBoolean), });
-    Type.importDefinitionValidatorObject = ({ type: evil_type_1.EvilType.Validator.isJust("import"), target: evil_type_1.EvilType.Validator.isString, from: evil_type_1.EvilType.Validator.isString, });
+    Type.importDefinitionValidatorObject = ({ import: evil_type_1.EvilType.Validator.isString, from: evil_type_1.EvilType.Validator.isString, });
     Type.codeDefinitionValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.alphaDefinitionValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("code"), tokens: evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString), });
     Type.namespaceDefinitionValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.alphaDefinitionValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("namespace"),
         members: Type.isDefinitionMap, });
@@ -70,7 +70,7 @@ var Type;
     Type.arrayElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.alphaElementValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("array"), items: Type.isTypeOrRefer, });
     Type.orElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.alphaElementValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("or"), types: evil_type_1.EvilType.Validator.isArray(Type.isTypeOrRefer), });
     Type.andElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.alphaElementValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("and"), types: evil_type_1.EvilType.Validator.isArray(Type.isTypeOrRefer), });
-    Type.literalElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.alphaElementValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("literal"), literal: jsonable_1.Jsonable.isJsonable, });
+    Type.literalElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { const: jsonable_1.Jsonable.isJsonable, });
     Type.referElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { $ref: evil_type_1.EvilType.Validator.isString, });
     Type.neverTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("never"), });
     Type.anyTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("any"), });
