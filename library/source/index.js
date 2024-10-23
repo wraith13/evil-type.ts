@@ -189,7 +189,9 @@ var Build;
                     return false;
                 case "keyof":
                     {
-                        var entry_1 = Build.getTarget(Build.nextProcess(target, null, target.value.value));
+                        var entry_1 = Build.getTarget(Build.nextProcess(target, null, type_1.Type.isTypeofElement(target.value.value) ?
+                            target.value.value.value :
+                            target.value.value));
                         if (type_1.Type.isInterfaceDefinition(entry_1.value)) {
                             return 0 === Object.entries(entry_1.value.members).filter(function (i) { return !Build.isKindofNeverType(Build.nextProcess(entry_1, i[0], i[1])); }).length;
                         }
@@ -526,7 +528,9 @@ var Build;
             }
         };
         Validator.buildKeyofValidator = function (name, data) {
-            var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
+            var target = Build.getTarget(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
+                data.value.value.value :
+                data.value.value));
             if (type_1.Type.isInterfaceDefinition(target.value)) {
                 return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getKeys(Build.nextProcess(data, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })), ".includes(").concat(name, " as any)")),];
             }
@@ -608,7 +612,9 @@ var Build;
                         return [(0, exports.$expression)(Validator.buildValidatorName(data.value.value.$ref)),];
                     case "keyof":
                         {
-                            var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
+                            var target = Build.getTarget(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
+                                data.value.value.value :
+                                data.value.value));
                             if (type_1.Type.isInterfaceDefinition(target.value)) {
                                 return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })),]);
                             }
@@ -1006,7 +1012,9 @@ var Build;
         };
         Schema.buildKeyOf = function (data) {
             var result = {};
-            var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
+            var target = Build.getTarget(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
+                data.value.value.value :
+                data.value.value));
             if (type_1.Type.isInterfaceDefinition(target.value)) {
                 result["enum"] = Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
             }

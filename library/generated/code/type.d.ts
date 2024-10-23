@@ -131,7 +131,7 @@ export declare namespace Type {
         regexpFlags?: string;
     }
     interface FormatStringType extends BasicStringType {
-        format: string;
+        format: keyof typeof StringFormatMap;
         regexpFlags?: string;
     }
     type StringType = BasicStringType | PatternStringType | FormatStringType;
@@ -147,7 +147,7 @@ export declare namespace Type {
     }
     interface KeyofElement extends CommonProperties {
         type: "keyof";
-        value: ReferElement;
+        value: TypeofElement | ReferElement;
     }
     interface ItemofElement extends CommonProperties {
         type: "itemof";
@@ -157,6 +157,27 @@ export declare namespace Type {
     type TypeOrValue = Type | ValueDefinition;
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
+    const StringFormatMap: {
+        readonly "date-time": "^date-time$";
+        readonly date: "^time$";
+        readonly time: "^time$";
+        readonly duration: "^duration$";
+        readonly email: "^email$";
+        readonly "idn-email": "^idn-email$";
+        readonly hostname: "^hostname$";
+        readonly "idn-hostname": "^idn-hostname$";
+        readonly ipv4: "^ipv4$";
+        readonly ipv6: "^ipv6$";
+        readonly uuid: "^uuid$";
+        readonly uri: "^uri$";
+        readonly "uri-reference": "^uri-reference$";
+        readonly iri: "^iri$";
+        readonly "iri-reference": "^iri-reference$";
+        readonly "uri-template": "^uri-template$";
+        readonly "json-pointer": "^json-pointer$";
+        readonly "relative-json-pointer": "^relative-json-pointer$";
+        readonly regex: "^regex$";
+    };
     const isSchema: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";
     const isCommentProperty: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is CommentProperty;
     const isCommonProperties: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is CommonProperties;
@@ -202,6 +223,27 @@ export declare namespace Type {
     const isTypeOrValue: EvilType.Validator.IsType<TypeOrValue>;
     const isTypeOrValueOfRefer: EvilType.Validator.IsType<TypeOrValueOfRefer>;
     const isTypeOrLiteralOfRefer: EvilType.Validator.IsType<TypeOrLiteralOfRefer>;
+    const isStringFormatMap: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is {
+        readonly "date-time": "^date-time$";
+        readonly date: "^time$";
+        readonly time: "^time$";
+        readonly duration: "^duration$";
+        readonly email: "^email$";
+        readonly "idn-email": "^idn-email$";
+        readonly hostname: "^hostname$";
+        readonly "idn-hostname": "^idn-hostname$";
+        readonly ipv4: "^ipv4$";
+        readonly ipv6: "^ipv6$";
+        readonly uuid: "^uuid$";
+        readonly uri: "^uri$";
+        readonly "uri-reference": "^uri-reference$";
+        readonly iri: "^iri$";
+        readonly "iri-reference": "^iri-reference$";
+        readonly "uri-template": "^uri-template$";
+        readonly "json-pointer": "^json-pointer$";
+        readonly "relative-json-pointer": "^relative-json-pointer$";
+        readonly regex: "^regex$";
+    };
     const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty>;
     const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties>;
     const typeSchemaValidatorObject: EvilType.Validator.ObjectValidator<TypeSchema>;

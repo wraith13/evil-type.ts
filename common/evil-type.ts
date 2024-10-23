@@ -244,7 +244,7 @@ export namespace EvilType
             {
                 return isString;
             }
-            const pattern = data.pattern; // ?? getPattern(data.format)
+            const pattern = data.pattern;
             const result = (value: unknown, listner?: ErrorListener): value is string => Error.withErrorHandling
             (
                 "string" === typeof value &&
@@ -263,13 +263,14 @@ export namespace EvilType
                     {
                         details.push(`maxLength:${data.maxLength}`);
                     }
-                    if (undefined !== data.pattern)
-                    {
-                        details.push(`pattern:${data.pattern}`);
-                    }
                     if (undefined !== data.format)
                     {
                         details.push(`format:${data.format}`);
+                    }
+                    else
+                    if (undefined !== data.pattern)
+                    {
+                        details.push(`pattern:${data.pattern}`);
                     }
                     if (undefined !== data.regexpFlags)
                     {

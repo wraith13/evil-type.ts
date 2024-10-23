@@ -157,7 +157,7 @@ export namespace Type
     }
     export interface FormatStringType extends BasicStringType
     {
-        format: string;
+        format: keyof typeof StringFormatMap;
         regexpFlags?: string;
     }
     export type StringType = BasicStringType | PatternStringType | FormatStringType;
@@ -177,7 +177,7 @@ export namespace Type
     export interface KeyofElement extends CommonProperties
     {
         type: "keyof";
-        value: ReferElement;
+        value: TypeofElement | ReferElement;
     }
     export interface ItemofElement extends CommonProperties
     {
@@ -188,6 +188,9 @@ export namespace Type
     export type TypeOrValue = Type | ValueDefinition;
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
+    export const StringFormatMap =
+        {"date-time":"^date-time$","date":"^time$","time":"^time$","duration":"^duration$","email":"^email$","idn-email":"^idn-email$","hostname":"^hostname$","idn-hostname":"^idn-hostname$","ipv4":"^ipv4$","ipv6":"^ipv6$","uuid":"^uuid$","uri":"^uri$","uri-reference":"^uri-reference$","iri":"^iri$","iri-reference":"^iri-reference$","uri-template":"^uri-template$","json-pointer":"^json-pointer$","relative-json-pointer":"^relative-json-pointer$","regex":"^regex$"} as
+        const;
     export const isSchema = EvilType.Validator.isJust(schema);
     export const isCommentProperty = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commentPropertyValidatorObject, false));
     export const isCommonProperties = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commonPropertiesValidatorObject, false));
@@ -247,6 +250,7 @@ export namespace Type
         isTypeOrValue, isReferElement));
     export const isTypeOrLiteralOfRefer: EvilType.Validator.IsType<TypeOrLiteralOfRefer> = EvilType.lazy(() => EvilType.Validator.isOr(
         isTypeOrRefer, isLiteralElement));
+    export const isStringFormatMap = EvilType.Validator.isJust(StringFormatMap);
     export const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty> = ({ comment:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString)), });
     export const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties> = ({ default:
@@ -325,8 +329,9 @@ export namespace Type
         EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { pattern: EvilType.Validator.isString, regexpFlags:
         EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const formatStringTypeValidatorObject: EvilType.Validator.ObjectValidator<FormatStringType> =
-        EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { format: EvilType.Validator.isString, regexpFlags:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), });
+        EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { format: EvilType.Validator.isEnum(
+        ["date-time","date","time","duration","email","idn-email","hostname","idn-hostname","ipv4","ipv6","uuid","uri","uri-reference","iri","iri-reference","uri-template","json-pointer","relative-json-pointer","regex"] as
+        const), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("enum-type" as const),
         members: EvilType.Validator.isArray(EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isBoolean,
@@ -334,7 +339,8 @@ export namespace Type
     export const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("typeof" as const), value: isReferElement, });
     export const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("keyof" as const), value: isReferElement, });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("keyof" as const), value: EvilType.Validator.isOr(
+        isTypeofElement, isReferElement), });
     export const itemofElementValidatorObject: EvilType.Validator.ObjectValidator<ItemofElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("itemof" as const), value: isReferElement, });
 }

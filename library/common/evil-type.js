@@ -226,7 +226,7 @@ var EvilType;
             if ([data.minLength, data.maxLength, data.pattern, data.format].every(function (i) { return undefined === i; })) {
                 return Validator.isString;
             }
-            var pattern = data.pattern; // ?? getPattern(data.format)
+            var pattern = data.pattern;
             var result = function (value, listner) {
                 var _a, _b;
                 return Error.withErrorHandling("string" === typeof value &&
@@ -240,11 +240,11 @@ var EvilType;
                     if (undefined !== data.maxLength) {
                         details.push("maxLength:".concat(data.maxLength));
                     }
-                    if (undefined !== data.pattern) {
-                        details.push("pattern:".concat(data.pattern));
-                    }
                     if (undefined !== data.format) {
                         details.push("format:".concat(data.format));
+                    }
+                    else if (undefined !== data.pattern) {
+                        details.push("pattern:".concat(data.pattern));
                     }
                     if (undefined !== data.regexpFlags) {
                         details.push("regexpFlags:".concat(data.regexpFlags));

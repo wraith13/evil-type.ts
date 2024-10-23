@@ -8,6 +8,7 @@ var Type;
 (function (Type) {
     Type.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";
     Type.indentStyleTypeMember = ["allman", "egyptian"];
+    Type.StringFormatMap = { "date-time": "^date-time$", "date": "^time$", "time": "^time$", "duration": "^duration$", "email": "^email$", "idn-email": "^idn-email$", "hostname": "^hostname$", "idn-hostname": "^idn-hostname$", "ipv4": "^ipv4$", "ipv6": "^ipv6$", "uuid": "^uuid$", "uri": "^uri$", "uri-reference": "^uri-reference$", "iri": "^iri$", "iri-reference": "^iri-reference$", "uri-template": "^uri-template$", "json-pointer": "^json-pointer$", "relative-json-pointer": "^relative-json-pointer$", "regex": "^regex$" };
     Type.isSchema = evil_type_1.EvilType.Validator.isJust(Type.schema);
     Type.isCommentProperty = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.commentPropertyValidatorObject, false); });
     Type.isCommonProperties = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.commonPropertiesValidatorObject, false); });
@@ -53,6 +54,7 @@ var Type;
     Type.isTypeOrValue = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isType, Type.isValueDefinition); });
     Type.isTypeOrValueOfRefer = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isTypeOrValue, Type.isReferElement); });
     Type.isTypeOrLiteralOfRefer = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isTypeOrRefer, Type.isLiteralElement); });
+    Type.isStringFormatMap = evil_type_1.EvilType.Validator.isJust(Type.StringFormatMap);
     Type.commentPropertyValidatorObject = ({ comment: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)), });
     Type.commonPropertiesValidatorObject = ({ default: evil_type_1.EvilType.Validator.isOptional(jsonable_1.Jsonable.isJsonable), title: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), description: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
     Type.typeSchemaValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commentPropertyValidatorObject, { $schema: Type.isSchema, imports: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isArray(Type.isImportDefinition)), defines: Type.isDefinitionMap, options: Type.isOutputOptions, });
@@ -85,11 +87,11 @@ var Type;
     Type.basicStringTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("string"),
         minLength: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isInteger), maxLength: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isInteger), });
     Type.patternStringTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.basicStringTypeValidatorObject, { pattern: evil_type_1.EvilType.Validator.isString, regexpFlags: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
-    Type.formatStringTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.basicStringTypeValidatorObject, { format: evil_type_1.EvilType.Validator.isString, regexpFlags: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
+    Type.formatStringTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.basicStringTypeValidatorObject, { format: evil_type_1.EvilType.Validator.isEnum(["date-time", "date", "time", "duration", "email", "idn-email", "hostname", "idn-hostname", "ipv4", "ipv6", "uuid", "uri", "uri-reference", "iri", "iri-reference", "uri-template", "json-pointer", "relative-json-pointer", "regex"]), regexpFlags: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
     Type.enumTypeElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("enum-type"),
         members: evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isOr(evil_type_1.EvilType.Validator.isNull, evil_type_1.EvilType.Validator.isBoolean, evil_type_1.EvilType.Validator.isNumber, evil_type_1.EvilType.Validator.isString)), });
     Type.typeofElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("typeof"), value: Type.isReferElement, });
-    Type.keyofElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("keyof"), value: Type.isReferElement, });
+    Type.keyofElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("keyof"), value: evil_type_1.EvilType.Validator.isOr(Type.isTypeofElement, Type.isReferElement), });
     Type.itemofElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("itemof"), value: Type.isReferElement, });
 })(Type || (exports.Type = Type = {}));
 //# sourceMappingURL=type.js.map

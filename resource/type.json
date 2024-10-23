@@ -615,7 +615,13 @@
                     ],
                     "members": {
                         "format": {
-                            "type": "string"
+                            "type": "keyof",
+                            "value": {
+                                "type": "typeof",
+                                "value": {
+                                    "$ref": "StringFormatMap"
+                                }
+                            }
                         },
                         "regexpFlags?": {
                             "type": "string"
@@ -776,7 +782,15 @@
                             "const": "keyof"
                         },
                         "value": {
-                            "$ref": "ReferElement"
+                            "type": "or",
+                            "types": [
+                                {
+                                    "$ref": "TypeofElement"
+                                },
+                                {
+                                    "$ref": "ReferElement"
+                                }
+                            ]
                         }
                     }
                 },
@@ -850,6 +864,32 @@
                                 "$ref": "LiteralElement"
                             }
                         ]
+                    }
+                },
+                "StringFormatMap": {
+                    "type": "value",
+                    "value": {
+                        "const": {
+                            "date-time": "^date-time$",
+                            "date": "^time$",
+                            "time": "^time$",
+                            "duration": "^duration$",
+                            "email": "^email$",
+                            "idn-email": "^idn-email$",
+                            "hostname": "^hostname$",
+                            "idn-hostname": "^idn-hostname$",
+                            "ipv4": "^ipv4$",
+                            "ipv6": "^ipv6$",
+                            "uuid": "^uuid$",
+                            "uri": "^uri$",
+                            "uri-reference": "^uri-reference$",
+                            "iri": "^iri$",
+                            "iri-reference": "^iri-reference$",
+                            "uri-template": "^uri-template$",
+                            "json-pointer": "^json-pointer$",
+                            "relative-json-pointer": "^relative-json-pointer$",
+                            "regex": "^regex$"
+                        }
                     }
                 }
             }

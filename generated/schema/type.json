@@ -950,7 +950,27 @@
                     "type": "integer"
                 },
                 "format": {
-                    "type": "string"
+                    "enum": [
+                        "date-time",
+                        "date",
+                        "time",
+                        "duration",
+                        "email",
+                        "idn-email",
+                        "hostname",
+                        "idn-hostname",
+                        "ipv4",
+                        "ipv6",
+                        "uuid",
+                        "uri",
+                        "uri-reference",
+                        "iri",
+                        "iri-reference",
+                        "uri-template",
+                        "json-pointer",
+                        "relative-json-pointer",
+                        "regex"
+                    ]
                 },
                 "regexpFlags": {
                     "type": "string"
@@ -1134,7 +1154,14 @@
                     "const": "keyof"
                 },
                 "value": {
-                    "$ref": "#/definitions/Type.ReferElement"
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/Type.TypeofElement"
+                        },
+                        {
+                            "$ref": "#/definitions/Type.ReferElement"
+                        }
+                    ]
                 }
             },
             "required": [
@@ -1210,6 +1237,29 @@
                     "$ref": "#/definitions/Type.LiteralElement"
                 }
             ]
+        },
+        "Type.StringFormatMap": {
+            "const": {
+                "date-time": "^date-time$",
+                "date": "^time$",
+                "time": "^time$",
+                "duration": "^duration$",
+                "email": "^email$",
+                "idn-email": "^idn-email$",
+                "hostname": "^hostname$",
+                "idn-hostname": "^idn-hostname$",
+                "ipv4": "^ipv4$",
+                "ipv6": "^ipv6$",
+                "uuid": "^uuid$",
+                "uri": "^uri$",
+                "uri-reference": "^uri-reference$",
+                "iri": "^iri$",
+                "iri-reference": "^iri-reference$",
+                "uri-template": "^uri-template$",
+                "json-pointer": "^json-pointer$",
+                "relative-json-pointer": "^relative-json-pointer$",
+                "regex": "^regex$"
+            }
         }
     }
 }

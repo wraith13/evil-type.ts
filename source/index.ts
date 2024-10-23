@@ -242,7 +242,17 @@ export namespace Build
                 return false;
             case "keyof":
                 {
-                    const entry = getTarget(nextProcess(target, null, target.value.value));
+                    const entry = getTarget
+                    (
+                        nextProcess
+                        (
+                            target,
+                            null,
+                            Type.isTypeofElement(target.value.value) ?
+                                target.value.value.value:
+                                target.value.value
+                        )
+                    );
                     if (Type.isInterfaceDefinition(entry.value))
                     {
                         return 0 === Object.entries(entry.value.members).filter(i => ! isKindofNeverType(nextProcess(entry, i[0], i[1]))).length;
@@ -638,7 +648,17 @@ export namespace Build
         };
         export const buildKeyofValidator = (name: string, data: Define.Process<Type.KeyofElement>): CodeExpression[] =>
         {
-            let target = getTarget(nextProcess(data, null, data.value.value));
+            const target = getTarget
+            (
+                nextProcess
+                (
+                    data,
+                    null,
+                    Type.isTypeofElement(data.value.value) ?
+                        data.value.value.value:
+                        data.value.value
+                )
+            );
             if (Type.isInterfaceDefinition(target.value))
             {
                 return [ $expression(`${Jsonable.stringify(getKeys(nextProcess(data, null, target.value)).map(i => Text.getPrimaryKeyName(i)))}.includes(${name} as any)`), ];
@@ -749,7 +769,17 @@ export namespace Build
                     return [ $expression(buildValidatorName(data.value.value.$ref)), ];
                 case "keyof":
                     {
-                        let target = getTarget(nextProcess(data, null, data.value.value));
+                        const target = getTarget
+                        (
+                            nextProcess
+                            (
+                                data,
+                                null,
+                                Type.isTypeofElement(data.value.value) ?
+                                    data.value.value.value:
+                                    data.value.value
+                            )
+                        );
                         if (Type.isInterfaceDefinition(target.value))
                         {
                             return buildCall
@@ -1319,7 +1349,17 @@ export namespace Build
             const result: Jsonable.JsonableObject =
             {
             };
-            let target = getTarget(nextProcess(data, null, data.value.value));
+            const target = getTarget
+            (
+                nextProcess
+                (
+                    data,
+                    null,
+                    Type.isTypeofElement(data.value.value) ?
+                        data.value.value.value:
+                        data.value.value
+                )
+            );
             if (Type.isInterfaceDefinition(target.value))
             {
                 result["enum"] = getKeys(nextProcess(target, null, target.value)).map(i => Text.getPrimaryKeyName(i));
