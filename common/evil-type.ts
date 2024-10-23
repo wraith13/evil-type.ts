@@ -1,5 +1,5 @@
 // Original: https://github.com/wraith13/evil-type.ts/blob/master/common/evil-type.ts
-// License: https://github.com/wraith13/evil-type.ts/blob/master/LICENSE_1_0.txt
+// License: BSL-1.0 ( https://github.com/wraith13/evil-type.ts/blob/master/LICENSE_1_0.txt )
 export namespace EvilType
 {
     export const comparer = <Item, T extends ((i: Item) => any)[]>(...args: T) =>
@@ -174,9 +174,8 @@ export namespace EvilType
                 )
             );
         };
-        export const andErros = (listner: Listener, modulus: number, errors: Item[], fullErrors: Item[]) =>
+        export const andErros = (listner: Listener, errors: Item[]) =>
         {
-            // このコードは現状、 orErros をコピーしただけのモックです。
             const paths = errors.map(i => i.path).filter((i, ix, list) => ix === list.indexOf(i));
             listner.errors.push
             (
@@ -184,7 +183,7 @@ export namespace EvilType
                 (
                     path =>
                     ({
-                        type: modulus <= fullErrors.filter(i => "solid" === i.type && i.path === path).length ?
+                        type: errors.some(i => "solid" === i.type && i.path === path) ?
                             "solid" as const:
                             "fragment" as const,
                         path,
@@ -239,6 +238,49 @@ export namespace EvilType
             Error.withErrorHandling(Number.isInteger(value), listner, "integer", value);
         export const isString = (value: unknown, listner?: ErrorListener): value is string =>
             Error.withErrorHandling("string" === typeof value, listner, "string", value);
+        export const isDetailString = (data: { minLength?: number, maxLength?: number, pattern?: string, format?: string, regexpFlags?: string}, regexpFlags?: string): IsType<string> =>
+        {
+            if ([ data.minLength, data.maxLength, data.pattern, data.format ].every(i => undefined === i))
+            {
+                return isString;
+            }
+            const pattern = data.pattern; // ?? getPattern(data.format)
+            const result = (value: unknown, listner?: ErrorListener): value is string => Error.withErrorHandling
+            (
+                "string" === typeof value &&
+                (undefined === data.minLength || data.minLength <= value.length) &&
+                (undefined === data.maxLength || value.length <= data.maxLength) &&
+                (undefined === pattern || new RegExp(pattern, data.regexpFlags ?? regexpFlags ?? "u").test(value)),
+                listner,
+                () =>
+                {
+                    const details: string[] = [];
+                    if (undefined !== data.minLength)
+                    {
+                        details.push(`minLength:${data.minLength}`);
+                    }
+                    if (undefined !== data.maxLength)
+                    {
+                        details.push(`maxLength:${data.maxLength}`);
+                    }
+                    if (undefined !== data.pattern)
+                    {
+                        details.push(`pattern:${data.pattern}`);
+                    }
+                    if (undefined !== data.format)
+                    {
+                        details.push(`format:${data.format}`);
+                    }
+                    if (undefined !== data.regexpFlags)
+                    {
+                        details.push(`regexpFlags:${data.regexpFlags}`);
+                    }
+                    return `string(${details.join(",")})`
+                },
+                value
+            );
+            return result;
+        };
         export type ActualObject = Exclude<object, null>;
         export const isObject = (value: unknown): value is ActualObject =>
             null !== value && "object" === typeof value && ! Array.isArray(value);
@@ -308,7 +350,6 @@ export namespace EvilType
                     if (result)
                     {
                         Error.setMatch(listner);
-                        //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                     }
                     else
                     {
@@ -326,7 +367,6 @@ export namespace EvilType
                             if (0 < bestMatchErrors.length)
                             {
                                 Object.entries(bestMatchErrors[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
-                                //Error.setMatchRate(listner, Error.getMatchRate(bestMatchErrors[0]));
                             }
                         }
                         else
@@ -350,7 +390,6 @@ export namespace EvilType
             export const isAnd = <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) =>
                 (value: unknown, listner?: ErrorListener): value is OrTypeToAndType<T[number]> =>
                 {
-                    // このコードは現状、 isOr をコピーしただけのモックです。
                     if (listner)
                     {
                         const resultList = isTypeList.map
@@ -370,7 +409,6 @@ export namespace EvilType
                         if (result)
                         {
                             Error.setMatch(listner);
-                            //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                         }
                         else
                         {
@@ -379,16 +417,36 @@ export namespace EvilType
                             {
                                 const transactionListners = resultList.map(i => i.transactionListner);
                                 const errors = transactionListners.map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                                const fullErrors = resultList.map(i => i.transactionListner).map(i => i.errors).reduce((a, b) => [...a, ...b], []);
-                                Error.andErros(listner, isTypeList.length, errors, fullErrors);
+                                Error.andErros(listner, errors);
                                 if (errors.length <= 0)
                                 {
                                     console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " +JSON.stringify(resultList));
                                 }
                                 if (0 < transactionListners.length)
                                 {
-                                    Object.entries(transactionListners[0].matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
-                                    //Error.setMatchRate(listner, Error.getMatchRate(bestMatchErrors[0]));
+                                    const paths = transactionListners
+                                        .map(i => Object.keys(i.matchRate))
+                                        .reduce((a, b) => [...a, ...b], [])
+                                        .filter((i, ix, list) => ix === list.indexOf(i));
+                                    paths.forEach
+                                    (
+                                        path =>
+                                        {
+                                            const matchRates = transactionListners.map(i => i.matchRate[path])
+                                                .filter(i => undefined !== i);
+                                            if (matchRates.every(i => true === i))
+                                            {
+                                                listner.matchRate[path] = true;
+                                            }
+                                            else
+                                            {
+                                                listner.matchRate[path] = matchRates
+                                                    .map(i => Error.matchRateToNumber(i))
+                                                    .reduce((a, b) => a +b, 0)
+                                                    /matchRates.length;
+                                            }
+                                        }
+                                    );
                                 }
                             }
                             else
@@ -488,8 +546,6 @@ export namespace EvilType
             A;
         export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
             Object.assign(...[{ }, target, ...sources]) as MergeMultipleType<ObjectValidator<A>, B>;
-        // export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
-        //     Object.assign(...[{ }, target, ...sources]) as ObjectValidator<unknown>;
         export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>), additionalProperties?: boolean) =>
             (value: unknown, listner?: ErrorListener): value is ObjectType =>
             {

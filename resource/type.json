@@ -571,7 +571,7 @@
                         }
                     }
                 },
-                "StringType": {
+                "BasicStringType": {
                     "type": "interface",
                     "extends": [
                         {
@@ -582,9 +582,61 @@
                         "type": {
                             "const": "string"
                         },
-                        "pattern?": {
+                        "minLength?": {
+                            "type": "integer"
+                        },
+                        "maxLength?": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "PatternStringType": {
+                    "type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "BasicStringType"
+                        }
+                    ],
+                    "members": {
+                        "pattern": {
+                            "type": "string"
+                        },
+                        "regexpFlags?": {
                             "type": "string"
                         }
+                    }
+                },
+                "FormatStringType": {
+                    "type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "BasicStringType"
+                        }
+                    ],
+                    "members": {
+                        "format": {
+                            "type": "string"
+                        },
+                        "regexpFlags?": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "StringType": {
+                    "type": "type",
+                    "define": {
+                        "type": "or",
+                        "types": [
+                            {
+                                "$ref": "BasicStringType"
+                            },
+                            {
+                                "$ref": "PatternStringType"
+                            },
+                            {
+                                "$ref": "FormatStringType"
+                            }
+                        ]
                     }
                 },
                 "PrimitiveTypeElement": {

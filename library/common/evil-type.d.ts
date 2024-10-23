@@ -28,7 +28,7 @@ export declare namespace EvilType {
         const setMatch: (listner: Listener | undefined) => void;
         const raiseError: (listner: Listener | undefined, requiredType: string | (() => string), actualValue: unknown) => boolean;
         const orErros: (listner: Listener, modulus: number, errors: Item[], fullErrors: Item[]) => void;
-        const andErros: (listner: Listener, modulus: number, errors: Item[], fullErrors: Item[]) => void;
+        const andErros: (listner: Listener, errors: Item[]) => void;
         const valueToString: (value: unknown) => string;
         const withErrorHandling: (isMatchType: boolean, listner: Listener | undefined, requiredType: string | (() => string), actualValue: unknown) => boolean;
     }
@@ -46,6 +46,13 @@ export declare namespace EvilType {
         const isNumber: (value: unknown, listner?: ErrorListener) => value is number;
         const isInteger: (value: unknown, listner?: ErrorListener) => value is number;
         const isString: (value: unknown, listner?: ErrorListener) => value is string;
+        const isDetailString: (data: {
+            minLength?: number;
+            maxLength?: number;
+            pattern?: string;
+            format?: string;
+            regexpFlags?: string;
+        }, regexpFlags?: string) => IsType<string>;
         type ActualObject = Exclude<object, null>;
         const isObject: (value: unknown) => value is ActualObject;
         const isEnum: <T>(list: readonly T[]) => (value: unknown, listner?: ErrorListener) => value is T;

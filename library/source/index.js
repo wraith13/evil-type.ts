@@ -193,6 +193,9 @@ var Build;
                         if (type_1.Type.isInterfaceDefinition(entry_1.value)) {
                             return 0 === Object.entries(entry_1.value.members).filter(function (i) { return !Build.isKindofNeverType(Build.nextProcess(entry_1, i[0], i[1])); }).length;
                         }
+                        else if (type_1.Type.isLiteralElement(entry_1.value)) {
+                            return !evil_type_1.EvilType.Validator.isObject(entry_1.value.const) || Object.keys(entry_1.value.const).length <= 0;
+                        }
                         else {
                             return false;
                         }
@@ -525,7 +528,15 @@ var Build;
         Validator.buildKeyofValidator = function (name, data) {
             var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
             if (type_1.Type.isInterfaceDefinition(target.value)) {
-                return [(0, exports.$expression)("".concat(Build.getKeys(Build.nextProcess(data, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); }), ".includes(").concat(name, " as any)")),];
+                return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getKeys(Build.nextProcess(data, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })), ".includes(").concat(name, " as any)")),];
+            }
+            else if (type_1.Type.isLiteralElement(target.value)) {
+                if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
+                    return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Object.keys(target.value.const)), ".includes(").concat(name, " as any)")),];
+                }
+                else {
+                    return [(0, exports.$expression)("false"),];
+                }
             }
             else {
                 return [(0, exports.$expression)("\"string\" === typeof ".concat(name)),];
@@ -600,6 +611,14 @@ var Build;
                             var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
                             if (type_1.Type.isInterfaceDefinition(target.value)) {
                                 return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })),]);
+                            }
+                            else if (type_1.Type.isLiteralElement(target.value)) {
+                                if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
+                                    return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(Object.keys(target.value.const)),]);
+                                }
+                                else {
+                                    return [(0, exports.$expression)("EvilType.Validator.isNever"),];
+                                }
                             }
                             else {
                                 return [(0, exports.$expression)("EvilType.Validator.isString"),];
@@ -699,7 +718,6 @@ var Build;
         Validator.isValidatorTarget = function (define) {
             return !(type_1.Type.isValueDefinition(define) && false === define.validator);
         };
-        //export const buildValidator = (options: Type.OutputOptions, name: string, define: Type.TypeOrValue): CodeLine[] =>
         Validator.buildValidator = function (data) {
             if ("simple" === data.options.validatorOption) {
                 var result_2 = [
@@ -752,7 +770,6 @@ var Build;
             }
             return [];
         };
-        //export const buildValidatorObject = (options: Type.OutputOptions, name: string, define: Type.InterfaceDefinition): CodeLine[] =>
         Validator.buildValidatorObject = function (data) {
             if ("full" === data.options.validatorOption) {
                 var result_4 = [
@@ -992,6 +1009,14 @@ var Build;
             var target = Build.getTarget(Build.nextProcess(data, null, data.value.value));
             if (type_1.Type.isInterfaceDefinition(target.value)) {
                 result["enum"] = Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
+            }
+            else if (type_1.Type.isLiteralElement(target.value)) {
+                if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
+                    result["enum"] = Object.keys(target.value.const);
+                }
+                else {
+                    result["enum"] = [];
+                }
             }
             else {
                 result["type"] = "string";

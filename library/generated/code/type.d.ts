@@ -121,10 +121,20 @@ export declare namespace Type {
     interface IntegerType extends CommonProperties {
         type: "integer";
     }
-    interface StringType extends CommonProperties {
+    interface BasicStringType extends CommonProperties {
         type: "string";
-        pattern?: string;
+        minLength?: number;
+        maxLength?: number;
     }
+    interface PatternStringType extends BasicStringType {
+        pattern: string;
+        regexpFlags?: string;
+    }
+    interface FormatStringType extends BasicStringType {
+        format: string;
+        regexpFlags?: string;
+    }
+    type StringType = BasicStringType | PatternStringType | FormatStringType;
     type PrimitiveTypeElement = NeverType | AnyType | UnknownType | NullType | BooleanType | NumberType | IntegerType | StringType;
     type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     interface EnumTypeElement extends CommonProperties {
@@ -178,7 +188,10 @@ export declare namespace Type {
     const isBooleanType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is BooleanType;
     const isNumberType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NumberType;
     const isIntegerType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is IntegerType;
-    const isStringType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is StringType;
+    const isBasicStringType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is BasicStringType;
+    const isPatternStringType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is PatternStringType;
+    const isFormatStringType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is FormatStringType;
+    const isStringType: EvilType.Validator.IsType<StringType>;
     const isPrimitiveTypeElement: EvilType.Validator.IsType<PrimitiveTypeElement>;
     const isType: EvilType.Validator.IsType<Type>;
     const isEnumTypeElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is EnumTypeElement;
@@ -215,7 +228,9 @@ export declare namespace Type {
     const booleanTypeValidatorObject: EvilType.Validator.ObjectValidator<BooleanType>;
     const numberTypeValidatorObject: EvilType.Validator.ObjectValidator<NumberType>;
     const integerTypeValidatorObject: EvilType.Validator.ObjectValidator<IntegerType>;
-    const stringTypeValidatorObject: EvilType.Validator.ObjectValidator<StringType>;
+    const basicStringTypeValidatorObject: EvilType.Validator.ObjectValidator<BasicStringType>;
+    const patternStringTypeValidatorObject: EvilType.Validator.ObjectValidator<PatternStringType>;
+    const formatStringTypeValidatorObject: EvilType.Validator.ObjectValidator<FormatStringType>;
     const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement>;
     const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement>;
     const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement>;

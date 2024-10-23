@@ -144,11 +144,23 @@ export namespace Type
     {
         type: "integer";
     }
-    export interface StringType extends CommonProperties
+    export interface BasicStringType extends CommonProperties
     {
         type: "string";
-        pattern?: string;
+        minLength?: number;
+        maxLength?: number;
     }
+    export interface PatternStringType extends BasicStringType
+    {
+        pattern: string;
+        regexpFlags?: string;
+    }
+    export interface FormatStringType extends BasicStringType
+    {
+        format: string;
+        regexpFlags?: string;
+    }
+    export type StringType = BasicStringType | PatternStringType | FormatStringType;
     export type PrimitiveTypeElement = NeverType | AnyType | UnknownType | NullType | BooleanType | NumberType | IntegerType | StringType;
     export type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement |
         InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
@@ -213,7 +225,11 @@ export namespace Type
     export const isBooleanType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(booleanTypeValidatorObject, false));
     export const isNumberType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(numberTypeValidatorObject, false));
     export const isIntegerType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(integerTypeValidatorObject, false));
-    export const isStringType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(stringTypeValidatorObject, false));
+    export const isBasicStringType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(basicStringTypeValidatorObject, false));
+    export const isPatternStringType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(patternStringTypeValidatorObject, false));
+    export const isFormatStringType = EvilType.lazy(() => EvilType.Validator.isSpecificObject(formatStringTypeValidatorObject, false));
+    export const isStringType: EvilType.Validator.IsType<StringType> = EvilType.lazy(() => EvilType.Validator.isOr(isBasicStringType,
+        isPatternStringType, isFormatStringType));
     export const isPrimitiveTypeElement: EvilType.Validator.IsType<PrimitiveTypeElement> = EvilType.lazy(() => EvilType.Validator.isOr(
         isNeverType, isAnyType, isUnknownType, isNullType, isBooleanType, isNumberType, isIntegerType, isStringType));
     export const isType: EvilType.Validator.IsType<Type> = EvilType.lazy(() => EvilType.Validator.isOr(isPrimitiveTypeElement,
@@ -301,9 +317,16 @@ export namespace Type
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("number" as const), });
     export const integerTypeValidatorObject: EvilType.Validator.ObjectValidator<IntegerType> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("integer" as const), });
-    export const stringTypeValidatorObject: EvilType.Validator.ObjectValidator<StringType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("string" as const), pattern: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), });
+    export const basicStringTypeValidatorObject: EvilType.Validator.ObjectValidator<BasicStringType> =
+        EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("string" as const),
+        minLength: EvilType.Validator.isOptional(EvilType.Validator.isInteger), maxLength: EvilType.Validator.isOptional(
+        EvilType.Validator.isInteger), });
+    export const patternStringTypeValidatorObject: EvilType.Validator.ObjectValidator<PatternStringType> =
+        EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { pattern: EvilType.Validator.isString, regexpFlags:
+        EvilType.Validator.isOptional(EvilType.Validator.isString), });
+    export const formatStringTypeValidatorObject: EvilType.Validator.ObjectValidator<FormatStringType> =
+        EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { format: EvilType.Validator.isString, regexpFlags:
+        EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("enum-type" as const),
         members: EvilType.Validator.isArray(EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isBoolean,

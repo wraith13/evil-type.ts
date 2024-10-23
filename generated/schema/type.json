@@ -858,7 +858,7 @@
             ],
             "additionalProperties": false
         },
-        "Type.StringType": {
+        "Type.BasicStringType": {
             "type": "object",
             "properties": {
                 "default": {
@@ -876,14 +876,104 @@
                 "type": {
                     "const": "string"
                 },
-                "pattern": {
-                    "type": "string"
+                "minLength": {
+                    "type": "integer"
+                },
+                "maxLength": {
+                    "type": "integer"
                 }
             },
             "required": [
                 "type"
             ],
             "additionalProperties": false
+        },
+        "Type.PatternStringType": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "description": "[SCHEMA]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "type": {
+                    "const": "string"
+                },
+                "minLength": {
+                    "type": "integer"
+                },
+                "maxLength": {
+                    "type": "integer"
+                },
+                "pattern": {
+                    "type": "string"
+                },
+                "regexpFlags": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "pattern",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "Type.FormatStringType": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "description": "[SCHEMA]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "type": {
+                    "const": "string"
+                },
+                "minLength": {
+                    "type": "integer"
+                },
+                "maxLength": {
+                    "type": "integer"
+                },
+                "format": {
+                    "type": "string"
+                },
+                "regexpFlags": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "format",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "Type.StringType": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/Type.BasicStringType"
+                },
+                {
+                    "$ref": "#/definitions/Type.PatternStringType"
+                },
+                {
+                    "$ref": "#/definitions/Type.FormatStringType"
+                }
+            ]
         },
         "Type.PrimitiveTypeElement": {
             "oneOf": [

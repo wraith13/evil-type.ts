@@ -5,6 +5,37 @@
     "imports": [
     ],
     "defines": {
+        "YOUR_NAMESPACE": {
+            "type": "namespace",
+            "members": {
+                "YOUR_TYPE": {
+                    "type": "interface",
+                    "members": {
+                        "YOUR_TEXT": {
+                            "type": "string"
+                        },
+                        "YOUR_NUMBER": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "YOUR_TYPE_ARRAY":{
+                    "type": "type",
+                    "define":{
+                        "type": "array",
+                        "items": {
+                            "$ref": "YOUR_TYPE"
+                        }
+                    }
+                },
+                "YOUR_TYPE_DICTIONALY": {
+                    "type": "dictionary",
+                    "valueType": {
+                        "$ref": "YOUR_TYPE"
+                    }
+                }
+            }
+        }
     },
     "options": {
         "outputFile": "./GENERATED-YOUR-TYPE-DEFINE.ts",

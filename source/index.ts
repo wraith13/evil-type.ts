@@ -248,6 +248,11 @@ export namespace Build
                         return 0 === Object.entries(entry.value.members).filter(i => ! isKindofNeverType(nextProcess(entry, i[0], i[1]))).length;
                     }
                     else
+                    if (Type.isLiteralElement(entry.value))
+                    {
+                        return ! EvilType.Validator.isObject(entry.value.const) || Object.keys(entry.value.const).length <= 0;
+                    }
+                    else
                     {
                         return false;
                     }
@@ -636,7 +641,19 @@ export namespace Build
             let target = getTarget(nextProcess(data, null, data.value.value));
             if (Type.isInterfaceDefinition(target.value))
             {
-                return [ $expression(`${getKeys(nextProcess(data, null, target.value)).map(i => Text.getPrimaryKeyName(i))}.includes(${name} as any)`), ];
+                return [ $expression(`${Jsonable.stringify(getKeys(nextProcess(data, null, target.value)).map(i => Text.getPrimaryKeyName(i)))}.includes(${name} as any)`), ];
+            }
+            else
+            if (Type.isLiteralElement(target.value))
+            {
+                if (EvilType.Validator.isObject(target.value.const))
+                {
+                    return [ $expression(`${Jsonable.stringify(Object.keys(target.value.const))}.includes(${name} as any)`), ];
+                }
+                else
+                {
+                    return [ $expression("false"), ];
+                }
             }
             else
             {
@@ -740,6 +757,22 @@ export namespace Build
                                 [ $expression("EvilType.Validator.isEnum"), ],
                                 [ buildLiteralAsConst(getKeys(nextProcess(target, null, target.value)).map(i => Text.getPrimaryKeyName(i))), ]
                             );
+                        }
+                        else
+                        if (Type.isLiteralElement(target.value))
+                        {
+                            if (EvilType.Validator.isObject(target.value.const))
+                            {
+                                return buildCall
+                                (
+                                    [ $expression("EvilType.Validator.isEnum"), ],
+                                    [ buildLiteralAsConst(Object.keys(target.value.const)), ]
+                                );
+                            }
+                            else
+                            {
+                                return [ $expression("EvilType.Validator.isNever"), ];
+                            }
                         }
                         else
                         {
@@ -887,7 +920,6 @@ export namespace Build
             buildObjectValidatorGetterCoreEntry(data);
         export const isValidatorTarget = (define: Type.TypeOrValue) =>
             ! (Type.isValueDefinition(define) && false === define.validator);
-        //export const buildValidator = (options: Type.OutputOptions, name: string, define: Type.TypeOrValue): CodeLine[] =>
         export const buildValidator = (data: Define.Process<Type.TypeOrValue & Type.Definition>): CodeLine[] =>
         {
             if ("simple" === data.options.validatorOption)
@@ -977,7 +1009,6 @@ export namespace Build
             }
             return [];
         };
-        //export const buildValidatorObject = (options: Type.OutputOptions, name: string, define: Type.InterfaceDefinition): CodeLine[] =>
         export const buildValidatorObject = (data: Define.Process<Type.InterfaceDefinition>): CodeLine[] =>
         {
             if ("full" === data.options.validatorOption)
@@ -1292,6 +1323,18 @@ export namespace Build
             if (Type.isInterfaceDefinition(target.value))
             {
                 result["enum"] = getKeys(nextProcess(target, null, target.value)).map(i => Text.getPrimaryKeyName(i));
+            }
+            else
+            if (Type.isLiteralElement(target.value))
+            {
+                if (EvilType.Validator.isObject(target.value.const))
+                {
+                    result["enum"] = Object.keys(target.value.const);
+                }
+                else
+                {
+                    result["enum"] = [];
+                }
             }
             else
             {

@@ -39,7 +39,10 @@ var Type;
     Type.isBooleanType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.booleanTypeValidatorObject, false); });
     Type.isNumberType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.numberTypeValidatorObject, false); });
     Type.isIntegerType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.integerTypeValidatorObject, false); });
-    Type.isStringType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.stringTypeValidatorObject, false); });
+    Type.isBasicStringType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.basicStringTypeValidatorObject, false); });
+    Type.isPatternStringType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.patternStringTypeValidatorObject, false); });
+    Type.isFormatStringType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.formatStringTypeValidatorObject, false); });
+    Type.isStringType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isBasicStringType, Type.isPatternStringType, Type.isFormatStringType); });
     Type.isPrimitiveTypeElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isNeverType, Type.isAnyType, Type.isUnknownType, Type.isNullType, Type.isBooleanType, Type.isNumberType, Type.isIntegerType, Type.isStringType); });
     Type.isType = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isOr(Type.isPrimitiveTypeElement, Type.isTypeDefinition, Type.isEnumTypeElement, Type.isTypeofElement, Type.isKeyofElement, Type.isItemofElement, Type.isInterfaceDefinition, Type.isDictionaryDefinition, Type.isArrayElement, Type.isOrElement, Type.isAndElement, Type.isLiteralElement); });
     Type.isEnumTypeElement = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.enumTypeElementValidatorObject, false); });
@@ -79,7 +82,10 @@ var Type;
     Type.booleanTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("boolean"), });
     Type.numberTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("number"), });
     Type.integerTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("integer"), });
-    Type.stringTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("string"), pattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
+    Type.basicStringTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("string"),
+        minLength: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isInteger), maxLength: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isInteger), });
+    Type.patternStringTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.basicStringTypeValidatorObject, { pattern: evil_type_1.EvilType.Validator.isString, regexpFlags: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
+    Type.formatStringTypeValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.basicStringTypeValidatorObject, { format: evil_type_1.EvilType.Validator.isString, regexpFlags: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
     Type.enumTypeElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("enum-type"),
         members: evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isOr(evil_type_1.EvilType.Validator.isNull, evil_type_1.EvilType.Validator.isBoolean, evil_type_1.EvilType.Validator.isNumber, evil_type_1.EvilType.Validator.isString)), });
     Type.typeofElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("typeof"), value: Type.isReferElement, });

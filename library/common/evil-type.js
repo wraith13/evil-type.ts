@@ -11,7 +11,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EvilType = void 0;
 // Original: https://github.com/wraith13/evil-type.ts/blob/master/common/evil-type.ts
-// License: https://github.com/wraith13/evil-type.ts/blob/master/LICENSE_1_0.txt
+// License: BSL-1.0 ( https://github.com/wraith13/evil-type.ts/blob/master/LICENSE_1_0.txt )
 var EvilType;
 (function (EvilType) {
     EvilType.comparer = function () {
@@ -162,13 +162,12 @@ var EvilType;
                 });
             }));
         };
-        Error.andErros = function (listner, modulus, errors, fullErrors) {
+        Error.andErros = function (listner, errors) {
             var _a;
-            // このコードは現状、 orErros をコピーしただけのモックです。
             var paths = errors.map(function (i) { return i.path; }).filter(function (i, ix, list) { return ix === list.indexOf(i); });
             (_a = listner.errors).push.apply(_a, paths.map(function (path) {
                 return ({
-                    type: modulus <= fullErrors.filter(function (i) { return "solid" === i.type && i.path === path; }).length ?
+                    type: errors.some(function (i) { return "solid" === i.type && i.path === path; }) ?
                         "solid" :
                         "fragment",
                     path: path,
@@ -222,6 +221,38 @@ var EvilType;
         };
         Validator.isString = function (value, listner) {
             return Error.withErrorHandling("string" === typeof value, listner, "string", value);
+        };
+        Validator.isDetailString = function (data, regexpFlags) {
+            if ([data.minLength, data.maxLength, data.pattern, data.format].every(function (i) { return undefined === i; })) {
+                return Validator.isString;
+            }
+            var pattern = data.pattern; // ?? getPattern(data.format)
+            var result = function (value, listner) {
+                var _a, _b;
+                return Error.withErrorHandling("string" === typeof value &&
+                    (undefined === data.minLength || data.minLength <= value.length) &&
+                    (undefined === data.maxLength || value.length <= data.maxLength) &&
+                    (undefined === pattern || new RegExp(pattern, (_b = (_a = data.regexpFlags) !== null && _a !== void 0 ? _a : regexpFlags) !== null && _b !== void 0 ? _b : "u").test(value)), listner, function () {
+                    var details = [];
+                    if (undefined !== data.minLength) {
+                        details.push("minLength:".concat(data.minLength));
+                    }
+                    if (undefined !== data.maxLength) {
+                        details.push("maxLength:".concat(data.maxLength));
+                    }
+                    if (undefined !== data.pattern) {
+                        details.push("pattern:".concat(data.pattern));
+                    }
+                    if (undefined !== data.format) {
+                        details.push("format:".concat(data.format));
+                    }
+                    if (undefined !== data.regexpFlags) {
+                        details.push("regexpFlags:".concat(data.regexpFlags));
+                    }
+                    return "string(".concat(details.join(","), ")");
+                }, value);
+            };
+            return result;
         };
         Validator.isObject = function (value) {
             return null !== value && "object" === typeof value && !Array.isArray(value);
@@ -289,7 +320,6 @@ var EvilType;
                     var result = Boolean(success);
                     if (result) {
                         Error.setMatch(listner);
-                        //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                     }
                     else {
                         var requiredType = Validator.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
@@ -303,7 +333,6 @@ var EvilType;
                             }
                             if (0 < bestMatchErrors.length) {
                                 Object.entries(bestMatchErrors[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
-                                //Error.setMatchRate(listner, Error.getMatchRate(bestMatchErrors[0]));
                             }
                         }
                         else {
@@ -323,7 +352,6 @@ var EvilType;
                 isTypeList[_i] = arguments[_i];
             }
             return function (value, listner) {
-                // このコードは現状、 isOr をコピーしただけのモックです。
                 if (listner) {
                     var resultList = isTypeList.map(function (i) {
                         var transactionListner = Error.makeListener(listner.path);
@@ -336,21 +364,34 @@ var EvilType;
                     var result = resultList.every(function (i) { return i.result; });
                     if (result) {
                         Error.setMatch(listner);
-                        //Object.entries(success.transactionListner.matchRate).forEach(kv => listner.matchRate[kv[0]] = kv[1]);
                     }
                     else {
                         var requiredType = Validator.makeOrTypeNameFromIsTypeList.apply(void 0, isTypeList);
                         if ((Validator.isObject(value) && requiredType.includes("object")) || (Array.isArray(value) && requiredType.includes("array"))) {
-                            var transactionListners = resultList.map(function (i) { return i.transactionListner; });
-                            var errors = transactionListners.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                            var fullErrors = resultList.map(function (i) { return i.transactionListner; }).map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
-                            Error.andErros(listner, isTypeList.length, errors, fullErrors);
+                            var transactionListners_1 = resultList.map(function (i) { return i.transactionListner; });
+                            var errors = transactionListners_1.map(function (i) { return i.errors; }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                            Error.andErros(listner, errors);
                             if (errors.length <= 0) {
                                 console.error("🦋 FIXME: \"UnmatchWithoutErrors\": " + JSON.stringify(resultList));
                             }
-                            if (0 < transactionListners.length) {
-                                Object.entries(transactionListners[0].matchRate).forEach(function (kv) { return listner.matchRate[kv[0]] = kv[1]; });
-                                //Error.setMatchRate(listner, Error.getMatchRate(bestMatchErrors[0]));
+                            if (0 < transactionListners_1.length) {
+                                var paths = transactionListners_1
+                                    .map(function (i) { return Object.keys(i.matchRate); })
+                                    .reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, [])
+                                    .filter(function (i, ix, list) { return ix === list.indexOf(i); });
+                                paths.forEach(function (path) {
+                                    var matchRates = transactionListners_1.map(function (i) { return i.matchRate[path]; })
+                                        .filter(function (i) { return undefined !== i; });
+                                    if (matchRates.every(function (i) { return true === i; })) {
+                                        listner.matchRate[path] = true;
+                                    }
+                                    else {
+                                        listner.matchRate[path] = matchRates
+                                            .map(function (i) { return Error.matchRateToNumber(i); })
+                                            .reduce(function (a, b) { return a + b; }, 0)
+                                            / matchRates.length;
+                                    }
+                                });
                             }
                         }
                         else {
@@ -425,8 +466,6 @@ var EvilType;
             }
             return Object.assign.apply(Object, __spreadArray([{}, target], sources, true));
         };
-        // export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
-        //     Object.assign(...[{ }, target, ...sources]) as ObjectValidator<unknown>;
         Validator.isSpecificObject = function (memberValidator, additionalProperties) {
             return function (value, listner) {
                 if (Validator.isObject(value)) {
