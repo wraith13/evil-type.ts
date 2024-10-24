@@ -72,6 +72,7 @@ export declare namespace Build {
         const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | CodeInlineBlock)[];
         const buildInlineDefineEnum: (value: Type.EnumTypeElement) => CodeExpression[];
         const buildInlineDefineArray: (data: Process<Type.ArrayElement>) => (CodeExpression | CodeInlineBlock)[];
+        const buildDictionaryKeyin: (data: Process<Type.DictionaryDefinition>) => (CodeExpression | CodeInlineBlock)[];
         const buildInlineDefineDictionary: (data: Process<Type.DictionaryDefinition>) => CodeInlineBlock;
         const buildInlineDefineAnd: (data: Process<Type.AndElement>) => CodeExpression[];
         const buildInlineDefineOr: (data: Process<Type.OrElement>) => CodeExpression[];

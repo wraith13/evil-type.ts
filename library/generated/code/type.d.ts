@@ -83,6 +83,7 @@ export declare namespace Type {
     }
     interface DictionaryDefinition extends AlphaDefinition {
         type: "dictionary";
+        keyin?: TypeOrRefer;
         valueType: TypeOrRefer;
     }
     interface ArrayElement extends AlphaElement {

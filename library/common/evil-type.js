@@ -495,10 +495,20 @@ var EvilType;
                 }
             };
         };
-        Validator.isDictionaryObject = function (isType) {
+        Validator.isDictionaryObject = function (isType, keys, additionalProperties) {
             return function (value, listner) {
                 if (Validator.isObject(value)) {
-                    var result = Object.entries(value).map(function (kv) { return isType(kv[1], Error.nextListener(kv[0], listner)); }).every(function (i) { return i; });
+                    var result = undefined === keys ?
+                        Object.entries(value).map(function (kv) { return isType(kv[1], Error.nextListener(kv[0], listner)); }).every(function (i) { return i; }) :
+                        keys.map(function (key) { return isType(value, Error.nextListener(key, listner)); }).every(function (i) { return i; });
+                    if (undefined !== keys && false === additionalProperties) {
+                        var additionalKeys = Object.keys(value)
+                            .filter(function (key) { return !keys.includes(key); });
+                        if (additionalKeys.some(function (_) { return true; })) {
+                            additionalKeys.map(function (key) { return Error.raiseError(Error.nextListener(key, listner), "never", value[key]); });
+                            result = false;
+                        }
+                    }
                     if (listner) {
                         if (result) {
                             Error.setMatch(listner);

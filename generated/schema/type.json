@@ -557,6 +557,9 @@
                 "export": {
                     "type": "boolean"
                 },
+                "keyin": {
+                    "$ref": "#/definitions/Type.TypeOrRefer"
+                },
                 "valueType": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
                 }

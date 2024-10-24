@@ -327,8 +327,15 @@ var Build;
         Define.buildInlineDefineArray = function (data) {
             return __spreadArray(__spreadArray([], Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, data.value.items))), true), [(0, exports.$expression)("[]"),], false);
         };
+        Define.buildDictionaryKeyin = function (data) {
+            return __spreadArray(__spreadArray([
+                (0, exports.$expression)("[ key:")
+            ], (undefined === data.value.keyin ? [(0, exports.$expression)("string"),] : Define.buildInlineDefine(Build.nextProcess(data, null, data.value.keyin))), true), [
+                (0, exports.$expression)("]:"),
+            ], false);
+        };
         Define.buildInlineDefineDictionary = function (data) {
-            return (0, exports.$iblock)([(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true))]);
+            return (0, exports.$iblock)([(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Define.buildDictionaryKeyin(data), true), Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true), [(0, exports.$expression)(";"),], false))]);
         };
         Define.buildInlineDefineAnd = function (data) {
             return kindofJoinExpression(data.value.types.map(function (i) { return Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, i))); }), (0, exports.$expression)("&"));
@@ -337,7 +344,7 @@ var Build;
             return kindofJoinExpression(data.value.types.map(function (i) { return Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, i))); }), (0, exports.$expression)("|"));
         };
         Define.buildDefineInlineInterface = function (data) { return (0, exports.$iblock)(Object.keys(data.value.members)
-            .map(function (name) { return (0, exports.$line)(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(Build.nextProcess(data, name, data.value.members[name])), true)); })); };
+            .map(function (name) { return (0, exports.$line)(__spreadArray(__spreadArray([(0, exports.$expression)(name + ":")], Define.buildInlineDefine(Build.nextProcess(data, name, data.value.members[name])), true), [(0, exports.$expression)(";"),], false)); })); };
         Define.buildDefineInterface = function (data) {
             var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), ["interface", data.key].map(function (i) { return (0, exports.$expression)(i); }), true), Build.buildExtends(data.value), true);
             var lines = Object.keys(data.value.members)
@@ -346,7 +353,7 @@ var Build;
         };
         Define.buildDefineDictionary = function (data) {
             var header = __spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), ["type", data.key].map(function (i) { return (0, exports.$expression)(i); }), true), [(0, exports.$expression)("=")], false);
-            return (0, exports.$block)(header, [(0, exports.$line)(__spreadArray([(0, exports.$expression)("[key: string]:")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true))]);
+            return (0, exports.$block)(header, [(0, exports.$line)(__spreadArray(__spreadArray([], Define.buildDictionaryKeyin(data), true), Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true))]);
         };
         Define.buildDefineNamespaceCore = function (data) {
             return __spreadArray(__spreadArray(__spreadArray([], Object.entries(data.value)
@@ -690,10 +697,12 @@ var Build;
             var value = Build.isKindofNeverType(Build.nextProcess(data, key, i[1])) ?
                 Build.buildLiteralAsConst({ $type: "never-type-guard", }) :
                 Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, key, i[1]));
-            return (0, exports.$line)(__spreadArray([
+            return (0, exports.$line)(__spreadArray(__spreadArray([
                 (0, exports.$expression)("".concat(key)),
                 (0, exports.$expression)(":")
-            ], (key === i[0] ? value : Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isOptional"),], [value,])), true));
+            ], (key === i[0] ? value : Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isOptional"),], [value,])), true), [
+                (0, exports.$expression)(","),
+            ], false));
         })); };
         Validator.buildObjectValidator = function (data) {
             var _a, _b;
@@ -1139,7 +1148,7 @@ var Format;
             case "inline-block":
                 return __spreadArray(__spreadArray(["{"], code.lines.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true), ["}",], false);
             case "line":
-                return __spreadArray(__spreadArray([], code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true), [","], false);
+                return __spreadArray([], code.expressions.map(function (i) { return Format.getTokens(i); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []), true);
             case "expression":
                 return [code.expression,];
         }

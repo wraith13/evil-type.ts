@@ -99,8 +99,6 @@ export declare namespace EvilType {
         type MergeMultipleType<A, B extends any[]> = B extends [infer Head, ...infer Tail] ? MergeMultipleType<MergeType<A, Head>, Tail> : B extends [infer Last] ? MergeType<A, Last> : A;
         const mergeObjectValidator: <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) => MergeMultipleType<ObjectValidator<A>, B>;
         const isSpecificObject: <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>), additionalProperties?: boolean) => (value: unknown, listner?: ErrorListener) => value is ObjectType;
-        const isDictionaryObject: <MemberType>(isType: IsType<MemberType>) => (value: unknown, listner?: ErrorListener) => value is {
-            [key: string]: MemberType;
-        };
+        const isDictionaryObject: <MemberType, Keys extends string>(isType: IsType<MemberType>, keys?: Keys[], additionalProperties?: boolean) => (value: unknown, listner?: ErrorListener) => value is { [key in Keys]: MemberType; };
     }
 }

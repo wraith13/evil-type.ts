@@ -405,8 +405,14 @@ export namespace Build
             kindofJoinExpression(value.members.map(i => $expression(Jsonable.stringify(i))), $expression("|"));
         export const buildInlineDefineArray = (data: Process<Type.ArrayElement>) =>
             [ ...enParenthesisIfNeed(buildInlineDefine(nextProcess(data, null, data.value.items))), $expression("[]"), ];
+        export const buildDictionaryKeyin = (data: Process<Type.DictionaryDefinition>) =>
+            [
+                $expression("[ key:"),
+                ...(undefined === data.value.keyin ? [ $expression("string"), ]: buildInlineDefine(nextProcess(data, null, data.value.keyin))),
+                $expression("]:"),
+            ];
         export const buildInlineDefineDictionary = (data: Process<Type.DictionaryDefinition>) =>
-            $iblock([ $line([ $expression("[key: string]:"), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), ]) ]);
+            $iblock([ $line([ ...buildDictionaryKeyin(data), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), $expression(";"), ]) ]);
         export const buildInlineDefineAnd = (data: Process<Type.AndElement>) =>
             kindofJoinExpression(data.value.types.map(i => enParenthesisIfNeed(buildInlineDefine(nextProcess(data, null, i)))), $expression("&"));
         export const buildInlineDefineOr = (data: Process<Type.OrElement>) =>
@@ -414,7 +420,7 @@ export namespace Build
         export const buildDefineInlineInterface = (data: Process<Type.InterfaceDefinition>) => $iblock
         (
             Object.keys(data.value.members)
-                .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(nextProcess(data, name, data.value.members[name]))]))
+                .map(name => $line([$expression(name+ ":"), ...buildInlineDefine(nextProcess(data, name, data.value.members[name])), $expression(";"), ]))
         );
         export const buildDefineInterface = (data: Process<Type.InterfaceDefinition>): CodeBlock =>
         {
@@ -426,7 +432,7 @@ export namespace Build
         export const buildDefineDictionary = (data: Process<Type.DictionaryDefinition>): CodeBlock =>
         {
             const header = [ ...buildExport(data), ...["type", data.key].map(i => $expression(i)), $expression("=")];
-            return $block(header, [ $line([ $expression("[key: string]:"), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), ]) ]);
+            return $block(header, [ $line([ ...buildDictionaryKeyin(data), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), ]) ]);
         };
         export const buildDefineNamespaceCore = (data: Process<Type.DefinitionMap>): CodeEntry[] =>
         [
@@ -896,6 +902,7 @@ export namespace Build
                         $expression(`${key}`),
                         $expression(":"),
                         ...(key === i[0] ? value: buildCall([ $expression("EvilType.Validator.isOptional"), ], [ value, ])),
+                        $expression(","),
                     ])
                 }
             )
@@ -1495,7 +1502,7 @@ export namespace Format
         case "inline-block":
             return [ "{", ...code.lines.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []), "}", ];
         case "line":
-            return [ ...code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []), "," ];
+            return [ ...code.expressions.map(i => getTokens(i)).reduce((a, b) => [ ...a, ...b, ], []) ];
         case "expression":
             return [ code.expression, ];
         }

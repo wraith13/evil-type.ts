@@ -592,12 +592,24 @@ export namespace EvilType
                     return undefined !== listner && Error.raiseError(listner, "object", value);
                 }
             };
-        export const isDictionaryObject = <MemberType>(isType: IsType<MemberType>) =>
-            (value: unknown, listner?: ErrorListener): value is { [key: string]: MemberType } =>
+        export const isDictionaryObject = <MemberType, Keys extends string>(isType: IsType<MemberType>, keys?: Keys[], additionalProperties?: boolean) =>
+            (value: unknown, listner?: ErrorListener): value is { [key in Keys]: MemberType } =>
             {
                 if (isObject(value))
                 {
-                    const result = Object.entries(value).map(kv => isType(kv[1], Error.nextListener(kv[0], listner))).every(i => i);
+                    let result = undefined === keys ?
+                        Object.entries(value).map(kv => isType(kv[1], Error.nextListener(kv[0], listner))).every(i => i):
+                        keys.map(key => isType(value, Error.nextListener(key, listner))).every(i => i);
+                    if (undefined !== keys && false === additionalProperties)
+                    {
+                        const additionalKeys = (Object.keys(value) as (keyof typeof value)[])
+                            .filter(key => ! keys.includes(key));
+                        if (additionalKeys.some(_ => true))
+                        {
+                            additionalKeys.map(key => Error.raiseError(Error.nextListener(key, listner), "never", value[key]));
+                            result = false;
+                        }
+                    }
                     if (listner)
                     {
                         if (result)

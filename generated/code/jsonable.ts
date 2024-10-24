@@ -6,7 +6,7 @@ export namespace Jsonable
     export type JsonableArray = Jsonable[];
     export type JsonableObject =
     {
-        [key: string]: Jsonable;
+        [ key: string ]: Jsonable;
     }
     export type Jsonable = JsonableValue | JsonableArray | JsonableObject;
     export const parse = (json: string): Jsonable => JSON.parse(json);

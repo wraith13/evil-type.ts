@@ -30,7 +30,7 @@ export namespace Type
         safeNumber?: boolean;
         safeInteger?: boolean;
         maxLineLength?: null | number;
-        default?: { export?: boolean, additionalProperties?: boolean, regexpFlags?: string, };
+        default?: { export?: boolean; additionalProperties?: boolean; regexpFlags?: string; };
         schema?: SchemaOptions;
     }
     export interface SchemaOptions
@@ -38,7 +38,7 @@ export namespace Type
         outputFile: string;
         $id?: string;
         $ref?: string;
-        externalReferMapping?: { [key: string]: string, };
+        externalReferMapping?: { [ key: string ]: string; };
     }
     export const indentStyleTypeMember = ["allman","egyptian"] as const;
     export type IndentStyleType = typeof indentStyleTypeMember[number];
@@ -60,7 +60,7 @@ export namespace Type
         DictionaryDefinition;
     export type DefinitionMap =
     {
-        [key: string]: Definition;
+        [ key: string ]: Definition;
     }
     export interface CodeDefinition extends AlphaDefinition
     {
@@ -87,12 +87,13 @@ export namespace Type
     {
         type: "interface";
         extends?: ReferElement[];
-        members: { [key: string]: TypeOrRefer, };
+        members: { [ key: string ]: TypeOrRefer; };
         additionalProperties?: boolean;
     }
     export interface DictionaryDefinition extends AlphaDefinition
     {
         type: "dictionary";
+        keyin?: TypeOrRefer;
         valueType: TypeOrRefer;
     }
     export interface ArrayElement extends AlphaElement
@@ -311,7 +312,7 @@ export namespace Type
         isTypeOrRefer), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const dictionaryDefinitionValidatorObject: EvilType.Validator.ObjectValidator<DictionaryDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("dictionary" as const),
-        valueType: isTypeOrRefer, });
+        keyin: EvilType.Validator.isOptional(isTypeOrRefer), valueType: isTypeOrRefer, });
     export const arrayElementValidatorObject: EvilType.Validator.ObjectValidator<ArrayElement> = EvilType.Validator.mergeObjectValidator(
         alphaElementValidatorObject, { type: EvilType.Validator.isJust("array" as const), items: isTypeOrRefer, });
     export const orElementValidatorObject: EvilType.Validator.ObjectValidator<OrElement> = EvilType.Validator.mergeObjectValidator(

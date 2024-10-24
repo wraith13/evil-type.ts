@@ -410,6 +410,9 @@
                         "type": {
                             "const": "dictionary"
                         },
+                        "keyin?": {
+                            "$ref": "TypeOrRefer"
+                        },
                         "valueType": {
                             "$ref": "TypeOrRefer"
                         }
