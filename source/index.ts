@@ -160,14 +160,14 @@ export namespace Build
         const path = getAbsolutePath(data, data.value);
         return Object.assign({ }, data, { path, value: data.definitions[path], });
     };
-    export const getTarget = <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process): NextProcess<Process, Type.TypeOrLiteralOfRefer> =>
+    export const getResolveRefer = <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process): NextProcess<Process, Type.TypeOrLiteralOfRefer> =>
     {
         if (Type.isReferElement(data.value))
         {
             const next = getDefinition(nextProcess(data, null, data.value));
             if (Type.isTypeOrValueOfRefer(next.value))
             {
-                return getTarget(<Process>next);
+                return getResolveRefer(<Process>next);
             }
             else
             {
@@ -178,7 +178,7 @@ export namespace Build
         {
             if (Type.isReferElement(data.value.value))
             {
-                return getTarget(<Process>nextProcess(data, null, data.value.value));
+                return getResolveRefer(<Process>nextProcess(data, null, data.value.value));
             }
             else
             {
@@ -187,10 +187,29 @@ export namespace Build
         }
         if (Type.isTypeDefinition(data.value))
         {
-            return getTarget(<Process>nextProcess(data, null, data.value.define));
+            return getResolveRefer(<Process>nextProcess(data, null, data.value.define));
         }
         return nextProcess(data, null, data.value);
     };
+    export const getKeyofTarget = <Process extends BaseProcess<Type.KeyofElement>>(data: Process) => getResolveRefer
+    (
+        nextProcess
+        (
+            data,
+            null,
+            Type.isTypeofElement(data.value.value) ?
+                data.value.value.value:
+                data.value.value
+        )
+    );
+    export const getRegexpFlags = <Process extends BaseProcess<unknown>>(data: Process) =>
+    {
+        if ((Type.isPatternStringType(data.value) || Type.isFormatStringType(data.value)) && undefined !== data.value.regexpFlags)
+        {
+            return data.value.regexpFlags;
+        }
+        return data.options.default?.regexpFlags ?? config.regexpFlags;
+    }
     export const getLiteral = <Process extends BaseProcess<Type.ReferElement>>(data: Process): Type.LiteralElement | null =>
     {
         const definition = getDefinition(data);
@@ -216,7 +235,7 @@ export namespace Build
             (
                 i =>
                 {
-                    const current = getTarget(nextProcess(data, null, i));
+                    const current = getResolveRefer(nextProcess(data, null, i));
                     if (Type.isInterfaceDefinition(current.value))
                     {
                         result.push(...getKeys(nextProcess(current, null, current.value)));
@@ -229,7 +248,7 @@ export namespace Build
     };
     export const isKindofNeverType = (data: BaseProcess<Type.TypeOrRefer>): boolean =>
     {
-        const target = getTarget(data);
+        const target = getResolveRefer(data);
         if (Type.isLiteralElement(target.value))
         {
             return false;
@@ -242,17 +261,7 @@ export namespace Build
                 return false;
             case "keyof":
                 {
-                    const entry = getTarget
-                    (
-                        nextProcess
-                        (
-                            target,
-                            null,
-                            Type.isTypeofElement(target.value.value) ?
-                                target.value.value.value:
-                                target.value.value
-                        )
-                    );
+                    const entry = getKeyofTarget(nextProcess(target, null, target.value));
                     if (Type.isInterfaceDefinition(entry.value))
                     {
                         return 0 === Object.entries(entry.value.members).filter(i => ! isKindofNeverType(nextProcess(entry, i[0], i[1]))).length;
@@ -595,9 +604,17 @@ export namespace Build
                 case "integer":
                     return [ $expression("Number.isInteger"), $expression("("), $expression(name), $expression(")"), ];
                 case "boolean":
-                case "number":
-                case "string":
                     return [ $expression(`"${data.value.type}" === typeof ${name}`), ];
+                case "number":
+                    return [ $expression(`"${data.value.type}" === typeof ${name}`), ];
+                case "string":
+                    return [
+                        $expression(`"${data.value.type}" === typeof ${name}`),
+                        ...(undefined !== data.value.minLength ? [ $expression("&&"), $expression(`${data.value.minLength}`), $expression("<="), $expression(`${name}.length`), ]: []),
+                        ...(undefined !== data.value.maxLength ? [ $expression("&&"), $expression(`${name}.length`), $expression("<="), $expression(`${data.value.maxLength}`), ]: []),
+                        ...(Type.isPatternStringType(data.value) ? [ $expression("new"), $expression("RegExp"), $expression("("), $expression(Jsonable.stringify(data.value.pattern)), $expression(","), $expression(Jsonable.stringify(getRegexpFlags(data))), $expression(")"), $expression(`.test(${name})`) ]: []),
+                        ...(Type.isFormatStringType(data.value) ? [ $expression("new"), $expression("RegExp"), $expression("("), $expression(Jsonable.stringify(Type.StringFormatMap[data.value.format])), $expression(","), $expression(Jsonable.stringify(getRegexpFlags(data))), $expression(")"), $expression(`.test(${name})`) ]: []),
+                    ];
                 case "type":
                     return buildValidatorExpression(name, nextProcess(data, null, data.value.define));
                 case "enum-type":
@@ -648,17 +665,7 @@ export namespace Build
         };
         export const buildKeyofValidator = (name: string, data: Define.Process<Type.KeyofElement>): CodeExpression[] =>
         {
-            const target = getTarget
-            (
-                nextProcess
-                (
-                    data,
-                    null,
-                    Type.isTypeofElement(data.value.value) ?
-                        data.value.value.value:
-                        data.value.value
-                )
-            );
+            const target = getKeyofTarget(nextProcess(data, null, data.value));
             if (Type.isInterfaceDefinition(target.value))
             {
                 return [ $expression(`${Jsonable.stringify(getKeys(nextProcess(data, null, target.value)).map(i => Text.getPrimaryKeyName(i)))}.includes(${name} as any)`), ];
@@ -769,17 +776,7 @@ export namespace Build
                     return [ $expression(buildValidatorName(data.value.value.$ref)), ];
                 case "keyof":
                     {
-                        const target = getTarget
-                        (
-                            nextProcess
-                            (
-                                data,
-                                null,
-                                Type.isTypeofElement(data.value.value) ?
-                                    data.value.value.value:
-                                    data.value.value
-                            )
-                        );
+                        const target = getKeyofTarget(nextProcess(data, null, data.value));
                         if (Type.isInterfaceDefinition(target.value))
                         {
                             return buildCall
@@ -826,7 +823,26 @@ export namespace Build
                 case "number":
                     return [ $expression("EvilType.Validator.isNumber"), ];
                 case "string":
-                    return [ $expression("EvilType.Validator.isString"), ];
+                    const stringOptions = [
+                        ...(undefined !== data.value.minLength ? [ $expression(`minLength:${data.value.minLength},`), ]: []),
+                        ...(undefined !== data.value.maxLength ? [ $expression(`maxLength:${data.value.maxLength},`), ]: []),
+                        ...(Type.isPatternStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(data.value.pattern)},`), ]: []),
+                        ...(Type.isFormatStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(Type.StringFormatMap[data.value.format])},`), $expression(`pattern:${Jsonable.stringify(data.value.format)},`), ]: []),
+                    ];
+                    if (0 < stringOptions.length)
+                    {
+                        return [
+                            $expression("EvilType.Validator.isDetailString"),
+                            $expression("({"),
+                            ...stringOptions,
+                            $expression(`regexpFlags:${Jsonable.stringify(getRegexpFlags(data))},`),
+                            $expression("})"),
+                        ];
+                    }
+                    else
+                    {
+                        return [ $expression("EvilType.Validator.isString"), ];
+                    }
                 case "type":
                     return buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.define));
                 case "enum-type":
@@ -1232,6 +1248,31 @@ export namespace Build
                 result["type"] = data.value.type;
                 break;
             }
+            if ("string" === data.value.type)
+            {
+                if (undefined !== data.value.minLength)
+                {
+                    result["minLength"] = data.value.minLength;
+                }
+                if (undefined !== data.value.maxLength)
+                {
+                    result["maxLength"] = data.value.maxLength;
+                }
+                if ("pattern" in data.value)
+                {
+                    result["pattern"] = data.value.pattern;
+                }
+                if ("format" in data.value)
+                {
+                    result["pattern"] = Type.StringFormatMap[data.value.format];
+                    result["format"] = data.value.format;
+                }
+                // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない
+                // if ("regexpFlags" in data.value && "string" === typeof data.value.regexpFlags)
+                // {
+                //     result["regexpFlags"] = data.value.regexpFlags;
+                // }
+            }
             return setCommonProperties(result, data);
         };
         export const buildInterface = (data: Process<Type.InterfaceDefinition>):Jsonable.JsonableObject =>
@@ -1253,7 +1294,7 @@ export namespace Build
                 (
                     i =>
                     {
-                        const current = getTarget(nextProcess(data, null, i));
+                        const current = getResolveRefer(nextProcess(data, null, i));
                         if (Type.isInterfaceDefinition(current.value))
                         {
                             const base = buildInterface(<Process<Type.InterfaceDefinition>>current);
@@ -1349,17 +1390,7 @@ export namespace Build
             const result: Jsonable.JsonableObject =
             {
             };
-            const target = getTarget
-            (
-                nextProcess
-                (
-                    data,
-                    null,
-                    Type.isTypeofElement(data.value.value) ?
-                        data.value.value.value:
-                        data.value.value
-                )
-            );
+            const target = getKeyofTarget(nextProcess(data, null, data.value));
             if (Type.isInterfaceDefinition(target.value))
             {
                 result["enum"] = getKeys(nextProcess(target, null, target.value)).map(i => Text.getPrimaryKeyName(i));

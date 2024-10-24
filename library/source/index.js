@@ -129,11 +129,11 @@ var Build;
         var path = Build.getAbsolutePath(data, data.value);
         return Object.assign({}, data, { path: path, value: data.definitions[path], });
     };
-    Build.getTarget = function (data) {
+    Build.getResolveRefer = function (data) {
         if (type_1.Type.isReferElement(data.value)) {
             var next = Build.getDefinition(Build.nextProcess(data, null, data.value));
             if (type_1.Type.isTypeOrValueOfRefer(next.value)) {
-                return Build.getTarget(next);
+                return Build.getResolveRefer(next);
             }
             else {
                 return Build.nextProcess(data, null, data.value);
@@ -141,16 +141,26 @@ var Build;
         }
         if (type_1.Type.isValueDefinition(data.value)) {
             if (type_1.Type.isReferElement(data.value.value)) {
-                return Build.getTarget(Build.nextProcess(data, null, data.value.value));
+                return Build.getResolveRefer(Build.nextProcess(data, null, data.value.value));
             }
             else {
                 return Build.nextProcess(data, null, data.value.value);
             }
         }
         if (type_1.Type.isTypeDefinition(data.value)) {
-            return Build.getTarget(Build.nextProcess(data, null, data.value.define));
+            return Build.getResolveRefer(Build.nextProcess(data, null, data.value.define));
         }
         return Build.nextProcess(data, null, data.value);
+    };
+    Build.getKeyofTarget = function (data) { return Build.getResolveRefer(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
+        data.value.value.value :
+        data.value.value)); };
+    Build.getRegexpFlags = function (data) {
+        var _a, _b;
+        if ((type_1.Type.isPatternStringType(data.value) || type_1.Type.isFormatStringType(data.value)) && undefined !== data.value.regexpFlags) {
+            return data.value.regexpFlags;
+        }
+        return (_b = (_a = data.options.default) === null || _a === void 0 ? void 0 : _a.regexpFlags) !== null && _b !== void 0 ? _b : config_json_1.default.regexpFlags;
     };
     Build.getLiteral = function (data) {
         var definition = Build.getDefinition(data);
@@ -168,7 +178,7 @@ var Build;
         var result = [];
         if (data.value.extends) {
             data.value.extends.forEach(function (i) {
-                var current = Build.getTarget(Build.nextProcess(data, null, i));
+                var current = Build.getResolveRefer(Build.nextProcess(data, null, i));
                 if (type_1.Type.isInterfaceDefinition(current.value)) {
                     result.push.apply(result, Build.getKeys(Build.nextProcess(current, null, current.value)));
                 }
@@ -179,7 +189,7 @@ var Build;
     };
     Build.isKindofNeverType = function (data) {
         var _a, _b, _c;
-        var target = Build.getTarget(data);
+        var target = Build.getResolveRefer(data);
         if (type_1.Type.isLiteralElement(target.value)) {
             return false;
         }
@@ -189,9 +199,7 @@ var Build;
                     return false;
                 case "keyof":
                     {
-                        var entry_1 = Build.getTarget(Build.nextProcess(target, null, type_1.Type.isTypeofElement(target.value.value) ?
-                            target.value.value.value :
-                            target.value.value));
+                        var entry_1 = Build.getKeyofTarget(Build.nextProcess(target, null, target.value));
                         if (type_1.Type.isInterfaceDefinition(entry_1.value)) {
                             return 0 === Object.entries(entry_1.value.members).filter(function (i) { return !Build.isKindofNeverType(Build.nextProcess(entry_1, i[0], i[1])); }).length;
                         }
@@ -487,9 +495,13 @@ var Build;
                     case "integer":
                         return [(0, exports.$expression)("Number.isInteger"), (0, exports.$expression)("("), (0, exports.$expression)(name), (0, exports.$expression)(")"),];
                     case "boolean":
-                    case "number":
-                    case "string":
                         return [(0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name)),];
+                    case "number":
+                        return [(0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name)),];
+                    case "string":
+                        return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
+                            (0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name))
+                        ], (undefined !== data.value.minLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minLength)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name, ".length")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name, ".length")), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maxLength)),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("new"), (0, exports.$expression)("RegExp"), (0, exports.$expression)("("), (0, exports.$expression)(jsonable_1.Jsonable.stringify(data.value.pattern)), (0, exports.$expression)(","), (0, exports.$expression)(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data))), (0, exports.$expression)(")"), (0, exports.$expression)(".test(".concat(name, ")"))] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("new"), (0, exports.$expression)("RegExp"), (0, exports.$expression)("("), (0, exports.$expression)(jsonable_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format])), (0, exports.$expression)(","), (0, exports.$expression)(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data))), (0, exports.$expression)(")"), (0, exports.$expression)(".test(".concat(name, ")"))] : []), true);
                     case "type":
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
@@ -528,9 +540,7 @@ var Build;
             }
         };
         Validator.buildKeyofValidator = function (name, data) {
-            var target = Build.getTarget(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
-                data.value.value.value :
-                data.value.value));
+            var target = Build.getKeyofTarget(Build.nextProcess(data, null, data.value));
             if (type_1.Type.isInterfaceDefinition(target.value)) {
                 return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getKeys(Build.nextProcess(data, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })), ".includes(").concat(name, " as any)")),];
             }
@@ -612,9 +622,7 @@ var Build;
                         return [(0, exports.$expression)(Validator.buildValidatorName(data.value.value.$ref)),];
                     case "keyof":
                         {
-                            var target = Build.getTarget(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
-                                data.value.value.value :
-                                data.value.value));
+                            var target = Build.getKeyofTarget(Build.nextProcess(data, null, data.value));
                             if (type_1.Type.isInterfaceDefinition(target.value)) {
                                 return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })),]);
                             }
@@ -647,7 +655,19 @@ var Build;
                     case "number":
                         return [(0, exports.$expression)("EvilType.Validator.isNumber"),];
                     case "string":
-                        return [(0, exports.$expression)("EvilType.Validator.isString"),];
+                        var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format]), ",")), (0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
+                        if (0 < stringOptions.length) {
+                            return __spreadArray(__spreadArray([
+                                (0, exports.$expression)("EvilType.Validator.isDetailString"),
+                                (0, exports.$expression)("({")
+                            ], stringOptions, true), [
+                                (0, exports.$expression)("regexpFlags:".concat(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data)), ",")),
+                                (0, exports.$expression)("})"),
+                            ], false);
+                        }
+                        else {
+                            return [(0, exports.$expression)("EvilType.Validator.isString"),];
+                        }
                     case "type":
                         return Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
@@ -927,6 +947,26 @@ var Build;
                     result["type"] = data.value.type;
                     break;
             }
+            if ("string" === data.value.type) {
+                if (undefined !== data.value.minLength) {
+                    result["minLength"] = data.value.minLength;
+                }
+                if (undefined !== data.value.maxLength) {
+                    result["maxLength"] = data.value.maxLength;
+                }
+                if ("pattern" in data.value) {
+                    result["pattern"] = data.value.pattern;
+                }
+                if ("format" in data.value) {
+                    result["pattern"] = type_1.Type.StringFormatMap[data.value.format];
+                    result["format"] = data.value.format;
+                }
+                // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない
+                // if ("regexpFlags" in data.value && "string" === typeof data.value.regexpFlags)
+                // {
+                //     result["regexpFlags"] = data.value.regexpFlags;
+                // }
+            }
             return Schema.setCommonProperties(result, data);
         };
         Schema.buildInterface = function (data) {
@@ -942,7 +982,7 @@ var Build;
                 // additionalProperties: false と allOf の組み合わせは残念な事になるので極力使わない。( additionalProperties: false が、 allOf の参照先の properties も参照元の Properties も使えなくしてしまうので、この組み合わせは使えたもんじゃない。 )
                 var allOf_1 = [];
                 data.value.extends.forEach(function (i) {
-                    var current = Build.getTarget(Build.nextProcess(data, null, i));
+                    var current = Build.getResolveRefer(Build.nextProcess(data, null, i));
                     if (type_1.Type.isInterfaceDefinition(current.value)) {
                         var base = Schema.buildInterface(current);
                         Object.assign(properties, base["properties"]);
@@ -1012,9 +1052,7 @@ var Build;
         };
         Schema.buildKeyOf = function (data) {
             var result = {};
-            var target = Build.getTarget(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
-                data.value.value.value :
-                data.value.value));
+            var target = Build.getKeyofTarget(Build.nextProcess(data, null, data.value));
             if (type_1.Type.isInterfaceDefinition(target.value)) {
                 result["enum"] = Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
             }

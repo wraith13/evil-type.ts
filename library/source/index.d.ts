@@ -54,7 +54,9 @@ export declare namespace Build {
     const makeDefinitionFlatMap: (defines: Type.DefinitionMap) => Type.DefinitionMap;
     const getAbsolutePath: (data: BaseProcess<unknown>, value: Type.ReferElement, context?: string) => string;
     const getDefinition: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => NextProcess<Process, Type.Definition>;
-    const getTarget: <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process) => NextProcess<Process, Type.TypeOrLiteralOfRefer>;
+    const getResolveRefer: <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process) => NextProcess<Process, Type.TypeOrLiteralOfRefer>;
+    const getKeyofTarget: <Process extends BaseProcess<Type.KeyofElement>>(data: Process) => NextProcess<NextProcess<Process, Type.ReferElement>, Type.TypeOrLiteralOfRefer>;
+    const getRegexpFlags: <Process extends BaseProcess<unknown>>(data: Process) => string;
     const getLiteral: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => Type.LiteralElement | null;
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
     const isKindofNeverType: (data: BaseProcess<Type.TypeOrRefer>) => boolean;

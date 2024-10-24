@@ -1,6 +1,8 @@
 {
     "repository": "https://github.com/wraith13/evil-type.ts",
     "maxLineLength": 140,
+    "safeNumber": true,
+    "safeInteger": true,
     "regexpFlags": "u",
     "lineUnbreakableTokens": {
         "heads": [

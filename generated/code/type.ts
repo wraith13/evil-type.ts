@@ -27,8 +27,10 @@ export namespace Type
         indentUnit: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "tab";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
+        safeNumber?: boolean;
+        safeInteger?: boolean;
         maxLineLength?: null | number;
-        default?: { export?: boolean, additionalProperties?: boolean, };
+        default?: { export?: boolean, additionalProperties?: boolean, regexpFlags?: string, };
         schema?: SchemaOptions;
     }
     export interface SchemaOptions
@@ -139,10 +141,22 @@ export namespace Type
     export interface NumberType extends CommonProperties
     {
         type: "number";
+        minimum?: number;
+        exclusiveMinimum?: number;
+        maximum?: number;
+        exclusiveMaximum?: number;
+        multipleOf?: number;
+        safeNumber?: boolean;
     }
     export interface IntegerType extends CommonProperties
     {
         type: "integer";
+        minimum?: number;
+        exclusiveMinimum?: number;
+        maximum?: number;
+        exclusiveMaximum?: number;
+        multipleOf?: number;
+        safeInteger?: boolean;
     }
     export interface BasicStringType extends CommonProperties
     {
@@ -189,7 +203,7 @@ export namespace Type
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
     export const StringFormatMap =
-        {"date-time":"^date-time$","date":"^time$","time":"^time$","duration":"^duration$","email":"^email$","idn-email":"^idn-email$","hostname":"^hostname$","idn-hostname":"^idn-hostname$","ipv4":"^ipv4$","ipv6":"^ipv6$","uuid":"^uuid$","uri":"^uri$","uri-reference":"^uri-reference$","iri":"^iri$","iri-reference":"^iri-reference$","uri-template":"^uri-template$","json-pointer":"^json-pointer$","relative-json-pointer":"^relative-json-pointer$","regex":"^regex$"} as
+        {"date-time":"^date-time$","date":"^date$","time":"^time$","duration":"^duration$","email":"^email$","idn-email":"^idn-email$","hostname":"^hostname$","idn-hostname":"^idn-hostname$","ipv4":"^ipv4$","ipv6":"^ipv6$","uuid":"^uuid$","uri":"^uri$","uri-reference":"^uri-reference$","iri":"^iri$","iri-reference":"^iri-reference$","uri-template":"^uri-template$","json-pointer":"^json-pointer$","relative-json-pointer":"^relative-json-pointer$","regex":"^regex$"} as
         const;
     export const isSchema = EvilType.Validator.isJust(schema);
     export const isCommentProperty = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commentPropertyValidatorObject, false));
@@ -261,10 +275,12 @@ export namespace Type
         isImportDefinition)), defines: isDefinitionMap, options: isOutputOptions, });
     export const outputOptionsValidatorObject: EvilType.Validator.ObjectValidator<OutputOptions> = ({ outputFile:
         EvilType.Validator.isString, indentUnit: EvilType.Validator.isEnum([0,1,2,3,4,5,6,7,8,"tab"] as const), indentStyle:
-        isIndentStyleType, validatorOption: isValidatorOptionType, maxLineLength: EvilType.Validator.isOptional(EvilType.Validator.isOr(
-        EvilType.Validator.isNull, EvilType.Validator.isInteger)), default: EvilType.Validator.isOptional(({ export:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(
-        EvilType.Validator.isBoolean), })), schema: EvilType.Validator.isOptional(isSchemaOptions), });
+        isIndentStyleType, validatorOption: isValidatorOptionType, safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean),
+        safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), maxLineLength: EvilType.Validator.isOptional(
+        EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), default: EvilType.Validator.isOptional(({ export
+        : EvilType.Validator.isOptional(EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(
+        EvilType.Validator.isBoolean), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), schema:
+        EvilType.Validator.isOptional(isSchemaOptions), });
     export const schemaOptionsValidatorObject: EvilType.Validator.ObjectValidator<SchemaOptions> = ({ outputFile:
         EvilType.Validator.isString, $id: EvilType.Validator.isOptional(EvilType.Validator.isString), $ref: EvilType.Validator.isOptional(
         EvilType.Validator.isString), externalReferMapping: EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(
@@ -318,9 +334,17 @@ export namespace Type
     export const booleanTypeValidatorObject: EvilType.Validator.ObjectValidator<BooleanType> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("boolean" as const), });
     export const numberTypeValidatorObject: EvilType.Validator.ObjectValidator<NumberType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("number" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("number" as const), minimum: EvilType.Validator.isOptional(
+        EvilType.Validator.isInteger), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isNumber), maximum:
+        EvilType.Validator.isOptional(EvilType.Validator.isNumber), exclusiveMaximum: EvilType.Validator.isOptional(
+        EvilType.Validator.isNumber), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isNumber), safeNumber:
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const integerTypeValidatorObject: EvilType.Validator.ObjectValidator<IntegerType> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("integer" as const), });
+        commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("integer" as const), minimum: EvilType.Validator.isOptional(
+        EvilType.Validator.isInteger), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isInteger), maximum:
+        EvilType.Validator.isOptional(EvilType.Validator.isInteger), exclusiveMaximum: EvilType.Validator.isOptional(
+        EvilType.Validator.isInteger), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isInteger), safeInteger:
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const basicStringTypeValidatorObject: EvilType.Validator.ObjectValidator<BasicStringType> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("string" as const),
         minLength: EvilType.Validator.isOptional(EvilType.Validator.isInteger), maxLength: EvilType.Validator.isOptional(

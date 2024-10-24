@@ -107,6 +107,16 @@
                     "default": "simple",
                     "description": "[CODE]"
                 },
+                "safeNumber": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "[CODE]"
+                },
+                "safeInteger": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "[CODE]"
+                },
                 "maxLineLength": {
                     "oneOf": [
                         {
@@ -130,6 +140,11 @@
                         "additionalProperties": {
                             "type": "boolean",
                             "description": "[SCHEMA]"
+                        },
+                        "regexpFlags": {
+                            "type": "string",
+                            "default": "u",
+                            "description": "[CODE]"
                         }
                     },
                     "required": [],
@@ -827,6 +842,24 @@
                 },
                 "type": {
                     "const": "number"
+                },
+                "minimum": {
+                    "type": "integer"
+                },
+                "exclusiveMinimum": {
+                    "type": "number"
+                },
+                "maximum": {
+                    "type": "number"
+                },
+                "exclusiveMaximum": {
+                    "type": "number"
+                },
+                "multipleOf": {
+                    "type": "number"
+                },
+                "safeNumber": {
+                    "type": "boolean"
                 }
             },
             "required": [
@@ -851,6 +884,24 @@
                 },
                 "type": {
                     "const": "integer"
+                },
+                "minimum": {
+                    "type": "integer"
+                },
+                "exclusiveMinimum": {
+                    "type": "integer"
+                },
+                "maximum": {
+                    "type": "integer"
+                },
+                "exclusiveMaximum": {
+                    "type": "integer"
+                },
+                "multipleOf": {
+                    "type": "integer"
+                },
+                "safeInteger": {
+                    "type": "boolean"
                 }
             },
             "required": [
@@ -1241,7 +1292,7 @@
         "Type.StringFormatMap": {
             "const": {
                 "date-time": "^date-time$",
-                "date": "^time$",
+                "date": "^date$",
                 "time": "^time$",
                 "duration": "^duration$",
                 "email": "^email$",

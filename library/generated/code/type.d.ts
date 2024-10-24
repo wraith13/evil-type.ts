@@ -21,10 +21,13 @@ export declare namespace Type {
         indentUnit: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | "tab";
         indentStyle: IndentStyleType;
         validatorOption: ValidatorOptionType;
+        safeNumber?: boolean;
+        safeInteger?: boolean;
         maxLineLength?: null | number;
         default?: {
             export?: boolean;
             additionalProperties?: boolean;
+            regexpFlags?: string;
         };
         schema?: SchemaOptions;
     }
@@ -117,9 +120,21 @@ export declare namespace Type {
     }
     interface NumberType extends CommonProperties {
         type: "number";
+        minimum?: number;
+        exclusiveMinimum?: number;
+        maximum?: number;
+        exclusiveMaximum?: number;
+        multipleOf?: number;
+        safeNumber?: boolean;
     }
     interface IntegerType extends CommonProperties {
         type: "integer";
+        minimum?: number;
+        exclusiveMinimum?: number;
+        maximum?: number;
+        exclusiveMaximum?: number;
+        multipleOf?: number;
+        safeInteger?: boolean;
     }
     interface BasicStringType extends CommonProperties {
         type: "string";
@@ -159,7 +174,7 @@ export declare namespace Type {
     type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
     const StringFormatMap: {
         readonly "date-time": "^date-time$";
-        readonly date: "^time$";
+        readonly date: "^date$";
         readonly time: "^time$";
         readonly duration: "^duration$";
         readonly email: "^email$";
@@ -225,7 +240,7 @@ export declare namespace Type {
     const isTypeOrLiteralOfRefer: EvilType.Validator.IsType<TypeOrLiteralOfRefer>;
     const isStringFormatMap: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is {
         readonly "date-time": "^date-time$";
-        readonly date: "^time$";
+        readonly date: "^date$";
         readonly time: "^time$";
         readonly duration: "^duration$";
         readonly email: "^email$";
