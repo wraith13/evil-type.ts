@@ -151,6 +151,14 @@
                                     "type": "boolean",
                                     "default": false
                                 },
+                                "safeInteger?": {
+                                    "type": "boolean",
+                                    "default": false
+                                },
+                                "safeNumber?": {
+                                    "type": "boolean",
+                                    "default": false
+                                },
                                 "regexpFlags?": {
                                     "type": "string",
                                     "default": "u",
@@ -565,7 +573,7 @@
                         }
                     }
                 },
-                "NumberType": {
+                "BaseNumberType": {
                     "type": "interface",
                     "extends": [
                         {
@@ -576,8 +584,68 @@
                         "type": {
                             "const": "number"
                         },
+                        "multipleOf?": {
+                            "type": "number"
+                        },
+                        "safeNumber?": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "NumberTypeMM": {
+                    "type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "BaseNumberType"
+                        }
+                    ],
+                    "members": {
                         "minimum?": {
-                            "type": "integer"
+                            "type": "number"
+                        },
+                        "exclusiveMinimum": {
+                            "type": "never"
+                        },
+                        "maximum?": {
+                            "type": "number"
+                        },
+                        "exclusiveMaximum": {
+                            "type": "never"
+                        }
+                    }
+                },
+                "NumberTypeME": {
+                    "type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "BaseNumberType"
+                        }
+                    ],
+                    "members": {
+                        "minimum?": {
+                            "type": "number"
+                        },
+                        "exclusiveMinimum": {
+                            "type": "never"
+                        },
+                        "maximum": {
+                            "type": "never"
+                        },
+                        "exclusiveMaximum?": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "NumberTypeEM": {
+                    "type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "BaseNumberType"
+                        }
+                    ],
+                    "members": {
+                        "minimum": {
+                            "type": "never"
                         },
                         "exclusiveMinimum?": {
                             "type": "number"
@@ -585,15 +653,51 @@
                         "maximum?": {
                             "type": "number"
                         },
+                        "exclusiveMaximum": {
+                            "type": "never"
+                        }
+                    }
+                },
+                "NumberTypeEE": {
+                    "type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "BaseNumberType"
+                        }
+                    ],
+                    "members": {
+                        "minimum": {
+                            "type": "never"
+                        },
+                        "exclusiveMinimum?": {
+                            "type": "number"
+                        },
+                        "maximum": {
+                            "type": "never"
+                        },
                         "exclusiveMaximum?": {
                             "type": "number"
-                        },
-                        "multipleOf?": {
-                            "type": "number"
-                        },
-                        "safeNumber?": {
-                            "type": "boolean"
                         }
+                    }
+                },
+                "NumberType": {
+                    "type": "type",
+                    "define": {
+                        "type": "or",
+                        "types": [
+                            {
+                                "$ref": "NumberTypeMM"
+                            },
+                            {
+                                "$ref": "NumberTypeME"
+                            },
+                            {
+                                "$ref": "NumberTypeEM"
+                            },
+                            {
+                                "$ref": "NumberTypeEE"
+                            }
+                        ]
                     }
                 },
                 "IntegerType": {

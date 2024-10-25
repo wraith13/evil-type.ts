@@ -45,6 +45,14 @@ export declare namespace EvilType {
         const isBoolean: (value: unknown, listner?: ErrorListener) => value is boolean;
         const isNumber: (value: unknown, listner?: ErrorListener) => value is number;
         const isInteger: (value: unknown, listner?: ErrorListener) => value is number;
+        const isSafeNumber: (value: unknown, listner?: ErrorListener) => value is number;
+        const isDetailNumber: (data: {
+            minimum?: number;
+            exclusiveMinimum?: number;
+            maximum?: number;
+            exclusiveMaximum?: number;
+            multipleOf?: number;
+        }, safeNumber?: boolean) => IsType<number>;
         const isString: (value: unknown, listner?: ErrorListener) => value is string;
         const isDetailString: (data: {
             minLength?: number;

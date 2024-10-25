@@ -159,6 +159,20 @@ var Build;
     Build.getKeyofTarget = function (data) { return Build.getResolveRefer(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
         data.value.value.value :
         data.value.value)); };
+    Build.getSafeInteger = function (data) {
+        var _a, _b;
+        if ((type_1.Type.isIntegerType(data.value)) && undefined !== data.value.safeInteger) {
+            return data.value.safeInteger;
+        }
+        return (_b = (_a = data.options.default) === null || _a === void 0 ? void 0 : _a.safeInteger) !== null && _b !== void 0 ? _b : config_json_1.default.safeInteger;
+    };
+    Build.getSafeNumber = function (data) {
+        var _a, _b;
+        if ((type_1.Type.isNumberType(data.value)) && undefined !== data.value.safeNumber) {
+            return data.value.safeNumber;
+        }
+        return (_b = (_a = data.options.default) === null || _a === void 0 ? void 0 : _a.safeNumber) !== null && _b !== void 0 ? _b : config_json_1.default.safeNumber;
+    };
     Build.getRegexpFlags = function (data) {
         var _a, _b;
         if ((type_1.Type.isPatternStringType(data.value) || type_1.Type.isFormatStringType(data.value)) && undefined !== data.value.regexpFlags) {
@@ -770,16 +784,36 @@ var Build;
                     case "integer":
                         return [(0, exports.$expression)("EvilType.Validator.isInteger"),];
                     case "number":
-                        return [(0, exports.$expression)("EvilType.Validator.isNumber"),];
+                        var numberOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minimum ? [(0, exports.$expression)("minimum:".concat(data.value.minimum, ",")),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("exclusiveMinimum:".concat(data.value.exclusiveMinimum, ",")),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("maximum:".concat(data.value.maximum, ",")),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("exclusiveMaximum:".concat(data.value.exclusiveMaximum, ",")),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("multipleOf:".concat(data.value.multipleOf, ",")),] : []), true);
+                        if (0 < numberOptions.length) {
+                            return __spreadArray(__spreadArray([
+                                (0, exports.$expression)("EvilType.Validator.isDetailNumber"),
+                                (0, exports.$expression)("("),
+                                (0, exports.$expression)("{")
+                            ], numberOptions, true), [
+                                (0, exports.$expression)("},"),
+                                (0, exports.$expression)("safeNumber:".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)), ",")),
+                                (0, exports.$expression)(")"),
+                            ], false);
+                        }
+                        else {
+                            return [
+                                Build.getSafeNumber(data) ?
+                                    (0, exports.$expression)("EvilType.Validator.isSafeNumber") :
+                                    (0, exports.$expression)("EvilType.Validator.isNumber"),
+                            ];
+                        }
                     case "string":
                         var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format]), ",")), (0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
                         if (0 < stringOptions.length) {
                             return __spreadArray(__spreadArray([
                                 (0, exports.$expression)("EvilType.Validator.isDetailString"),
-                                (0, exports.$expression)("({")
+                                (0, exports.$expression)("("),
+                                (0, exports.$expression)("{")
                             ], stringOptions, true), [
+                                (0, exports.$expression)("},"),
                                 (0, exports.$expression)("regexpFlags:".concat(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data)), ",")),
-                                (0, exports.$expression)("})"),
+                                (0, exports.$expression)(")"),
                             ], false);
                         }
                         else {
@@ -1070,6 +1104,28 @@ var Build;
                 default:
                     result["type"] = data.value.type;
                     break;
+            }
+            if ("number" === data.value.type) {
+                if (undefined !== data.value.minimum) {
+                    result["minimum"] = data.value.minimum;
+                }
+                if (undefined !== data.value.exclusiveMinimum) {
+                    result["exclusiveMinimum"] = data.value.exclusiveMinimum;
+                }
+                if (undefined !== data.value.maximum) {
+                    result["maximum"] = data.value.maximum;
+                }
+                if (undefined !== data.value.exclusiveMaximum) {
+                    result["exclusiveMaximum"] = data.value.exclusiveMaximum;
+                }
+                if (undefined !== data.value.multipleOf) {
+                    result["multipleOf"] = data.value.multipleOf;
+                }
+                // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない
+                // if (undefined !== data.value.safeNynber)
+                // {
+                //     result["safeNynber"] = data.value.safeNynber;
+                // }
             }
             if ("string" === data.value.type) {
                 if (undefined !== data.value.minLength) {

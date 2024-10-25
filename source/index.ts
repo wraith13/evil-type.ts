@@ -205,6 +205,22 @@ export namespace Build
                 data.value.value
         )
     );
+    export const getSafeInteger = <Process extends BaseProcess<unknown>>(data: Process) =>
+    {
+        if ((Type.isIntegerType(data.value)) && undefined !== data.value.safeInteger)
+        {
+            return data.value.safeInteger;
+        }
+        return data.options.default?.safeInteger ?? config.safeInteger;
+    }
+    export const getSafeNumber = <Process extends BaseProcess<unknown>>(data: Process) =>
+    {
+        if ((Type.isNumberType(data.value)) && undefined !== data.value.safeNumber)
+        {
+            return data.value.safeNumber;
+        }
+        return data.options.default?.safeNumber ?? config.safeNumber;
+    }
     export const getRegexpFlags = <Process extends BaseProcess<unknown>>(data: Process) =>
     {
         if ((Type.isPatternStringType(data.value) || Type.isFormatStringType(data.value)) && undefined !== data.value.regexpFlags)
@@ -968,7 +984,33 @@ export namespace Build
                 case "integer":
                     return [ $expression("EvilType.Validator.isInteger"), ];
                 case "number":
-                    return [ $expression("EvilType.Validator.isNumber"), ];
+                    const numberOptions = [
+                        ...(undefined !== data.value.minimum ? [ $expression(`minimum:${data.value.minimum},`), ]: []),
+                        ...(undefined !== data.value.exclusiveMinimum ? [ $expression(`exclusiveMinimum:${data.value.exclusiveMinimum},`), ]: []),
+                        ...(undefined !== data.value.maximum ? [ $expression(`maximum:${data.value.maximum},`), ]: []),
+                        ...(undefined !== data.value.exclusiveMaximum ? [ $expression(`exclusiveMaximum:${data.value.exclusiveMaximum},`), ]: []),
+                        ...(undefined !== data.value.multipleOf ? [ $expression(`multipleOf:${data.value.multipleOf},`), ]: []),
+                    ];
+                    if (0 < numberOptions.length)
+                    {
+                        return [
+                            $expression("EvilType.Validator.isDetailNumber"),
+                            $expression("("),
+                            $expression("{"),
+                            ...numberOptions,
+                            $expression("},"),
+                            $expression(`safeNumber:${Jsonable.stringify(getSafeNumber(data))},`),
+                            $expression(")"),
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            getSafeNumber(data) ?
+                                $expression("EvilType.Validator.isSafeNumber"):
+                                $expression("EvilType.Validator.isNumber"),
+                        ];
+                    }
                 case "string":
                     const stringOptions = [
                         ...(undefined !== data.value.minLength ? [ $expression(`minLength:${data.value.minLength},`), ]: []),
@@ -980,10 +1022,12 @@ export namespace Build
                     {
                         return [
                             $expression("EvilType.Validator.isDetailString"),
-                            $expression("({"),
+                            $expression("("),
+                            $expression("{"),
                             ...stringOptions,
+                            $expression("},"),
                             $expression(`regexpFlags:${Jsonable.stringify(getRegexpFlags(data))},`),
-                            $expression("})"),
+                            $expression(")"),
                         ];
                     }
                     else
@@ -1408,6 +1452,34 @@ export namespace Build
             default:
                 result["type"] = data.value.type;
                 break;
+            }
+            if ("number" === data.value.type)
+            {
+                if (undefined !== data.value.minimum)
+                {
+                    result["minimum"] = data.value.minimum;
+                }
+                if (undefined !== data.value.exclusiveMinimum)
+                {
+                    result["exclusiveMinimum"] = data.value.exclusiveMinimum;
+                }
+                if (undefined !== data.value.maximum)
+                {
+                    result["maximum"] = data.value.maximum;
+                }
+                if (undefined !== data.value.exclusiveMaximum)
+                {
+                    result["exclusiveMaximum"] = data.value.exclusiveMaximum;
+                }
+                if (undefined !== data.value.multipleOf)
+                {
+                    result["multipleOf"] = data.value.multipleOf;
+                }
+                // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない
+                // if (undefined !== data.value.safeNynber)
+                // {
+                //     result["safeNynber"] = data.value.safeNynber;
+                // }
             }
             if ("string" === data.value.type)
             {

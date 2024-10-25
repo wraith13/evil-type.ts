@@ -239,6 +239,56 @@ export namespace EvilType
             Error.withErrorHandling("number" === typeof value, listner, "number", value);
         export const isInteger = (value: unknown, listner?: ErrorListener): value is number =>
             Error.withErrorHandling(Number.isInteger(value), listner, "integer", value);
+        export const isSafeNumber = (value: unknown, listner?: ErrorListener): value is number =>
+            Error.withErrorHandling(Number.isFinite(value), listner, "safe-number", value);
+        export const isDetailNumber = (data: { minimum?: number; exclusiveMinimum?: number; maximum?: number; exclusiveMaximum?: number; multipleOf?: number; }, safeNumber?: boolean): IsType<number> =>
+        {
+            const base = true === safeNumber ? isSafeNumber: isNumber;
+            if ([ data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf ].every(i => undefined === i))
+            {
+                return base;
+            }
+            else
+            {
+                const result = (value: unknown, listner?: ErrorListener): value is number => Error.withErrorHandling
+                (
+                    base(value) &&
+                    (undefined === data.minimum || data.minimum <= value) &&
+                    (undefined === data.exclusiveMinimum || data.exclusiveMinimum <= value) &&
+                    (undefined === data.maximum || value <= data.maximum) &&
+                    (undefined === data.exclusiveMaximum || value <= data.exclusiveMaximum) &&
+                    (undefined === data.multipleOf || 0 === value % data.multipleOf),
+                    listner,
+                    () =>
+                    {
+                        const details: string[] = [];
+                        if (undefined !== data.minimum)
+                        {
+                            details.push(`minimum:${data.minimum}`);
+                        }
+                        if (undefined !== data.exclusiveMinimum)
+                        {
+                            details.push(`exclusiveMinimum:${data.exclusiveMinimum}`);
+                        }
+                        if (undefined !== data.maximum)
+                        {
+                            details.push(`maximum:${data.maximum}`);
+                        }
+                        if (undefined !== data.exclusiveMaximum)
+                        {
+                            details.push(`exclusiveMaximum:${data.exclusiveMaximum}`);
+                        }
+                        if (undefined !== data.multipleOf)
+                        {
+                            details.push(`format:${data.multipleOf}`);
+                        }
+                        return `${true === safeNumber ? "safe-number": "number"}(${details.join(",")})`
+                    },
+                    value
+                );
+                return result;
+            }
+        };
         export const isString = (value: unknown, listner?: ErrorListener): value is string =>
             Error.withErrorHandling("string" === typeof value, listner, "string", value);
         export const isDetailString = (data: { minLength?: number, maxLength?: number, pattern?: string, format?: string, regexpFlags?: string}, regexpFlags?: string): IsType<string> =>

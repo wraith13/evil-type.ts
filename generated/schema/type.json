@@ -140,6 +140,12 @@
                         "additionalProperties": {
                             "type": "boolean"
                         },
+                        "safeInteger": {
+                            "type": "boolean"
+                        },
+                        "safeNumber": {
+                            "type": "boolean"
+                        },
                         "regexpFlags": {
                             "type": "string",
                             "default": "u",
@@ -830,7 +836,7 @@
             ],
             "additionalProperties": false
         },
-        "Type.NumberType": {
+        "Type.BaseNumberType": {
             "type": "object",
             "properties": {
                 "default": {
@@ -848,18 +854,6 @@
                 "type": {
                     "const": "number"
                 },
-                "minimum": {
-                    "type": "integer"
-                },
-                "exclusiveMinimum": {
-                    "type": "number"
-                },
-                "maximum": {
-                    "type": "number"
-                },
-                "exclusiveMaximum": {
-                    "type": "number"
-                },
                 "multipleOf": {
                     "type": "number"
                 },
@@ -871,6 +865,190 @@
                 "type"
             ],
             "additionalProperties": false
+        },
+        "Type.NumberTypeMM": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "description": "[SCHEMA]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "type": {
+                    "const": "number"
+                },
+                "multipleOf": {
+                    "type": "number"
+                },
+                "safeNumber": {
+                    "type": "boolean"
+                },
+                "minimum": {
+                    "type": "number"
+                },
+                "maximum": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false,
+            "not": {
+                "required": [
+                    "exclusiveMinimum",
+                    "exclusiveMaximum"
+                ]
+            }
+        },
+        "Type.NumberTypeME": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "description": "[SCHEMA]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "type": {
+                    "const": "number"
+                },
+                "multipleOf": {
+                    "type": "number"
+                },
+                "safeNumber": {
+                    "type": "boolean"
+                },
+                "minimum": {
+                    "type": "number"
+                },
+                "exclusiveMaximum": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false,
+            "not": {
+                "required": [
+                    "exclusiveMinimum",
+                    "maximum"
+                ]
+            }
+        },
+        "Type.NumberTypeEM": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "description": "[SCHEMA]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "type": {
+                    "const": "number"
+                },
+                "multipleOf": {
+                    "type": "number"
+                },
+                "safeNumber": {
+                    "type": "boolean"
+                },
+                "exclusiveMinimum": {
+                    "type": "number"
+                },
+                "maximum": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false,
+            "not": {
+                "required": [
+                    "minimum",
+                    "exclusiveMaximum"
+                ]
+            }
+        },
+        "Type.NumberTypeEE": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "description": "[SCHEMA]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "type": {
+                    "const": "number"
+                },
+                "multipleOf": {
+                    "type": "number"
+                },
+                "safeNumber": {
+                    "type": "boolean"
+                },
+                "exclusiveMinimum": {
+                    "type": "number"
+                },
+                "exclusiveMaximum": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false,
+            "not": {
+                "required": [
+                    "minimum",
+                    "maximum"
+                ]
+            }
+        },
+        "Type.NumberType": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/Type.NumberTypeMM"
+                },
+                {
+                    "$ref": "#/definitions/Type.NumberTypeME"
+                },
+                {
+                    "$ref": "#/definitions/Type.NumberTypeEM"
+                },
+                {
+                    "$ref": "#/definitions/Type.NumberTypeEE"
+                }
+            ]
         },
         "Type.IntegerType": {
             "type": "object",

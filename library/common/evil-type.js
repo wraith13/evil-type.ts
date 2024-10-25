@@ -223,6 +223,42 @@ var EvilType;
         Validator.isInteger = function (value, listner) {
             return Error.withErrorHandling(Number.isInteger(value), listner, "integer", value);
         };
+        Validator.isSafeNumber = function (value, listner) {
+            return Error.withErrorHandling(Number.isFinite(value), listner, "safe-number", value);
+        };
+        Validator.isDetailNumber = function (data, safeNumber) {
+            var base = true === safeNumber ? Validator.isSafeNumber : Validator.isNumber;
+            if ([data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf].every(function (i) { return undefined === i; })) {
+                return base;
+            }
+            else {
+                var result = function (value, listner) { return Error.withErrorHandling(base(value) &&
+                    (undefined === data.minimum || data.minimum <= value) &&
+                    (undefined === data.exclusiveMinimum || data.exclusiveMinimum <= value) &&
+                    (undefined === data.maximum || value <= data.maximum) &&
+                    (undefined === data.exclusiveMaximum || value <= data.exclusiveMaximum) &&
+                    (undefined === data.multipleOf || 0 === value % data.multipleOf), listner, function () {
+                    var details = [];
+                    if (undefined !== data.minimum) {
+                        details.push("minimum:".concat(data.minimum));
+                    }
+                    if (undefined !== data.exclusiveMinimum) {
+                        details.push("exclusiveMinimum:".concat(data.exclusiveMinimum));
+                    }
+                    if (undefined !== data.maximum) {
+                        details.push("maximum:".concat(data.maximum));
+                    }
+                    if (undefined !== data.exclusiveMaximum) {
+                        details.push("exclusiveMaximum:".concat(data.exclusiveMaximum));
+                    }
+                    if (undefined !== data.multipleOf) {
+                        details.push("format:".concat(data.multipleOf));
+                    }
+                    return "".concat(true === safeNumber ? "safe-number" : "number", "(").concat(details.join(","), ")");
+                }, value); };
+                return result;
+            }
+        };
         Validator.isString = function (value, listner) {
             return Error.withErrorHandling("string" === typeof value, listner, "string", value);
         };
