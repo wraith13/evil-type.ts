@@ -73,6 +73,10 @@ var $iblock = function (lines) { return ({ $code: "inline-block", lines: lines, 
 exports.$iblock = $iblock;
 var $block = function (header, lines) { return ({ $code: "block", header: header, lines: lines, }); };
 exports.$block = $block;
+var stringifyTokens = function (json) {
+    return jsonable_1.Jsonable.stringify(json, null, 1).split(/[\r\n]+[\t ]*/)
+        .map(function (i) { return (0, exports.$expression)(i); });
+};
 var Build;
 (function (Build) {
     Build.buildExport = function (data) { var _a, _b, _c; return ((_c = (_a = data.value.export) !== null && _a !== void 0 ? _a : (_b = data.options.default) === null || _b === void 0 ? void 0 : _b.export) !== null && _c !== void 0 ? _c : true) ? [(0, exports.$expression)("export"),] : []; };
@@ -82,7 +86,7 @@ var Build;
     };
     Build.asConst = [(0, exports.$expression)("as"), (0, exports.$expression)("const"),];
     Build.buildLiteralAsConst = function (literal) {
-        return __spreadArray([(0, exports.$expression)(jsonable_1.Jsonable.stringify(literal))], Build.asConst, true);
+        return __spreadArray(__spreadArray([], stringifyTokens(literal), true), Build.asConst, true);
     };
     ;
     Build.nextProcess = function (current, key, value) {
@@ -187,6 +191,54 @@ var Build;
         result.push.apply(result, Object.keys(data.value.members));
         return result;
     };
+    Build.getActualKeys = function (data) {
+        var target = Build.getResolveRefer(data);
+        if (type_1.Type.isLiteralElement(target.value)) {
+            if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
+                return Object.keys(target.value.const);
+            }
+            else {
+                return [];
+            }
+        }
+        if (type_1.Type.isType(target.value)) {
+            switch (target.value.type) {
+                case "keyof":
+                    {
+                        var entry = Build.getKeyofTarget(Build.nextProcess(target, null, target.value));
+                        if (type_1.Type.isInterfaceDefinition(entry.value)) {
+                            return Object.keys(entry.value.members).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
+                        }
+                        else if (type_1.Type.isDictionaryDefinition(entry.value)) {
+                            if (undefined !== entry.value.keyin) {
+                                return Build.getActualKeys(Build.nextProcess(entry, null, entry.value.keyin));
+                            }
+                        }
+                        else if (type_1.Type.isLiteralElement(entry.value)) {
+                            if (evil_type_1.EvilType.Validator.isObject(entry.value.const)) {
+                                return Object.keys(entry.value.const);
+                            }
+                        }
+                        return [];
+                    }
+                case "itemof":
+                    {
+                        var entry = Build.getResolveRefer(Build.nextProcess(target, null, target.value.value));
+                        if (type_1.Type.isLiteralElement(entry.value)) {
+                            if (evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)(entry.value.const)) {
+                                return entry.value.const;
+                            }
+                        }
+                        return [];
+                    }
+                case "enum-type":
+                    return target.value.members.map(function (i) { return "".concat(i); });
+                case "or":
+                    return target.value.types.map(function (i) { return Build.getActualKeys(Build.nextProcess(target, null, i)); }).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+            }
+        }
+        return [];
+    };
     Build.isKindofNeverType = function (data) {
         var _a, _b, _c;
         var target = Build.getResolveRefer(data);
@@ -202,6 +254,9 @@ var Build;
                         var entry_1 = Build.getKeyofTarget(Build.nextProcess(target, null, target.value));
                         if (type_1.Type.isInterfaceDefinition(entry_1.value)) {
                             return 0 === Object.entries(entry_1.value.members).filter(function (i) { return !Build.isKindofNeverType(Build.nextProcess(entry_1, i[0], i[1])); }).length;
+                        }
+                        else if (type_1.Type.isDictionaryDefinition(entry_1.value)) {
+                            return undefined !== entry_1.value.keyin && 0 === Build.getActualKeys(Build.nextProcess(entry_1, null, entry_1.value.keyin)).length;
                         }
                         else if (type_1.Type.isLiteralElement(entry_1.value)) {
                             return !evil_type_1.EvilType.Validator.isObject(entry_1.value.const) || Object.keys(entry_1.value.const).length <= 0;
@@ -273,7 +328,7 @@ var Build;
             return (0, exports.$line)(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], Build.buildExport(data), true), [(0, exports.$expression)(declarator), (0, exports.$expression)(data.key), (0, exports.$expression)("=")], false), (0, exports.convertToExpression)(Define.buildInlineDefine(data)), true), postEpressions, true));
         };
         Define.buildInlineDefineLiteral = function (define) {
-            return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(define.const))];
+            return __spreadArray([], stringifyTokens(define.const), true);
         };
         Define.buildInlineDefinePrimitiveType = function (value) {
             switch (value.type) {
@@ -431,6 +486,14 @@ var Build;
     })(Define = Build.Define || (Build.Define = {}));
     var Validator;
     (function (Validator) {
+        Validator.isRegularIdentifier = function (key) {
+            return 0 <= key.length &&
+                !/^\d/.test(key) &&
+                /^[$\w]+$/.test(key);
+        };
+        Validator.buildObjectMember = function (name, key) {
+            return Validator.isRegularIdentifier(key) ? "".concat(name, ".").concat(key) : "".concat(name, "[").concat(jsonable_1.Jsonable.stringify(key), "]");
+        };
         Validator.buildCall = function (method, args) {
             return __spreadArray(__spreadArray([], method, true), Define.enParenthesis(kindofJoinExpression(args, (0, exports.$expression)(","))), true);
         };
@@ -454,15 +517,18 @@ var Build;
                     list_2.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
                     Object.keys(value).forEach(function (key) {
                         list_2.push((0, exports.$expression)("&&"));
-                        list_2.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
+                        list_2.push((0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(key), " in ").concat(name)));
                         list_2.push((0, exports.$expression)("&&"));
-                        list_2.push.apply(list_2, Validator.buildLiterarlValidatorExpression("".concat(name, ".").concat(key), value[key]));
+                        list_2.push.apply(list_2, Validator.buildLiterarlValidatorExpression(Validator.buildObjectMember(name, key), value[key]));
                     });
                     return list_2;
                 }
             }
             if (undefined === value) {
                 return [(0, exports.$expression)("undefined"), (0, exports.$expression)("==="), (0, exports.$expression)(name),];
+            }
+            else if (null !== value && "object" === typeof value) {
+                return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(jsonable_1.Jsonable.stringify(value))), (0, exports.$expression)("==="), (0, exports.$expression)("JSON.stringify(".concat(name, ")")),];
             }
             else {
                 return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(value)), (0, exports.$expression)("==="), (0, exports.$expression)(name),];
@@ -512,7 +578,7 @@ var Build;
                     case "type":
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
-                        return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(data.value.members), ".includes(").concat(name, " as any)")),];
+                        return __spreadArray(__spreadArray([], stringifyTokens(data.value.members), true), [(0, exports.$expression)("."), (0, exports.$expression)("includes(".concat(name, " as any)")),], false);
                     case "array":
                         return __spreadArray(__spreadArray([
                             (0, exports.$expression)("Array.isArray(".concat(name, ")")),
@@ -532,7 +598,7 @@ var Build;
                     case "interface":
                         return Validator.buildInterfaceValidator(name, Build.nextProcess(data, null, data.value));
                     case "dictionary":
-                        return __spreadArray(__spreadArray([
+                        return __spreadArray(__spreadArray(__spreadArray([
                             (0, exports.$expression)("null !== ".concat(name)),
                             (0, exports.$expression)("&&"),
                             (0, exports.$expression)("\"object\" === typeof ".concat(name)),
@@ -542,18 +608,26 @@ var Build;
                             (0, exports.$expression)("=>")
                         ], Validator.buildValidatorExpression("i", Build.nextProcess(data, null, data.value.valueType)), true), [
                             (0, exports.$expression)(")")
-                        ], false);
+                        ], false), (undefined !== data.value.keyin && false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? Validator.rejectAdditionalProperties(name, Build.getActualKeys(Build.nextProcess(data, null, data.value.keyin))) : []), true);
                 }
             }
         };
         Validator.buildKeyofValidator = function (name, data) {
             var target = Build.getKeyofTarget(Build.nextProcess(data, null, data.value));
             if (type_1.Type.isInterfaceDefinition(target.value)) {
-                return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getKeys(Build.nextProcess(data, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })), ".includes(").concat(name, " as any)")),];
+                return __spreadArray(__spreadArray([], stringifyTokens(Build.getKeys(Build.nextProcess(data, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })), true), [(0, exports.$expression)("."), (0, exports.$expression)("includes(".concat(name, " as any)")),], false);
+            }
+            else if (type_1.Type.isDictionaryDefinition(target.value)) {
+                if (undefined !== target.value.keyin) {
+                    return __spreadArray(__spreadArray([], stringifyTokens(Build.getActualKeys(Build.nextProcess(data, null, target.value.keyin)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })), true), [(0, exports.$expression)("."), (0, exports.$expression)("includes(".concat(name, " as any)")),], false);
+                }
+                else {
+                    return [(0, exports.$expression)("\"string\" === typeof ".concat(name)),];
+                }
             }
             else if (type_1.Type.isLiteralElement(target.value)) {
                 if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
-                    return [(0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Object.keys(target.value.const)), ".includes(").concat(name, " as any)")),];
+                    return __spreadArray(__spreadArray([], stringifyTokens(Object.keys(target.value.const)), true), [(0, exports.$expression)("."), (0, exports.$expression)("includes(".concat(name, " as any)")),], false);
                 }
                 else {
                     return [(0, exports.$expression)("false"),];
@@ -562,6 +636,31 @@ var Build;
             else {
                 return [(0, exports.$expression)("\"string\" === typeof ".concat(name)),];
             }
+        };
+        Validator.rejectAdditionalProperties = function (name, regularKeys) {
+            var list = [];
+            list.push((0, exports.$expression)("&&"));
+            list.push((0, exports.$expression)("Object"));
+            list.push((0, exports.$expression)("."));
+            list.push((0, exports.$expression)("keys"));
+            list.push((0, exports.$expression)("("));
+            list.push((0, exports.$expression)(name));
+            list.push((0, exports.$expression)(")"));
+            list.push((0, exports.$expression)("."));
+            list.push((0, exports.$expression)("filter"));
+            list.push((0, exports.$expression)("("));
+            list.push((0, exports.$expression)("key"));
+            list.push((0, exports.$expression)("=>"));
+            list.push((0, exports.$expression)("!"));
+            list.push.apply(list, stringifyTokens(regularKeys));
+            list.push((0, exports.$expression)("."));
+            list.push((0, exports.$expression)("includes(key)"));
+            list.push((0, exports.$expression)(")"));
+            list.push((0, exports.$expression)("."));
+            list.push((0, exports.$expression)("length"));
+            list.push((0, exports.$expression)("<="));
+            list.push((0, exports.$expression)("0"));
+            return list;
         };
         Validator.buildInterfaceValidator = function (name, data) {
             var list = [];
@@ -586,29 +685,32 @@ var Build;
                 var value = members[k];
                 if (Build.isKindofNeverType(Build.nextProcess(data, key, value))) {
                     list.push((0, exports.$expression)("&&"));
-                    list.push((0, exports.$expression)("! \"".concat(key, "\" in ").concat(name)));
+                    list.push((0, exports.$expression)("! ".concat(jsonable_1.Jsonable.stringify(key), " in ").concat(name)));
                 }
                 else {
-                    var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression("".concat(name, ".").concat(key), Build.nextProcess(data, key, value)));
+                    var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression(Validator.buildObjectMember(name, key), Build.nextProcess(data, key, value)));
                     var current = type_1.Type.isOrElement(value) ?
                         Define.enParenthesis(base) :
                         base;
                     if (k === key) {
                         list.push((0, exports.$expression)("&&"));
-                        list.push((0, exports.$expression)("\"".concat(key, "\" in ").concat(name)));
+                        list.push((0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(key), " in ").concat(name)));
                         list.push((0, exports.$expression)("&&"));
                         list.push.apply(list, current);
                     }
                     else {
                         list.push((0, exports.$expression)("&&"));
                         list.push((0, exports.$expression)("("));
-                        list.push((0, exports.$expression)("! (\"".concat(key, "\" in ").concat(name, ")")));
+                        list.push((0, exports.$expression)("! (".concat(jsonable_1.Jsonable.stringify(key), " in ").concat(name, ")")));
                         list.push((0, exports.$expression)("||"));
                         list.push.apply(list, current);
                         list.push((0, exports.$expression)(")"));
                     }
                 }
             });
+            if (false === Build.getAdditionalProperties(data)) {
+                list.push.apply(list, Validator.rejectAdditionalProperties(name, Object.keys(data.value.members).map(function (key) { return text_1.Text.getPrimaryKeyName(key); })));
+            }
             return list;
         };
         Validator.buildInlineValidator = function (name, data) {
@@ -632,6 +734,14 @@ var Build;
                             var target = Build.getKeyofTarget(Build.nextProcess(data, null, data.value));
                             if (type_1.Type.isInterfaceDefinition(target.value)) {
                                 return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })),]);
+                            }
+                            else if (type_1.Type.isDictionaryDefinition(target.value)) {
+                                if (undefined !== target.value.keyin) {
+                                    return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(Build.getActualKeys(Build.nextProcess(target, null, target.value.keyin)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); })),]);
+                                }
+                                else {
+                                    return [(0, exports.$expression)("EvilType.Validator.isString"),];
+                                }
                             }
                             else if (type_1.Type.isLiteralElement(target.value)) {
                                 if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
@@ -688,7 +798,12 @@ var Build;
                     case "interface":
                         return Validator.buildObjectValidator(Build.nextProcess(data, null, data.value));
                     case "dictionary":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isDictionaryObject"),], [Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.valueType)),]);
+                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isDictionaryObject"),], __spreadArray([
+                            Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.valueType))
+                        ], (undefined !== data.value.keyin ? __spreadArray([
+                            __spreadArray([], stringifyTokens(Build.getActualKeys(Build.nextProcess(data, null, data.value.keyin))), true)
+                        ], (false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? [(0, exports.$expression)("false"),] : []), true) :
+                            []), true));
                 }
             }
         };
@@ -1064,6 +1179,14 @@ var Build;
             var target = Build.getKeyofTarget(Build.nextProcess(data, null, data.value));
             if (type_1.Type.isInterfaceDefinition(target.value)) {
                 result["enum"] = Build.getKeys(Build.nextProcess(target, null, target.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
+            }
+            else if (type_1.Type.isDictionaryDefinition(target.value)) {
+                if (undefined !== target.value.keyin) {
+                    result["enum"] = Build.getActualKeys(Build.nextProcess(target, null, target.value.keyin));
+                }
+                else {
+                    result["type"] = "string";
+                }
             }
             else if (type_1.Type.isLiteralElement(target.value)) {
                 if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {

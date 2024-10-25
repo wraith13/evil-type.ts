@@ -138,8 +138,7 @@
                             "description": "[CODE]"
                         },
                         "additionalProperties": {
-                            "type": "boolean",
-                            "description": "[SCHEMA]"
+                            "type": "boolean"
                         },
                         "regexpFlags": {
                             "type": "string",
@@ -562,6 +561,9 @@
                 },
                 "valueType": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
+                },
+                "additionalProperties": {
+                    "type": "boolean"
                 }
             },
             "required": [

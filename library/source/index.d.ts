@@ -59,6 +59,7 @@ export declare namespace Build {
     const getRegexpFlags: <Process extends BaseProcess<unknown>>(data: Process) => string;
     const getLiteral: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => Type.LiteralElement | null;
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
+    const getActualKeys: (data: BaseProcess<Type.TypeOrRefer>) => string[];
     const isKindofNeverType: (data: BaseProcess<Type.TypeOrRefer>) => boolean;
     namespace Define {
         interface Process<ValueType> extends BaseProcess<ValueType> {
@@ -86,12 +87,15 @@ export declare namespace Build {
         const buildInlineDefine: (data: Process<Type.TypeOrValueOfRefer>) => (CodeExpression | CodeInlineBlock)[];
     }
     namespace Validator {
+        const isRegularIdentifier: (key: string) => boolean;
+        const buildObjectMember: (name: string, key: string) => string;
         const buildCall: (method: CodeInlineEntry[], args: (CodeInlineEntry | CodeInlineEntry[])[]) => CodeInlineEntry[];
         const buildLiterarlValidatorExpression: (name: string, value: Jsonable.Jsonable) => CodeExpression[];
         const buildObjectValidatorObjectName: (name: string) => string;
         const buildValidatorName: (name: string) => string;
         const buildValidatorExpression: (name: string, data: Define.Process<Type.TypeOrValueOfRefer>) => CodeExpression[];
         const buildKeyofValidator: (name: string, data: Define.Process<Type.KeyofElement>) => CodeExpression[];
+        const rejectAdditionalProperties: (name: string, regularKeys: string[]) => CodeExpression[];
         const buildInterfaceValidator: (name: string, data: Define.Process<Type.InterfaceDefinition>) => CodeExpression[];
         const buildInlineValidator: (name: string, data: Define.Process<Type.TypeOrValue>) => CodeExpression[];
         const buildObjectValidatorGetterCoreEntry: (data: Define.Process<Type.TypeOrRefer>) => CodeInlineEntry[];

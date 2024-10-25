@@ -200,9 +200,13 @@ var EvilType;
     var Validator;
     (function (Validator) {
         Validator.makeErrorListener = Error.makeListener;
-        Validator.isJust = function (target) { return function (value, listner) {
-            return Error.withErrorHandling(target === value, listner, function () { return Error.valueToString(target); }, value);
-        }; };
+        Validator.isJust = function (target) { return null !== target && "object" === typeof target ?
+            function (value, listner) {
+                return Error.withErrorHandling(JSON.stringify(target) === JSON.stringify(value), listner, function () { return Error.valueToString(target); }, value);
+            } :
+            function (value, listner) {
+                return Error.withErrorHandling(target === value, listner, function () { return Error.valueToString(target); }, value);
+            }; };
         Validator.isNever = function (value, listner) {
             return Error.withErrorHandling(false, listner, "never", value);
         };

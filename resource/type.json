@@ -149,8 +149,7 @@
                                 },
                                 "additionalProperties?": {
                                     "type": "boolean",
-                                    "default": false,
-                                    "description": "[SCHEMA]"
+                                    "default": false
                                 },
                                 "regexpFlags?": {
                                     "type": "string",
@@ -415,6 +414,9 @@
                         },
                         "valueType": {
                             "$ref": "TypeOrRefer"
+                        },
+                        "additionalProperties?": {
+                            "type": "boolean"
                         }
                     }
                 },
@@ -944,7 +946,8 @@
                             "relative-json-pointer": "^relative-json-pointer$",
                             "regex": "^regex$"
                         }
-                    }
+                    },
+                    "validator": false
                 }
             }
         }

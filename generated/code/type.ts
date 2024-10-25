@@ -40,7 +40,7 @@ export namespace Type
         $ref?: string;
         externalReferMapping?: { [ key: string ]: string; };
     }
-    export const indentStyleTypeMember = ["allman","egyptian"] as const;
+    export const indentStyleTypeMember = [ "allman", "egyptian" ] as const;
     export type IndentStyleType = typeof indentStyleTypeMember[number];
     export type ValidatorOptionType = "none" | "simple" | "full";
     export interface AlphaElement extends CommonProperties
@@ -95,6 +95,7 @@ export namespace Type
         type: "dictionary";
         keyin?: TypeOrRefer;
         valueType: TypeOrRefer;
+        additionalProperties?: boolean;
     }
     export interface ArrayElement extends AlphaElement
     {
@@ -203,9 +204,11 @@ export namespace Type
     export type TypeOrValue = Type | ValueDefinition;
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
-    export const StringFormatMap =
-        {"date-time":"^date-time$","date":"^date$","time":"^time$","duration":"^duration$","email":"^email$","idn-email":"^idn-email$","hostname":"^hostname$","idn-hostname":"^idn-hostname$","ipv4":"^ipv4$","ipv6":"^ipv6$","uuid":"^uuid$","uri":"^uri$","uri-reference":"^uri-reference$","iri":"^iri$","iri-reference":"^iri-reference$","uri-template":"^uri-template$","json-pointer":"^json-pointer$","relative-json-pointer":"^relative-json-pointer$","regex":"^regex$"} as
-        const;
+    export const StringFormatMap = { "date-time": "^date-time$", "date": "^date$", "time": "^time$", "duration": "^duration$",
+        "email": "^email$", "idn-email": "^idn-email$", "hostname": "^hostname$", "idn-hostname": "^idn-hostname$", "ipv4": "^ipv4$",
+        "ipv6": "^ipv6$", "uuid": "^uuid$", "uri": "^uri$", "uri-reference": "^uri-reference$", "iri": "^iri$",
+        "iri-reference": "^iri-reference$", "uri-template": "^uri-template$", "json-pointer": "^json-pointer$",
+        "relative-json-pointer": "^relative-json-pointer$", "regex": "^regex$" } as const;
     export const isSchema = EvilType.Validator.isJust(schema);
     export const isCommentProperty = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commentPropertyValidatorObject, false));
     export const isCommonProperties = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commonPropertiesValidatorObject, false));
@@ -213,8 +216,8 @@ export namespace Type
     export const isOutputOptions = EvilType.lazy(() => EvilType.Validator.isSpecificObject(outputOptionsValidatorObject, false));
     export const isSchemaOptions = EvilType.lazy(() => EvilType.Validator.isSpecificObject(schemaOptionsValidatorObject, false));
     export const isIndentStyleType: EvilType.Validator.IsType<IndentStyleType> = EvilType.Validator.isEnum(indentStyleTypeMember);
-    export const isValidatorOptionType: EvilType.Validator.IsType<ValidatorOptionType> = EvilType.Validator.isEnum(
-        ["none","simple","full"] as const);
+    export const isValidatorOptionType: EvilType.Validator.IsType<ValidatorOptionType> = EvilType.Validator.isEnum([ "none", "simple",
+        "full" ] as const);
     export const isAlphaElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(alphaElementValidatorObject, false));
     export const isAlphaDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(alphaDefinitionValidatorObject, false));
     export const isImportDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(importDefinitionValidatorObject, false));
@@ -265,7 +268,6 @@ export namespace Type
         isTypeOrValue, isReferElement));
     export const isTypeOrLiteralOfRefer: EvilType.Validator.IsType<TypeOrLiteralOfRefer> = EvilType.lazy(() => EvilType.Validator.isOr(
         isTypeOrRefer, isLiteralElement));
-    export const isStringFormatMap = EvilType.Validator.isJust(StringFormatMap);
     export const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty> = ({ comment:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString)), });
     export const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties> = ({ default:
@@ -275,7 +277,7 @@ export namespace Type
         commentPropertyValidatorObject, { $schema: isSchema, imports: EvilType.Validator.isOptional(EvilType.Validator.isArray(
         isImportDefinition)), defines: isDefinitionMap, options: isOutputOptions, });
     export const outputOptionsValidatorObject: EvilType.Validator.ObjectValidator<OutputOptions> = ({ outputFile:
-        EvilType.Validator.isString, indentUnit: EvilType.Validator.isEnum([0,1,2,3,4,5,6,7,8,"tab"] as const), indentStyle:
+        EvilType.Validator.isString, indentUnit: EvilType.Validator.isEnum([ 0, 1, 2, 3, 4, 5, 6, 7, 8, "tab" ] as const), indentStyle:
         isIndentStyleType, validatorOption: isValidatorOptionType, safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean),
         safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), maxLineLength: EvilType.Validator.isOptional(
         EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), default: EvilType.Validator.isOptional(({ export
@@ -312,7 +314,8 @@ export namespace Type
         isTypeOrRefer), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const dictionaryDefinitionValidatorObject: EvilType.Validator.ObjectValidator<DictionaryDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("dictionary" as const),
-        keyin: EvilType.Validator.isOptional(isTypeOrRefer), valueType: isTypeOrRefer, });
+        keyin: EvilType.Validator.isOptional(isTypeOrRefer), valueType: isTypeOrRefer, additionalProperties: EvilType.Validator.isOptional(
+        EvilType.Validator.isBoolean), });
     export const arrayElementValidatorObject: EvilType.Validator.ObjectValidator<ArrayElement> = EvilType.Validator.mergeObjectValidator(
         alphaElementValidatorObject, { type: EvilType.Validator.isJust("array" as const), items: isTypeOrRefer, });
     export const orElementValidatorObject: EvilType.Validator.ObjectValidator<OrElement> = EvilType.Validator.mergeObjectValidator(
@@ -354,9 +357,10 @@ export namespace Type
         EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { pattern: EvilType.Validator.isString, regexpFlags:
         EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const formatStringTypeValidatorObject: EvilType.Validator.ObjectValidator<FormatStringType> =
-        EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { format: EvilType.Validator.isEnum(
-        ["date-time","date","time","duration","email","idn-email","hostname","idn-hostname","ipv4","ipv6","uuid","uri","uri-reference","iri","iri-reference","uri-template","json-pointer","relative-json-pointer","regex"] as
-        const), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), });
+        EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { format: EvilType.Validator.isEnum([ "date-time", "date",
+        "time", "duration", "email", "idn-email", "hostname", "idn-hostname", "ipv4", "ipv6", "uuid", "uri", "uri-reference", "iri",
+        "iri-reference", "uri-template", "json-pointer", "relative-json-pointer", "regex" ] as const), regexpFlags:
+        EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("enum-type" as const),
         members: EvilType.Validator.isArray(EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isBoolean,

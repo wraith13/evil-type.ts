@@ -86,6 +86,9 @@ export const $line = (expressions: CodeLine["expressions"]): CodeLine => ({ $cod
 export const $comment = (define: Type.CommentProperty): CodeLine[] => define.comment ? define.comment.map(i => $line([$expression("//"), $expression(i)])): [];
 export const $iblock = (lines: CodeInlineBlock["lines"]): CodeInlineBlock => ({ $code: "inline-block", lines, });
 export const $block = (header: CodeBlock["header"], lines: CodeBlock["lines"]): CodeBlock => ({ $code: "block", header, lines, });
+const stringifyTokens = (json: Jsonable.Jsonable) =>
+    Jsonable.stringify(json, null, 1).split(/[\r\n]+[\t ]*/)
+    .map(i => $expression(i));
 export namespace Build
 {
     export const buildExport = (data: BaseProcess<{ export?: boolean; }>): CodeExpression[] =>
@@ -96,7 +99,7 @@ export namespace Build
         undefined !== define.extends ? [$expression("extends"), ...define.extends.map((i, ix, list) => $expression(ix < (list.length -1) ? `${i.$ref},`: `${i.$ref}`))]: [];
     export const asConst = [ $expression("as"), $expression("const"), ];
     export const buildLiteralAsConst = (literal: Jsonable.Jsonable) =>
-        [ $expression(Jsonable.stringify(literal)), ...asConst, ];
+        [ ...stringifyTokens(literal), ...asConst, ];
     export interface BaseProcess<ValueType>
     {
         source: Type.TypeSchema;
@@ -246,6 +249,69 @@ export namespace Build
         result.push(...Object.keys(data.value.members));
         return result;
     };
+    export const getActualKeys = (data: BaseProcess<Type.TypeOrRefer>): string[] =>
+    {
+        const target = getResolveRefer(data);
+        if (Type.isLiteralElement(target.value))
+        {
+            if (EvilType.Validator.isObject(target.value.const))
+            {
+                return Object.keys(target.value.const);
+            }
+            else
+            {
+                return [];
+            }
+        }
+        if (Type.isType(target.value))
+        {
+            switch(target.value.type)
+            {
+            case "keyof":
+                {
+                    const entry = getKeyofTarget(nextProcess(target, null, target.value));
+                    if (Type.isInterfaceDefinition(entry.value))
+                    {
+                        return Object.keys(entry.value.members).map(i => Text.getPrimaryKeyName(i));
+                    }
+                    else
+                    if (Type.isDictionaryDefinition(entry.value))
+                    {
+                        if (undefined !== entry.value.keyin)
+                        {
+                            return getActualKeys(nextProcess(entry, null, entry.value.keyin));
+                        }
+                    }
+                    else
+                    if (Type.isLiteralElement(entry.value))
+                    {
+                        if (EvilType.Validator.isObject(entry.value.const))
+                        {
+                            return Object.keys(entry.value.const);
+                        }
+                    }
+                    return [];
+                }
+            case "itemof":
+                {
+                    const entry = getResolveRefer(nextProcess(target, null, target.value.value));
+                    if (Type.isLiteralElement(entry.value))
+                    {
+                        if (EvilType.Validator.isArray(EvilType.Validator.isString)(entry.value.const))
+                        {
+                            return entry.value.const;
+                        }
+                    }
+                    return [];
+                }
+            case "enum-type":
+                return target.value.members.map(i => `${i}`);
+            case "or":
+                return target.value.types.map(i => getActualKeys(nextProcess(target, null, i))).reduce((a, b) => [...a, ...b], []);
+            }
+        }
+        return [];
+    }
     export const isKindofNeverType = (data: BaseProcess<Type.TypeOrRefer>): boolean =>
     {
         const target = getResolveRefer(data);
@@ -265,6 +331,11 @@ export namespace Build
                     if (Type.isInterfaceDefinition(entry.value))
                     {
                         return 0 === Object.entries(entry.value.members).filter(i => ! isKindofNeverType(nextProcess(entry, i[0], i[1]))).length;
+                    }
+                    else
+                    if (Type.isDictionaryDefinition(entry.value))
+                    {
+                        return undefined !== entry.value.keyin && 0 === getActualKeys(nextProcess(entry, null, entry.value.keyin)).length;
                     }
                     else
                     if (Type.isLiteralElement(entry.value))
@@ -341,7 +412,7 @@ export namespace Build
         export const buildDefineLine = (declarator: string, data: Process<Type.TypeOrValue & Type.Definition>, postEpressions: CodeExpression[] = []): CodeLine =>
             $line([ ...buildExport(data), $expression(declarator), $expression(data.key), $expression("="), ...convertToExpression(buildInlineDefine(data)), ...postEpressions, ]);
         export const buildInlineDefineLiteral = (define: Type.LiteralElement) =>
-            [ $expression(Jsonable.stringify(define.const)) ];
+            [ ...stringifyTokens(define.const) ];
         export const buildInlineDefinePrimitiveType = (value: Type.PrimitiveTypeElement) =>
         {
             switch(value.type)
@@ -522,6 +593,12 @@ export namespace Build
     }
     export namespace Validator
     {
+        export const isRegularIdentifier = (key: string) =>
+            0 <= key.length &&
+            ! /^\d/.test(key) &&
+            /^[$\w]+$/.test(key);
+        export const buildObjectMember = (name: string, key: string) =>
+            isRegularIdentifier(key) ? `${name}.${key}`: `${name}[${Jsonable.stringify(key)}]`;
         export const buildCall = (method: CodeInlineEntry[], args: (CodeInlineEntry | CodeInlineEntry[])[]): CodeInlineEntry[] =>
             [ ...method, ...Define.enParenthesis(kindofJoinExpression(args, $expression(",")))];
         export const buildLiterarlValidatorExpression = (name: string, value: Jsonable.Jsonable): CodeExpression[] =>
@@ -555,9 +632,9 @@ export namespace Build
                         key =>
                         {
                             list.push($expression("&&"));
-                            list.push($expression(`"${key}" in ${name}`));
+                            list.push($expression(`${Jsonable.stringify(key)} in ${name}`));
                             list.push($expression("&&"));
-                            list.push(...buildLiterarlValidatorExpression(`${name}.${key}`, value[key]));
+                            list.push(...buildLiterarlValidatorExpression(buildObjectMember(name, key), value[key]));
                         }
                     );
                     return list;
@@ -566,6 +643,11 @@ export namespace Build
             if (undefined === value)
             {
                 return [ $expression("undefined"), $expression("==="), $expression(name), ];
+            }
+            else
+            if (null !== value && "object" === typeof value)
+            {
+                return [ $expression(Jsonable.stringify(Jsonable.stringify(value))), $expression("==="), $expression(`JSON.stringify(${name})`), ];
             }
             else
             {
@@ -624,7 +706,7 @@ export namespace Build
                 case "type":
                     return buildValidatorExpression(name, nextProcess(data, null, data.value.define));
                 case "enum-type":
-                    return [ $expression(`${Jsonable.stringify(data.value.members)}.includes(${name} as any)`), ];
+                    return [ ...stringifyTokens(data.value.members), $expression("."), $expression(`includes(${name} as any)`), ];
                 case "array":
                     return [
                         $expression(`Array.isArray(${name})`),
@@ -664,7 +746,8 @@ export namespace Build
                         $expression("i"),
                         $expression("=>"),
                         ...buildValidatorExpression("i", nextProcess(data, null, data.value.valueType)),
-                        $expression(")")
+                        $expression(")"),
+                        ...(undefined !== data.value.keyin && false === getAdditionalProperties(nextProcess(data, null, data.value)) ? rejectAdditionalProperties(name, getActualKeys(nextProcess(data, null, data.value.keyin))): [])
                     ];
                 }
             }
@@ -674,14 +757,26 @@ export namespace Build
             const target = getKeyofTarget(nextProcess(data, null, data.value));
             if (Type.isInterfaceDefinition(target.value))
             {
-                return [ $expression(`${Jsonable.stringify(getKeys(nextProcess(data, null, target.value)).map(i => Text.getPrimaryKeyName(i)))}.includes(${name} as any)`), ];
+                return [ ...stringifyTokens(getKeys(nextProcess(data, null, target.value)).map(i => Text.getPrimaryKeyName(i))), $expression("."), $expression(`includes(${name} as any)`), ];
+            }
+            else
+            if (Type.isDictionaryDefinition(target.value))
+            {
+                if (undefined !== target.value.keyin)
+                {
+                    return [ ...stringifyTokens(getActualKeys(nextProcess(data, null, target.value.keyin)).map(i => Text.getPrimaryKeyName(i))), $expression("."), $expression(`includes(${name} as any)`), ];
+                }
+                else
+                {
+                    return [ $expression(`"string" === typeof ${name}`), ];
+                }
             }
             else
             if (Type.isLiteralElement(target.value))
             {
                 if (EvilType.Validator.isObject(target.value.const))
                 {
-                    return [ $expression(`${Jsonable.stringify(Object.keys(target.value.const))}.includes(${name} as any)`), ];
+                    return [ ...stringifyTokens(Object.keys(target.value.const)), $expression("."), $expression(`includes(${name} as any)`), ];
                 }
                 else
                 {
@@ -692,6 +787,32 @@ export namespace Build
             {
                 return [ $expression(`"string" === typeof ${name}`), ];
             }
+        };
+        export const rejectAdditionalProperties = (name: string, regularKeys: string[]) =>
+        {
+            const list: CodeExpression[] = [];
+            list.push($expression("&&"));
+            list.push($expression("Object"));
+            list.push($expression("."));
+            list.push($expression("keys"));
+            list.push($expression("("));
+                list.push($expression(name));
+            list.push($expression(")"));
+            list.push($expression("."));
+            list.push($expression("filter"));
+            list.push($expression("("));
+                list.push($expression("key"));
+                list.push($expression("=>"));
+                list.push($expression("!"));
+                list.push(...stringifyTokens(regularKeys))
+                list.push($expression("."));
+                list.push($expression("includes(key)"));
+            list.push($expression(")"));
+            list.push($expression("."));
+            list.push($expression("length"));
+            list.push($expression("<="));
+            list.push($expression("0"));
+            return list;
         };
         export const buildInterfaceValidator = (name: string, data: Define.Process<Type.InterfaceDefinition>): CodeExpression[] =>
         {
@@ -729,18 +850,18 @@ export namespace Build
                     if (isKindofNeverType(nextProcess(data, key, value)))
                     {
                         list.push($expression("&&"));
-                        list.push($expression(`! "${key}" in ${name}`));
+                        list.push($expression(`! ${Jsonable.stringify(key)} in ${name}`));
                     }
                     else
                     {
-                        const base = convertToExpression(buildValidatorExpression(`${name}.${key}`, nextProcess(data, key, value)));
+                        const base = convertToExpression(buildValidatorExpression(buildObjectMember(name, key), nextProcess(data, key, value)));
                         const current = Type.isOrElement(value) ?
-                        Define.enParenthesis(base):
-                        base;
+                            Define.enParenthesis(base):
+                            base;
                         if (k === key)
                         {
                             list.push($expression("&&"));
-                            list.push($expression(`"${key}" in ${name}`));
+                            list.push($expression(`${Jsonable.stringify(key)} in ${name}`));
                             list.push($expression("&&"));
                             list.push(...current);
                         }
@@ -748,7 +869,7 @@ export namespace Build
                         {
                             list.push($expression("&&"));
                             list.push($expression("("));
-                            list.push($expression(`! ("${key}" in ${name})`));
+                            list.push($expression(`! (${Jsonable.stringify(key)} in ${name})`));
                             list.push($expression("||"));
                             list.push(...current);
                             list.push($expression(")"));
@@ -756,6 +877,10 @@ export namespace Build
                     }
                 }
             );
+            if (false === getAdditionalProperties(data))
+            {
+                list.push(...rejectAdditionalProperties(name, Object.keys(data.value.members).map(key => Text.getPrimaryKeyName(key))));
+            }
             return list;
         };
         export const buildInlineValidator = (name: string, data: Define.Process<Type.TypeOrValue>) =>
@@ -790,6 +915,22 @@ export namespace Build
                                 [ $expression("EvilType.Validator.isEnum"), ],
                                 [ buildLiteralAsConst(getKeys(nextProcess(target, null, target.value)).map(i => Text.getPrimaryKeyName(i))), ]
                             );
+                        }
+                        else
+                        if (Type.isDictionaryDefinition(target.value))
+                        {
+                            if (undefined !== target.value.keyin)
+                            {
+                                return buildCall
+                                (
+                                    [ $expression("EvilType.Validator.isEnum"), ],
+                                    [ buildLiteralAsConst(getActualKeys(nextProcess(target, null, target.value.keyin)).map(i => Text.getPrimaryKeyName(i))), ]
+                                );
+                            }
+                            else
+                            {
+                                return [ $expression("EvilType.Validator.isString"), ];
+                            }
                         }
                         else
                         if (Type.isLiteralElement(target.value))
@@ -881,7 +1022,20 @@ export namespace Build
                     return buildCall
                     (
                         [ $expression("EvilType.Validator.isDictionaryObject"), ],
-                        [ buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.valueType)), ]
+                        [
+                            buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.valueType)),
+                            ...
+                            (
+                                undefined !== data.value.keyin ?
+                                [
+                                    [
+                                        ...stringifyTokens(getActualKeys(nextProcess(data, null, data.value.keyin)))
+                                    ],
+                                    ...(false === getAdditionalProperties(nextProcess(data, null, data.value)) ? [ $expression("false"), ]: []),
+                                ]:
+                                []
+                            )
+                        ]
                     );
                 }
             }
@@ -1401,6 +1555,18 @@ export namespace Build
             if (Type.isInterfaceDefinition(target.value))
             {
                 result["enum"] = getKeys(nextProcess(target, null, target.value)).map(i => Text.getPrimaryKeyName(i));
+            }
+            else
+            if (Type.isDictionaryDefinition(target.value))
+            {
+                if (undefined !== target.value.keyin)
+                {
+                    result["enum"] = getActualKeys(nextProcess(target, null, target.value.keyin));
+                }
+                else
+                {
+                    result["type"] = "string";
+                }
             }
             else
             if (Type.isLiteralElement(target.value))

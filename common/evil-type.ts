@@ -222,8 +222,11 @@ export namespace EvilType
         export type ErrorListener = Error.Listener;
         export const makeErrorListener = Error.makeListener;
         export type IsType<T> = (value: unknown, listner?: ErrorListener) => value is T;
-        export const isJust = <T>(target: T) => (value: unknown, listner?: ErrorListener): value is T =>
-            Error.withErrorHandling(target === value, listner, () => Error.valueToString(target), value);
+        export const isJust = <T>(target: T) => null !== target && "object" === typeof target ?
+            (value: unknown, listner?: ErrorListener): value is T =>
+                Error.withErrorHandling(JSON.stringify(target) === JSON.stringify(value), listner, () => Error.valueToString(target), value):
+            (value: unknown, listner?: ErrorListener): value is T =>
+                Error.withErrorHandling(target === value, listner, () => Error.valueToString(target), value);
         export const isNever = (value: unknown, listner?: ErrorListener): value is never =>
             Error.withErrorHandling(false, listner, "never", value);
         export const isUndefined = isJust(undefined);
