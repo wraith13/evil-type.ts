@@ -92,6 +92,9 @@ export declare namespace Type {
     interface ArrayElement extends AlphaElement {
         type: "array";
         items: TypeOrRefer;
+        minItems?: number;
+        maxItems?: number;
+        uniqueItems?: boolean;
     }
     interface OrElement extends AlphaElement {
         type: "or";
@@ -121,37 +124,8 @@ export declare namespace Type {
     }
     interface BooleanType extends CommonProperties {
         type: "boolean";
+        default?: boolean;
     }
-    interface BaseNumberType extends CommonProperties {
-        type: "number";
-        multipleOf?: number;
-        safeNumber?: boolean;
-    }
-    interface NumberTypeMM extends BaseNumberType {
-        minimum?: number;
-        exclusiveMinimum: never;
-        maximum?: number;
-        exclusiveMaximum: never;
-    }
-    interface NumberTypeME extends BaseNumberType {
-        minimum?: number;
-        exclusiveMinimum: never;
-        maximum: never;
-        exclusiveMaximum?: number;
-    }
-    interface NumberTypeEM extends BaseNumberType {
-        minimum: never;
-        exclusiveMinimum?: number;
-        maximum?: number;
-        exclusiveMaximum: never;
-    }
-    interface NumberTypeEE extends BaseNumberType {
-        minimum: never;
-        exclusiveMinimum?: number;
-        maximum: never;
-        exclusiveMaximum?: number;
-    }
-    type NumberType = NumberTypeMM | NumberTypeME | NumberTypeEM | NumberTypeEE;
     interface IntegerType extends CommonProperties {
         type: "integer";
         minimum?: number;
@@ -160,11 +134,23 @@ export declare namespace Type {
         exclusiveMaximum?: number;
         multipleOf?: number;
         safeInteger?: boolean;
+        default?: number;
+    }
+    interface NumberType extends CommonProperties {
+        type: "number";
+        minimum?: number;
+        exclusiveMinimum?: number;
+        maximum?: number;
+        exclusiveMaximum?: number;
+        multipleOf?: number;
+        safeNumber?: number;
+        default?: number;
     }
     interface BasicStringType extends CommonProperties {
         type: "string";
         minLength?: number;
         maxLength?: number;
+        default?: string;
     }
     interface PatternStringType extends BasicStringType {
         pattern: string;
@@ -247,13 +233,8 @@ export declare namespace Type {
     const isUnknownType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is UnknownType;
     const isNullType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NullType;
     const isBooleanType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is BooleanType;
-    const isBaseNumberType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is BaseNumberType;
-    const isNumberTypeMM: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NumberTypeMM;
-    const isNumberTypeME: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NumberTypeME;
-    const isNumberTypeEM: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NumberTypeEM;
-    const isNumberTypeEE: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NumberTypeEE;
-    const isNumberType: EvilType.Validator.IsType<NumberType>;
     const isIntegerType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is IntegerType;
+    const isNumberType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is NumberType;
     const isBasicStringType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is BasicStringType;
     const isPatternStringType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is PatternStringType;
     const isFormatStringType: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is FormatStringType;
@@ -292,12 +273,8 @@ export declare namespace Type {
     const unknownTypeValidatorObject: EvilType.Validator.ObjectValidator<UnknownType>;
     const nullTypeValidatorObject: EvilType.Validator.ObjectValidator<NullType>;
     const booleanTypeValidatorObject: EvilType.Validator.ObjectValidator<BooleanType>;
-    const baseNumberTypeValidatorObject: EvilType.Validator.ObjectValidator<BaseNumberType>;
-    const numberTypeMMValidatorObject: EvilType.Validator.ObjectValidator<NumberTypeMM>;
-    const numberTypeMEValidatorObject: EvilType.Validator.ObjectValidator<NumberTypeME>;
-    const numberTypeEMValidatorObject: EvilType.Validator.ObjectValidator<NumberTypeEM>;
-    const numberTypeEEValidatorObject: EvilType.Validator.ObjectValidator<NumberTypeEE>;
     const integerTypeValidatorObject: EvilType.Validator.ObjectValidator<IntegerType>;
+    const numberTypeValidatorObject: EvilType.Validator.ObjectValidator<NumberType>;
     const basicStringTypeValidatorObject: EvilType.Validator.ObjectValidator<BasicStringType>;
     const patternStringTypeValidatorObject: EvilType.Validator.ObjectValidator<PatternStringType>;
     const formatStringTypeValidatorObject: EvilType.Validator.ObjectValidator<FormatStringType>;

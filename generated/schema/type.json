@@ -598,6 +598,17 @@
                 },
                 "items": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
+                },
+                "minItems": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "maxItems": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "uniqueItems": {
+                    "type": "boolean"
                 }
             },
             "required": [
@@ -816,7 +827,7 @@
             "type": "object",
             "properties": {
                 "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "type": "boolean",
                     "description": "[SCHEMA]"
                 },
                 "title": {
@@ -836,225 +847,11 @@
             ],
             "additionalProperties": false
         },
-        "Type.BaseNumberType": {
-            "type": "object",
-            "properties": {
-                "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
-                    "description": "[SCHEMA]"
-                },
-                "title": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "type": {
-                    "const": "number"
-                },
-                "multipleOf": {
-                    "type": "number"
-                },
-                "safeNumber": {
-                    "type": "boolean"
-                }
-            },
-            "required": [
-                "type"
-            ],
-            "additionalProperties": false
-        },
-        "Type.NumberTypeMM": {
-            "type": "object",
-            "properties": {
-                "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
-                    "description": "[SCHEMA]"
-                },
-                "title": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "type": {
-                    "const": "number"
-                },
-                "multipleOf": {
-                    "type": "number"
-                },
-                "safeNumber": {
-                    "type": "boolean"
-                },
-                "minimum": {
-                    "type": "number"
-                },
-                "maximum": {
-                    "type": "number"
-                }
-            },
-            "required": [
-                "type"
-            ],
-            "additionalProperties": false,
-            "not": {
-                "required": [
-                    "exclusiveMinimum",
-                    "exclusiveMaximum"
-                ]
-            }
-        },
-        "Type.NumberTypeME": {
-            "type": "object",
-            "properties": {
-                "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
-                    "description": "[SCHEMA]"
-                },
-                "title": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "type": {
-                    "const": "number"
-                },
-                "multipleOf": {
-                    "type": "number"
-                },
-                "safeNumber": {
-                    "type": "boolean"
-                },
-                "minimum": {
-                    "type": "number"
-                },
-                "exclusiveMaximum": {
-                    "type": "number"
-                }
-            },
-            "required": [
-                "type"
-            ],
-            "additionalProperties": false,
-            "not": {
-                "required": [
-                    "exclusiveMinimum",
-                    "maximum"
-                ]
-            }
-        },
-        "Type.NumberTypeEM": {
-            "type": "object",
-            "properties": {
-                "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
-                    "description": "[SCHEMA]"
-                },
-                "title": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "type": {
-                    "const": "number"
-                },
-                "multipleOf": {
-                    "type": "number"
-                },
-                "safeNumber": {
-                    "type": "boolean"
-                },
-                "exclusiveMinimum": {
-                    "type": "number"
-                },
-                "maximum": {
-                    "type": "number"
-                }
-            },
-            "required": [
-                "type"
-            ],
-            "additionalProperties": false,
-            "not": {
-                "required": [
-                    "minimum",
-                    "exclusiveMaximum"
-                ]
-            }
-        },
-        "Type.NumberTypeEE": {
-            "type": "object",
-            "properties": {
-                "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
-                    "description": "[SCHEMA]"
-                },
-                "title": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "[SCHEMA]"
-                },
-                "type": {
-                    "const": "number"
-                },
-                "multipleOf": {
-                    "type": "number"
-                },
-                "safeNumber": {
-                    "type": "boolean"
-                },
-                "exclusiveMinimum": {
-                    "type": "number"
-                },
-                "exclusiveMaximum": {
-                    "type": "number"
-                }
-            },
-            "required": [
-                "type"
-            ],
-            "additionalProperties": false,
-            "not": {
-                "required": [
-                    "minimum",
-                    "maximum"
-                ]
-            }
-        },
-        "Type.NumberType": {
-            "oneOf": [
-                {
-                    "$ref": "#/definitions/Type.NumberTypeMM"
-                },
-                {
-                    "$ref": "#/definitions/Type.NumberTypeME"
-                },
-                {
-                    "$ref": "#/definitions/Type.NumberTypeEM"
-                },
-                {
-                    "$ref": "#/definitions/Type.NumberTypeEE"
-                }
-            ]
-        },
         "Type.IntegerType": {
             "type": "object",
             "properties": {
                 "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "type": "integer",
                     "description": "[SCHEMA]"
                 },
                 "title": {
@@ -1092,11 +889,53 @@
             ],
             "additionalProperties": false
         },
+        "Type.NumberType": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "type": "number",
+                    "description": "[SCHEMA]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[SCHEMA]"
+                },
+                "type": {
+                    "const": "number"
+                },
+                "minimum": {
+                    "type": "number"
+                },
+                "exclusiveMinimum": {
+                    "type": "number"
+                },
+                "maximum": {
+                    "type": "number"
+                },
+                "exclusiveMaximum": {
+                    "type": "number"
+                },
+                "multipleOf": {
+                    "type": "number"
+                },
+                "safeNumber": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false
+        },
         "Type.BasicStringType": {
             "type": "object",
             "properties": {
                 "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "type": "string",
                     "description": "[SCHEMA]"
                 },
                 "title": {
@@ -1111,10 +950,12 @@
                     "const": "string"
                 },
                 "minLength": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "maxLength": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 }
             },
             "required": [
@@ -1126,7 +967,7 @@
             "type": "object",
             "properties": {
                 "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "type": "string",
                     "description": "[SCHEMA]"
                 },
                 "title": {
@@ -1141,10 +982,12 @@
                     "const": "string"
                 },
                 "minLength": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "maxLength": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "pattern": {
                     "type": "string"
@@ -1163,7 +1006,7 @@
             "type": "object",
             "properties": {
                 "default": {
-                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "type": "string",
                     "description": "[SCHEMA]"
                 },
                 "title": {
@@ -1178,10 +1021,12 @@
                     "const": "string"
                 },
                 "minLength": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "maxLength": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "format": {
                     "enum": [

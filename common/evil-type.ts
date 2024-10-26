@@ -235,15 +235,13 @@ export namespace EvilType
         export const isNull = isJust(null);
         export const isBoolean = (value: unknown, listner?: ErrorListener): value is boolean =>
             Error.withErrorHandling("boolean" === typeof value, listner, "boolean", value);
-        export const isNumber = (value: unknown, listner?: ErrorListener): value is number =>
-            Error.withErrorHandling("number" === typeof value, listner, "number", value);
         export const isInteger = (value: unknown, listner?: ErrorListener): value is number =>
             Error.withErrorHandling(Number.isInteger(value), listner, "integer", value);
-        export const isSafeNumber = (value: unknown, listner?: ErrorListener): value is number =>
-            Error.withErrorHandling(Number.isFinite(value), listner, "safe-number", value);
-        export const isDetailNumber = (data: { minimum?: number; exclusiveMinimum?: number; maximum?: number; exclusiveMaximum?: number; multipleOf?: number; }, safeNumber?: boolean): IsType<number> =>
+        export const isSafeInteger = (value: unknown, listner?: ErrorListener): value is number =>
+            Error.withErrorHandling(Number.isSafeInteger(value), listner, "safe-integer", value);
+        export const isDetailInteger = (data: { minimum?: number; exclusiveMinimum?: number; maximum?: number; exclusiveMaximum?: number; multipleOf?: number; }, safeInteger?: boolean): IsType<number> =>
         {
-            const base = true === safeNumber ? isSafeNumber: isNumber;
+            const base = true === safeInteger ? isSafeInteger: isInteger;
             if ([ data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf ].every(i => undefined === i))
             {
                 return base;
@@ -254,9 +252,9 @@ export namespace EvilType
                 (
                     base(value) &&
                     (undefined === data.minimum || data.minimum <= value) &&
-                    (undefined === data.exclusiveMinimum || data.exclusiveMinimum <= value) &&
+                    (undefined === data.exclusiveMinimum || data.exclusiveMinimum < value) &&
                     (undefined === data.maximum || value <= data.maximum) &&
-                    (undefined === data.exclusiveMaximum || value <= data.exclusiveMaximum) &&
+                    (undefined === data.exclusiveMaximum || value < data.exclusiveMaximum) &&
                     (undefined === data.multipleOf || 0 === value % data.multipleOf),
                     listner,
                     () =>
@@ -280,7 +278,59 @@ export namespace EvilType
                         }
                         if (undefined !== data.multipleOf)
                         {
-                            details.push(`format:${data.multipleOf}`);
+                            details.push(`multipleOf:${data.multipleOf}`);
+                        }
+                        return `${true === safeInteger ? "safe-integer": "integer"}(${details.join(",")})`
+                    },
+                    value
+                );
+                return result;
+            }
+        };
+        export const isNumber = (value: unknown, listner?: ErrorListener): value is number =>
+            Error.withErrorHandling("number" === typeof value, listner, "number", value);
+        export const isSafeNumber = (value: unknown, listner?: ErrorListener): value is number =>
+            Error.withErrorHandling(Number.isFinite(value), listner, "safe-number", value);
+        export const isDetailNumber = (data: { minimum?: number; exclusiveMinimum?: number; maximum?: number; exclusiveMaximum?: number; multipleOf?: number; }, safeNumber?: boolean): IsType<number> =>
+        {
+            const base = true === safeNumber ? isSafeNumber: isNumber;
+            if ([ data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf ].every(i => undefined === i))
+            {
+                return base;
+            }
+            else
+            {
+                const result = (value: unknown, listner?: ErrorListener): value is number => Error.withErrorHandling
+                (
+                    base(value) &&
+                    (undefined === data.minimum || data.minimum <= value) &&
+                    (undefined === data.exclusiveMinimum || data.exclusiveMinimum < value) &&
+                    (undefined === data.maximum || value <= data.maximum) &&
+                    (undefined === data.exclusiveMaximum || value < data.exclusiveMaximum) &&
+                    (undefined === data.multipleOf || 0 === value % data.multipleOf),
+                    listner,
+                    () =>
+                    {
+                        const details: string[] = [];
+                        if (undefined !== data.minimum)
+                        {
+                            details.push(`minimum:${data.minimum}`);
+                        }
+                        if (undefined !== data.exclusiveMinimum)
+                        {
+                            details.push(`exclusiveMinimum:${data.exclusiveMinimum}`);
+                        }
+                        if (undefined !== data.maximum)
+                        {
+                            details.push(`maximum:${data.maximum}`);
+                        }
+                        if (undefined !== data.exclusiveMaximum)
+                        {
+                            details.push(`exclusiveMaximum:${data.exclusiveMaximum}`);
+                        }
+                        if (undefined !== data.multipleOf)
+                        {
+                            details.push(`multipleOf:${data.multipleOf}`);
                         }
                         return `${true === safeNumber ? "safe-number": "number"}(${details.join(",")})`
                     },

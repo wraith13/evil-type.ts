@@ -579,12 +579,17 @@ var Build;
                         return [(0, exports.$expression)("true"),];
                     case "null":
                         return [(0, exports.$expression)("\"".concat(data.value.type, "\" === ").concat(name)),];
-                    case "integer":
-                        return [(0, exports.$expression)("Number.isInteger"), (0, exports.$expression)("("), (0, exports.$expression)(name), (0, exports.$expression)(")"),];
                     case "boolean":
                         return [(0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name)),];
+                    case "integer":
+                        return __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([
+                            (0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name)),
+                            (0, exports.$expression)("&&"), true !== Build.getSafeInteger(data) ? (0, exports.$expression)("Number.isSafeInteger") : (0, exports.$expression)("Number.isInteger"), (0, exports.$expression)("("), (0, exports.$expression)(name), (0, exports.$expression)(")")
+                        ], (undefined !== data.value.minimum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minimum)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name)),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.exclusiveMinimum)), (0, exports.$expression)("<"), (0, exports.$expression)("".concat(name)),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maximum)),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("<"), (0, exports.$expression)("".concat(data.value.exclusiveMaximum)),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("&&"), (0, exports.$expression)("0"), (0, exports.$expression)("==="), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("%"), (0, exports.$expression)("".concat(data.value.multipleOf)),] : []), true);
                     case "number":
-                        return [(0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name)),];
+                        return __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([
+                            (0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name))
+                        ], (true !== Build.getSafeNumber(data) ? [(0, exports.$expression)("&&"), (0, exports.$expression)("Number.isFinite"), (0, exports.$expression)("("), (0, exports.$expression)(name), (0, exports.$expression)(")"),] : []), true), (undefined !== data.value.minimum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minimum)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name)),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.exclusiveMinimum)), (0, exports.$expression)("<"), (0, exports.$expression)("".concat(name)),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maximum)),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("<"), (0, exports.$expression)("".concat(data.value.exclusiveMaximum)),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("&&"), (0, exports.$expression)("0"), (0, exports.$expression)("==="), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("%"), (0, exports.$expression)("".concat(data.value.multipleOf)),] : []), true);
                     case "string":
                         return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
                             (0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name))
@@ -782,7 +787,25 @@ var Build;
                     case "boolean":
                         return [(0, exports.$expression)("EvilType.Validator.isBoolean"),];
                     case "integer":
-                        return [(0, exports.$expression)("EvilType.Validator.isInteger"),];
+                        var integerOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minimum ? [(0, exports.$expression)("minimum:".concat(data.value.minimum, ",")),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("exclusiveMinimum:".concat(data.value.exclusiveMinimum, ",")),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("maximum:".concat(data.value.maximum, ",")),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("exclusiveMaximum:".concat(data.value.exclusiveMaximum, ",")),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("multipleOf:".concat(data.value.multipleOf, ",")),] : []), true);
+                        if (0 < integerOptions.length) {
+                            return __spreadArray(__spreadArray([
+                                (0, exports.$expression)("EvilType.Validator.isDetailInteger"),
+                                (0, exports.$expression)("("),
+                                (0, exports.$expression)("{")
+                            ], integerOptions, true), [
+                                (0, exports.$expression)("},"),
+                                (0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)), ",")),
+                                (0, exports.$expression)(")"),
+                            ], false);
+                        }
+                        else {
+                            return [
+                                Build.getSafeInteger(data) ?
+                                    (0, exports.$expression)("EvilType.Validator.isSafeInteger") :
+                                    (0, exports.$expression)("EvilType.Validator.isInteger"),
+                            ];
+                        }
                     case "number":
                         var numberOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minimum ? [(0, exports.$expression)("minimum:".concat(data.value.minimum, ",")),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("exclusiveMinimum:".concat(data.value.exclusiveMinimum, ",")),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("maximum:".concat(data.value.maximum, ",")),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("exclusiveMaximum:".concat(data.value.exclusiveMaximum, ",")),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("multipleOf:".concat(data.value.multipleOf, ",")),] : []), true);
                         if (0 < numberOptions.length) {
@@ -792,7 +815,7 @@ var Build;
                                 (0, exports.$expression)("{")
                             ], numberOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)("safeNumber:".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)), ",")),
+                                (0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)), ",")),
                                 (0, exports.$expression)(")"),
                             ], false);
                         }
@@ -1105,7 +1128,7 @@ var Build;
                     result["type"] = data.value.type;
                     break;
             }
-            if ("number" === data.value.type) {
+            if ("integer" === data.value.type || "number" === data.value.type) {
                 if (undefined !== data.value.minimum) {
                     result["minimum"] = data.value.minimum;
                 }
@@ -1122,9 +1145,13 @@ var Build;
                     result["multipleOf"] = data.value.multipleOf;
                 }
                 // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない
-                // if (undefined !== data.value.safeNynber)
+                // if (undefined !== data.value.safeInteger)
                 // {
-                //     result["safeNynber"] = data.value.safeNynber;
+                //     result["safeInteger"] = data.value.safeInteger;
+                // }
+                // if (undefined !== data.value.safeNumber)
+                // {
+                //     result["safeNumber"] = data.value.safeNumber;
                 // }
             }
             if ("string" === data.value.type) {

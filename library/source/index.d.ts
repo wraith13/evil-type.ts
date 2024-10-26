@@ -57,7 +57,7 @@ export declare namespace Build {
     const getResolveRefer: <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process) => NextProcess<Process, Type.TypeOrLiteralOfRefer>;
     const getKeyofTarget: <Process extends BaseProcess<Type.KeyofElement>>(data: Process) => NextProcess<NextProcess<Process, Type.ReferElement>, Type.TypeOrLiteralOfRefer>;
     const getSafeInteger: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
-    const getSafeNumber: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
+    const getSafeNumber: <Process extends BaseProcess<unknown>>(data: Process) => number | boolean;
     const getRegexpFlags: <Process extends BaseProcess<unknown>>(data: Process) => string;
     const getLiteral: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => Type.LiteralElement | null;
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
@@ -123,7 +123,9 @@ export declare namespace Build {
         const buildLiteral: (data: Process<Type.LiteralElement>) => Jsonable.JsonableObject;
         const buildValue: (data: Process<Type.ValueDefinition>) => Jsonable.JsonableObject;
         const buildType: (data: Process<Type.Type>) => Jsonable.JsonableObject;
-        const setCommonProperties: (result: Jsonable.JsonableObject, data: Process<Type.CommonProperties>) => Jsonable.JsonableObject;
+        const setCommonProperties: <T>(result: Jsonable.JsonableObject, data: Process<Type.CommonProperties & {
+            default?: T;
+        }>) => Jsonable.JsonableObject;
         const buildPrimitiveType: (data: Process<Type.PrimitiveTypeElement>) => Jsonable.JsonableObject;
         const buildInterface: (data: Process<Type.InterfaceDefinition>) => Jsonable.JsonableObject;
         const buildDictionary: (data: Process<Type.DictionaryDefinition>) => Jsonable.JsonableObject;

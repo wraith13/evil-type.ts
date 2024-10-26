@@ -705,12 +705,28 @@ export namespace Build
                     return [ $expression("true"), ];
                 case "null":
                     return [ $expression(`"${data.value.type}" === ${name}`), ];
-                case "integer":
-                    return [ $expression("Number.isInteger"), $expression("("), $expression(name), $expression(")"), ];
                 case "boolean":
                     return [ $expression(`"${data.value.type}" === typeof ${name}`), ];
+                case "integer":
+                    return [
+                        $expression(`"${data.value.type}" === typeof ${name}`),
+                        $expression("&&"), true !== getSafeInteger(data) ? $expression("Number.isSafeInteger"): $expression("Number.isInteger"), $expression("("), $expression(name), $expression(")"),
+                        ...(undefined !== data.value.minimum ? [ $expression("&&"), $expression(`${data.value.minimum}`), $expression("<="), $expression(`${name}`), ]: []),
+                        ...(undefined !== data.value.exclusiveMinimum ? [ $expression("&&"), $expression(`${data.value.exclusiveMinimum}`), $expression("<"), $expression(`${name}`), ]: []),
+                        ...(undefined !== data.value.maximum ? [ $expression("&&"), $expression(`${name}`), $expression("<="), $expression(`${data.value.maximum}`), ]: []),
+                        ...(undefined !== data.value.exclusiveMaximum ? [ $expression("&&"), $expression(`${name}`), $expression("<"), $expression(`${data.value.exclusiveMaximum}`), ]: []),
+                        ...(undefined !== data.value.multipleOf ? [ $expression("&&"), $expression("0"), $expression("==="), $expression(`${name}`), $expression("%"), $expression(`${data.value.multipleOf}`), ]: []),
+                    ];
                 case "number":
-                    return [ $expression(`"${data.value.type}" === typeof ${name}`), ];
+                    return [
+                        $expression(`"${data.value.type}" === typeof ${name}`),
+                        ...(true !== getSafeNumber(data) ? [ $expression("&&"), $expression("Number.isFinite"), $expression("("), $expression(name), $expression(")"), ]: []),
+                        ...(undefined !== data.value.minimum ? [ $expression("&&"), $expression(`${data.value.minimum}`), $expression("<="), $expression(`${name}`), ]: []),
+                        ...(undefined !== data.value.exclusiveMinimum ? [ $expression("&&"), $expression(`${data.value.exclusiveMinimum}`), $expression("<"), $expression(`${name}`), ]: []),
+                        ...(undefined !== data.value.maximum ? [ $expression("&&"), $expression(`${name}`), $expression("<="), $expression(`${data.value.maximum}`), ]: []),
+                        ...(undefined !== data.value.exclusiveMaximum ? [ $expression("&&"), $expression(`${name}`), $expression("<"), $expression(`${data.value.exclusiveMaximum}`), ]: []),
+                        ...(undefined !== data.value.multipleOf ? [ $expression("&&"), $expression("0"), $expression("==="), $expression(`${name}`), $expression("%"), $expression(`${data.value.multipleOf}`), ]: []),
+                    ];
                 case "string":
                     return [
                         $expression(`"${data.value.type}" === typeof ${name}`),
@@ -982,7 +998,33 @@ export namespace Build
                 case "boolean":
                     return [ $expression("EvilType.Validator.isBoolean"), ];
                 case "integer":
-                    return [ $expression("EvilType.Validator.isInteger"), ];
+                    const integerOptions = [
+                        ...(undefined !== data.value.minimum ? [ $expression(`minimum:${data.value.minimum},`), ]: []),
+                        ...(undefined !== data.value.exclusiveMinimum ? [ $expression(`exclusiveMinimum:${data.value.exclusiveMinimum},`), ]: []),
+                        ...(undefined !== data.value.maximum ? [ $expression(`maximum:${data.value.maximum},`), ]: []),
+                        ...(undefined !== data.value.exclusiveMaximum ? [ $expression(`exclusiveMaximum:${data.value.exclusiveMaximum},`), ]: []),
+                        ...(undefined !== data.value.multipleOf ? [ $expression(`multipleOf:${data.value.multipleOf},`), ]: []),
+                    ];
+                    if (0 < integerOptions.length)
+                    {
+                        return [
+                            $expression("EvilType.Validator.isDetailInteger"),
+                            $expression("("),
+                            $expression("{"),
+                            ...integerOptions,
+                            $expression("},"),
+                            $expression(`${Jsonable.stringify(getSafeNumber(data))},`),
+                            $expression(")"),
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            getSafeInteger(data) ?
+                                $expression("EvilType.Validator.isSafeInteger"):
+                                $expression("EvilType.Validator.isInteger"),
+                        ];
+                    }
                 case "number":
                     const numberOptions = [
                         ...(undefined !== data.value.minimum ? [ $expression(`minimum:${data.value.minimum},`), ]: []),
@@ -999,7 +1041,7 @@ export namespace Build
                             $expression("{"),
                             ...numberOptions,
                             $expression("},"),
-                            $expression(`safeNumber:${Jsonable.stringify(getSafeNumber(data))},`),
+                            $expression(`${Jsonable.stringify(getSafeNumber(data))},`),
                             $expression(")"),
                         ];
                     }
@@ -1423,7 +1465,7 @@ export namespace Build
             };
             return result;
         };
-        export const setCommonProperties = (result: Jsonable.JsonableObject, data: Process<Type.CommonProperties>) =>
+        export const setCommonProperties = <T>(result: Jsonable.JsonableObject, data: Process<Type.CommonProperties & { default?: T }>) =>
         {
             if (data.value.default)
             {
@@ -1453,7 +1495,7 @@ export namespace Build
                 result["type"] = data.value.type;
                 break;
             }
-            if ("number" === data.value.type)
+            if ("integer" === data.value.type || "number" === data.value.type)
             {
                 if (undefined !== data.value.minimum)
                 {
@@ -1476,9 +1518,13 @@ export namespace Build
                     result["multipleOf"] = data.value.multipleOf;
                 }
                 // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない
-                // if (undefined !== data.value.safeNynber)
+                // if (undefined !== data.value.safeInteger)
                 // {
-                //     result["safeNynber"] = data.value.safeNynber;
+                //     result["safeInteger"] = data.value.safeInteger;
+                // }
+                // if (undefined !== data.value.safeNumber)
+                // {
+                //     result["safeNumber"] = data.value.safeNumber;
                 // }
             }
             if ("string" === data.value.type)

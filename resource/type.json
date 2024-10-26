@@ -441,6 +441,18 @@
                         },
                         "items": {
                             "$ref": "TypeOrRefer"
+                        },
+                        "minItems?": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "maxItems?": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "uniqueItems?": {
+                            "type": "boolean",
+                            "default": false
                         }
                     }
                 },
@@ -570,134 +582,11 @@
                     "members": {
                         "type": {
                             "const": "boolean"
+                        },
+                        "default?": {
+                            "type": "boolean",
+                            "description": "[SCHEMA]"
                         }
-                    }
-                },
-                "BaseNumberType": {
-                    "type": "interface",
-                    "extends": [
-                        {
-                            "$ref": "CommonProperties"
-                        }
-                    ],
-                    "members": {
-                        "type": {
-                            "const": "number"
-                        },
-                        "multipleOf?": {
-                            "type": "number"
-                        },
-                        "safeNumber?": {
-                            "type": "boolean"
-                        }
-                    }
-                },
-                "NumberTypeMM": {
-                    "type": "interface",
-                    "extends": [
-                        {
-                            "$ref": "BaseNumberType"
-                        }
-                    ],
-                    "members": {
-                        "minimum?": {
-                            "type": "number"
-                        },
-                        "exclusiveMinimum": {
-                            "type": "never"
-                        },
-                        "maximum?": {
-                            "type": "number"
-                        },
-                        "exclusiveMaximum": {
-                            "type": "never"
-                        }
-                    }
-                },
-                "NumberTypeME": {
-                    "type": "interface",
-                    "extends": [
-                        {
-                            "$ref": "BaseNumberType"
-                        }
-                    ],
-                    "members": {
-                        "minimum?": {
-                            "type": "number"
-                        },
-                        "exclusiveMinimum": {
-                            "type": "never"
-                        },
-                        "maximum": {
-                            "type": "never"
-                        },
-                        "exclusiveMaximum?": {
-                            "type": "number"
-                        }
-                    }
-                },
-                "NumberTypeEM": {
-                    "type": "interface",
-                    "extends": [
-                        {
-                            "$ref": "BaseNumberType"
-                        }
-                    ],
-                    "members": {
-                        "minimum": {
-                            "type": "never"
-                        },
-                        "exclusiveMinimum?": {
-                            "type": "number"
-                        },
-                        "maximum?": {
-                            "type": "number"
-                        },
-                        "exclusiveMaximum": {
-                            "type": "never"
-                        }
-                    }
-                },
-                "NumberTypeEE": {
-                    "type": "interface",
-                    "extends": [
-                        {
-                            "$ref": "BaseNumberType"
-                        }
-                    ],
-                    "members": {
-                        "minimum": {
-                            "type": "never"
-                        },
-                        "exclusiveMinimum?": {
-                            "type": "number"
-                        },
-                        "maximum": {
-                            "type": "never"
-                        },
-                        "exclusiveMaximum?": {
-                            "type": "number"
-                        }
-                    }
-                },
-                "NumberType": {
-                    "type": "type",
-                    "define": {
-                        "type": "or",
-                        "types": [
-                            {
-                                "$ref": "NumberTypeMM"
-                            },
-                            {
-                                "$ref": "NumberTypeME"
-                            },
-                            {
-                                "$ref": "NumberTypeEM"
-                            },
-                            {
-                                "$ref": "NumberTypeEE"
-                            }
-                        ]
                     }
                 },
                 "IntegerType": {
@@ -728,6 +617,45 @@
                         },
                         "safeInteger?": {
                             "type": "boolean"
+                        },
+                        "default?": {
+                            "type": "integer",
+                            "description": "[SCHEMA]"
+                        }
+                    }
+                },
+                "NumberType": {
+                    "type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "type": {
+                            "const": "number"
+                        },
+                        "minimum?": {
+                            "type": "number"
+                        },
+                        "exclusiveMinimum?": {
+                            "type": "number"
+                        },
+                        "maximum?": {
+                            "type": "number"
+                        },
+                        "exclusiveMaximum?": {
+                            "type": "number"
+                        },
+                        "multipleOf?": {
+                            "type": "number"
+                        },
+                        "safeNumber?": {
+                            "type": "number"
+                        },
+                        "default?": {
+                            "type": "number",
+                            "description": "[SCHEMA]"
                         }
                     }
                 },
@@ -743,10 +671,16 @@
                             "const": "string"
                         },
                         "minLength?": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "maxLength?": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "default?": {
+                            "type": "string",
+                            "description": "[SCHEMA]"
                         }
                     }
                 },

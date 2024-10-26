@@ -15,7 +15,7 @@ export namespace Jsonable
         string => JSON.stringify(value, replacer as any, space);
     export type JsonablePartial<Target extends JsonableObject> = { [key in keyof Target]?: Target[key] } & JsonableObject;
     export const isJsonableValue: EvilType.Validator.IsType<JsonableValue> = EvilType.Validator.isOr(EvilType.Validator.isNull,
-        EvilType.Validator.isBoolean, EvilType.Validator.isNumber, EvilType.Validator.isString);
+        EvilType.Validator.isBoolean, EvilType.Validator.isSafeNumber, EvilType.Validator.isString);
     export const isJsonableArray: EvilType.Validator.IsType<JsonableArray> = EvilType.lazy(() => EvilType.Validator.isArray(isJsonable));
     export const isJsonableObject: EvilType.Validator.IsType<JsonableObject> = EvilType.lazy(() => EvilType.Validator.isDictionaryObject(
         isJsonable));
