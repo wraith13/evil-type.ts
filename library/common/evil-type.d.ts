@@ -72,7 +72,12 @@ export declare namespace EvilType {
         type ActualObject = Exclude<object, null>;
         const isObject: (value: unknown) => value is ActualObject;
         const isEnum: <T>(list: readonly T[]) => (value: unknown, listner?: ErrorListener) => value is T;
-        const isArray: <T>(isType: IsType<T>) => (value: unknown, listner?: ErrorListener) => value is T[];
+        const isUniqueItems: (list: unknown[]) => boolean;
+        const isArray: <T>(isType: IsType<T>, data?: {
+            minItems?: number;
+            maxItems?: number;
+            uniqueItems?: boolean;
+        }) => (value: unknown, listner?: ErrorListener) => value is T[];
         const makeOrTypeNameFromIsTypeList: <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) => string[];
         const getBestMatchErrors: (listeners: ErrorListener[]) => Error.Listener[];
         const isOr: <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) => (value: unknown, listner?: ErrorListener) => value is T[number];

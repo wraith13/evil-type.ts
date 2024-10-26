@@ -31,7 +31,7 @@
                             "items": {
                                 "type": "string"
                             },
-                            "description": "[CODE]"
+                            "description": "[TypeScript]"
                         }
                     }
                 },
@@ -40,15 +40,15 @@
                     "members": {
                         "default?": {
                             "$ref": "Jsonable.Jsonable",
-                            "description": "[SCHEMA]"
+                            "description": "[JSON Schema]"
                         },
                         "title?": {
                             "type": "string",
-                            "description": "[SCHEMA]"
+                            "description": "[JSON Schema]"
                         },
                         "description?": {
                             "type": "string",
-                            "description": "[SCHEMA]"
+                            "description": "[JSON Schema]"
                         }
                     }
                 },
@@ -71,7 +71,7 @@
                             "items": {
                                 "$ref": "ImportDefinition"
                             },
-                            "description": "[CODE] Specify imports that your code depends on. If you use `full` for `validatorOption`, you need to specify import as `evil-type` as `{ EvilType }` here."
+                            "description": "[TypeScript] Specify imports that your code depends on. If you use `full` for `validatorOption`, you need to specify import as `evil-type` as `{ EvilType }` here."
                         },
                         "defines": {
                             "$ref": "DefinitionMap",
@@ -87,7 +87,7 @@
                     "members": {
                         "outputFile": {
                             "type": "string",
-                            "description": "[CODE]"
+                            "description": "[TypeScript]"
                         },
                         "indentUnit": {
                             "type": "enum-type",
@@ -104,27 +104,27 @@
                                 "tab"
                             ],
                             "default": 4,
-                            "description": "[CODE]"
+                            "description": "[TypeScript]"
                         },
                         "indentStyle": {
                             "$ref": "IndentStyleType",
                             "default": "allman",
-                            "description": "[CODE]"
+                            "description": "[TypeScript]"
                         },
                         "validatorOption": {
                             "$ref": "ValidatorOptionType",
                             "default": "simple",
-                            "description": "[CODE]"
+                            "description": "[TypeScript]"
                         },
                         "safeNumber?": {
                             "type": "boolean",
                             "default": true,
-                            "description": "[CODE]"
+                            "description": "[TypeScript]"
                         },
                         "safeInteger?": {
                             "type": "boolean",
                             "default": true,
-                            "description": "[CODE]"
+                            "description": "[TypeScript]"
                         },
                         "maxLineLength?": {
                             "type": "or",
@@ -137,7 +137,7 @@
                                 }
                             ],
                             "default": 160,
-                            "description": "[CODE]"
+                            "description": "[TypeScript]"
                         },
                         "default?": {
                             "type": "interface",
@@ -145,7 +145,7 @@
                                 "export?": {
                                     "type": "boolean",
                                     "default": true,
-                                    "description": "[CODE]"
+                                    "description": "[TypeScript]"
                                 },
                                 "additionalProperties?": {
                                     "type": "boolean",
@@ -162,13 +162,13 @@
                                 "regexpFlags?": {
                                     "type": "string",
                                     "default": "u",
-                                    "description": "[CODE]"
+                                    "description": "[TypeScript]"
                                 }
                             }
                         },
                         "schema?": {
                             "$ref": "SchemaOptions",
-                            "description": "[SCHEMA] If you want to generate JSON Schema, specify this option."
+                            "description": "[JSON Schema] If you want to generate JSON Schema, specify this option."
                         }
                     }
                 },
@@ -177,22 +177,22 @@
                     "members": {
                         "outputFile": {
                             "type": "string",
-                            "description": "[SCHEMA]"
+                            "description": "[JSON Schema]"
                         },
                         "$id?": {
                             "type": "string",
-                            "description": "[SCHEMA] Schema ID"
+                            "description": "[JSON Schema] Schema ID"
                         },
                         "$ref?": {
                             "type": "string",
-                            "description": "[SCHEMA] Root Schema"
+                            "description": "[JSON Schema] Root Schema"
                         },
                         "externalReferMapping?": {
                             "type": "dictionary",
                             "valueType": {
                                 "type": "string"
                             },
-                            "description": "[SCHEMA] Mapping of external schemas to reference"
+                            "description": "[JSON Schema] Mapping of external schemas to reference"
                         }
                     }
                 },
@@ -316,7 +316,7 @@
                             }
                         }
                     },
-                    "description": "[CODE]"
+                    "description": "[TypeScript]"
                 },
                 "NamespaceDefinition": {
                     "type": "interface",
@@ -585,7 +585,7 @@
                         },
                         "default?": {
                             "type": "boolean",
-                            "description": "[SCHEMA]"
+                            "description": "[JSON Schema]"
                         }
                     }
                 },
@@ -620,7 +620,7 @@
                         },
                         "default?": {
                             "type": "integer",
-                            "description": "[SCHEMA]"
+                            "description": "[JSON Schema]"
                         }
                     }
                 },
@@ -655,7 +655,7 @@
                         },
                         "default?": {
                             "type": "number",
-                            "description": "[SCHEMA]"
+                            "description": "[JSON Schema]"
                         }
                     }
                 },
@@ -680,7 +680,7 @@
                         },
                         "default?": {
                             "type": "string",
-                            "description": "[SCHEMA]"
+                            "description": "[JSON Schema]"
                         }
                     }
                 },

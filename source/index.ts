@@ -742,6 +742,20 @@ export namespace Build
                 case "array":
                     return [
                         $expression(`Array.isArray(${name})`),
+                        ...(undefined !== data.value.minItems ? [ $expression("&&"), $expression(`${data.value.minItems}`), $expression("<="), $expression(`${name}.length`), ]: []),
+                        ...(undefined !== data.value.maxItems ? [ $expression("&&"), $expression(`${name}.length`), $expression("<="), $expression(`${data.value.maxItems}`), ]: []),
+                        ...
+                        (
+                            true === data.value.uniqueItems ?
+                            [
+                                $expression("&&"), $expression(`${name}`), $expression("."), $expression("map"), $expression("("), $expression("i"), $expression("=>"),
+                                $expression("JSON"), $expression("."), $expression("stringify"), $expression("("), $expression("i"), $expression(")"), $expression(")"),
+                                $expression("."), $expression("every"), $expression("("), $expression("("), $expression("i"), $expression(","), $expression("ix"),
+                                $expression(","), $expression("list"), $expression(")"), $expression("=>"), $expression("ix"), $expression("==="), $expression("list"),
+                                $expression("."), $expression("indexOf"), $expression("("), $expression("i"), $expression(")"), $expression(")"),
+                            ]:
+                            []
+                        ),
                         $expression("&&"),
                         $expression(`${name}.every(`),
                         $expression("i"),
@@ -1085,11 +1099,30 @@ export namespace Build
                         [ buildLiteralAsConst(data.value.members), ]
                     );
                 case "array":
-                    return buildCall
-                    (
-                        [ $expression("EvilType.Validator.isArray"), ],
-                        [ buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.items)), ]
-                    );
+                    const arrayOptions = [
+                        ...(undefined !== data.value.minItems ? [ $expression(`minItems:${data.value.minItems},`), ]: []),
+                        ...(undefined !== data.value.maxItems ? [ $expression(`maxItems:${data.value.maxItems},`), ]: []),
+                        ...(undefined !== data.value.uniqueItems ? [ $expression(`maxItems:${data.value.maxItems},`), ]: []),
+                    ];
+                    if (0 < arrayOptions.length)
+                    {
+                        return buildCall
+                        (
+                            [ $expression("EvilType.Validator.isArray"), ],
+                            [
+                                buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.items)),
+                                [ $expression("{"), ...arrayOptions, $expression("},"), ],
+                            ]
+                        );
+                    }
+                    else
+                    {
+                        return buildCall
+                        (
+                            [ $expression("EvilType.Validator.isArray"), ],
+                            [ buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.items)), ]
+                        );
+                    }
                 case "and":
                     return buildCall
                     (
@@ -1743,6 +1776,18 @@ export namespace Build
                 type: "array",
                 items: buildTypeOrRefer(nextProcess(data, null, data.value.items)),
             };
+            if (undefined !== data.value.minItems)
+            {
+                result["minItems"] = data.value.minItems;
+            }
+            if (undefined !== data.value.maxItems)
+            {
+                result["maxItems"] = data.value.maxItems;
+            }
+            if (undefined !== data.value.uniqueItems)
+            {
+                result["uniqueItems"] = data.value.uniqueItems;
+            }
             return setCommonProperties(result, data);
         };
         export const buildOr = (data: Process<Type.OrElement>):Jsonable.JsonableObject =>

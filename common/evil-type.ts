@@ -391,10 +391,33 @@ export namespace EvilType
         export const isEnum = <T>(list: readonly T[]) =>
             (value: unknown, listner?: ErrorListener): value is T =>
                 Error.withErrorHandling(list.includes(value as T), listner, () => list.map(i => Error.valueToString(i)).join(" | "), value);
-        export const isArray = <T>(isType: IsType<T>) =>
-            (value: unknown, listner?: ErrorListener): value is T[] =>
+        export const isUniqueItems = (list: unknown[]) =>
+            list.map(i => JSON.stringify(i)).every((i, ix, list) => ix === list.indexOf(i));
+        export const isArray = <T>(isType: IsType<T>, data?: { minItems?: number; maxItems?: number; uniqueItems?: boolean; }) =>
+        {
+            const details: string[] = [];
+            if (undefined !== data?.minItems)
             {
-                if (Array.isArray(value))
+                details.push(`minItems:${data.minItems}`);
+            }
+            if (undefined !== data?.maxItems)
+            {
+                details.push(`maxItems:${data.maxItems}`);
+            }
+            if (true === data?.uniqueItems)
+            {
+                details.push(`uniqueItems:${data.uniqueItems}`);
+            }
+            const type = details.length <= 0 ? "array": `array(${details.join(",")})`
+            return (value: unknown, listner?: ErrorListener): value is T[] =>
+            {
+                if
+                (
+                    Array.isArray(value) &&
+                    (undefined === data?.minItems || data.minItems <= value.length) &&
+                    (undefined === data?.maxItems || value.length <= data.maxItems) &&
+                    (true !== data?.uniqueItems || isUniqueItems(value))
+                )
                 {
                     const result = value.map(i => isType(i, listner)).every(i => i);
                     if (listner)
@@ -412,9 +435,10 @@ export namespace EvilType
                 }
                 else
                 {
-                    return undefined !== listner && Error.raiseError(listner, "array", value);
+                    return undefined !== listner && Error.raiseError(listner, type, value);
                 }
             };
+        };
         export const makeOrTypeNameFromIsTypeList = <T extends any[]>(...isTypeList: { [K in keyof T]: IsType<T[K]>; }) =>
             isTypeList.map(i => Error.getType(i))
                 .reduce((a, b) => [...a, ...b], [])

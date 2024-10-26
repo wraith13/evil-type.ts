@@ -599,13 +599,22 @@ var Build;
                     case "enum-type":
                         return __spreadArray(__spreadArray([], stringifyTokens(data.value.members), true), [(0, exports.$expression)("."), (0, exports.$expression)("includes(".concat(name, " as any)")),], false);
                     case "array":
-                        return __spreadArray(__spreadArray([
-                            (0, exports.$expression)("Array.isArray(".concat(name, ")")),
+                        return __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([
+                            (0, exports.$expression)("Array.isArray(".concat(name, ")"))
+                        ], (undefined !== data.value.minItems ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minItems)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name, ".length")),] : []), true), (undefined !== data.value.maxItems ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name, ".length")), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maxItems)),] : []), true), (true === data.value.uniqueItems ?
+                            [
+                                (0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("."), (0, exports.$expression)("map"), (0, exports.$expression)("("), (0, exports.$expression)("i"), (0, exports.$expression)("=>"),
+                                (0, exports.$expression)("JSON"), (0, exports.$expression)("."), (0, exports.$expression)("stringify"), (0, exports.$expression)("("), (0, exports.$expression)("i"), (0, exports.$expression)(")"), (0, exports.$expression)(")"),
+                                (0, exports.$expression)("."), (0, exports.$expression)("every"), (0, exports.$expression)("("), (0, exports.$expression)("("), (0, exports.$expression)("i"), (0, exports.$expression)(","), (0, exports.$expression)("ix"),
+                                (0, exports.$expression)(","), (0, exports.$expression)("list"), (0, exports.$expression)(")"), (0, exports.$expression)("=>"), (0, exports.$expression)("ix"), (0, exports.$expression)("==="), (0, exports.$expression)("list"),
+                                (0, exports.$expression)("."), (0, exports.$expression)("indexOf"), (0, exports.$expression)("("), (0, exports.$expression)("i"), (0, exports.$expression)(")"), (0, exports.$expression)(")"),
+                            ] :
+                            []), true), [
                             (0, exports.$expression)("&&"),
                             (0, exports.$expression)("".concat(name, ".every(")),
                             (0, exports.$expression)("i"),
                             (0, exports.$expression)("=>")
-                        ], Validator.buildValidatorExpression("i", Build.nextProcess(data, null, data.value.items)), true), [
+                        ], false), Validator.buildValidatorExpression("i", Build.nextProcess(data, null, data.value.items)), true), [
                             (0, exports.$expression)(")")
                         ], false);
                     case "and":
@@ -847,7 +856,16 @@ var Build;
                     case "enum-type":
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(data.value.members),]);
                     case "array":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isArray"),], [Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.items)),]);
+                        var arrayOptions = __spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minItems ? [(0, exports.$expression)("minItems:".concat(data.value.minItems, ",")),] : []), true), (undefined !== data.value.maxItems ? [(0, exports.$expression)("maxItems:".concat(data.value.maxItems, ",")),] : []), true), (undefined !== data.value.uniqueItems ? [(0, exports.$expression)("maxItems:".concat(data.value.maxItems, ",")),] : []), true);
+                        if (0 < arrayOptions.length) {
+                            return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isArray"),], [
+                                Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.items)),
+                                __spreadArray(__spreadArray([(0, exports.$expression)("{")], arrayOptions, true), [(0, exports.$expression)("},"),], false),
+                            ]);
+                        }
+                        else {
+                            return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isArray"),], [Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.items)),]);
+                        }
                     case "and":
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isAnd"),], data.value.types.map(function (i) { return Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, i)); }));
                     case "or":
@@ -1313,6 +1331,15 @@ var Build;
                 type: "array",
                 items: Schema.buildTypeOrRefer(Build.nextProcess(data, null, data.value.items)),
             };
+            if (undefined !== data.value.minItems) {
+                result["minItems"] = data.value.minItems;
+            }
+            if (undefined !== data.value.maxItems) {
+                result["maxItems"] = data.value.maxItems;
+            }
+            if (undefined !== data.value.uniqueItems) {
+                result["uniqueItems"] = data.value.uniqueItems;
+            }
             return Schema.setCommonProperties(result, data);
         };
         Schema.buildOr = function (data) {

@@ -338,9 +338,26 @@ var EvilType;
                 return Error.withErrorHandling(list.includes(value), listner, function () { return list.map(function (i) { return Error.valueToString(i); }).join(" | "); }, value);
             };
         };
-        Validator.isArray = function (isType) {
+        Validator.isUniqueItems = function (list) {
+            return list.map(function (i) { return JSON.stringify(i); }).every(function (i, ix, list) { return ix === list.indexOf(i); });
+        };
+        Validator.isArray = function (isType, data) {
+            var details = [];
+            if (undefined !== (data === null || data === void 0 ? void 0 : data.minItems)) {
+                details.push("minItems:".concat(data.minItems));
+            }
+            if (undefined !== (data === null || data === void 0 ? void 0 : data.maxItems)) {
+                details.push("maxItems:".concat(data.maxItems));
+            }
+            if (true === (data === null || data === void 0 ? void 0 : data.uniqueItems)) {
+                details.push("uniqueItems:".concat(data.uniqueItems));
+            }
+            var type = details.length <= 0 ? "array" : "array(".concat(details.join(","), ")");
             return function (value, listner) {
-                if (Array.isArray(value)) {
+                if (Array.isArray(value) &&
+                    (undefined === (data === null || data === void 0 ? void 0 : data.minItems) || data.minItems <= value.length) &&
+                    (undefined === (data === null || data === void 0 ? void 0 : data.maxItems) || value.length <= data.maxItems) &&
+                    (true !== (data === null || data === void 0 ? void 0 : data.uniqueItems) || Validator.isUniqueItems(value))) {
                     var result = value.map(function (i) { return isType(i, listner); }).every(function (i) { return i; });
                     if (listner) {
                         if (result) {
@@ -353,7 +370,7 @@ var EvilType;
                     return result;
                 }
                 else {
-                    return undefined !== listner && Error.raiseError(listner, "array", value);
+                    return undefined !== listner && Error.raiseError(listner, type, value);
                 }
             };
         };
