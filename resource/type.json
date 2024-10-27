@@ -795,6 +795,9 @@
                                 "$ref": "ItemofElement"
                             },
                             {
+                                "$ref": "MemberofElement"
+                            },
+                            {
                                 "$ref": "InterfaceDefinition"
                             },
                             {
@@ -901,6 +904,25 @@
                         },
                         "value": {
                             "$ref": "ReferElement"
+                        }
+                    }
+                },
+                "MemberofElement": {
+                    "type": "interface",
+                    "extends": [
+                        {
+                            "$ref": "CommonProperties"
+                        }
+                    ],
+                    "members": {
+                        "type": {
+                            "const": "memberof"
+                        },
+                        "value": {
+                            "$ref": "ReferElement"
+                        },
+                        "key": {
+                            "type": "string"
                         }
                     }
                 },

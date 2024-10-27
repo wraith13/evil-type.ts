@@ -205,6 +205,36 @@ export namespace Build
                 data.value.value
         )
     );
+    export const getMemberofTarget = <Process extends BaseProcess<Type.MemberofElement>>(data: Process): Type.TypeOrRefer =>
+    {
+        const entry = getResolveRefer
+        (
+            nextProcess
+            (
+                data,
+                null,
+                data.value.value
+            )
+        );
+        if (Type.isInterfaceDefinition(entry.value))
+        {
+            return entry.value.members[data.value.key] ?? <Type.NeverType>{ "type": "never" }
+        }
+        else
+        if (Type.isDictionaryDefinition(entry.value))
+        {
+            return entry.value.valueType;
+        }
+        else
+        if (Type.isLiteralElement(entry.value))
+        {
+            return ! EvilType.Validator.isObject(entry.value.const) || Object.keys(entry.value.const).length <= 0;
+        }
+        else
+        {
+            return <Type.NeverType>{ "type": "never" };
+        }
+    }
     export const getSafeInteger = <Process extends BaseProcess<unknown>>(data: Process) =>
     {
         if ((Type.isIntegerType(data.value)) && undefined !== data.value.safeInteger)
@@ -377,6 +407,8 @@ export namespace Build
                         return false;
                     }
                 }
+            case "memberof":
+                return isKindofNeverType(getMemberofTarget(nextProcess(target, null, target.value)));
             case "never":
                 return true;
             case "any":

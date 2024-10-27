@@ -1123,6 +1123,9 @@
                     "$ref": "#/definitions/Type.ItemofElement"
                 },
                 {
+                    "$ref": "#/definitions/Type.MemberofElement"
+                },
+                {
                     "$ref": "#/definitions/Type.InterfaceDefinition"
                 },
                 {
@@ -1274,6 +1277,38 @@
             "required": [
                 "type",
                 "value"
+            ],
+            "additionalProperties": false
+        },
+        "Type.MemberofElement": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "jsonable.json#/definitions/Jsonable.Jsonable",
+                    "description": "[JSON Schema]"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "[JSON Schema]"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "[JSON Schema]"
+                },
+                "type": {
+                    "const": "memberof"
+                },
+                "value": {
+                    "$ref": "#/definitions/Type.ReferElement"
+                },
+                "key": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "type",
+                "value",
+                "key"
             ],
             "additionalProperties": false
         },
