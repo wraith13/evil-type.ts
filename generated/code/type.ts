@@ -211,7 +211,7 @@ export namespace Type
     {
         type: "memberof";
         value: ReferElement;
-        key: string;
+        key: string | number;
     }
     export type TypeOrRefer = Type | ReferElement;
     export type TypeOrValue = Type | ValueDefinition;
@@ -396,5 +396,6 @@ export namespace Type
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("itemof" as const), value: isReferElement, });
     export const memberofElementValidatorObject: EvilType.Validator.ObjectValidator<MemberofElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("memberof" as const),
-        value: isReferElement, key: EvilType.Validator.isString, });
+        value: isReferElement, key: EvilType.Validator.isOr(EvilType.Validator.isString, EvilType.Validator.isDetailInteger({ minimum:0, },
+        true,)), });
 }

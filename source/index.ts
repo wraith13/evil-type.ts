@@ -192,6 +192,10 @@ export namespace Build
         {
             return getResolveRefer(<Process>nextProcess(data, null, data.value.define));
         }
+        if (Type.isMemberofElement(data.value))
+        {
+            return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>getResolveRefer(getMemberofTarget(nextProcess(data, null, data.value)));
+        }
         return nextProcess(data, null, data.value);
     };
     export const getKeyofTarget = <Process extends BaseProcess<Type.KeyofElement>>(data: Process) => getResolveRefer
@@ -205,7 +209,7 @@ export namespace Build
                 data.value.value
         )
     );
-    export const getMemberofTarget = <Process extends BaseProcess<Type.MemberofElement>>(data: Process): Type.TypeOrRefer =>
+    export const getMemberofTarget = <Process extends BaseProcess<Type.MemberofElement>>(data: Process): NextProcess<Process, Type.TypeOrLiteralOfRefer>  =>
     {
         const entry = getResolveRefer
         (
@@ -218,22 +222,26 @@ export namespace Build
         );
         if (Type.isInterfaceDefinition(entry.value))
         {
-            return entry.value.members[data.value.key] ?? <Type.NeverType>{ "type": "never" }
+            return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, entry.value.members[data.value.key] ?? <Type.NeverType>{ "type": "never" });
         }
         else
         if (Type.isDictionaryDefinition(entry.value))
         {
-            return entry.value.valueType;
+            return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, entry.value.valueType);
         }
         else
         if (Type.isLiteralElement(entry.value))
         {
-            return ! EvilType.Validator.isObject(entry.value.const) || Object.keys(entry.value.const).length <= 0;
+            if (EvilType.Validator.isObject(entry.value.const) && data.value.key in entry.value.const)
+            {
+                const value = (entry.value.const as any)[data.value.key];
+                if (Jsonable.isJsonable(value))
+                {
+                    return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, <Type.LiteralElement>{ const: value });
+                }
+            }
         }
-        else
-        {
-            return <Type.NeverType>{ "type": "never" };
-        }
+        return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, <Type.NeverType>{ "type": "never" });
     }
     export const getSafeInteger = <Process extends BaseProcess<unknown>>(data: Process) =>
     {
@@ -408,7 +416,7 @@ export namespace Build
                     }
                 }
             case "memberof":
-                return isKindofNeverType(getMemberofTarget(nextProcess(target, null, target.value)));
+                return false;
             case "never":
                 return true;
             case "any":
@@ -610,6 +618,8 @@ export namespace Build
                     return [ <CodeExpression | CodeInlineBlock>$expression("keyof"), ...buildInlineDefine(nextProcess(data, null, data.value.value)), ];
                 case "itemof":
                     return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), $expression(`${data.value.value.$ref}[number]`), ];
+                case "memberof":
+                    return [ <CodeExpression | CodeInlineBlock>$expression(`${data.value.value.$ref}[${data.value.key}]`), ];
                 case "value":
                     return buildInlineDefine(nextProcess(data, null, data.value.value));
                 case "never":

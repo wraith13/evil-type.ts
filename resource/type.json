@@ -922,7 +922,16 @@
                             "$ref": "ReferElement"
                         },
                         "key": {
-                            "type": "string"
+                            "type": "or",
+                            "types": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            ]
                         }
                     }
                 },
