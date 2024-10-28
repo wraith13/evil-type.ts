@@ -1554,6 +1554,8 @@ export namespace Build
                 return buildKeyOf(nextProcess(data, null, data.value));
             case "itemof":
                 return buildItemOf(nextProcess(data, null, data.value));
+            case "memberof":
+                return buildMemberOf(nextProcess(data, null, data.value));
             case "array":
                 return buildArray(nextProcess(data, null, data.value));
             case "or":
@@ -1827,6 +1829,22 @@ export namespace Build
                 console.error(`🚫 Can not resolve refer: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref }) }`);
             }
             return setCommonProperties(result, data);
+        };
+        export const buildMemberOf = (data: Process<Type.MemberofElement>):Jsonable.JsonableObject =>
+        {
+            const target = getMemberofTarget(data);
+            if (Type.isMemberofElement(target.value))
+            {
+                console.error(`🚫 Can not resolve memberof: ${ JSON.stringify({ path: data.path, $ref: data.value.value.$ref, key: data.value.key, }) }`);
+                const result: Jsonable.JsonableObject =
+                {
+                };
+                return setCommonProperties(result, data);
+            }
+            else
+            {
+                return buildTypeOrRefer(target);
+            }
         };
         export const buildRefer = (data: Process<Type.ReferElement>):Jsonable.JsonableObject =>
         {

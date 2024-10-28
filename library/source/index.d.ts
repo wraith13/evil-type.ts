@@ -56,6 +56,7 @@ export declare namespace Build {
     const getDefinition: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => NextProcess<Process, Type.Definition>;
     const getResolveRefer: <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process) => NextProcess<Process, Type.TypeOrLiteralOfRefer>;
     const getKeyofTarget: <Process extends BaseProcess<Type.KeyofElement>>(data: Process) => NextProcess<NextProcess<Process, Type.ReferElement>, Type.TypeOrLiteralOfRefer>;
+    const getMemberofTarget: <Process extends BaseProcess<Type.MemberofElement>>(data: Process) => NextProcess<Process, Type.TypeOrLiteralOfRefer>;
     const getSafeInteger: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
     const getSafeNumber: <Process extends BaseProcess<unknown>>(data: Process) => number | boolean;
     const getRegexpFlags: <Process extends BaseProcess<unknown>>(data: Process) => string;
@@ -103,7 +104,7 @@ export declare namespace Build {
         const buildObjectValidatorGetterCoreEntry: (data: Define.Process<Type.TypeOrRefer>) => CodeInlineEntry[];
         const buildObjectValidatorGetterCore: (data: Define.Process<Type.InterfaceDefinition>) => CodeInlineBlock;
         const buildObjectValidator: (data: Define.Process<Type.InterfaceDefinition>) => (CodeExpression | CodeInlineBlock)[];
-        const isLazyValidator: (define: Type.TypeOrRefer) => boolean;
+        const isLazyValidator: (data: Define.Process<Type.TypeOrRefer>) => boolean;
         const buildFullValidator: (data: Define.Process<Type.Type>) => CodeInlineEntry[];
         const isValidatorTarget: (define: Type.TypeOrValue) => boolean;
         const buildValidator: (data: Define.Process<Type.TypeOrValue & Type.Definition>) => CodeLine[];
@@ -133,6 +134,7 @@ export declare namespace Build {
         const buildTypeOf: (data: Process<Type.TypeofElement>) => Jsonable.JsonableObject;
         const buildKeyOf: (data: Process<Type.KeyofElement>) => Jsonable.JsonableObject;
         const buildItemOf: (data: Process<Type.ItemofElement>) => Jsonable.JsonableObject;
+        const buildMemberOf: (data: Process<Type.MemberofElement>) => Jsonable.JsonableObject;
         const buildRefer: (data: Process<Type.ReferElement>) => Jsonable.JsonableObject;
         const buildArray: (data: Process<Type.ArrayElement>) => Jsonable.JsonableObject;
         const buildOr: (data: Process<Type.OrElement>) => Jsonable.JsonableObject;

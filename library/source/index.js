@@ -154,11 +154,33 @@ var Build;
         if (type_1.Type.isTypeDefinition(data.value)) {
             return Build.getResolveRefer(Build.nextProcess(data, null, data.value.define));
         }
+        if (type_1.Type.isMemberofElement(data.value)) {
+            return Build.getResolveRefer(Build.getMemberofTarget(Build.nextProcess(data, null, data.value)));
+        }
         return Build.nextProcess(data, null, data.value);
     };
     Build.getKeyofTarget = function (data) { return Build.getResolveRefer(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
         data.value.value.value :
         data.value.value)); };
+    Build.getMemberofTarget = function (data) {
+        var _a;
+        var entry = Build.getResolveRefer(Build.nextProcess(data, null, data.value.value));
+        if (type_1.Type.isInterfaceDefinition(entry.value)) {
+            return Build.nextProcess(entry, "".concat(data.value.key), (_a = entry.value.members[data.value.key]) !== null && _a !== void 0 ? _a : { "type": "never" });
+        }
+        else if (type_1.Type.isDictionaryDefinition(entry.value)) {
+            return Build.nextProcess(entry, "".concat(data.value.key), entry.value.valueType);
+        }
+        else if (type_1.Type.isLiteralElement(entry.value)) {
+            if (evil_type_1.EvilType.Validator.isObject(entry.value.const) && data.value.key in entry.value.const) {
+                var value = entry.value.const[data.value.key];
+                if (jsonable_1.Jsonable.isJsonable(value)) {
+                    return Build.nextProcess(entry, "".concat(data.value.key), { const: value });
+                }
+            }
+        }
+        return Build.nextProcess(entry, "".concat(data.value.key), { "type": "never" });
+    };
     Build.getSafeInteger = function (data) {
         var _a, _b;
         if ((type_1.Type.isIntegerType(data.value)) && undefined !== data.value.safeInteger) {
@@ -291,6 +313,8 @@ var Build;
                             return false;
                         }
                     }
+                case "memberof":
+                    return false;
                 case "never":
                     return true;
                 case "any":
@@ -469,6 +493,8 @@ var Build;
                         return __spreadArray([(0, exports.$expression)("keyof")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.value)), true);
                     case "itemof":
                         return [(0, exports.$expression)("typeof"), (0, exports.$expression)("".concat(data.value.value.$ref, "[number]")),];
+                    case "memberof":
+                        return [(0, exports.$expression)("".concat(data.value.value.$ref, "[").concat(data.value.key, "]")),];
                     case "value":
                         return Define.buildInlineDefine(Build.nextProcess(data, null, data.value.value));
                     case "never":
@@ -569,6 +595,16 @@ var Build;
                         return Validator.buildKeyofValidator(name, Build.nextProcess(data, null, data.value));
                     case "itemof":
                         return [(0, exports.$expression)("".concat(data.value.value.$ref, ".includes(").concat(name, " as any)")),];
+                    case "memberof":
+                        {
+                            var target = Build.getResolveRefer(data);
+                            if (!type_1.Type.isMemberofElement(target.value)) {
+                                return Validator.buildValidatorExpression(name, target);
+                            }
+                            else {
+                                return [(0, exports.$expression)("false"),];
+                            }
+                        }
                     case "value":
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.value));
                     case "never":
@@ -785,6 +821,16 @@ var Build;
                         }
                     case "itemof":
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [(0, exports.$expression)(data.value.value.$ref),]);
+                    case "memberof":
+                        {
+                            var target = Build.getResolveRefer(data);
+                            if (!type_1.Type.isMemberofElement(target.value)) {
+                                return Validator.buildObjectValidatorGetterCoreEntry(target);
+                            }
+                            else {
+                                return [(0, exports.$expression)("EvilType.Validator.isNever"),];
+                            }
+                        }
                     case "never":
                         return [(0, exports.$expression)("EvilType.Validator.isNever"),];
                     case "any":
@@ -903,12 +949,12 @@ var Build;
             ], false)), true) :
                 Define.enParenthesis([Validator.buildObjectValidatorGetterCore(data),]);
         };
-        Validator.isLazyValidator = function (define) {
-            if (type_1.Type.isLiteralElement(define)) {
+        Validator.isLazyValidator = function (data) {
+            if (type_1.Type.isLiteralElement(data.value)) {
                 return false;
             }
-            if (type_1.Type.isType(define)) {
-                switch (define.type) {
+            if (type_1.Type.isType(data.value)) {
+                switch (data.value.type) {
                     case "enum-type":
                     case "itemof":
                     case "never":
@@ -922,23 +968,25 @@ var Build;
                     case "typeof":
                         return false;
                     case "type":
-                        return Validator.isLazyValidator(define.define);
+                        return Validator.isLazyValidator(Build.nextProcess(data, null, data.value.define));
                     case "array":
-                        return Validator.isLazyValidator(define.items);
+                        return Validator.isLazyValidator(Build.nextProcess(data, null, data.value.items));
                     case "dictionary":
-                        return Validator.isLazyValidator(define.valueType);
+                        return Validator.isLazyValidator(Build.nextProcess(data, null, data.value.valueType));
                     case "keyof":
                         return false;
+                    case "memberof":
+                        return Validator.isLazyValidator(Build.getMemberofTarget(Build.nextProcess(data, null, data.value)));
                     case "and":
                     case "or":
-                        return define.types.some(function (i) { return Validator.isLazyValidator(i); });
+                        return data.value.types.some(function (i) { return Validator.isLazyValidator(Build.nextProcess(data, null, i)); });
                     case "interface":
                         return true;
                 }
             }
             return true;
         };
-        Validator.buildFullValidator = function (data) { return Validator.isLazyValidator(data.value) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(data), true),]), true) :
+        Validator.buildFullValidator = function (data) { return Validator.isLazyValidator(data) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(data), true),]), true) :
             Validator.buildObjectValidatorGetterCoreEntry(data); };
         Validator.isValidatorTarget = function (define) {
             return !(type_1.Type.isValueDefinition(define) && false === define.validator);
@@ -1114,6 +1162,8 @@ var Build;
                     return Schema.buildKeyOf(Build.nextProcess(data, null, data.value));
                 case "itemof":
                     return Schema.buildItemOf(Build.nextProcess(data, null, data.value));
+                case "memberof":
+                    return Schema.buildMemberOf(Build.nextProcess(data, null, data.value));
                 case "array":
                     return Schema.buildArray(Build.nextProcess(data, null, data.value));
                 case "or":
@@ -1318,6 +1368,17 @@ var Build;
             }
             return Schema.setCommonProperties(result, data);
         };
+        Schema.buildMemberOf = function (data) {
+            var target = Build.getMemberofTarget(data);
+            if (type_1.Type.isMemberofElement(target.value)) {
+                console.error("\uD83D\uDEAB Can not resolve memberof: ".concat(JSON.stringify({ path: data.path, $ref: data.value.value.$ref, key: data.value.key, })));
+                var result_5 = {};
+                return Schema.setCommonProperties(result_5, data);
+            }
+            else {
+                return Schema.buildTypeOrRefer(target);
+            }
+        };
         Schema.buildRefer = function (data) {
             var _a;
             var path = Build.getAbsolutePath(data, data.value);
@@ -1427,12 +1488,12 @@ var Format;
     Format.isLineBreak = function (data) {
         var maxLineLength = Format.getMaxLineLength(data.options);
         if (null !== maxLineLength && !Format.isInLineComment(data)) {
-            var options = data.options, indentDepth = data.indentDepth, result_5 = data.result, buffer = data.buffer, tokens = data.tokens, i = data.i;
+            var options = data.options, indentDepth = data.indentDepth, result_6 = data.result, buffer = data.buffer, tokens = data.tokens, i = data.i;
             ++i;
-            if (data.i + 1 < tokens.length && maxLineLength <= Format.temporaryAssembleLine({ options: options, indentDepth: indentDepth, result: result_5, buffer: buffer, tokens: tokens, i: i, }, 1).length) {
+            if (data.i + 1 < tokens.length && maxLineLength <= Format.temporaryAssembleLine({ options: options, indentDepth: indentDepth, result: result_6, buffer: buffer, tokens: tokens, i: i, }, 1).length) {
                 return !config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[data.i]) && !config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[data.i + 1]);
             }
-            if (data.i + 2 < tokens.length && maxLineLength <= Format.temporaryAssembleLine({ options: options, indentDepth: indentDepth, result: result_5, buffer: buffer, tokens: tokens, i: i, }, 2).length) {
+            if (data.i + 2 < tokens.length && maxLineLength <= Format.temporaryAssembleLine({ options: options, indentDepth: indentDepth, result: result_6, buffer: buffer, tokens: tokens, i: i, }, 2).length) {
                 return config_json_1.default.lineUnbreakableTokens.heads.includes(tokens[data.i + 1]) || config_json_1.default.lineUnbreakableTokens.tails.includes(tokens[data.i + 2]);
             }
         }
@@ -1533,8 +1594,8 @@ var build = function (jsonPath) {
         };
         if (type_1.Type.isTypeSchema(typeSource, errorListner)) {
             var code = __spreadArray(__spreadArray(__spreadArray([], (0, exports.$comment)(typeSource), true), Build.Define.buildImports(typeSource.imports), true), Build.Define.buildDefineNamespaceCore(Build.Define.makeProcess(typeSource)), true);
-            var result_6 = Format.text(typeSource.options, 0, code);
-            fs_1.default.writeFileSync(resolvePath(typeSource.options.outputFile), result_6, { encoding: "utf-8" });
+            var result_7 = Format.text(typeSource.options, 0, code);
+            fs_1.default.writeFileSync(resolvePath(typeSource.options.outputFile), result_7, { encoding: "utf-8" });
             if (typeSource.options.schema) {
                 var schema = Build.Schema.build(Build.Schema.makeProcess(typeSource, typeSource.options.schema));
                 fs_1.default.writeFileSync(resolvePath(typeSource.options.schema.outputFile), jsonable_1.Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });

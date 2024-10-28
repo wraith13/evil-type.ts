@@ -162,7 +162,7 @@ export declare namespace Type {
     }
     type StringType = BasicStringType | PatternStringType | FormatStringType;
     type PrimitiveTypeElement = NeverType | AnyType | UnknownType | NullType | BooleanType | NumberType | IntegerType | StringType;
-    type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
+    type Type = PrimitiveTypeElement | TypeDefinition | EnumTypeElement | TypeofElement | KeyofElement | ItemofElement | MemberofElement | InterfaceDefinition | DictionaryDefinition | ArrayElement | OrElement | AndElement | LiteralElement;
     interface EnumTypeElement extends CommonProperties {
         type: "enum-type";
         members: (null | boolean | number | string)[];
@@ -178,6 +178,11 @@ export declare namespace Type {
     interface ItemofElement extends CommonProperties {
         type: "itemof";
         value: ReferElement;
+    }
+    interface MemberofElement extends CommonProperties {
+        type: "memberof";
+        value: ReferElement;
+        key: string | number;
     }
     type TypeOrRefer = Type | ReferElement;
     type TypeOrValue = Type | ValueDefinition;
@@ -245,6 +250,7 @@ export declare namespace Type {
     const isTypeofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is TypeofElement;
     const isKeyofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is KeyofElement;
     const isItemofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is ItemofElement;
+    const isMemberofElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is MemberofElement;
     const isTypeOrRefer: EvilType.Validator.IsType<TypeOrRefer>;
     const isTypeOrValue: EvilType.Validator.IsType<TypeOrValue>;
     const isTypeOrValueOfRefer: EvilType.Validator.IsType<TypeOrValueOfRefer>;
@@ -282,4 +288,5 @@ export declare namespace Type {
     const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement>;
     const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement>;
     const itemofElementValidatorObject: EvilType.Validator.ObjectValidator<ItemofElement>;
+    const memberofElementValidatorObject: EvilType.Validator.ObjectValidator<MemberofElement>;
 }
