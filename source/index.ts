@@ -1256,15 +1256,15 @@ export namespace Build
                 ]),
             ]:
             Define.enParenthesis([ buildObjectValidatorGetterCore(data), ]);
-        export const isLazyValidator = (define: Type.TypeOrRefer): boolean =>
+        export const isLazyValidator = (data: Define.Process<Type.TypeOrRefer>): boolean =>
         {
-            if (Type.isLiteralElement(define))
+            if (Type.isLiteralElement(data.value))
             {
                 return false;
             }
-            if (Type.isType(define))
+            if (Type.isType(data.value))
             {
-                switch(define.type)
+                switch(data.value.type)
                 {
                 case "enum-type":
                 case "itemof":
@@ -1279,23 +1279,25 @@ export namespace Build
                 case "typeof":
                     return false;
                 case "type":
-                    return isLazyValidator(define.define);
+                    return isLazyValidator(nextProcess(data, null, data.value.define));
                 case "array":
-                    return isLazyValidator(define.items);
+                    return isLazyValidator(nextProcess(data, null, data.value.items));
                 case "dictionary":
-                    return isLazyValidator(define.valueType);
+                    return isLazyValidator(nextProcess(data, null, data.value.valueType));
                 case "keyof":
                     return false;
+                case "memberof":
+                    return isLazyValidator(getMemberofTarget(nextProcess(data, null, data.value)))
                 case "and":
                 case "or":
-                    return define.types.some(i => isLazyValidator(i));
+                    return data.value.types.some(i => isLazyValidator(nextProcess(data, null, i)));
                 case "interface":
                     return true;
                 }
             }
             return true;
         };
-        export const buildFullValidator = (data: Define.Process<Type.Type>) => isLazyValidator(data.value) ?
+        export const buildFullValidator = (data: Define.Process<Type.Type>) => isLazyValidator(data) ?
             [
                 ...buildCall
                 (
