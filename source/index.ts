@@ -737,6 +737,18 @@ export namespace Build
                     return buildKeyofValidator(name, nextProcess(data, null, data.value));
                 case "itemof":
                     return [ $expression(`${data.value.value.$ref}.includes(${name} as any)`), ];
+                case "memberof":
+                    {
+                        const target = getResolveRefer(data);
+                        if ( ! Type.isMemberofElement(target.value))
+                        {
+                            return buildValidatorExpression(name, target);
+                        }
+                        else
+                        {
+                            return [ $expression("false"), ];
+                        }
+                    }
                 case "value":
                     return buildValidatorExpression(name, nextProcess(data, null, data.value.value));
                 case "never":
@@ -1043,6 +1055,18 @@ export namespace Build
                     }
                 case "itemof":
                     return buildCall([ $expression("EvilType.Validator.isEnum"), ], [ $expression(data.value.value.$ref), ]);
+                case "memberof":
+                    {
+                        const target = getResolveRefer(data);
+                        if ( ! Type.isMemberofElement(target.value))
+                        {
+                            return buildObjectValidatorGetterCoreEntry(target);
+                        }
+                        else
+                        {
+                            return [ $expression("EvilType.Validator.isNever"), ];
+                        }
+                    }
                 case "never":
                     return [ $expression("EvilType.Validator.isNever"), ];
                 case "any":
