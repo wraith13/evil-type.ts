@@ -239,7 +239,7 @@ export namespace EvilType
             Error.withErrorHandling(Number.isInteger(value), listner, "integer", value);
         export const isSafeInteger = (value: unknown, listner?: ErrorListener): value is number =>
             Error.withErrorHandling(Number.isSafeInteger(value), listner, "safe-integer", value);
-        export const isDetailInteger = (data: { minimum?: number; exclusiveMinimum?: number; maximum?: number; exclusiveMaximum?: number; multipleOf?: number; }, safeInteger?: boolean): IsType<number> =>
+        export const isDetailedInteger = (data: { minimum?: number; exclusiveMinimum?: number; maximum?: number; exclusiveMaximum?: number; multipleOf?: number; }, safeInteger?: boolean): IsType<number> =>
         {
             const base = true === safeInteger ? isSafeInteger: isInteger;
             if ([ data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf ].every(i => undefined === i))
@@ -291,7 +291,7 @@ export namespace EvilType
             Error.withErrorHandling("number" === typeof value, listner, "number", value);
         export const isSafeNumber = (value: unknown, listner?: ErrorListener): value is number =>
             Error.withErrorHandling(Number.isFinite(value), listner, "safe-number", value);
-        export const isDetailNumber = (data: { minimum?: number; exclusiveMinimum?: number; maximum?: number; exclusiveMaximum?: number; multipleOf?: number; }, safeNumber?: boolean): IsType<number> =>
+        export const isDetailedNumber = (data: { minimum?: number; exclusiveMinimum?: number; maximum?: number; exclusiveMaximum?: number; multipleOf?: number; }, safeNumber?: boolean): IsType<number> =>
         {
             const base = true === safeNumber ? isSafeNumber: isNumber;
             if ([ data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf ].every(i => undefined === i))
@@ -341,7 +341,7 @@ export namespace EvilType
         };
         export const isString = (value: unknown, listner?: ErrorListener): value is string =>
             Error.withErrorHandling("string" === typeof value, listner, "string", value);
-        export const isDetailString = (data: { minLength?: number, maxLength?: number, pattern?: string, format?: string, regexpFlags?: string}, regexpFlags?: string): IsType<string> =>
+        export const isDetailedString = (data: { minLength?: number, maxLength?: number, pattern?: string, format?: string, regexpFlags?: string}, regexpFlags?: string): IsType<string> =>
         {
             if ([ data.minLength, data.maxLength, data.pattern, data.format ].every(i => undefined === i))
             {

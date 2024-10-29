@@ -1143,7 +1143,7 @@ export namespace Build
                     if (0 < integerOptions.length)
                     {
                         return [
-                            $expression("EvilType.Validator.isDetailInteger"),
+                            $expression("EvilType.Validator.isDetailedInteger"),
                             $expression("("),
                             $expression("{"),
                             ...integerOptions,
@@ -1171,7 +1171,7 @@ export namespace Build
                     if (0 < numberOptions.length)
                     {
                         return [
-                            $expression("EvilType.Validator.isDetailNumber"),
+                            $expression("EvilType.Validator.isDetailedNumber"),
                             $expression("("),
                             $expression("{"),
                             ...numberOptions,
@@ -1198,7 +1198,7 @@ export namespace Build
                     if (0 < stringOptions.length)
                     {
                         return [
-                            $expression("EvilType.Validator.isDetailString"),
+                            $expression("EvilType.Validator.isDetailedString"),
                             $expression("("),
                             $expression("{"),
                             ...stringOptions,

@@ -223,7 +223,7 @@ var EvilType;
         Validator.isSafeInteger = function (value, listner) {
             return Error.withErrorHandling(Number.isSafeInteger(value), listner, "safe-integer", value);
         };
-        Validator.isDetailInteger = function (data, safeInteger) {
+        Validator.isDetailedInteger = function (data, safeInteger) {
             var base = true === safeInteger ? Validator.isSafeInteger : Validator.isInteger;
             if ([data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf].every(function (i) { return undefined === i; })) {
                 return base;
@@ -262,7 +262,7 @@ var EvilType;
         Validator.isSafeNumber = function (value, listner) {
             return Error.withErrorHandling(Number.isFinite(value), listner, "safe-number", value);
         };
-        Validator.isDetailNumber = function (data, safeNumber) {
+        Validator.isDetailedNumber = function (data, safeNumber) {
             var base = true === safeNumber ? Validator.isSafeNumber : Validator.isNumber;
             if ([data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf].every(function (i) { return undefined === i; })) {
                 return base;
@@ -298,7 +298,7 @@ var EvilType;
         Validator.isString = function (value, listner) {
             return Error.withErrorHandling("string" === typeof value, listner, "string", value);
         };
-        Validator.isDetailString = function (data, regexpFlags) {
+        Validator.isDetailedString = function (data, regexpFlags) {
             if ([data.minLength, data.maxLength, data.pattern, data.format].every(function (i) { return undefined === i; })) {
                 return Validator.isString;
             }

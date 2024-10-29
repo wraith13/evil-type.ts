@@ -865,7 +865,7 @@ var Build;
                         var integerOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minimum ? [(0, exports.$expression)("minimum:".concat(data.value.minimum, ",")),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("exclusiveMinimum:".concat(data.value.exclusiveMinimum, ",")),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("maximum:".concat(data.value.maximum, ",")),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("exclusiveMaximum:".concat(data.value.exclusiveMaximum, ",")),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("multipleOf:".concat(data.value.multipleOf, ",")),] : []), true);
                         if (0 < integerOptions.length) {
                             return __spreadArray(__spreadArray([
-                                (0, exports.$expression)("EvilType.Validator.isDetailInteger"),
+                                (0, exports.$expression)("EvilType.Validator.isDetailedInteger"),
                                 (0, exports.$expression)("("),
                                 (0, exports.$expression)("{")
                             ], integerOptions, true), [
@@ -885,7 +885,7 @@ var Build;
                         var numberOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minimum ? [(0, exports.$expression)("minimum:".concat(data.value.minimum, ",")),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("exclusiveMinimum:".concat(data.value.exclusiveMinimum, ",")),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("maximum:".concat(data.value.maximum, ",")),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("exclusiveMaximum:".concat(data.value.exclusiveMaximum, ",")),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("multipleOf:".concat(data.value.multipleOf, ",")),] : []), true);
                         if (0 < numberOptions.length) {
                             return __spreadArray(__spreadArray([
-                                (0, exports.$expression)("EvilType.Validator.isDetailNumber"),
+                                (0, exports.$expression)("EvilType.Validator.isDetailedNumber"),
                                 (0, exports.$expression)("("),
                                 (0, exports.$expression)("{")
                             ], numberOptions, true), [
@@ -905,7 +905,7 @@ var Build;
                         var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format]), ",")), (0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
                         if (0 < stringOptions.length) {
                             return __spreadArray(__spreadArray([
-                                (0, exports.$expression)("EvilType.Validator.isDetailString"),
+                                (0, exports.$expression)("EvilType.Validator.isDetailedString"),
                                 (0, exports.$expression)("("),
                                 (0, exports.$expression)("{")
                             ], stringOptions, true), [
