@@ -619,7 +619,7 @@ export namespace Build
                 case "itemof":
                     return [ <CodeExpression | CodeInlineBlock>$expression("typeof"), $expression(`${data.value.value.$ref}[number]`), ];
                 case "memberof":
-                    return [ <CodeExpression | CodeInlineBlock>$expression(`${data.value.value.$ref}[${data.value.key}]`), ];
+                    return [ <CodeExpression | CodeInlineBlock>$expression(`${data.value.value.$ref}["${data.value.key}"]`), ];
                 case "value":
                     return buildInlineDefine(nextProcess(data, null, data.value.value));
                 case "never":

@@ -494,7 +494,7 @@ var Build;
                     case "itemof":
                         return [(0, exports.$expression)("typeof"), (0, exports.$expression)("".concat(data.value.value.$ref, "[number]")),];
                     case "memberof":
-                        return [(0, exports.$expression)("".concat(data.value.value.$ref, "[").concat(data.value.key, "]")),];
+                        return [(0, exports.$expression)("".concat(data.value.value.$ref, "[\"").concat(data.value.key, "\"]")),];
                     case "value":
                         return Define.buildInlineDefine(Build.nextProcess(data, null, data.value.value));
                     case "never":
