@@ -220,16 +220,6 @@ export namespace Build
                 data.value.value
             )
         );
-        if (Type.isInterfaceDefinition(entry.value))
-        {
-            return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, entry.value.members[data.value.key] ?? <Type.NeverType>{ "type": "never" });
-        }
-        else
-        if (Type.isDictionaryDefinition(entry.value))
-        {
-            return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, entry.value.valueType);
-        }
-        else
         if (Type.isLiteralElement(entry.value))
         {
             if (EvilType.Validator.isObject(entry.value.const) && data.value.key in entry.value.const)
@@ -239,6 +229,71 @@ export namespace Build
                 {
                     return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, <Type.LiteralElement>{ const: value });
                 }
+            }
+        }
+        else
+        if (Type.isType(entry.value))
+        {
+            switch(entry.value.type)
+            {
+            case "interface":
+                return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, entry.value.members[data.value.key] ?? <Type.NeverType>{ "type": "never" });
+            case "dictionary":
+                return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, entry.value.valueType);
+            case "or":
+                return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess
+                (
+                    entry,
+                    `${data.value.key}`,
+                    <Type.OrElement>
+                    {
+                        type: "or",
+                        types: entry.value.types.map
+                        (
+                            i => getMemberofTarget
+                            (
+                                nextProcess
+                                (
+                                    entry,
+                                    null,
+                                    <Type.MemberofElement>
+                                    {
+                                        type: "memberof",
+                                        value: i,
+                                        key: data.value.key,
+                                    }
+                                )
+                            ).value
+                        )
+                    }
+                );
+            case "and":
+                return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess
+                (
+                    entry,
+                    `${data.value.key}`,
+                    <Type.AndElement>
+                    {
+                        type: "and",
+                        types: entry.value.types.map
+                        (
+                            i => getMemberofTarget
+                            (
+                                nextProcess
+                                (
+                                    entry,
+                                    null,
+                                    <Type.MemberofElement>
+                                    {
+                                        type: "memberof",
+                                        value: i,
+                                        key: data.value.key,
+                                    }
+                                )
+                            ).value
+                        )
+                    }
+                );
             }
         }
         return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>nextProcess(entry, `${data.value.key}`, <Type.NeverType>{ "type": "never" });

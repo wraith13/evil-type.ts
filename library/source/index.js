@@ -165,18 +165,38 @@ var Build;
     Build.getMemberofTarget = function (data) {
         var _a;
         var entry = Build.getResolveRefer(Build.nextProcess(data, null, data.value.value));
-        if (type_1.Type.isInterfaceDefinition(entry.value)) {
-            return Build.nextProcess(entry, "".concat(data.value.key), (_a = entry.value.members[data.value.key]) !== null && _a !== void 0 ? _a : { "type": "never" });
-        }
-        else if (type_1.Type.isDictionaryDefinition(entry.value)) {
-            return Build.nextProcess(entry, "".concat(data.value.key), entry.value.valueType);
-        }
-        else if (type_1.Type.isLiteralElement(entry.value)) {
+        if (type_1.Type.isLiteralElement(entry.value)) {
             if (evil_type_1.EvilType.Validator.isObject(entry.value.const) && data.value.key in entry.value.const) {
                 var value = entry.value.const[data.value.key];
                 if (jsonable_1.Jsonable.isJsonable(value)) {
                     return Build.nextProcess(entry, "".concat(data.value.key), { const: value });
                 }
+            }
+        }
+        else if (type_1.Type.isType(entry.value)) {
+            switch (entry.value.type) {
+                case "interface":
+                    return Build.nextProcess(entry, "".concat(data.value.key), (_a = entry.value.members[data.value.key]) !== null && _a !== void 0 ? _a : { "type": "never" });
+                case "dictionary":
+                    return Build.nextProcess(entry, "".concat(data.value.key), entry.value.valueType);
+                case "or":
+                    return Build.nextProcess(entry, "".concat(data.value.key), {
+                        type: "or",
+                        types: entry.value.types.map(function (i) { return Build.getMemberofTarget(Build.nextProcess(entry, null, {
+                            type: "memberof",
+                            value: i,
+                            key: data.value.key,
+                        })).value; })
+                    });
+                case "and":
+                    return Build.nextProcess(entry, "".concat(data.value.key), {
+                        type: "and",
+                        types: entry.value.types.map(function (i) { return Build.getMemberofTarget(Build.nextProcess(entry, null, {
+                            type: "memberof",
+                            value: i,
+                            key: data.value.key,
+                        })).value; })
+                    });
             }
         }
         return Build.nextProcess(entry, "".concat(data.value.key), { "type": "never" });
