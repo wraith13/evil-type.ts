@@ -157,6 +157,21 @@
                             "default": 160,
                             "description": "[TypeScript]"
                         },
+                        "StringFormatMap?": {
+                            "type": "dictionary",
+                            "keyin": {
+                                "type": "keyof",
+                                "value": {
+                                    "type": "typeof",
+                                    "value": {
+                                        "$ref": "StringFormatMap"
+                                    }
+                                }
+                            },
+                            "valueType": {
+                                "type": "string"
+                            }
+                        },
                         "default?": {
                             "type": "interface",
                             "members": {

@@ -31,6 +31,7 @@ export namespace Type
         safeInteger?: boolean;
         regulateType?: { sortBy?: "none" | "define" | "alphabet"; merge?: boolean; };
         maxLineLength?: null | number;
+        StringFormatMap?: { [ key in keyof typeof StringFormatMap ]: string; };
         default?: { export?: boolean; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?: string; };
         schema?: SchemaOptions;
     }
@@ -297,11 +298,14 @@ export namespace Type
         safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regulateType: EvilType.Validator.isOptional(({ sortBy:
         EvilType.Validator.isOptional(EvilType.Validator.isEnum([ "none", "define", "alphabet" ] as const)), merge:
         EvilType.Validator.isOptional(EvilType.Validator.isBoolean), })), maxLineLength: EvilType.Validator.isOptional(
-        EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), default: EvilType.Validator.isOptional(({ export
-        : EvilType.Validator.isOptional(EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(
-        EvilType.Validator.isBoolean), safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeNumber:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString
-        ), })), schema: EvilType.Validator.isOptional(isSchemaOptions), });
+        EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), StringFormatMap: EvilType.Validator.isOptional(
+        EvilType.Validator.isDictionaryObject(EvilType.Validator.isString, [ "date-time", "date", "time", "duration", "email", "idn-email",
+        "hostname", "idn-hostname", "ipv4", "ipv6", "uuid", "uri", "uri-reference", "iri", "iri-reference", "uri-template", "json-pointer",
+        "relative-json-pointer", "regex" ], false)), default: EvilType.Validator.isOptional(({ export: EvilType.Validator.isOptional(
+        EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeInteger:
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean
+        ), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), schema: EvilType.Validator.isOptional(
+        isSchemaOptions), });
     export const schemaOptionsValidatorObject: EvilType.Validator.ObjectValidator<SchemaOptions> = ({ outputFile:
         EvilType.Validator.isString, $id: EvilType.Validator.isOptional(EvilType.Validator.isString), $ref: EvilType.Validator.isOptional(
         EvilType.Validator.isString), externalReferMapping: EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(

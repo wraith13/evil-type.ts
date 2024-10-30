@@ -28,6 +28,9 @@ export declare namespace Type {
             merge?: boolean;
         };
         maxLineLength?: null | number;
+        StringFormatMap?: {
+            [key in keyof typeof StringFormatMap]: string;
+        };
         default?: {
             export?: boolean;
             additionalProperties?: boolean;

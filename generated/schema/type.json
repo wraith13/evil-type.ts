@@ -146,6 +146,12 @@
                     "default": 160,
                     "description": "[TypeScript]"
                 },
+                "StringFormatMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
                 "default": {
                     "type": "object",
                     "properties": {

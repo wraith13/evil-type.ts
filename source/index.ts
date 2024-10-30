@@ -588,11 +588,9 @@ export namespace Build
         export const buildInlineDefineArray = (data: Process<Type.ArrayElement>) =>
             [ ...enParenthesisIfNeed(buildInlineDefine(nextProcess(data, null, data.value.items))), $expression("[]"), ];
         export const buildDictionaryKeyin = (data: Process<Type.DictionaryDefinition>) =>
-            [
-                $expression("[ key:"),
-                ...(undefined === data.value.keyin ? [ $expression("string"), ]: buildInlineDefine(nextProcess(data, null, data.value.keyin))),
-                $expression("]:"),
-            ];
+            undefined === data.value.keyin ?
+                [ $expression("["), $expression("key:"), $expression("string"), $expression("]:"), ]:
+                [ $expression("["), $expression("key"), $expression("in"), ...buildInlineDefine(nextProcess(data, null, data.value.keyin)), $expression("]:"), ];
         export const buildInlineDefineDictionary = (data: Process<Type.DictionaryDefinition>) =>
             $iblock([ $line([ ...buildDictionaryKeyin(data), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), $expression(";"), ]) ]);
         export const buildInlineDefineAnd = (data: Process<Type.AndElement>) =>

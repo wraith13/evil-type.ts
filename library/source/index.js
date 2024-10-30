@@ -441,11 +441,8 @@ var Build;
             return __spreadArray(__spreadArray([], Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, data.value.items))), true), [(0, exports.$expression)("[]"),], false);
         };
         Define.buildDictionaryKeyin = function (data) {
-            return __spreadArray(__spreadArray([
-                (0, exports.$expression)("[ key:")
-            ], (undefined === data.value.keyin ? [(0, exports.$expression)("string"),] : Define.buildInlineDefine(Build.nextProcess(data, null, data.value.keyin))), true), [
-                (0, exports.$expression)("]:"),
-            ], false);
+            return undefined === data.value.keyin ?
+                [(0, exports.$expression)("["), (0, exports.$expression)("key:"), (0, exports.$expression)("string"), (0, exports.$expression)("]:"),] : __spreadArray(__spreadArray([(0, exports.$expression)("["), (0, exports.$expression)("key"), (0, exports.$expression)("in")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.keyin)), true), [(0, exports.$expression)("]:"),], false);
         };
         Define.buildInlineDefineDictionary = function (data) {
             return (0, exports.$iblock)([(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Define.buildDictionaryKeyin(data), true), Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true), [(0, exports.$expression)(";"),], false))]);
