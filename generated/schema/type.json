@@ -109,13 +109,30 @@
                 },
                 "safeNumber": {
                     "type": "boolean",
-                    "default": true,
                     "description": "[TypeScript]"
                 },
                 "safeInteger": {
                     "type": "boolean",
-                    "default": true,
                     "description": "[TypeScript]"
+                },
+                "regulateType": {
+                    "type": "object",
+                    "properties": {
+                        "sortBy": {
+                            "enum": [
+                                "none",
+                                "define",
+                                "alphabet"
+                            ],
+                            "default": "define"
+                        },
+                        "merge": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    },
+                    "required": [],
+                    "additionalProperties": false
                 },
                 "maxLineLength": {
                     "oneOf": [

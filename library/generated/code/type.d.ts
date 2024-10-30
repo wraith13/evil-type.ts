@@ -23,6 +23,10 @@ export declare namespace Type {
         validatorOption: ValidatorOptionType;
         safeNumber?: boolean;
         safeInteger?: boolean;
+        regulateType?: {
+            sortBy?: "none" | "define" | "alphabet";
+            merge?: boolean;
+        };
         maxLineLength?: null | number;
         default?: {
             export?: boolean;

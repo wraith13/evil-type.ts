@@ -29,6 +29,7 @@ export namespace Type
         validatorOption: ValidatorOptionType;
         safeNumber?: boolean;
         safeInteger?: boolean;
+        regulateType?: { sortBy?: "none" | "define" | "alphabet"; merge?: boolean; };
         maxLineLength?: null | number;
         default?: { export?: boolean; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?: string; };
         schema?: SchemaOptions;
@@ -293,9 +294,11 @@ export namespace Type
     export const outputOptionsValidatorObject: EvilType.Validator.ObjectValidator<OutputOptions> = ({ outputFile:
         EvilType.Validator.isString, indentUnit: EvilType.Validator.isEnum([ 0, 1, 2, 3, 4, 5, 6, 7, 8, "tab" ] as const), indentStyle:
         isIndentStyleType, validatorOption: isValidatorOptionType, safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean),
-        safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), maxLineLength: EvilType.Validator.isOptional(
-        EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isSafeInteger)), default: EvilType.Validator.isOptional(({
-        export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(
+        safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regulateType: EvilType.Validator.isOptional(({ sortBy:
+        EvilType.Validator.isOptional(EvilType.Validator.isEnum([ "none", "define", "alphabet" ] as const)), merge:
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), })), maxLineLength: EvilType.Validator.isOptional(
+        EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), default: EvilType.Validator.isOptional(({ export
+        : EvilType.Validator.isOptional(EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(
         EvilType.Validator.isBoolean), safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeNumber:
         EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString
         ), })), schema: EvilType.Validator.isOptional(isSchemaOptions), });
@@ -333,9 +336,9 @@ export namespace Type
         EvilType.Validator.isBoolean), });
     export const arrayElementValidatorObject: EvilType.Validator.ObjectValidator<ArrayElement> = EvilType.Validator.mergeObjectValidator(
         alphaElementValidatorObject, { type: EvilType.Validator.isJust("array" as const), items: isTypeOrRefer, minItems:
-        EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, true,)), maxItems: EvilType.Validator.isOptional
-        (EvilType.Validator.isDetailedInteger({ minimum:0, }, true,)), uniqueItems: EvilType.Validator.isOptional(
-        EvilType.Validator.isBoolean), });
+        EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, false,)), maxItems:
+        EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, false,)), uniqueItems:
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const orElementValidatorObject: EvilType.Validator.ObjectValidator<OrElement> = EvilType.Validator.mergeObjectValidator(
         alphaElementValidatorObject, { type: EvilType.Validator.isJust("or" as const), types: EvilType.Validator.isArray(isTypeOrRefer), });
     export const andElementValidatorObject: EvilType.Validator.ObjectValidator<AndElement> = EvilType.Validator.mergeObjectValidator(
@@ -358,23 +361,22 @@ export namespace Type
         EvilType.Validator.isBoolean), });
     export const integerTypeValidatorObject: EvilType.Validator.ObjectValidator<IntegerType> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("integer" as const), minimum: EvilType.Validator.isOptional(
-        EvilType.Validator.isSafeInteger), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isSafeInteger), maximum:
-        EvilType.Validator.isOptional(EvilType.Validator.isSafeInteger), exclusiveMaximum: EvilType.Validator.isOptional(
-        EvilType.Validator.isSafeInteger), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isSafeInteger), safeInteger:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), default: EvilType.Validator.isOptional(
-        EvilType.Validator.isSafeInteger), });
+        EvilType.Validator.isInteger), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isInteger), maximum:
+        EvilType.Validator.isOptional(EvilType.Validator.isInteger), exclusiveMaximum: EvilType.Validator.isOptional(
+        EvilType.Validator.isInteger), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isInteger), safeInteger:
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), default: EvilType.Validator.isOptional(EvilType.Validator.isInteger),
+        });
     export const numberTypeValidatorObject: EvilType.Validator.ObjectValidator<NumberType> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("number" as const), minimum: EvilType.Validator.isOptional(
-        EvilType.Validator.isSafeNumber), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isSafeNumber), maximum:
-        EvilType.Validator.isOptional(EvilType.Validator.isSafeNumber), exclusiveMaximum: EvilType.Validator.isOptional(
-        EvilType.Validator.isSafeNumber), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isSafeNumber), safeNumber:
-        EvilType.Validator.isOptional(EvilType.Validator.isSafeNumber), default: EvilType.Validator.isOptional(
-        EvilType.Validator.isSafeNumber), });
+        EvilType.Validator.isNumber), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isNumber), maximum:
+        EvilType.Validator.isOptional(EvilType.Validator.isNumber), exclusiveMaximum: EvilType.Validator.isOptional(
+        EvilType.Validator.isNumber), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isNumber), safeNumber:
+        EvilType.Validator.isOptional(EvilType.Validator.isNumber), default: EvilType.Validator.isOptional(EvilType.Validator.isNumber), });
     export const basicStringTypeValidatorObject: EvilType.Validator.ObjectValidator<BasicStringType> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("string" as const),
-        minLength: EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, true,)), maxLength:
-        EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, true,)), default: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), });
+        minLength: EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, false,)), maxLength:
+        EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, false,)), default: EvilType.Validator.isOptional
+        (EvilType.Validator.isString), });
     export const patternStringTypeValidatorObject: EvilType.Validator.ObjectValidator<PatternStringType> =
         EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { pattern: EvilType.Validator.isString, regexpFlags:
         EvilType.Validator.isOptional(EvilType.Validator.isString), });
@@ -386,7 +388,7 @@ export namespace Type
     export const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("enum-type" as const),
         members: EvilType.Validator.isArray(EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isBoolean,
-        EvilType.Validator.isSafeNumber, EvilType.Validator.isString)), });
+        EvilType.Validator.isNumber, EvilType.Validator.isString)), });
     export const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("typeof" as const), value: isReferElement, });
     export const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement> = EvilType.Validator.mergeObjectValidator(
@@ -397,5 +399,5 @@ export namespace Type
     export const memberofElementValidatorObject: EvilType.Validator.ObjectValidator<MemberofElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("memberof" as const),
         value: isReferElement, key: EvilType.Validator.isOr(EvilType.Validator.isString, EvilType.Validator.isDetailedInteger({ minimum:0,
-        }, true,)), });
+        }, false,)), });
 }
