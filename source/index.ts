@@ -1792,8 +1792,25 @@ export namespace Build
             const result: Jsonable.JsonableObject =
             {
                 type: "object",
-                additionalProperties: buildTypeOrRefer(nextProcess(data, null, data.value.valueType)),
             };
+            const valueType = buildTypeOrRefer(nextProcess(data, null, data.value.valueType));
+            if (undefined === data.value.keyin)
+            {
+                result["additionalProperties"] = valueType;
+            }
+            else
+            {
+                const properties: Jsonable.JsonableObject = { };
+                const keys = getActualKeys(nextProcess(data, null, data.value.keyin));
+                keys.map(i => Text.getPrimaryKeyName(i)).forEach(key => properties[key] = valueType);
+                result["properties"] = properties;
+                result["required"] = keys.filter(i => ! i.endsWith("?"));
+                const additionalProperties = getAdditionalProperties(data);
+                if ("boolean" === typeof additionalProperties)
+                {
+                    result["additionalProperties"] = additionalProperties;
+                }
+            }
             return setCommonProperties(result, data);
         };
         export const buildEnumType = (data: Process<Type.EnumTypeElement>):Jsonable.JsonableObject =>

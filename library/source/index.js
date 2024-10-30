@@ -1321,8 +1321,22 @@ var Build;
         Schema.buildDictionary = function (data) {
             var result = {
                 type: "object",
-                additionalProperties: Schema.buildTypeOrRefer(Build.nextProcess(data, null, data.value.valueType)),
             };
+            var valueType = Schema.buildTypeOrRefer(Build.nextProcess(data, null, data.value.valueType));
+            if (undefined === data.value.keyin) {
+                result["additionalProperties"] = valueType;
+            }
+            else {
+                var properties_1 = {};
+                var keys = Build.getActualKeys(Build.nextProcess(data, null, data.value.keyin));
+                keys.map(function (i) { return text_1.Text.getPrimaryKeyName(i); }).forEach(function (key) { return properties_1[key] = valueType; });
+                result["properties"] = properties_1;
+                result["required"] = keys.filter(function (i) { return !i.endsWith("?"); });
+                var additionalProperties = Build.getAdditionalProperties(data);
+                if ("boolean" === typeof additionalProperties) {
+                    result["additionalProperties"] = additionalProperties;
+                }
+            }
             return Schema.setCommonProperties(result, data);
         };
         Schema.buildEnumType = function (data) {
