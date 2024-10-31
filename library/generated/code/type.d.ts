@@ -93,6 +93,7 @@ export declare namespace Type {
     interface DictionaryDefinition extends AlphaDefinition {
         type: "dictionary";
         keyin?: TypeOrRefer;
+        optionality?: "as-is" | "partial" | "required";
         valueType: TypeOrRefer;
         additionalProperties?: boolean;
     }

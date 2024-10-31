@@ -440,9 +440,27 @@ var Build;
         Define.buildInlineDefineArray = function (data) {
             return __spreadArray(__spreadArray([], Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, data.value.items))), true), [(0, exports.$expression)("[]"),], false);
         };
+        Define.buildOptionality = function (optionality) {
+            switch (optionality !== null && optionality !== void 0 ? optionality : "as-is") {
+                case "as-is":
+                    return [];
+                case "partial":
+                    return [(0, exports.$expression)("?"),];
+                case "required":
+                    return [(0, exports.$expression)("-?"),];
+            }
+        };
         Define.buildDictionaryKeyin = function (data) {
             return undefined === data.value.keyin ?
-                [(0, exports.$expression)("["), (0, exports.$expression)("key:"), (0, exports.$expression)("string"), (0, exports.$expression)("]:"),] : __spreadArray(__spreadArray([(0, exports.$expression)("["), (0, exports.$expression)("key"), (0, exports.$expression)("in")], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.keyin)), true), [(0, exports.$expression)("]:"),], false);
+                [(0, exports.$expression)("["), (0, exports.$expression)("key:"), (0, exports.$expression)("string"), (0, exports.$expression)("]:"),] : __spreadArray(__spreadArray(__spreadArray(__spreadArray([
+                (0, exports.$expression)("["),
+                (0, exports.$expression)("key"),
+                (0, exports.$expression)("in")
+            ], Define.buildInlineDefine(Build.nextProcess(data, null, data.value.keyin)), true), [
+                (0, exports.$expression)("]")
+            ], false), Define.buildOptionality(data.value.optionality), true), [
+                (0, exports.$expression)(":"),
+            ], false);
         };
         Define.buildInlineDefineDictionary = function (data) {
             return (0, exports.$iblock)([(0, exports.$line)(__spreadArray(__spreadArray(__spreadArray([], Define.buildDictionaryKeyin(data), true), Define.buildInlineDefine(Build.nextProcess(data, null, data.value.valueType)), true), [(0, exports.$expression)(";"),], false))]);
@@ -1319,6 +1337,7 @@ var Build;
             return Schema.setCommonProperties(result, data);
         };
         Schema.buildDictionary = function (data) {
+            var _a;
             var result = {
                 type: "object",
             };
@@ -1331,7 +1350,17 @@ var Build;
                 var keys = Build.getActualKeys(Build.nextProcess(data, null, data.value.keyin));
                 keys.map(function (i) { return text_1.Text.getPrimaryKeyName(i); }).forEach(function (key) { return properties_1[key] = valueType; });
                 result["properties"] = properties_1;
-                result["required"] = keys.filter(function (i) { return !i.endsWith("?"); });
+                switch ((_a = data.value.optionality) !== null && _a !== void 0 ? _a : "as-is") {
+                    case "as-is":
+                        result["required"] = keys.filter(function (i) { return !i.endsWith("?"); });
+                        break;
+                    case "partial":
+                        result["required"] = [];
+                        break;
+                    case "required":
+                        result["required"] = keys.map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
+                        break;
+                }
                 var additionalProperties = Build.getAdditionalProperties(data);
                 if ("boolean" === typeof additionalProperties) {
                     result["additionalProperties"] = additionalProperties;

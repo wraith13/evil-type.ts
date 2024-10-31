@@ -168,6 +168,7 @@
                                     }
                                 }
                             },
+                            "optionality": "required",
                             "valueType": {
                                 "type": "string"
                             },
@@ -453,6 +454,14 @@
                         },
                         "keyin?": {
                             "$ref": "TypeOrRefer"
+                        },
+                        "optionality?": {
+                            "type": "enum-type",
+                            "members": [
+                                "as-is",
+                                "partial",
+                                "required"
+                            ]
                         },
                         "valueType": {
                             "$ref": "TypeOrRefer"

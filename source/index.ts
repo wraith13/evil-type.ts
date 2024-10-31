@@ -587,10 +587,30 @@ export namespace Build
             kindofJoinExpression(value.members.map(i => $expression(Jsonable.stringify(i))), $expression("|"));
         export const buildInlineDefineArray = (data: Process<Type.ArrayElement>) =>
             [ ...enParenthesisIfNeed(buildInlineDefine(nextProcess(data, null, data.value.items))), $expression("[]"), ];
+        export const buildOptionality = (optionality: Type.DictionaryDefinition["optionality"]): CodeExpression[] =>
+        {
+            switch(optionality ?? "as-is")
+            {
+            case "as-is":
+                return [];
+            case "partial":
+                return [ $expression("?"), ];
+            case "required":
+                return [ $expression("-?"), ];
+            }
+        };
         export const buildDictionaryKeyin = (data: Process<Type.DictionaryDefinition>) =>
             undefined === data.value.keyin ?
                 [ $expression("["), $expression("key:"), $expression("string"), $expression("]:"), ]:
-                [ $expression("["), $expression("key"), $expression("in"), ...buildInlineDefine(nextProcess(data, null, data.value.keyin)), $expression("]:"), ];
+                [
+                    $expression("["),
+                    $expression("key"),
+                    $expression("in"),
+                    ...buildInlineDefine(nextProcess(data, null, data.value.keyin)),
+                    $expression("]"),
+                    ...buildOptionality(data.value.optionality),
+                    $expression(":"),
+                ];
         export const buildInlineDefineDictionary = (data: Process<Type.DictionaryDefinition>) =>
             $iblock([ $line([ ...buildDictionaryKeyin(data), ...buildInlineDefine(nextProcess(data, null, data.value.valueType)), $expression(";"), ]) ]);
         export const buildInlineDefineAnd = (data: Process<Type.AndElement>) =>
@@ -1804,7 +1824,18 @@ export namespace Build
                 const keys = getActualKeys(nextProcess(data, null, data.value.keyin));
                 keys.map(i => Text.getPrimaryKeyName(i)).forEach(key => properties[key] = valueType);
                 result["properties"] = properties;
-                result["required"] = keys.filter(i => ! i.endsWith("?"));
+                switch(data.value.optionality ?? "as-is")
+                {
+                case "as-is":
+                    result["required"] = keys.filter(i => ! i.endsWith("?"));
+                    break;
+                case "partial":
+                    result["required"] = [];
+                    break;
+                case "required":
+                    result["required"] = keys.map(i => Text.getPrimaryKeyName(i));
+                    break;
+                }
                 const additionalProperties = getAdditionalProperties(data);
                 if ("boolean" === typeof additionalProperties)
                 {

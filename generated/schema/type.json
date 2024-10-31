@@ -148,9 +148,87 @@
                 },
                 "StringFormatMap": {
                     "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "properties": {
+                        "date-time": {
+                            "type": "string"
+                        },
+                        "date": {
+                            "type": "string"
+                        },
+                        "time": {
+                            "type": "string"
+                        },
+                        "duration": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        },
+                        "idn-email": {
+                            "type": "string"
+                        },
+                        "hostname": {
+                            "type": "string"
+                        },
+                        "idn-hostname": {
+                            "type": "string"
+                        },
+                        "ipv4": {
+                            "type": "string"
+                        },
+                        "ipv6": {
+                            "type": "string"
+                        },
+                        "uuid": {
+                            "type": "string"
+                        },
+                        "uri": {
+                            "type": "string"
+                        },
+                        "uri-reference": {
+                            "type": "string"
+                        },
+                        "iri": {
+                            "type": "string"
+                        },
+                        "iri-reference": {
+                            "type": "string"
+                        },
+                        "uri-template": {
+                            "type": "string"
+                        },
+                        "json-pointer": {
+                            "type": "string"
+                        },
+                        "relative-json-pointer": {
+                            "type": "string"
+                        },
+                        "regex": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "date-time",
+                        "date",
+                        "time",
+                        "duration",
+                        "email",
+                        "idn-email",
+                        "hostname",
+                        "idn-hostname",
+                        "ipv4",
+                        "ipv6",
+                        "uuid",
+                        "uri",
+                        "uri-reference",
+                        "iri",
+                        "iri-reference",
+                        "uri-template",
+                        "json-pointer",
+                        "relative-json-pointer",
+                        "regex"
+                    ],
+                    "additionalProperties": false
                 },
                 "default": {
                     "type": "object",
@@ -587,6 +665,13 @@
                 },
                 "keyin": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
+                },
+                "optionality": {
+                    "enum": [
+                        "as-is",
+                        "partial",
+                        "required"
+                    ]
                 },
                 "valueType": {
                     "$ref": "#/definitions/Type.TypeOrRefer"

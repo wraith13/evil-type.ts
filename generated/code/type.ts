@@ -31,7 +31,7 @@ export namespace Type
         safeInteger?: boolean;
         regulateType?: { sortBy?: "none" | "define" | "alphabet"; merge?: boolean; };
         maxLineLength?: null | number;
-        StringFormatMap?: { [ key in keyof typeof StringFormatMap ]: string; };
+        StringFormatMap?: { [ key in keyof typeof StringFormatMap ] -?: string; };
         default?: { export?: boolean; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?: string; };
         schema?: SchemaOptions;
     }
@@ -96,6 +96,7 @@ export namespace Type
     {
         type: "dictionary";
         keyin?: TypeOrRefer;
+        optionality?: "as-is" | "partial" | "required";
         valueType: TypeOrRefer;
         additionalProperties?: boolean;
     }
@@ -336,7 +337,8 @@ export namespace Type
         isTypeOrRefer), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const dictionaryDefinitionValidatorObject: EvilType.Validator.ObjectValidator<DictionaryDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("dictionary" as const),
-        keyin: EvilType.Validator.isOptional(isTypeOrRefer), valueType: isTypeOrRefer, additionalProperties: EvilType.Validator.isOptional(
+        keyin: EvilType.Validator.isOptional(isTypeOrRefer), optionality: EvilType.Validator.isOptional(EvilType.Validator.isEnum([
+        "as-is", "partial", "required" ] as const)), valueType: isTypeOrRefer, additionalProperties: EvilType.Validator.isOptional(
         EvilType.Validator.isBoolean), });
     export const arrayElementValidatorObject: EvilType.Validator.ObjectValidator<ArrayElement> = EvilType.Validator.mergeObjectValidator(
         alphaElementValidatorObject, { type: EvilType.Validator.isJust("array" as const), items: isTypeOrRefer, minItems:
