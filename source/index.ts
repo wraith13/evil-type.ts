@@ -363,9 +363,9 @@ export namespace Build
         const target = getResolveRefer(data);
         if (Type.isLiteralElement(target.value))
         {
-            if (EvilType.Validator.isObject(target.value.const))
+            if (EvilType.Validator.isArray(EvilType.Validator.isString)(target.value.const))
             {
-                return Object.keys(target.value.const);
+                return target.value.const;
             }
             else
             {
@@ -381,7 +381,7 @@ export namespace Build
                     const entry = getKeyofTarget(nextProcess(target, null, target.value));
                     if (Type.isInterfaceDefinition(entry.value))
                     {
-                        return Object.keys(entry.value.members).map(i => Text.getPrimaryKeyName(i));
+                        return getKeys(nextProcess(entry, null, entry.value)).map(i => Text.getPrimaryKeyName(i));
                     }
                     else
                     if (Type.isDictionaryDefinition(entry.value))

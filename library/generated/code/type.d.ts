@@ -29,7 +29,7 @@ export declare namespace Type {
         };
         maxLineLength?: null | number;
         StringFormatMap?: {
-            [key in keyof typeof StringFormatMap]: string;
+            [key in keyof typeof StringFormatMap]-?: string;
         };
         default?: {
             export?: boolean;

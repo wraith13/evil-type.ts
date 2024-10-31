@@ -250,8 +250,8 @@ var Build;
     Build.getActualKeys = function (data) {
         var target = Build.getResolveRefer(data);
         if (type_1.Type.isLiteralElement(target.value)) {
-            if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
-                return Object.keys(target.value.const);
+            if (evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)(target.value.const)) {
+                return target.value.const;
             }
             else {
                 return [];
@@ -263,7 +263,7 @@ var Build;
                     {
                         var entry = Build.getKeyofTarget(Build.nextProcess(target, null, target.value));
                         if (type_1.Type.isInterfaceDefinition(entry.value)) {
-                            return Object.keys(entry.value.members).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
+                            return Build.getKeys(Build.nextProcess(entry, null, entry.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
                         }
                         else if (type_1.Type.isDictionaryDefinition(entry.value)) {
                             if (undefined !== entry.value.keyin) {
