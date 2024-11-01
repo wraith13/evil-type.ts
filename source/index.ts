@@ -421,10 +421,33 @@ export namespace Build
         }
         return [];
     }
-    // export const dictionaryToInterface = <Process extends BaseProcess<Type.DictionaryDefinition & { keyin: Type.TypeOrRefer }>>(data: Process): NextProcess<Process, Type.InterfaceDefinition> =>
-    // {
-
-    // };
+    export const applyOptionality = (key: string, optionality: Type.DictionaryDefinition["optionality"]) =>
+    {
+        switch(optionality ?? "as-is")
+        {
+        case "as-is":
+            return key;
+        case "partial":
+            return key.replace(/\??$/, "?");
+        case "required":
+            return Text.getPrimaryKeyName(key);
+        }
+    };
+    export const dictionaryToInterface = <Process extends BaseProcess<Type.DictionaryDefinition & { keyin: Type.TypeOrRefer }>>(data: Process): NextProcess<Process, Type.InterfaceDefinition> =>
+    {
+        const result: Type.InterfaceDefinition =
+        {
+            type: "interface",
+            members: { }
+        };
+        getActualKeys(nextProcess(data, null, data.value.keyin))
+            .forEach(key => result.members[applyOptionality(key, data.value.optionality)] = data.value.valueType);
+        if (undefined !== data.value.additionalProperties)
+        {
+            result.additionalProperties = data.value.additionalProperties;
+        }
+        return nextProcess(data, null, result);
+    };
     export const isKindofNeverType = (data: BaseProcess<Type.TypeOrRefer>): boolean =>
     {
         const target = resolveRefer(data);
