@@ -163,14 +163,14 @@ export namespace Build
         const path = getAbsolutePath(data, data.value);
         return Object.assign({ }, data, { path, value: data.definitions[path], });
     };
-    export const getResolveRefer = <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process): NextProcess<Process, Type.TypeOrLiteralOfRefer> =>
+    export const resolveRefer = <Process extends BaseProcess<Type.TypeOrValueOfRefer>>(data: Process): NextProcess<Process, Type.TypeOrLiteralOfRefer> =>
     {
         if (Type.isReferElement(data.value))
         {
             const next = getDefinition(nextProcess(data, null, data.value));
             if (Type.isTypeOrValueOfRefer(next.value))
             {
-                return getResolveRefer(<Process>next);
+                return resolveRefer(<Process>next);
             }
             else
             {
@@ -181,7 +181,7 @@ export namespace Build
         {
             if (Type.isReferElement(data.value.value))
             {
-                return getResolveRefer(<Process>nextProcess(data, null, data.value.value));
+                return resolveRefer(<Process>nextProcess(data, null, data.value.value));
             }
             else
             {
@@ -190,15 +190,15 @@ export namespace Build
         }
         if (Type.isTypeDefinition(data.value))
         {
-            return getResolveRefer(<Process>nextProcess(data, null, data.value.define));
+            return resolveRefer(<Process>nextProcess(data, null, data.value.define));
         }
         if (Type.isMemberofElement(data.value))
         {
-            return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>getResolveRefer(getMemberofTarget(nextProcess(data, null, data.value)));
+            return <NextProcess<Process, Type.TypeOrLiteralOfRefer>>resolveRefer(getMemberofTarget(nextProcess(data, null, data.value)));
         }
         return nextProcess(data, null, data.value);
     };
-    export const getKeyofTarget = <Process extends BaseProcess<Type.KeyofElement>>(data: Process) => getResolveRefer
+    export const getKeyofTarget = <Process extends BaseProcess<Type.KeyofElement>>(data: Process) => resolveRefer
     (
         nextProcess
         (
@@ -211,7 +211,7 @@ export namespace Build
     );
     export const getMemberofTarget = <Process extends BaseProcess<Type.MemberofElement>>(data: Process): NextProcess<Process, Type.TypeOrLiteralOfRefer>  =>
     {
-        const entry = getResolveRefer
+        const entry = resolveRefer
         (
             nextProcess
             (
@@ -347,7 +347,7 @@ export namespace Build
             (
                 i =>
                 {
-                    const current = getResolveRefer(nextProcess(data, null, i));
+                    const current = resolveRefer(nextProcess(data, null, i));
                     if (Type.isInterfaceDefinition(current.value))
                     {
                         result.push(...getKeys(nextProcess(current, null, current.value)));
@@ -360,7 +360,7 @@ export namespace Build
     };
     export const getActualKeys = (data: BaseProcess<Type.TypeOrRefer>): string[] =>
     {
-        const target = getResolveRefer(data);
+        const target = resolveRefer(data);
         if (Type.isLiteralElement(target.value))
         {
             if (EvilType.Validator.isArray(EvilType.Validator.isString)(target.value.const))
@@ -381,7 +381,7 @@ export namespace Build
                     const entry = getKeyofTarget(nextProcess(target, null, target.value));
                     if (Type.isInterfaceDefinition(entry.value))
                     {
-                        return getKeys(nextProcess(entry, null, entry.value)).map(i => Text.getPrimaryKeyName(i));
+                        return getKeys(nextProcess(entry, null, entry.value));
                     }
                     else
                     if (Type.isDictionaryDefinition(entry.value))
@@ -403,7 +403,7 @@ export namespace Build
                 }
             case "itemof":
                 {
-                    const entry = getResolveRefer(nextProcess(target, null, target.value.value));
+                    const entry = resolveRefer(nextProcess(target, null, target.value.value));
                     if (Type.isLiteralElement(entry.value))
                     {
                         if (EvilType.Validator.isArray(EvilType.Validator.isString)(entry.value.const))
@@ -421,9 +421,13 @@ export namespace Build
         }
         return [];
     }
+    // export const dictionaryToInterface = <Process extends BaseProcess<Type.DictionaryDefinition & { keyin: Type.TypeOrRefer }>>(data: Process): NextProcess<Process, Type.InterfaceDefinition> =>
+    // {
+
+    // };
     export const isKindofNeverType = (data: BaseProcess<Type.TypeOrRefer>): boolean =>
     {
-        const target = getResolveRefer(data);
+        const target = resolveRefer(data);
         if (Type.isLiteralElement(target.value))
         {
             return false;
@@ -812,7 +816,7 @@ export namespace Build
                     return [ $expression(`${data.value.value.$ref}.includes(${name} as any)`), ];
                 case "memberof":
                     {
-                        const target = getResolveRefer(data);
+                        const target = resolveRefer(data);
                         if ( ! Type.isMemberofElement(target.value))
                         {
                             return buildValidatorExpression(name, target);
@@ -1130,7 +1134,7 @@ export namespace Build
                     return buildCall([ $expression("EvilType.Validator.isEnum"), ], [ $expression(data.value.value.$ref), ]);
                 case "memberof":
                     {
-                        const target = getResolveRefer(data);
+                        const target = resolveRefer(data);
                         if ( ! Type.isMemberofElement(target.value))
                         {
                             return buildObjectValidatorGetterCoreEntry(target);
@@ -1749,7 +1753,7 @@ export namespace Build
                 (
                     i =>
                     {
-                        const current = getResolveRefer(nextProcess(data, null, i));
+                        const current = resolveRefer(nextProcess(data, null, i));
                         if (Type.isInterfaceDefinition(current.value))
                         {
                             const base = buildInterface(<Process<Type.InterfaceDefinition>>current);
@@ -1883,7 +1887,7 @@ export namespace Build
             {
                 if (undefined !== target.value.keyin)
                 {
-                    result["enum"] = getActualKeys(nextProcess(target, null, target.value.keyin));
+                    result["enum"] = getActualKeys(nextProcess(target, null, target.value.keyin)).map(i => Text.getPrimaryKeyName(i));
                 }
                 else
                 {

@@ -133,11 +133,11 @@ var Build;
         var path = Build.getAbsolutePath(data, data.value);
         return Object.assign({}, data, { path: path, value: data.definitions[path], });
     };
-    Build.getResolveRefer = function (data) {
+    Build.resolveRefer = function (data) {
         if (type_1.Type.isReferElement(data.value)) {
             var next = Build.getDefinition(Build.nextProcess(data, null, data.value));
             if (type_1.Type.isTypeOrValueOfRefer(next.value)) {
-                return Build.getResolveRefer(next);
+                return Build.resolveRefer(next);
             }
             else {
                 return Build.nextProcess(data, null, data.value);
@@ -145,26 +145,26 @@ var Build;
         }
         if (type_1.Type.isValueDefinition(data.value)) {
             if (type_1.Type.isReferElement(data.value.value)) {
-                return Build.getResolveRefer(Build.nextProcess(data, null, data.value.value));
+                return Build.resolveRefer(Build.nextProcess(data, null, data.value.value));
             }
             else {
                 return Build.nextProcess(data, null, data.value.value);
             }
         }
         if (type_1.Type.isTypeDefinition(data.value)) {
-            return Build.getResolveRefer(Build.nextProcess(data, null, data.value.define));
+            return Build.resolveRefer(Build.nextProcess(data, null, data.value.define));
         }
         if (type_1.Type.isMemberofElement(data.value)) {
-            return Build.getResolveRefer(Build.getMemberofTarget(Build.nextProcess(data, null, data.value)));
+            return Build.resolveRefer(Build.getMemberofTarget(Build.nextProcess(data, null, data.value)));
         }
         return Build.nextProcess(data, null, data.value);
     };
-    Build.getKeyofTarget = function (data) { return Build.getResolveRefer(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
+    Build.getKeyofTarget = function (data) { return Build.resolveRefer(Build.nextProcess(data, null, type_1.Type.isTypeofElement(data.value.value) ?
         data.value.value.value :
         data.value.value)); };
     Build.getMemberofTarget = function (data) {
         var _a;
-        var entry = Build.getResolveRefer(Build.nextProcess(data, null, data.value.value));
+        var entry = Build.resolveRefer(Build.nextProcess(data, null, data.value.value));
         if (type_1.Type.isLiteralElement(entry.value)) {
             if (evil_type_1.EvilType.Validator.isObject(entry.value.const) && data.value.key in entry.value.const) {
                 var value = entry.value.const[data.value.key];
@@ -238,7 +238,7 @@ var Build;
         var result = [];
         if (data.value.extends) {
             data.value.extends.forEach(function (i) {
-                var current = Build.getResolveRefer(Build.nextProcess(data, null, i));
+                var current = Build.resolveRefer(Build.nextProcess(data, null, i));
                 if (type_1.Type.isInterfaceDefinition(current.value)) {
                     result.push.apply(result, Build.getKeys(Build.nextProcess(current, null, current.value)));
                 }
@@ -248,7 +248,7 @@ var Build;
         return result;
     };
     Build.getActualKeys = function (data) {
-        var target = Build.getResolveRefer(data);
+        var target = Build.resolveRefer(data);
         if (type_1.Type.isLiteralElement(target.value)) {
             if (evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)(target.value.const)) {
                 return target.value.const;
@@ -263,7 +263,7 @@ var Build;
                     {
                         var entry = Build.getKeyofTarget(Build.nextProcess(target, null, target.value));
                         if (type_1.Type.isInterfaceDefinition(entry.value)) {
-                            return Build.getKeys(Build.nextProcess(entry, null, entry.value)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
+                            return Build.getKeys(Build.nextProcess(entry, null, entry.value));
                         }
                         else if (type_1.Type.isDictionaryDefinition(entry.value)) {
                             if (undefined !== entry.value.keyin) {
@@ -279,7 +279,7 @@ var Build;
                     }
                 case "itemof":
                     {
-                        var entry = Build.getResolveRefer(Build.nextProcess(target, null, target.value.value));
+                        var entry = Build.resolveRefer(Build.nextProcess(target, null, target.value.value));
                         if (type_1.Type.isLiteralElement(entry.value)) {
                             if (evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)(entry.value.const)) {
                                 return entry.value.const;
@@ -295,9 +295,12 @@ var Build;
         }
         return [];
     };
+    // export const dictionaryToInterface = <Process extends BaseProcess<Type.DictionaryDefinition & { keyin: Type.TypeOrRefer }>>(data: Process): NextProcess<Process, Type.InterfaceDefinition> =>
+    // {
+    // };
     Build.isKindofNeverType = function (data) {
         var _a, _b, _c;
-        var target = Build.getResolveRefer(data);
+        var target = Build.resolveRefer(data);
         if (type_1.Type.isLiteralElement(target.value)) {
             return false;
         }
@@ -632,7 +635,7 @@ var Build;
                         return [(0, exports.$expression)("".concat(data.value.value.$ref, ".includes(").concat(name, " as any)")),];
                     case "memberof":
                         {
-                            var target = Build.getResolveRefer(data);
+                            var target = Build.resolveRefer(data);
                             if (!type_1.Type.isMemberofElement(target.value)) {
                                 return Validator.buildValidatorExpression(name, target);
                             }
@@ -858,7 +861,7 @@ var Build;
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [(0, exports.$expression)(data.value.value.$ref),]);
                     case "memberof":
                         {
-                            var target = Build.getResolveRefer(data);
+                            var target = Build.resolveRefer(data);
                             if (!type_1.Type.isMemberofElement(target.value)) {
                                 return Validator.buildObjectValidatorGetterCoreEntry(target);
                             }
@@ -1292,7 +1295,7 @@ var Build;
                 // additionalProperties: false と allOf の組み合わせは残念な事になるので極力使わない。( additionalProperties: false が、 allOf の参照先の properties も参照元の Properties も使えなくしてしまうので、この組み合わせは使えたもんじゃない。 )
                 var allOf_1 = [];
                 data.value.extends.forEach(function (i) {
-                    var current = Build.getResolveRefer(Build.nextProcess(data, null, i));
+                    var current = Build.resolveRefer(Build.nextProcess(data, null, i));
                     if (type_1.Type.isInterfaceDefinition(current.value)) {
                         var base = Schema.buildInterface(current);
                         Object.assign(properties, base["properties"]);
@@ -1393,7 +1396,7 @@ var Build;
             }
             else if (type_1.Type.isDictionaryDefinition(target.value)) {
                 if (undefined !== target.value.keyin) {
-                    result["enum"] = Build.getActualKeys(Build.nextProcess(target, null, target.value.keyin));
+                    result["enum"] = Build.getActualKeys(Build.nextProcess(target, null, target.value.keyin)).map(function (i) { return text_1.Text.getPrimaryKeyName(i); });
                 }
                 else {
                     result["type"] = "string";
