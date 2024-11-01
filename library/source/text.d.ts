@@ -4,4 +4,5 @@ export declare namespace Text {
     const toUpperCamelCase: (name: string) => string;
     const toLowerCamelCase: (name: string) => string;
     const getPrimaryKeyName: (key: string) => string;
+    const isValidIdentifier: (identifier: string) => boolean;
 }

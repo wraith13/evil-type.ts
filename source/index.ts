@@ -433,7 +433,9 @@ export namespace Build
             return Text.getPrimaryKeyName(key);
         }
     };
-    export const dictionaryToInterface = <Process extends BaseProcess<Type.DictionaryDefinition & { keyin: Type.TypeOrRefer }>>(data: Process): NextProcess<Process, Type.InterfaceDefinition> =>
+    export const isDetailedDictionary = <Process extends BaseProcess<Type.DictionaryDefinition>>(data: Process): data is Process & { value: { keyin: Type.TypeOrRefer; } } =>
+        undefined !== data.value.keyin;
+    export const dictionaryToInterface = <Process extends BaseProcess<Type.DictionaryDefinition> & { value: { keyin: Type.TypeOrRefer; } }>(data: Process): NextProcess<Process, Type.InterfaceDefinition> =>
     {
         const result: Type.InterfaceDefinition =
         {
@@ -528,7 +530,7 @@ export namespace Build
             case "interface":
                 return target.value.extends?.some?.(i => isKindofNeverType(nextProcess(target, null, i))) ?? false;
             case "dictionary":
-                return false;
+                return isKindofNeverType(nextProcess(target, null, target.value.valueType));
             }
         }
         return false;
@@ -937,18 +939,27 @@ export namespace Build
                 case "interface":
                     return buildInterfaceValidator(name, nextProcess(data, null, data.value));
                 case "dictionary":
-                    return [
-                        $expression(`null !== ${name}`),
-                        $expression("&&"),
-                        $expression(`"object" === typeof ${name}`),
-                        $expression("&&"),
-                        $expression(`Object.values(${name}).every(`),
-                        $expression("i"),
-                        $expression("=>"),
-                        ...buildValidatorExpression("i", nextProcess(data, null, data.value.valueType)),
-                        $expression(")"),
-                        ...(undefined !== data.value.keyin && false === getAdditionalProperties(nextProcess(data, null, data.value)) ? rejectAdditionalProperties(name, getActualKeys(nextProcess(data, null, data.value.keyin))): [])
-                    ];
+                    {
+                        const entry = nextProcess(data, null, data.value);
+                        if (isDetailedDictionary(entry))
+                        {
+                            return buildInterfaceValidator(name, dictionaryToInterface(entry));
+                        }
+                        else
+                        {
+                            return [
+                                $expression(`null !== ${name}`),
+                                $expression("&&"),
+                                $expression(`"object" === typeof ${name}`),
+                                $expression("&&"),
+                                $expression(`Object.values(${name}).every(`),
+                                $expression("i"),
+                                $expression("=>"),
+                                ...buildValidatorExpression("i", nextProcess(data, null, data.value.valueType)),
+                                $expression(")"),
+                            ];
+                        }
+                    }
                 }
             }
         };
@@ -1304,24 +1315,21 @@ export namespace Build
                 case "interface":
                     return buildObjectValidator(nextProcess(data, null, data.value));
                 case "dictionary":
-                    return buildCall
-                    (
-                        [ $expression("EvilType.Validator.isDictionaryObject"), ],
-                        [
-                            buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.valueType)),
-                            ...
+                    {
+                        const entry = nextProcess(data, null, data.value);
+                        if (isDetailedDictionary(entry))
+                        {
+                            return buildObjectValidator(dictionaryToInterface(entry));
+                        }
+                        else
+                        {
+                            return buildCall
                             (
-                                undefined !== data.value.keyin ?
-                                [
-                                    [
-                                        ...stringifyTokens(getActualKeys(nextProcess(data, null, data.value.keyin)))
-                                    ],
-                                    ...(false === getAdditionalProperties(nextProcess(data, null, data.value)) ? [ $expression("false"), ]: []),
-                                ]:
-                                []
-                            )
-                        ]
-                    );
+                                [ $expression("EvilType.Validator.isDictionaryObject"), ],
+                                [ buildObjectValidatorGetterCoreEntry(nextProcess(data, null, data.value.valueType)), ]
+                            );
+                        }
+                    }
                 }
             }
         };
@@ -1338,7 +1346,7 @@ export namespace Build
                             buildObjectValidatorGetterCoreEntry(nextProcess(data, key, i[1]));
                     return $line
                     ([
-                        $expression(`${key}`),
+                        $expression(Text.isValidIdentifier(key) ? key: JSON.stringify(key)),
                         $expression(":"),
                         ...(key === i[0] ? value: buildCall([ $expression("EvilType.Validator.isOptional"), ], [ value, ])),
                         $expression(","),
@@ -1383,7 +1391,7 @@ export namespace Build
                 case "array":
                     return isLazyValidator(nextProcess(data, null, data.value.items));
                 case "dictionary":
-                    return isLazyValidator(nextProcess(data, null, data.value.valueType));
+                    return undefined !== data.value.keyin || isLazyValidator(nextProcess(data, null, data.value.valueType));
                 case "keyof":
                     return false;
                 case "memberof":
@@ -1645,7 +1653,17 @@ export namespace Build
             case "interface":
                 return buildInterface(nextProcess(data, null, data.value));
             case "dictionary":
-                return buildDictionary(nextProcess(data, null, data.value));
+                {
+                    const entry = nextProcess(data, null, data.value);
+                    if (isDetailedDictionary(entry))
+                    {
+                        return buildInterface(dictionaryToInterface(entry));
+                    }
+                    else
+                    {
+                        return buildDictionary(entry);
+                    }
+                }
             case "enum-type":
                 return buildEnumType(nextProcess(data, null, data.value));
             case "typeof":
@@ -1847,6 +1865,7 @@ export namespace Build
             }
             else
             {
+                // ここには到達しない
                 const properties: Jsonable.JsonableObject = { };
                 const keys = getActualKeys(nextProcess(data, null, data.value.keyin));
                 keys.map(i => Text.getPrimaryKeyName(i)).forEach(key => properties[key] = valueType);

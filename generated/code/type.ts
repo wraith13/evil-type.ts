@@ -291,7 +291,7 @@ export namespace Type
         EvilType.Validator.isOptional(Jsonable.isJsonable), title: EvilType.Validator.isOptional(EvilType.Validator.isString), description:
         EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const typeSchemaValidatorObject: EvilType.Validator.ObjectValidator<TypeSchema> = EvilType.Validator.mergeObjectValidator(
-        commentPropertyValidatorObject, { $schema: isSchema, imports: EvilType.Validator.isOptional(EvilType.Validator.isArray(
+        commentPropertyValidatorObject, { "$schema": isSchema, imports: EvilType.Validator.isOptional(EvilType.Validator.isArray(
         isImportDefinition)), defines: isDefinitionMap, options: isOutputOptions, });
     export const outputOptionsValidatorObject: EvilType.Validator.ObjectValidator<OutputOptions> = ({ outputFile:
         EvilType.Validator.isString, indentUnit: EvilType.Validator.isEnum([ 0, 1, 2, 3, 4, 5, 6, 7, 8, "tab" ] as const), indentStyle:
@@ -299,18 +299,22 @@ export namespace Type
         safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regulateType: EvilType.Validator.isOptional(({ sortBy:
         EvilType.Validator.isOptional(EvilType.Validator.isEnum([ "none", "define", "alphabet" ] as const)), merge:
         EvilType.Validator.isOptional(EvilType.Validator.isBoolean), })), maxLineLength: EvilType.Validator.isOptional(
-        EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), StringFormatMap: EvilType.Validator.isOptional(
-        EvilType.Validator.isDictionaryObject(EvilType.Validator.isString, [ "date-time", "date", "time", "duration", "email", "idn-email",
-        "hostname", "idn-hostname", "ipv4", "ipv6", "uuid", "uri", "uri-reference", "iri", "iri-reference", "uri-template", "json-pointer",
-        "relative-json-pointer", "regex" ], false)), default: EvilType.Validator.isOptional(({ export: EvilType.Validator.isOptional(
+        EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), StringFormatMap: EvilType.Validator.isOptional((
+        { "date-time": EvilType.Validator.isString, date: EvilType.Validator.isString, time: EvilType.Validator.isString, duration:
+        EvilType.Validator.isString, email: EvilType.Validator.isString, "idn-email": EvilType.Validator.isString, hostname:
+        EvilType.Validator.isString, "idn-hostname": EvilType.Validator.isString, ipv4: EvilType.Validator.isString, ipv6:
+        EvilType.Validator.isString, uuid: EvilType.Validator.isString, uri: EvilType.Validator.isString, "uri-reference":
+        EvilType.Validator.isString, iri: EvilType.Validator.isString, "iri-reference": EvilType.Validator.isString, "uri-template":
+        EvilType.Validator.isString, "json-pointer": EvilType.Validator.isString, "relative-json-pointer": EvilType.Validator.isString,
+        regex: EvilType.Validator.isString, })), default: EvilType.Validator.isOptional(({ export: EvilType.Validator.isOptional(
         EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeInteger:
         EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean
         ), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), schema: EvilType.Validator.isOptional(
         isSchemaOptions), });
     export const schemaOptionsValidatorObject: EvilType.Validator.ObjectValidator<SchemaOptions> = ({ outputFile:
-        EvilType.Validator.isString, $id: EvilType.Validator.isOptional(EvilType.Validator.isString), $ref: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), externalReferMapping: EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(
-        EvilType.Validator.isString)), });
+        EvilType.Validator.isString, "$id": EvilType.Validator.isOptional(EvilType.Validator.isString), "$ref":
+        EvilType.Validator.isOptional(EvilType.Validator.isString), externalReferMapping: EvilType.Validator.isOptional(
+        EvilType.Validator.isDictionaryObject(EvilType.Validator.isString)), });
     export const alphaElementValidatorObject: EvilType.Validator.ObjectValidator<AlphaElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isString, });
     export const alphaDefinitionValidatorObject: EvilType.Validator.ObjectValidator<AlphaDefinition> =
@@ -353,7 +357,7 @@ export namespace Type
     export const literalElementValidatorObject: EvilType.Validator.ObjectValidator<LiteralElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { const: Jsonable.isJsonable, });
     export const referElementValidatorObject: EvilType.Validator.ObjectValidator<ReferElement> = EvilType.Validator.mergeObjectValidator(
-        commonPropertiesValidatorObject, { $ref: EvilType.Validator.isString, });
+        commonPropertiesValidatorObject, { "$ref": EvilType.Validator.isString, });
     export const neverTypeValidatorObject: EvilType.Validator.ObjectValidator<NeverType> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("never" as const), });
     export const anyTypeValidatorObject: EvilType.Validator.ObjectValidator<AnyType> = EvilType.Validator.mergeObjectValidator(

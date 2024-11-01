@@ -63,6 +63,17 @@ export declare namespace Build {
     const getLiteral: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => Type.LiteralElement | null;
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
     const getActualKeys: (data: BaseProcess<Type.TypeOrRefer>) => string[];
+    const applyOptionality: (key: string, optionality: Type.DictionaryDefinition["optionality"]) => string;
+    const isDetailedDictionary: <Process extends BaseProcess<Type.DictionaryDefinition>>(data: Process) => data is Process & {
+        value: {
+            keyin: Type.TypeOrRefer;
+        };
+    };
+    const dictionaryToInterface: <Process extends BaseProcess<Type.DictionaryDefinition> & {
+        value: {
+            keyin: Type.TypeOrRefer;
+        };
+    }>(data: Process) => NextProcess<Process, Type.InterfaceDefinition>;
     const isKindofNeverType: (data: BaseProcess<Type.TypeOrRefer>) => boolean;
     namespace Define {
         interface Process<ValueType> extends BaseProcess<ValueType> {

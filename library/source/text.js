@@ -16,5 +16,8 @@ var Text;
         return "".concat(name.slice(0, 1).toLowerCase()).concat(name.slice(1));
     };
     Text.getPrimaryKeyName = function (key) { return key.replace(/\?$/, ""); };
+    Text.isValidIdentifier = function (identifier) {
+        return /^[A-Za-z_]\w*$/.test(identifier);
+    };
 })(Text || (exports.Text = Text = {}));
 //# sourceMappingURL=text.js.map

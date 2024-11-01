@@ -295,9 +295,31 @@ var Build;
         }
         return [];
     };
-    // export const dictionaryToInterface = <Process extends BaseProcess<Type.DictionaryDefinition & { keyin: Type.TypeOrRefer }>>(data: Process): NextProcess<Process, Type.InterfaceDefinition> =>
-    // {
-    // };
+    Build.applyOptionality = function (key, optionality) {
+        switch (optionality !== null && optionality !== void 0 ? optionality : "as-is") {
+            case "as-is":
+                return key;
+            case "partial":
+                return key.replace(/\??$/, "?");
+            case "required":
+                return text_1.Text.getPrimaryKeyName(key);
+        }
+    };
+    Build.isDetailedDictionary = function (data) {
+        return undefined !== data.value.keyin;
+    };
+    Build.dictionaryToInterface = function (data) {
+        var result = {
+            type: "interface",
+            members: {}
+        };
+        Build.getActualKeys(Build.nextProcess(data, null, data.value.keyin))
+            .forEach(function (key) { return result.members[Build.applyOptionality(key, data.value.optionality)] = data.value.valueType; });
+        if (undefined !== data.value.additionalProperties) {
+            result.additionalProperties = data.value.additionalProperties;
+        }
+        return Build.nextProcess(data, null, result);
+    };
     Build.isKindofNeverType = function (data) {
         var _a, _b, _c;
         var target = Build.resolveRefer(data);
@@ -367,7 +389,7 @@ var Build;
                 case "interface":
                     return (_c = (_b = (_a = target.value.extends) === null || _a === void 0 ? void 0 : _a.some) === null || _b === void 0 ? void 0 : _b.call(_a, function (i) { return Build.isKindofNeverType(Build.nextProcess(target, null, i)); })) !== null && _c !== void 0 ? _c : false;
                 case "dictionary":
-                    return false;
+                    return Build.isKindofNeverType(Build.nextProcess(target, null, target.value.valueType));
             }
         }
         return false;
@@ -700,17 +722,25 @@ var Build;
                     case "interface":
                         return Validator.buildInterfaceValidator(name, Build.nextProcess(data, null, data.value));
                     case "dictionary":
-                        return __spreadArray(__spreadArray(__spreadArray([
-                            (0, exports.$expression)("null !== ".concat(name)),
-                            (0, exports.$expression)("&&"),
-                            (0, exports.$expression)("\"object\" === typeof ".concat(name)),
-                            (0, exports.$expression)("&&"),
-                            (0, exports.$expression)("Object.values(".concat(name, ").every(")),
-                            (0, exports.$expression)("i"),
-                            (0, exports.$expression)("=>")
-                        ], Validator.buildValidatorExpression("i", Build.nextProcess(data, null, data.value.valueType)), true), [
-                            (0, exports.$expression)(")")
-                        ], false), (undefined !== data.value.keyin && false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? Validator.rejectAdditionalProperties(name, Build.getActualKeys(Build.nextProcess(data, null, data.value.keyin))) : []), true);
+                        {
+                            var entry = Build.nextProcess(data, null, data.value);
+                            if (Build.isDetailedDictionary(entry)) {
+                                return Validator.buildInterfaceValidator(name, Build.dictionaryToInterface(entry));
+                            }
+                            else {
+                                return __spreadArray(__spreadArray([
+                                    (0, exports.$expression)("null !== ".concat(name)),
+                                    (0, exports.$expression)("&&"),
+                                    (0, exports.$expression)("\"object\" === typeof ".concat(name)),
+                                    (0, exports.$expression)("&&"),
+                                    (0, exports.$expression)("Object.values(".concat(name, ").every(")),
+                                    (0, exports.$expression)("i"),
+                                    (0, exports.$expression)("=>")
+                                ], Validator.buildValidatorExpression("i", Build.nextProcess(data, null, data.value.valueType)), true), [
+                                    (0, exports.$expression)(")"),
+                                ], false);
+                            }
+                        }
                 }
             }
         };
@@ -957,12 +987,15 @@ var Build;
                     case "interface":
                         return Validator.buildObjectValidator(Build.nextProcess(data, null, data.value));
                     case "dictionary":
-                        return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isDictionaryObject"),], __spreadArray([
-                            Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.valueType))
-                        ], (undefined !== data.value.keyin ? __spreadArray([
-                            __spreadArray([], stringifyTokens(Build.getActualKeys(Build.nextProcess(data, null, data.value.keyin))), true)
-                        ], (false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? [(0, exports.$expression)("false"),] : []), true) :
-                            []), true));
+                        {
+                            var entry = Build.nextProcess(data, null, data.value);
+                            if (Build.isDetailedDictionary(entry)) {
+                                return Validator.buildObjectValidator(Build.dictionaryToInterface(entry));
+                            }
+                            else {
+                                return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isDictionaryObject"),], [Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.valueType)),]);
+                            }
+                        }
                 }
             }
         };
@@ -972,7 +1005,7 @@ var Build;
                 Build.buildLiteralAsConst({ $type: "never-type-guard", }) :
                 Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, key, i[1]));
             return (0, exports.$line)(__spreadArray(__spreadArray([
-                (0, exports.$expression)("".concat(key)),
+                (0, exports.$expression)(text_1.Text.isValidIdentifier(key) ? key : JSON.stringify(key)),
                 (0, exports.$expression)(":")
             ], (key === i[0] ? value : Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isOptional"),], [value,])), true), [
                 (0, exports.$expression)(","),
@@ -1010,7 +1043,7 @@ var Build;
                     case "array":
                         return Validator.isLazyValidator(Build.nextProcess(data, null, data.value.items));
                     case "dictionary":
-                        return Validator.isLazyValidator(Build.nextProcess(data, null, data.value.valueType));
+                        return undefined !== data.value.keyin || Validator.isLazyValidator(Build.nextProcess(data, null, data.value.valueType));
                     case "keyof":
                         return false;
                     case "memberof":
@@ -1191,7 +1224,15 @@ var Build;
                 case "interface":
                     return Schema.buildInterface(Build.nextProcess(data, null, data.value));
                 case "dictionary":
-                    return Schema.buildDictionary(Build.nextProcess(data, null, data.value));
+                    {
+                        var entry = Build.nextProcess(data, null, data.value);
+                        if (Build.isDetailedDictionary(entry)) {
+                            return Schema.buildInterface(Build.dictionaryToInterface(entry));
+                        }
+                        else {
+                            return Schema.buildDictionary(entry);
+                        }
+                    }
                 case "enum-type":
                     return Schema.buildEnumType(Build.nextProcess(data, null, data.value));
                 case "typeof":
@@ -1349,6 +1390,7 @@ var Build;
                 result["additionalProperties"] = valueType;
             }
             else {
+                // ここには到達しない
                 var properties_1 = {};
                 var keys = Build.getActualKeys(Build.nextProcess(data, null, data.value.keyin));
                 keys.map(function (i) { return text_1.Text.getPrimaryKeyName(i); }).forEach(function (key) { return properties_1[key] = valueType; });
