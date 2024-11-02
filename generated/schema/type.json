@@ -207,27 +207,7 @@
                             "type": "string"
                         }
                     },
-                    "required": [
-                        "date-time",
-                        "date",
-                        "time",
-                        "duration",
-                        "email",
-                        "idn-email",
-                        "hostname",
-                        "idn-hostname",
-                        "ipv4",
-                        "ipv6",
-                        "uuid",
-                        "uri",
-                        "uri-reference",
-                        "iri",
-                        "iri-reference",
-                        "uri-template",
-                        "json-pointer",
-                        "relative-json-pointer",
-                        "regex"
-                    ],
+                    "required": [],
                     "additionalProperties": false
                 },
                 "default": {

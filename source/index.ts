@@ -450,6 +450,26 @@ export namespace Build
         }
         return nextProcess(data, null, result);
     };
+    export const sortType = <Process extends BaseProcess<Type.Type>>(data: Process): Process =>
+    {
+        const sortBy = data.options.regulateType?.sortBy ?? config.regulateType.sortBy;
+        switch(sortBy)
+        {
+
+        }
+        return data;
+    };
+    export const mergeType = <Process extends BaseProcess<Type.Type>>(data: Process): Process =>
+    {
+        const merge = data.options.regulateType?.merge ?? config.regulateType.merge;
+        if(merge)
+        {
+
+        }
+        return data;
+    };
+    export const regulateType = <Process extends BaseProcess<Type.Type>>(data: Process): Process =>
+        sortType(mergeType(data));
     export const isKindofNeverType = (data: BaseProcess<Type.TypeOrRefer>): boolean =>
     {
         const target = resolveRefer(data);
