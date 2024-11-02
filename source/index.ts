@@ -450,7 +450,7 @@ export namespace Build
         }
         return nextProcess(data, null, result);
     };
-    export const sortType = <Process extends BaseProcess<Type.Type>>(data: Process): Process =>
+    export const sortType = <Process extends BaseProcess<Type.TypeOrRefer>>(data: Process): Process =>
     {
         const sortBy = data.options.regulateType?.sortBy ?? config.regulateType.sortBy;
         switch(sortBy)
@@ -459,16 +459,185 @@ export namespace Build
         }
         return data;
     };
-    export const mergeType = <Process extends BaseProcess<Type.Type>>(data: Process): Process =>
+    export const mergeType = <Process extends BaseProcess<Type.TypeOrRefer>>(data: Process): Process =>
     {
         const merge = data.options.regulateType?.merge ?? config.regulateType.merge;
         if(merge)
         {
-
+            const target = resolveRefer(data);
+            if (Type.isOrElement(target.value))
+            {
+                return <Process>mergeOrElement(nextProcess(data, null, target.value));
+            }
+            if (Type.isAndElement(target.value))
+            {
+                return <Process>mergeAndElement(nextProcess(data, null, target.value));
+            }
         }
         return data;
     };
-    export const regulateType = <Process extends BaseProcess<Type.Type>>(data: Process): Process =>
+    export type TypeCompatibility = "unknown" | "same" | "wide" | "narrow" | "overlapping" | "exclusive";
+    export const compareType = <Process extends BaseProcess<Type.TypeOrRefer>>(a: Process, b: Process): TypeCompatibility =>
+    {
+        const aTarget = resolveRefer(a);
+        const bTarget = resolveRefer(b);
+        if (Type.isAnyType(aTarget.value))
+        {
+            if (Type.isAnyType(bTarget.value))
+            {
+                return "same";
+            }
+            return "wide";
+        }
+        if (Type.isNeverType(aTarget.value))
+        {
+            if (Type.isNeverType(bTarget.value))
+            {
+                return "same";
+            }
+            return "narrow";
+        }
+        if (Type.isReferElement(aTarget.value))
+        {
+            if (Type.isReferElement(bTarget.value))
+            {
+                if (aTarget.value.$ref === bTarget.value.$ref)
+                {
+                    return "same";
+                }
+            }
+            return "unknown";
+        }
+        if (Type.isLiteralElement(aTarget.value))
+        {
+
+            // 🚧
+
+        return "unknown";
+        }
+        switch(aTarget.value.type)
+        {
+
+            // 🚧
+
+        }
+        return "unknown";
+    };
+    export const mergeOrElement = <Process extends BaseProcess<Type.OrElement>>(data: Process): NextProcess<Process, Type.TypeOrRefer> =>
+    {
+        const sourceTypes = data.value.types.map(i => mergeType(nextProcess(data, null, i)));
+        const types: NextProcess<Process, Type.TypeOrRefer>[] = [];
+        sourceTypes.forEach
+        (
+            i =>
+            {
+                for(var ix = 0; ix < types.length; ++ix)
+                {
+                    switch(compareType(types[ix], i))
+                    {
+                    case "unknown":
+                        break;
+                    case "same":
+                    case "wide":
+                        return;
+                    case "narrow":
+                        types[ix] = i;
+                        return;
+                    case "overlapping":
+                        types[ix] = mergeOrType(types[ix], i);
+                        return;
+                    case "exclusive":
+                        break;
+                    }
+                }
+                types.push(i);
+            }
+        );
+        switch(types.length)
+        {
+        case 0:
+            return nextProcess(data, null, <Type.NeverType>{ type: "never" });
+        case 1:
+            return nextProcess(data, null, types[0].value);
+        }
+        if (types.map(i => i.value).some(i => Type.isAnyType(i)))
+        {
+            return nextProcess(data, null, <Type.AnyType>{ type: "any" });
+        }
+        const result: Type.OrElement = { type: "or", types: types.map(i => i.value), }
+        if (undefined !== data.value.default)
+        {
+            result.default = data.value.default;
+        }
+        if (undefined !== data.value.title)
+        {
+            result.title = data.value.title;
+        }
+        if (undefined !== data.value.description)
+        {
+            result.description = data.value.description;
+        }
+        return nextProcess(data, null, result);
+    };
+    export const mergeAndElement = <Process extends BaseProcess<Type.AndElement>>(data: Process): NextProcess<Process, Type.TypeOrRefer> =>
+    {
+        const sourceTypes = data.value.types.map(i => mergeType(nextProcess(data, null, i)));
+        const types: NextProcess<Process, Type.TypeOrRefer>[] = [];
+        sourceTypes.forEach
+        (
+            i =>
+            {
+                for(var ix = 0; ix < types.length; ++ix)
+                {
+                    switch(compareType(types[ix], i))
+                    {
+                    case "unknown":
+                        break;
+                    case "same":
+                        return;
+                    case "wide":
+                        types[ix] = i;
+                        return;
+                    case "narrow":
+                        return;
+                    case "overlapping":
+                        types[ix] = mergeAndType(types[ix], i);
+                        return;
+                    case "exclusive":
+                        types[ix] = nextProcess(data, null, <Type.NeverType>{ type: "never" });
+                        return;
+                    }
+                }
+                types.push(i);
+            }
+        );
+        switch(types.length)
+        {
+        case 0:
+            return nextProcess(data, null, <Type.AnyType>{ type: "any" });
+        case 1:
+            return nextProcess(data, null, types[0].value);
+        }
+        if (types.map(i => i.value).some(i => Type.isNeverType(i)))
+        {
+            return nextProcess(data, null, <Type.NeverType>{ type: "never" });
+        }
+        const result: Type.AndElement = { type: "and", types: types.map(i => i.value), }
+        if (undefined !== data.value.default)
+        {
+            result.default = data.value.default;
+        }
+        if (undefined !== data.value.title)
+        {
+            result.title = data.value.title;
+        }
+        if (undefined !== data.value.description)
+        {
+            result.description = data.value.description;
+        }
+        return nextProcess(data, null, result);
+    };
+    export const regulateType = <Process extends BaseProcess<Type.TypeOrRefer>>(data: Process): Process =>
         sortType(mergeType(data));
     export const isKindofNeverType = (data: BaseProcess<Type.TypeOrRefer>): boolean =>
     {
@@ -548,9 +717,11 @@ export namespace Build
             case "or":
                 return 0 === target.value.types.length || target.value.types.every(i => isKindofNeverType(nextProcess(target, null, i)));
             case "interface":
-                return target.value.extends?.some?.(i => isKindofNeverType(nextProcess(target, null, i))) ?? false;
+                //return target.value.extends?.some?.(i => isKindofNeverType(nextProcess(target, null, i))) ?? false;
+                return false;
             case "dictionary":
-                return isKindofNeverType(nextProcess(target, null, target.value.valueType));
+                //return isKindofNeverType(nextProcess(target, null, target.value.valueType));
+                return false;
             }
         }
         return false;
