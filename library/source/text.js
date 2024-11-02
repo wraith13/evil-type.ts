@@ -17,7 +17,7 @@ var Text;
     };
     Text.getPrimaryKeyName = function (key) { return key.replace(/\?$/, ""); };
     Text.isValidIdentifier = function (identifier) {
-        return /^[A-Za-z_]\w*$/.test(identifier);
+        return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(identifier);
     };
 })(Text || (exports.Text = Text = {}));
 //# sourceMappingURL=text.js.map

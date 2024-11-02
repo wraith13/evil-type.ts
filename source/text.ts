@@ -10,5 +10,5 @@ export namespace Text
         `${name.slice(0, 1).toLowerCase()}${name.slice(1)}`;
     export const getPrimaryKeyName = (key: string) =>key.replace(/\?$/, "");
     export const isValidIdentifier = (identifier: string) =>
-        /^[A-Za-z_]\w*$/.test(identifier);
+        /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(identifier);
 }
