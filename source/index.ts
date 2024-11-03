@@ -539,10 +539,21 @@ export namespace Build
         }
         return target;
     };
+    export const mergeOrType = <Process extends BaseProcess<Type.TypeOrRefer>>(a: Process, b: Process): Process =>
+    {
+
+            // 🚧
+
+            return <Process>nextProcess(a, null, <Type.OrElement>{ type: "or", types: [ a.value, b.value ] });
+    };
     export const mergeOrElement = <Process extends BaseProcess<Type.OrElement>>(data: Process): NextProcess<Process, Type.TypeOrRefer> =>
     {
-        const sourceTypes = data.value.types.map(i => mergeType(nextProcess(data, null, i)));
-        const types: NextProcess<Process, Type.TypeOrRefer>[] = [];
+        type ResultType = NextProcess<Process, Type.TypeOrRefer>;
+        const sourceTypes: ResultType[] = data.value.types
+            .map(i => mergeType(nextProcess(data, null, i)))
+            .map(i => Type.isOrElement(i.value) ? i.value.types.map(j => <ResultType>nextProcess(i, null, j)): [ i, ])
+            .reduce((a, b) => [ ...a, ...b, ], []);
+        let types: ResultType[] = [];
         sourceTypes.forEach
         (
             i =>
@@ -569,6 +580,9 @@ export namespace Build
                 types.push(i);
             }
         );
+        types = types
+            .map(i => Type.isOrElement(i.value) ? i.value.types.map(j => <ResultType>nextProcess(i, null, j)): [ i, ])
+            .reduce((a, b) => [ ...a, ...b, ], []);
         switch(types.length)
         {
         case 0:
@@ -582,10 +596,20 @@ export namespace Build
         }
         return nextProcess(data, null, applyCommonProperties(<Type.OrElement>{ type: "or", types: types.map(i => i.value), }, data.value));
     };
+    export const mergeAndType = <Process extends BaseProcess<Type.TypeOrRefer>>(a: Process, b: Process): Process =>
+    {
+
+            // 🚧
+
+            return <Process>nextProcess(a, null, <Type.AndElement>{ type: "and", types: [ a.value, b.value ] });
+    };
     export const mergeAndElement = <Process extends BaseProcess<Type.AndElement>>(data: Process): NextProcess<Process, Type.TypeOrRefer> =>
     {
-        const sourceTypes = data.value.types.map(i => mergeType(nextProcess(data, null, i)));
-        const types: NextProcess<Process, Type.TypeOrRefer>[] = [];
+        type ResultType = NextProcess<Process, Type.TypeOrRefer>;
+        const sourceTypes = data.value.types.map(i => mergeType(nextProcess(data, null, i)))
+            .map(i => Type.isAndElement(i.value) ? i.value.types.map(j => <ResultType>nextProcess(i, null, j)): [ i, ])
+            .reduce((a, b) => [ ...a, ...b, ], []);
+        let types: ResultType[] = [];
         sourceTypes.forEach
         (
             i =>
@@ -614,6 +638,9 @@ export namespace Build
                 types.push(i);
             }
         );
+        types = types
+            .map(i => Type.isAndElement(i.value) ? i.value.types.map(j => <ResultType>nextProcess(i, null, j)): [ i, ])
+            .reduce((a, b) => [ ...a, ...b, ], []);
         switch(types.length)
         {
         case 0:
