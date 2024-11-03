@@ -523,6 +523,22 @@ export namespace Build
         }
         return "unknown";
     };
+    export const applyCommonProperties = <ValueType extends Type.CommonProperties>(target: ValueType, source: Type.CommonProperties): ValueType =>
+    {
+        if (undefined !== source.default)
+        {
+            target.default = source.default;
+        }
+        if (undefined !== source.title)
+        {
+            target.title = source.title;
+        }
+        if (undefined !== source.description)
+        {
+            target.description = source.description;
+        }
+        return target;
+    };
     export const mergeOrElement = <Process extends BaseProcess<Type.OrElement>>(data: Process): NextProcess<Process, Type.TypeOrRefer> =>
     {
         const sourceTypes = data.value.types.map(i => mergeType(nextProcess(data, null, i)));
@@ -556,28 +572,15 @@ export namespace Build
         switch(types.length)
         {
         case 0:
-            return nextProcess(data, null, <Type.NeverType>{ type: "never" });
+            return nextProcess(data, null, applyCommonProperties(<Type.NeverType>{ type: "never" }, data.value));
         case 1:
-            return nextProcess(data, null, types[0].value);
+            return nextProcess(data, null, applyCommonProperties(types[0].value, data.value));
         }
         if (types.map(i => i.value).some(i => Type.isAnyType(i)))
         {
-            return nextProcess(data, null, <Type.AnyType>{ type: "any" });
+            return nextProcess(data, null, applyCommonProperties(<Type.AnyType>{ type: "any" }, data.value));
         }
-        const result: Type.OrElement = { type: "or", types: types.map(i => i.value), }
-        if (undefined !== data.value.default)
-        {
-            result.default = data.value.default;
-        }
-        if (undefined !== data.value.title)
-        {
-            result.title = data.value.title;
-        }
-        if (undefined !== data.value.description)
-        {
-            result.description = data.value.description;
-        }
-        return nextProcess(data, null, result);
+        return nextProcess(data, null, applyCommonProperties(<Type.OrElement>{ type: "or", types: types.map(i => i.value), }, data.value));
     };
     export const mergeAndElement = <Process extends BaseProcess<Type.AndElement>>(data: Process): NextProcess<Process, Type.TypeOrRefer> =>
     {
@@ -614,28 +617,15 @@ export namespace Build
         switch(types.length)
         {
         case 0:
-            return nextProcess(data, null, <Type.AnyType>{ type: "any" });
+            return nextProcess(data, null, applyCommonProperties(<Type.AnyType>{ type: "any" }, data.value));
         case 1:
-            return nextProcess(data, null, types[0].value);
+            return nextProcess(data, null, applyCommonProperties(types[0].value, data.value));
         }
         if (types.map(i => i.value).some(i => Type.isNeverType(i)))
         {
-            return nextProcess(data, null, <Type.NeverType>{ type: "never" });
+            return nextProcess(data, null, applyCommonProperties(<Type.NeverType>{ type: "never" }, data.value));
         }
-        const result: Type.AndElement = { type: "and", types: types.map(i => i.value), }
-        if (undefined !== data.value.default)
-        {
-            result.default = data.value.default;
-        }
-        if (undefined !== data.value.title)
-        {
-            result.title = data.value.title;
-        }
-        if (undefined !== data.value.description)
-        {
-            result.description = data.value.description;
-        }
-        return nextProcess(data, null, result);
+        return nextProcess(data, null, applyCommonProperties(<Type.AndElement>{ type: "and", types: types.map(i => i.value), }, data.value));
     };
     export const regulateType = <Process extends BaseProcess<Type.TypeOrRefer>>(data: Process): Process =>
         sortType(mergeType(data));
