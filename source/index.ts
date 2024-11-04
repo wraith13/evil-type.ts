@@ -543,10 +543,40 @@ export namespace Build
                         {
                             return "overlapping";
                         }
-                        return "unknown";
                     }
+                    return "unknown";
                 }
 
+            case "and":
+                {
+                    if (Type.isAndElement(bTarget.value))
+                    {
+
+                    }
+                    else
+                    {
+                        const results = aTarget.value.types
+                            .map(i => compareType(nextProcess(aTarget, null, i), bTarget))
+                            .filter((i, ix, list) => ix === list.indexOf(i));
+                        if (results.length === 1)
+                        {
+                            return results[0];
+                        }
+                        if (results.includes("exclusive"))
+                        {
+                            return "exclusive";
+                        }
+                        if (results.includes("same"))
+                        {
+                            return "narrow";
+                        }
+                        if (results.includes("wide") || results.includes("narrow") || results.includes("overlapping"))
+                        {
+                            return "overlapping";
+                        }
+                    }
+                    return "unknown";
+                }
         }
         return "unknown";
     };
