@@ -477,6 +477,30 @@ export namespace Build
         return data;
     };
     export type TypeCompatibility = "unknown" | "same" | "wide" | "narrow" | "overlapping" | "exclusive";
+    export const getBestTypeCompatibility = (list: TypeCompatibility[]): TypeCompatibility =>
+    {
+        if (list.includes("same"))
+        {
+            return "same";
+        }
+        if (list.includes("wide"))
+        {
+            return "wide";
+        }
+        if (list.includes("narrow"))
+        {
+            return "narrow";
+        }
+        if (list.includes("overlapping"))
+        {
+            return "overlapping";
+        }
+        if (list.includes("exclusive"))
+        {
+            return "exclusive";
+        }
+        return "unknown";
+    };
     export const compareType = <Process extends BaseProcess<Type.TypeOrRefer>>(a: Process, b: Process): TypeCompatibility =>
     {
         const aTarget = resolveRefer(a);
@@ -524,7 +548,10 @@ export namespace Build
                 {
                     if (Type.isOrElement(bTarget.value))
                     {
-
+                        const aOr = aTarget.value;
+                        const bOr = bTarget.value;
+                        aOr.types.map(i => bOr.types.map(j => compareType(nextProcess(aTarget, null, i), nextProcess(bTarget, null, j))));
+                        
                     }
                     else
                     {
