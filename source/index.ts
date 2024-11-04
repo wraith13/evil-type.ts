@@ -520,6 +520,33 @@ export namespace Build
 
             // 🚧
 
+            case "or":
+                {
+                    if (Type.isOrElement(bTarget.value))
+                    {
+
+                    }
+                    else
+                    {
+                        const results = aTarget.value.types
+                            .map(i => compareType(nextProcess(aTarget, null, i), bTarget))
+                            .filter((i, ix, list) => ix === list.indexOf(i));
+                        if (results.length === 1)
+                        {
+                            return results[0];
+                        }
+                        if (results.includes("same") || results.includes("wide"))
+                        {
+                            return "wide";
+                        }
+                        if (results.includes("narrow") || results.includes("overlapping"))
+                        {
+                            return "overlapping";
+                        }
+                        return "unknown";
+                    }
+                }
+
         }
         return "unknown";
     };
