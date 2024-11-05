@@ -562,8 +562,29 @@ export namespace Build
                     {
                         const aOr = aTarget.value;
                         const bOr = bTarget.value;
-                        aOr.types.map(i => bOr.types.map(j => compareType(nextProcess(aTarget, null, i), nextProcess(bTarget, null, j))));
-                        
+                        const results = aOr.types
+                            .map(i => getBestTypeCompatibility(bOr.types.map(j => compareType(nextProcess(aTarget, null, i), nextProcess(bTarget, null, j)))))
+                            .filter((i, ix, list) => ix === list.indexOf(i));
+                        if (results.length === 1)
+                        {
+                            if (aOr.types.length < bOr.types.length)
+                            {
+                                switch(results[0])
+                                {
+
+                                }
+                                return "unknown";
+                            }
+                            if (bOr.types.length < aOr.types.length)
+                            {
+                                switch(results[0])
+                                {
+
+                                }
+                                return "unknown";
+                            }
+                            return results[0];
+                        }
                     }
                     else
                     {
