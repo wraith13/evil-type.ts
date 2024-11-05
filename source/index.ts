@@ -501,6 +501,18 @@ export namespace Build
         }
         return "unknown";
     };
+    export const reverseTypeCompatibility = (value: TypeCompatibility): TypeCompatibility =>
+    {
+        switch(value)
+        {
+        case "wide":
+            return "narrow";
+        case "narrow":
+            return "wide";
+        default:
+            return value;
+        }
+    }
     export const compareType = <Process extends BaseProcess<Type.TypeOrRefer>>(a: Process, b: Process): TypeCompatibility =>
     {
         const aTarget = resolveRefer(a);
