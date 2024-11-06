@@ -557,6 +557,10 @@ export namespace Build
                     return "exclusive";
                 }
             }
+            if (Type.isOrElement(bTarget.value))
+            {
+                return reverseTypeCompatibility(compareType(bTarget, aTarget));
+            }
             if (null === aTarget.value.const)
             {
                 if (Type.isNullType(bTarget.value))
