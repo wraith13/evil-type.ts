@@ -546,10 +546,21 @@ export namespace Build
         }
         if (Type.isLiteralElement(aTarget.value))
         {
+            if (Type.isLiteralElement(bTarget.value))
+            {
+                if (Jsonable.stringify(aTarget.value.const) === Jsonable.stringify(bTarget.value.const))
+                {
+                    return "same";
+                }
+                else
+                {
+                    return "exclusive";
+                }
+            }
 
             // 🚧
 
-        return "unknown";
+            return "unknown";
         }
         switch(aTarget.value.type)
         {
