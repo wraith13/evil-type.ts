@@ -557,6 +557,17 @@ export namespace Build
                     return "exclusive";
                 }
             }
+            if (null === aTarget.value.const)
+            {
+                if (Type.isNullType(bTarget.value))
+                {
+                    return "same";
+                }
+                else
+                {
+                    return "exclusive";
+                }
+            }
 
             // 🚧
 
