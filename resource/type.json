@@ -694,7 +694,7 @@
                             "type": "number"
                         },
                         "safeNumber?": {
-                            "type": "number"
+                            "type": "boolean"
                         },
                         "default?": {
                             "type": "number",

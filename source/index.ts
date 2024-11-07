@@ -576,14 +576,32 @@ export namespace Build
             {
                 if (Type.isBooleanType(bTarget.value))
                 {
-                    return "same";
+                    return "narrow";
                 }
                 else
                 {
                     return "exclusive";
                 }
             }
-
+            if ("number" === typeof aTarget.value.const)
+            {
+                if (Type.isNumberType(bTarget.value))
+                {
+                    if (EvilType.Validator.isDetailedNumber(bTarget.value, bTarget.value.safeNumber)(aTarget.value.const))
+                    {
+                        return "narrow";
+                    }
+                    else
+                    {
+                        return "exclusive";
+                    }
+                }
+                else
+                {
+                    return "exclusive";
+                }
+            }
+    
             // 🚧
 
             return "unknown";

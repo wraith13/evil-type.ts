@@ -166,7 +166,7 @@ export namespace Type
         maximum?: number;
         exclusiveMaximum?: number;
         multipleOf?: number;
-        safeNumber?: number;
+        safeNumber?: boolean;
         default?: number;
     }
     export interface BasicStringType extends CommonProperties
@@ -386,7 +386,8 @@ export namespace Type
         EvilType.Validator.isNumber), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isNumber), maximum:
         EvilType.Validator.isOptional(EvilType.Validator.isNumber), exclusiveMaximum: EvilType.Validator.isOptional(
         EvilType.Validator.isNumber), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isNumber), safeNumber:
-        EvilType.Validator.isOptional(EvilType.Validator.isNumber), default: EvilType.Validator.isOptional(EvilType.Validator.isNumber), });
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), default: EvilType.Validator.isOptional(EvilType.Validator.isNumber), }
+        );
     export const basicStringTypeValidatorObject: EvilType.Validator.ObjectValidator<BasicStringType> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("string" as const),
         minLength: EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, false,)), maxLength:

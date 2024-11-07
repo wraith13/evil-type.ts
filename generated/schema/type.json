@@ -1011,7 +1011,7 @@
                     "type": "number"
                 },
                 "safeNumber": {
-                    "type": "number"
+                    "type": "boolean"
                 }
             },
             "required": [
