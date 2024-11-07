@@ -561,6 +561,36 @@ export namespace Build
             {
                 return reverseTypeCompatibility(compareType(bTarget, aTarget));
             }
+            if (Type.isEnumTypeElement(bTarget.value))
+            {
+                if (bTarget.value.members.includes(aTarget.value.const as any))
+                {
+                    return "narrow";
+                }
+                else
+                {
+                    return "exclusive";
+                }
+            }
+            if (Type.isItemofElement(bTarget.value))
+            {
+                const items = resolveRefer(nextProcess(bTarget, null, bTarget.value.value));
+                if (Type.isLiteralElement(items.value))
+                {
+                    if (Array.isArray(items.value.const))
+                    {
+                        if (items.value.const.includes(aTarget.value.const as any))
+                        {
+                            return "narrow";
+                        }
+                        else
+                        {
+                            return "exclusive";
+                        }
+                    }
+                }
+                return "unknown";
+            }
             if (null === aTarget.value.const)
             {
                 if (Type.isNullType(bTarget.value))
@@ -588,6 +618,18 @@ export namespace Build
                 if (Type.isNumberType(bTarget.value))
                 {
                     if (EvilType.Validator.isDetailedNumber(bTarget.value, bTarget.value.safeNumber)(aTarget.value.const))
+                    {
+                        return "narrow";
+                    }
+                    else
+                    {
+                        return "exclusive";
+                    }
+                }
+                else
+                if (Type.isIntegerType(bTarget.value))
+                {
+                    if (EvilType.Validator.isDetailedInteger(bTarget.value, bTarget.value.safeInteger)(aTarget.value.const))
                     {
                         return "narrow";
                     }
