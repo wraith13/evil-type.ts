@@ -572,6 +572,17 @@ export namespace Build
                     return "exclusive";
                 }
             }
+            if ("boolean" === typeof aTarget.value.const)
+            {
+                if (Type.isBooleanType(bTarget.value))
+                {
+                    return "same";
+                }
+                else
+                {
+                    return "exclusive";
+                }
+            }
 
             // 🚧
 
