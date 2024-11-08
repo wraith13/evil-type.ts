@@ -477,29 +477,67 @@ export namespace Build
         return data;
     };
     export type TypeCompatibility = "unknown" | "same" | "wide" | "narrow" | "overlapping" | "exclusive";
-    export const getBestTypeCompatibility = (list: TypeCompatibility[]): TypeCompatibility =>
+    export const orTypeCompatibility = (list: TypeCompatibility[]): TypeCompatibility =>
     {
         if (list.includes("same"))
         {
             return "same";
         }
+        else
         if (list.includes("wide"))
         {
             return "wide";
         }
+        else
         if (list.includes("narrow"))
         {
             return "narrow";
         }
+        else
         if (list.includes("overlapping"))
         {
             return "overlapping";
         }
+        else
         if (list.includes("exclusive"))
         {
             return "exclusive";
         }
-        return "unknown";
+        else
+        {
+            return "unknown";
+        }
+    };
+    export const andTypeCompatibility = (list: TypeCompatibility[]): TypeCompatibility =>
+    {
+        if (list.includes("unknown"))
+        {
+            return "unknown";
+        }
+        else
+        if (list.includes("exclusive"))
+        {
+            return "exclusive";
+        }
+        else
+        if (list.includes("overlapping"))
+        {
+            return "overlapping";
+        }
+        else
+        if (list.includes("narrow"))
+        {
+            return "narrow";
+        }
+        else
+        if (list.includes("wide"))
+        {
+            return "wide";
+        }
+        else
+        {
+            return "same";
+        }
     };
     export const reverseTypeCompatibility = (value: TypeCompatibility): TypeCompatibility =>
     {
@@ -513,7 +551,7 @@ export namespace Build
             return value;
         }
     }
-    export const compareType = <Process extends BaseProcess<Type.TypeOrRefer>>(a: Process, b: Process): TypeCompatibility =>
+    export const compareType = <Process extends BaseProcess<Type.TypeOrLiteralOfRefer>>(a: Process, b: Process): TypeCompatibility =>
     {
         const aTarget = resolveRefer(a);
         const bTarget = resolveRefer(b);
@@ -661,6 +699,39 @@ export namespace Build
                     return "exclusive";
                 }
             }
+            if (Array.isArray(aTarget.value.const))
+            {
+                if (Type.isArrayElement(bTarget.value))
+                {
+                    if (true === bTarget.value.uniqueItems)
+                    {
+                        if ( ! EvilType.Validator.isUniqueItems(aTarget.value.const))
+                        {
+                            return "exclusive";
+                        }
+                    }
+                    if (undefined !== bTarget.value.minItems)
+                    {
+                        if (aTarget.value.const.length < bTarget.value.minItems)
+                        {
+                            return "exclusive";
+                        }
+                    }
+                    if (undefined !== bTarget.value.maxItems)
+                    {
+                        if (bTarget.value.maxItems < aTarget.value.const.length)
+                        {
+                            return "exclusive";
+                        }
+                    }
+                    const bValue = bTarget.value;
+                    return andTypeCompatibility(aTarget.value.const.map((i, ix) => compareType(<Process>nextProcess(aTarget, `${ix}`, { const: i}), <Process>nextProcess(bTarget, null, bValue.items))));
+                }
+                else
+                {
+                    return "exclusive";
+                }
+            }
     
             // 🚧
 
@@ -675,14 +746,14 @@ export namespace Build
                 {
                     if (Type.isOrElement(bTarget.value))
                     {
-                        const aOr = aTarget.value;
-                        const bOr = bTarget.value;
-                        const results = aOr.types
-                            .map(i => getBestTypeCompatibility(bOr.types.map(j => compareType(nextProcess(aTarget, null, i), nextProcess(bTarget, null, j)))))
+                        const aValue = aTarget.value;
+                        const bValue = bTarget.value;
+                        const results = aValue.types
+                            .map(i => orTypeCompatibility(bValue.types.map(j => compareType(nextProcess(aTarget, null, i), nextProcess(bTarget, null, j)))))
                             .filter((i, ix, list) => ix === list.indexOf(i));
                         if (results.length === 1)
                         {
-                            if (aOr.types.length < bOr.types.length)
+                            if (aValue.types.length < bValue.types.length)
                             {
                                 switch(results[0])
                                 {
@@ -690,7 +761,7 @@ export namespace Build
                                 }
                                 return "unknown";
                             }
-                            if (bOr.types.length < aOr.types.length)
+                            if (bValue.types.length < aValue.types.length)
                             {
                                 switch(results[0])
                                 {
