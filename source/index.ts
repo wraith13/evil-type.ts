@@ -643,6 +643,24 @@ export namespace Build
                     return "exclusive";
                 }
             }
+            if ("string" === typeof aTarget.value.const)
+            {
+                if (Type.isStringType(bTarget.value))
+                {
+                    if (EvilType.Validator.isDetailedString(bTarget.value, getRegexpFlags(bTarget))(aTarget.value.const))
+                    {
+                        return "narrow";
+                    }
+                    else
+                    {
+                        return "exclusive";
+                    }
+                }
+                else
+                {
+                    return "exclusive";
+                }
+            }
     
             // 🚧
 
