@@ -732,6 +732,23 @@ export namespace Build
                     return "exclusive";
                 }
             }
+            if (EvilType.Validator.isObject(aTarget.value.const))
+            {
+                if (Type.isDictionaryDefinition(bTarget.value))
+                {
+                
+                    // 🚧
+                    
+                }
+                else
+                if (Type.isInterfaceDefinition(bTarget.value))
+                {
+                    
+                    // 🚧
+
+                }
+                return "exclusive";
+            }
     
             // 🚧
 
