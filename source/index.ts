@@ -725,7 +725,7 @@ export namespace Build
                         }
                     }
                     const bValue = bTarget.value;
-                    return andTypeCompatibility(aTarget.value.const.map((i, ix) => compareType(<Process>nextProcess(aTarget, `${ix}`, { const: i}), <Process>nextProcess(bTarget, null, bValue.items))));
+                    return andTypeCompatibility(aTarget.value.const.map((i, ix) => compareType(<Process>nextProcess(aTarget, `${ix}`, { const: i, }), <Process>nextProcess(bTarget, null, bValue.items))));
                 }
                 else
                 {
@@ -736,9 +736,16 @@ export namespace Build
             {
                 if (Type.isDictionaryDefinition(bTarget.value))
                 {
-                
-                    // 🚧
-                    
+                    const entry = nextProcess(bTarget, null, bTarget.value);
+                    if (isDetailedDictionary(entry))
+                    {
+                        return compareType(aTarget, <Process>dictionaryToInterface(entry));
+                    }
+                    else
+                    {
+                        const valueType = <Process>nextProcess(bTarget, null, bTarget.value.valueType);
+                        return andTypeCompatibility(Object.entries(aTarget.value.const).map(i => compareType(<Process>nextProcess(aTarget, i[0], { const: i[1], }), valueType)));
+                    }
                 }
                 else
                 if (Type.isInterfaceDefinition(bTarget.value))
@@ -787,6 +794,34 @@ export namespace Build
                                 return "unknown";
                             }
                             return results[0];
+                        }
+                        if (results.includes("unknown"))
+                        {
+                            return "unknown";
+                        }
+                        else
+                        if (results.every(i => "exclusive" === i))
+                        {
+                            return "exclusive";
+                        }
+                        else
+                        if (results.includes("overlapping"))
+                        {
+                            return "overlapping";
+                        }
+                        else
+                        if (results.every(i => "narrow" === i || "same" === i))
+                        {
+                            return "narrow";
+                        }
+                        else
+                        if (results.every(i => "wide" === i || "same" === i))
+                        {
+                            return "wide";
+                        }
+                        else
+                        {
+                            return "overlapping";
                         }
                     }
                     else
