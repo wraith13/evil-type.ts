@@ -750,7 +750,27 @@ export namespace Build
                 else
                 if (Type.isInterfaceDefinition(bTarget.value))
                 {
-                    
+                    const membersResult = andTypeCompatibility
+                    (
+                        Object.entries(bTarget.value.members)
+                            .map
+                            (
+                                i =>
+                                {
+                                    const key = Text.getPrimaryKeyName(i[0]);
+                                    const value = i[1];
+                                    if (key !== i[0])
+                                    {
+
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                }
+                            )
+                    );
+
                     // 🚧
 
                 }
