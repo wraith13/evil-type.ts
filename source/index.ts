@@ -750,6 +750,7 @@ export namespace Build
                 else
                 if (Type.isInterfaceDefinition(bTarget.value))
                 {
+                    const aConst = aTarget.value.const;
                     const membersResult = andTypeCompatibility
                     (
                         Object.entries(bTarget.value.members)
@@ -758,14 +759,35 @@ export namespace Build
                                 i =>
                                 {
                                     const key = Text.getPrimaryKeyName(i[0]);
-                                    const value = i[1];
+                                    const value = resolveRefer(nextProcess(bTarget, key, i[1]));
                                     if (key !== i[0])
                                     {
-
+                                        if (key in aConst)
+                                        {
+                                            return compareType(<Process>nextProcess(aTarget, key, { const: aConst[key] }), value);
+                                        }
+                                        else
+                                        {
+                                            return "narrow";
+                                        }
                                     }
                                     else
                                     {
-
+                                        if (key in aConst)
+                                        {
+                                            return compareType(<Process>nextProcess(aTarget, key, { const: aConst[key] }), value);
+                                        }
+                                        else
+                                        {
+                                            if (Type.isNeverType(value.value))
+                                            {
+                                                return "same";
+                                            }
+                                            else
+                                            {
+                                                return "exclusive";
+                                            }
+                                        }
                                     }
                                 }
                             )
