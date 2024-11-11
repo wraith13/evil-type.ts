@@ -582,6 +582,10 @@ export namespace Build
             }
             return "unknown";
         }
+        if (Type.isReferElement(bTarget.value))
+        {
+            return "unknown";
+        }
         if (Type.isLiteralElement(aTarget.value))
         {
             if (Type.isLiteralElement(bTarget.value))
@@ -809,6 +813,20 @@ export namespace Build
         }
         switch(aTarget.value.type)
         {
+            case "null":
+                if (Type.isNullType(bTarget.value))
+                {
+                    return "same";
+                }
+                else
+                if (Type.isOrElement(bTarget.value))
+                {
+                    if (bTarget.value.types.some(i => Type.isNullType(i)))
+                    {
+                        return "narrow";
+                    }
+                }
+                return "exclusive";
 
             // 🚧
 
