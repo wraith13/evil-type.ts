@@ -751,7 +751,7 @@ export namespace Build
                 if (Type.isInterfaceDefinition(bTarget.value))
                 {
                     const aConst = aTarget.value.const;
-                    const membersResult = andTypeCompatibility
+                    let membersResult = andTypeCompatibility
                     (
                         Object.entries(bTarget.value.members)
                             .map
@@ -792,15 +792,19 @@ export namespace Build
                                 }
                             )
                     );
-
-                    // 🚧
-
+                    if (false === bTarget.value.additionalProperties)
+                    {
+                        const keys = Object.keys(bTarget.value.members).map(i => Text.getPrimaryKeyName(i));
+                        membersResult = andTypeCompatibility
+                        ([
+                            membersResult,
+                            Object.keys(aConst).every(i => keys.includes(i)) ? "narrow": "exclusive"
+                        ]);
+                    }
+                    return membersResult;
                 }
                 return "exclusive";
             }
-    
-            // 🚧
-
             return "unknown";
         }
         switch(aTarget.value.type)
