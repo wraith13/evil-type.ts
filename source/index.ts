@@ -819,14 +819,39 @@ export namespace Build
                     return "same";
                 }
                 else
-                if (Type.isOrElement(bTarget.value))
+                if (Type.isLiteralElement(bTarget.value))
                 {
-                    if (bTarget.value.types.some(i => Type.isNullType(i)))
+                    if (null === bTarget.value.const)
                     {
-                        return "narrow";
+                        return "same";
                     }
                 }
+                else
+                if (Type.isOrElement(bTarget.value))
+                {
+                    return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
+                }
                 return "exclusive";
+            case "boolean":
+                if (Type.isBooleanType(bTarget.value))
+                {
+                    return "same";
+                }
+                else
+                if (Type.isLiteralElement(bTarget.value))
+                {
+                    if ("boolean" === typeof bTarget.value.const)
+                    {
+                        return "wide";
+                    }
+                }
+                else
+                if (Type.isOrElement(bTarget.value))
+                {
+                    return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
+                }
+                return "exclusive";
+    
 
             // 🚧
 
