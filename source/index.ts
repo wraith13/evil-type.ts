@@ -851,6 +851,52 @@ export namespace Build
                     return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
                 }
                 return "exclusive";
+            case "integer":
+                if (Type.isIntegerType(bTarget.value))
+                {
+                    // 🚧
+                    return "same";
+                }
+                else
+                if (Type.isNumberType(bTarget.value))
+                {
+                    // 🚧
+                    return "narrow";
+                }
+                else
+                if (Type.isLiteralElement(bTarget.value))
+                {
+                    if (true === getSafeInteger(aTarget))
+                    {
+                        if (Number.isSafeInteger(bTarget.value.const))
+                        {
+                            // 🚧
+                            return "wide";
+                        }
+                        else
+                        {
+                            return "exclusive";
+                        }
+                    }
+                    else
+                    {
+                        if (Number.isInteger(bTarget.value.const))
+                        {
+                            // 🚧
+                            return "wide";
+                        }
+                        else
+                        {
+                            return "exclusive";
+                        }
+                    }
+                }
+                else
+                if (Type.isOrElement(bTarget.value))
+                {
+                    return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
+                }
+                return "exclusive";
     
 
             // 🚧
