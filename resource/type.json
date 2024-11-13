@@ -656,7 +656,8 @@
                             "type": "integer"
                         },
                         "multipleOf?": {
-                            "type": "integer"
+                            "type": "integer",
+                            "exclusiveMinimum": 0
                         },
                         "safeInteger?": {
                             "type": "boolean"
@@ -691,7 +692,8 @@
                             "type": "number"
                         },
                         "multipleOf?": {
-                            "type": "number"
+                            "type": "number",
+                            "exclusiveMinimum": 0
                         },
                         "safeNumber?": {
                             "type": "boolean"

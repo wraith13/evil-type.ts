@@ -378,16 +378,16 @@ export namespace Type
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("integer" as const), minimum: EvilType.Validator.isOptional(
         EvilType.Validator.isInteger), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isInteger), maximum:
         EvilType.Validator.isOptional(EvilType.Validator.isInteger), exclusiveMaximum: EvilType.Validator.isOptional(
-        EvilType.Validator.isInteger), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isInteger), safeInteger:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), default: EvilType.Validator.isOptional(EvilType.Validator.isInteger),
-        });
+        EvilType.Validator.isInteger), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ exclusiveMinimum:0,
+        }, false,)), safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), default: EvilType.Validator.isOptional(
+        EvilType.Validator.isInteger), });
     export const numberTypeValidatorObject: EvilType.Validator.ObjectValidator<NumberType> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("number" as const), minimum: EvilType.Validator.isOptional(
         EvilType.Validator.isNumber), exclusiveMinimum: EvilType.Validator.isOptional(EvilType.Validator.isNumber), maximum:
         EvilType.Validator.isOptional(EvilType.Validator.isNumber), exclusiveMaximum: EvilType.Validator.isOptional(
-        EvilType.Validator.isNumber), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isNumber), safeNumber:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), default: EvilType.Validator.isOptional(EvilType.Validator.isNumber), }
-        );
+        EvilType.Validator.isNumber), multipleOf: EvilType.Validator.isOptional(EvilType.Validator.isDetailedNumber({ exclusiveMinimum:0,
+        }, false,)), safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), default: EvilType.Validator.isOptional(
+        EvilType.Validator.isNumber), });
     export const basicStringTypeValidatorObject: EvilType.Validator.ObjectValidator<BasicStringType> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("string" as const),
         minLength: EvilType.Validator.isOptional(EvilType.Validator.isDetailedInteger({ minimum:0, }, false,)), maxLength:
