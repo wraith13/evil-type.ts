@@ -657,9 +657,9 @@ export namespace Build
             }
             if ("number" === typeof aTarget.value.const)
             {
-                if (Type.isNumberType(bTarget.value))
+                if (Type.isIntegerType(bTarget.value))
                 {
-                    if (EvilType.Validator.isDetailedNumber(bTarget.value, bTarget.value.safeNumber)(aTarget.value.const))
+                    if (EvilType.Validator.isDetailedInteger(bTarget.value, bTarget.value.safeInteger)(aTarget.value.const))
                     {
                         return "narrow";
                     }
@@ -669,9 +669,9 @@ export namespace Build
                     }
                 }
                 else
-                if (Type.isIntegerType(bTarget.value))
+                if (Type.isNumberType(bTarget.value))
                 {
-                    if (EvilType.Validator.isDetailedInteger(bTarget.value, bTarget.value.safeInteger)(aTarget.value.const))
+                    if (EvilType.Validator.isDetailedNumber(bTarget.value, bTarget.value.safeNumber)(aTarget.value.const))
                     {
                         return "narrow";
                     }
@@ -986,29 +986,13 @@ export namespace Build
                 else
                 if (Type.isLiteralElement(bTarget.value))
                 {
-                    if (true === getSafeInteger(aTarget))
+                    if (EvilType.Validator.isDetailedInteger(aTarget.value, aTarget.value.safeInteger)(bTarget.value.const))
                     {
-                        if (Number.isSafeInteger(bTarget.value.const))
-                        {
-                            // 🚧
-                            return "wide";
-                        }
-                        else
-                        {
-                            return "exclusive";
-                        }
+                        return "wide";
                     }
                     else
                     {
-                        if (Number.isInteger(bTarget.value.const))
-                        {
-                            // 🚧
-                            return "wide";
-                        }
-                        else
-                        {
-                            return "exclusive";
-                        }
+                        return "exclusive";
                     }
                 }
                 else
