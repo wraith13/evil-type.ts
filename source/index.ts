@@ -1001,8 +1001,158 @@ export namespace Build
                     return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
                 }
                 return "exclusive";
-    
 
+            case "number":
+                if (Type.isNumberType(bTarget.value))
+                {
+                    if
+                    (
+                        aTarget.value.minimum === bTarget.value.minimum &&
+                        aTarget.value.maximum === bTarget.value.maximum &&
+                        aTarget.value.exclusiveMinimum === bTarget.value.exclusiveMinimum &&
+                        aTarget.value.exclusiveMaximum === bTarget.value.exclusiveMaximum &&
+                        aTarget.value.multipleOf === bTarget.value.multipleOf &&
+                        aTarget.value.safeNumber === bTarget.value.safeNumber
+                    )
+                    {
+                        return "same";
+                    }
+                    if
+                    (
+                        !
+                        (
+                            (undefined === aTarget.value.minimum || undefined === bTarget.value.maximum || aTarget.value.minimum <= bTarget.value.maximum) &&
+                            (undefined === aTarget.value.maximum || undefined === bTarget.value.minimum || bTarget.value.minimum <= aTarget.value.maximum) &&
+                            (undefined === aTarget.value.minimum || undefined === bTarget.value.exclusiveMaximum || aTarget.value.minimum < bTarget.value.exclusiveMaximum) &&
+                            (undefined === aTarget.value.maximum || undefined === bTarget.value.exclusiveMinimum || bTarget.value.exclusiveMinimum < aTarget.value.maximum) &&
+                            (undefined === aTarget.value.exclusiveMinimum || undefined === bTarget.value.maximum || aTarget.value.exclusiveMinimum < bTarget.value.maximum) &&
+                            (undefined === aTarget.value.exclusiveMaximum || undefined === bTarget.value.minimum || bTarget.value.minimum < aTarget.value.exclusiveMaximum) &&
+                            (undefined === aTarget.value.exclusiveMinimum || undefined === bTarget.value.exclusiveMaximum || aTarget.value.exclusiveMinimum < bTarget.value.exclusiveMaximum) &&
+                            (undefined === aTarget.value.exclusiveMaximum || undefined === bTarget.value.exclusiveMinimum || bTarget.value.exclusiveMinimum < aTarget.value.exclusiveMaximum)
+                        )
+                    )
+                    {
+                        return "exclusive";
+                    }
+                    if
+                    (
+                        (undefined === aTarget.value.minimum || aTarget.value.minimum <= (bTarget.value.minimum ?? aTarget.value.minimum)) &&
+                        (undefined === aTarget.value.maximum || (bTarget.value.maximum ?? aTarget.value.maximum) <= aTarget.value.maximum) &&
+                        (undefined === aTarget.value.exclusiveMinimum || aTarget.value.exclusiveMinimum <= (bTarget.value.exclusiveMinimum ?? aTarget.value.exclusiveMinimum)) &&
+                        (undefined === aTarget.value.exclusiveMaximum || (bTarget.value.exclusiveMaximum ?? aTarget.value.exclusiveMaximum) <= aTarget.value.exclusiveMaximum) &&
+                        (undefined === aTarget.value.minimum || undefined === bTarget.value.exclusiveMinimum || aTarget.value.minimum < bTarget.value.exclusiveMinimum) &&
+                        (undefined === aTarget.value.maximum || undefined === bTarget.value.exclusiveMaximum || bTarget.value.exclusiveMaximum < aTarget.value.maximum) &&
+                        (undefined === aTarget.value.exclusiveMinimum || undefined === bTarget.value.minimum || aTarget.value.exclusiveMinimum < bTarget.value.minimum) &&
+                        (undefined === aTarget.value.exclusiveMaximum || undefined === bTarget.value.maximum || bTarget.value.maximum < aTarget.value.exclusiveMaximum) &&
+                        (undefined === aTarget.value.multipleOf || Number.isInteger((bTarget.value.multipleOf ?? aTarget.value.multipleOf) /aTarget.value.multipleOf)) &&
+                        (true !== aTarget.value.safeNumber || true === bTarget.value.safeNumber)
+                    )
+                    {
+                        return "wide";
+                    }
+                    if
+                    (
+                        (undefined === bTarget.value.minimum || bTarget.value.minimum <= (aTarget.value.minimum ?? bTarget.value.minimum)) &&
+                        (undefined === bTarget.value.maximum || (aTarget.value.maximum ?? bTarget.value.maximum) <= bTarget.value.maximum) &&
+                        (undefined === bTarget.value.exclusiveMinimum || bTarget.value.exclusiveMinimum <= (aTarget.value.exclusiveMinimum ?? bTarget.value.exclusiveMinimum)) &&
+                        (undefined === bTarget.value.exclusiveMaximum || (aTarget.value.exclusiveMaximum ?? bTarget.value.exclusiveMaximum) <= bTarget.value.exclusiveMaximum) &&
+                        (undefined === bTarget.value.minimum || undefined === aTarget.value.exclusiveMinimum || bTarget.value.minimum < aTarget.value.exclusiveMinimum) &&
+                        (undefined === bTarget.value.maximum || undefined === aTarget.value.exclusiveMaximum || aTarget.value.exclusiveMaximum < bTarget.value.maximum) &&
+                        (undefined === bTarget.value.exclusiveMinimum || undefined === aTarget.value.minimum || bTarget.value.exclusiveMinimum < aTarget.value.minimum) &&
+                        (undefined === bTarget.value.exclusiveMaximum || undefined === aTarget.value.maximum || aTarget.value.maximum < bTarget.value.exclusiveMaximum) &&
+                        (undefined === bTarget.value.multipleOf || Number.isInteger((aTarget.value.multipleOf ?? bTarget.value.multipleOf) /bTarget.value.multipleOf)) &&
+                        (true !== bTarget.value.safeNumber || true === aTarget.value.safeNumber)
+                    )
+                    {
+                        return "narrow";
+                    }
+                    return "overlapping";
+                }
+                else
+                if (Type.isIntegerType(bTarget.value))
+                {
+                    if
+                    (
+                        aTarget.value.minimum === bTarget.value.minimum &&
+                        aTarget.value.maximum === bTarget.value.maximum &&
+                        aTarget.value.exclusiveMinimum === bTarget.value.exclusiveMinimum &&
+                        aTarget.value.exclusiveMaximum === bTarget.value.exclusiveMaximum &&
+                        aTarget.value.multipleOf === bTarget.value.multipleOf &&
+                        aTarget.value.safeNumber === bTarget.value.safeInteger
+                    )
+                    {
+                        return "wide";
+                    }
+                    if
+                    (
+                        !
+                        (
+                            (undefined === aTarget.value.minimum || undefined === bTarget.value.maximum || aTarget.value.minimum <= bTarget.value.maximum) &&
+                            (undefined === aTarget.value.maximum || undefined === bTarget.value.minimum || bTarget.value.minimum <= aTarget.value.maximum) &&
+                            (undefined === aTarget.value.minimum || undefined === bTarget.value.exclusiveMaximum || aTarget.value.minimum < bTarget.value.exclusiveMaximum) &&
+                            (undefined === aTarget.value.maximum || undefined === bTarget.value.exclusiveMinimum || bTarget.value.exclusiveMinimum < aTarget.value.maximum) &&
+                            (undefined === aTarget.value.exclusiveMinimum || undefined === bTarget.value.maximum || aTarget.value.exclusiveMinimum < bTarget.value.maximum) &&
+                            (undefined === aTarget.value.exclusiveMaximum || undefined === bTarget.value.minimum || bTarget.value.minimum < aTarget.value.exclusiveMaximum) &&
+                            (undefined === aTarget.value.exclusiveMinimum || undefined === bTarget.value.exclusiveMaximum || aTarget.value.exclusiveMinimum < bTarget.value.exclusiveMaximum) &&
+                            (undefined === aTarget.value.exclusiveMaximum || undefined === bTarget.value.exclusiveMinimum || bTarget.value.exclusiveMinimum < aTarget.value.exclusiveMaximum)
+                        )
+                    )
+                    {
+                        return "exclusive";
+                    }
+                    if
+                    (
+                        (undefined === aTarget.value.minimum || aTarget.value.minimum <= (bTarget.value.minimum ?? aTarget.value.minimum)) &&
+                        (undefined === aTarget.value.maximum || (bTarget.value.maximum ?? aTarget.value.maximum) <= aTarget.value.maximum) &&
+                        (undefined === aTarget.value.exclusiveMinimum || aTarget.value.exclusiveMinimum <= (bTarget.value.exclusiveMinimum ?? aTarget.value.exclusiveMinimum)) &&
+                        (undefined === aTarget.value.exclusiveMaximum || (bTarget.value.exclusiveMaximum ?? aTarget.value.exclusiveMaximum) <= aTarget.value.exclusiveMaximum) &&
+                        (undefined === aTarget.value.minimum || undefined === bTarget.value.exclusiveMinimum || aTarget.value.minimum < bTarget.value.exclusiveMinimum) &&
+                        (undefined === aTarget.value.maximum || undefined === bTarget.value.exclusiveMaximum || bTarget.value.exclusiveMaximum < aTarget.value.maximum) &&
+                        (undefined === aTarget.value.exclusiveMinimum || undefined === bTarget.value.minimum || aTarget.value.exclusiveMinimum < bTarget.value.minimum) &&
+                        (undefined === aTarget.value.exclusiveMaximum || undefined === bTarget.value.maximum || bTarget.value.maximum < aTarget.value.exclusiveMaximum) &&
+                        (undefined === aTarget.value.multipleOf || Number.isInteger((bTarget.value.multipleOf ?? aTarget.value.multipleOf) /aTarget.value.multipleOf)) &&
+                        (true !== aTarget.value.safeNumber || true === bTarget.value.safeInteger)
+                    )
+                    {
+                        return "overlapping";
+                    }
+                    if
+                    (
+                        (undefined === bTarget.value.minimum || bTarget.value.minimum <= (aTarget.value.minimum ?? bTarget.value.minimum)) &&
+                        (undefined === bTarget.value.maximum || (aTarget.value.maximum ?? bTarget.value.maximum) <= bTarget.value.maximum) &&
+                        (undefined === bTarget.value.exclusiveMinimum || bTarget.value.exclusiveMinimum <= (aTarget.value.exclusiveMinimum ?? bTarget.value.exclusiveMinimum)) &&
+                        (undefined === bTarget.value.exclusiveMaximum || (aTarget.value.exclusiveMaximum ?? bTarget.value.exclusiveMaximum) <= bTarget.value.exclusiveMaximum) &&
+                        (undefined === bTarget.value.minimum || undefined === aTarget.value.exclusiveMinimum || bTarget.value.minimum < aTarget.value.exclusiveMinimum) &&
+                        (undefined === bTarget.value.maximum || undefined === aTarget.value.exclusiveMaximum || aTarget.value.exclusiveMaximum < bTarget.value.maximum) &&
+                        (undefined === bTarget.value.exclusiveMinimum || undefined === aTarget.value.minimum || bTarget.value.exclusiveMinimum < aTarget.value.minimum) &&
+                        (undefined === bTarget.value.exclusiveMaximum || undefined === aTarget.value.maximum || aTarget.value.maximum < bTarget.value.exclusiveMaximum) &&
+                        (undefined === bTarget.value.multipleOf || Number.isInteger((aTarget.value.multipleOf ?? bTarget.value.multipleOf) /bTarget.value.multipleOf)) &&
+                        (true !== bTarget.value.safeInteger || true === aTarget.value.safeNumber)
+                    )
+                    {
+                        return "narrow";
+                    }
+                    return "overlapping";
+                }
+                else
+                if (Type.isLiteralElement(bTarget.value))
+                {
+                    if (EvilType.Validator.isDetailedNumber(aTarget.value, aTarget.value.safeNumber)(bTarget.value.const))
+                    {
+                        return "wide";
+                    }
+                    else
+                    {
+                        return "exclusive";
+                    }
+                }
+                else
+                if (Type.isOrElement(bTarget.value))
+                {
+                    return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
+                }
+                return "exclusive";
+    
             // 🚧
 
             case "or":
