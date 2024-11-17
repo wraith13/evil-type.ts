@@ -1225,7 +1225,41 @@ export namespace Build
                     return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
                 }
                 return "exclusive";
-    
+            case "array":
+                if (Type.isArrayElement(bTarget.value))
+                {
+                    const items = compareType(nextProcess(aTarget, null, aTarget.value.items), nextProcess(bTarget, null, bTarget.value.items));
+                    if
+                    (
+                        "same" === items &&
+                        aTarget.value.minItems === bTarget.value.minItems &&
+                        aTarget.value.maxItems === bTarget.value.maxItems &&
+                        (aTarget.value.uniqueItems ?? false) === (bTarget.value.uniqueItems ?? false)
+                    )
+                    {
+                        return "wide";
+                    }
+                    // 🚧
+                }
+                else
+                if (Type.isLiteralElement(bTarget.value))
+                {
+                    if (EvilType.Validator.isDetailedArray(aTarget.value)(bTarget.value.const))
+                    {
+                        return "wide";
+                    }
+                    else
+                    {
+                        return "exclusive";
+                    }
+                }
+                else
+                if (Type.isOrElement(bTarget.value))
+                {
+                    return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
+                }
+                return "exclusive";
+        
             // 🚧
 
             case "or":
