@@ -1244,7 +1244,15 @@ export namespace Build
                 else
                 if (Type.isLiteralElement(bTarget.value))
                 {
-                    if (EvilType.Validator.isDetailedArray(aTarget.value)(bTarget.value.const))
+                    const aValue = aTarget.value;
+                    if
+                    (
+                        Array.isArray(bTarget.value.const) &&
+                        (undefined === aTarget.value.minItems || aTarget.value.minItems <= bTarget.value.const.length) &&
+                        (undefined === aTarget.value.maxItems || bTarget.value.const.length <= aTarget.value.maxItems) &&
+                        bTarget.value.const.every((i, ix) => ["same", "wide"].includes(compareType(nextProcess(aTarget, null, aValue.items), nextProcess(bTarget, `${ix}`, { const: i, })))) &&
+                        (false === (aTarget.value.uniqueItems ?? false) || EvilType.Validator.isUniqueItems(bTarget.value.const))
+                    )
                     {
                         return "wide";
                     }
