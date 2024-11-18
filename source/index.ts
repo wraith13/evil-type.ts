@@ -885,10 +885,10 @@ export namespace Build
                     }
                     if
                     (
-                        (undefined === aTarget.value.minimum || aTarget.value.minimum <= (bTarget.value.minimum ?? aTarget.value.minimum)) &&
-                        (undefined === aTarget.value.maximum || (bTarget.value.maximum ?? aTarget.value.maximum) <= aTarget.value.maximum) &&
-                        (undefined === aTarget.value.exclusiveMinimum || aTarget.value.exclusiveMinimum <= (bTarget.value.exclusiveMinimum ?? aTarget.value.exclusiveMinimum)) &&
-                        (undefined === aTarget.value.exclusiveMaximum || (bTarget.value.exclusiveMaximum ?? aTarget.value.exclusiveMaximum) <= aTarget.value.exclusiveMaximum) &&
+                        (undefined === aTarget.value.minimum || (undefined !== bTarget.value.minimum && aTarget.value.minimum <= bTarget.value.minimum)) &&
+                        (undefined === aTarget.value.maximum || (undefined !== bTarget.value.maximum && bTarget.value.maximum <= aTarget.value.maximum)) &&
+                        (undefined === aTarget.value.exclusiveMinimum || (undefined !== bTarget.value.exclusiveMinimum && aTarget.value.exclusiveMinimum <= bTarget.value.exclusiveMinimum)) &&
+                        (undefined === aTarget.value.exclusiveMaximum || (undefined !== bTarget.value.exclusiveMaximum && bTarget.value.exclusiveMaximum <= aTarget.value.exclusiveMaximum)) &&
                         (undefined === aTarget.value.minimum || undefined === bTarget.value.exclusiveMinimum || aTarget.value.minimum < bTarget.value.exclusiveMinimum) &&
                         (undefined === aTarget.value.maximum || undefined === bTarget.value.exclusiveMaximum || bTarget.value.exclusiveMaximum < aTarget.value.maximum) &&
                         (undefined === aTarget.value.exclusiveMinimum || undefined === bTarget.value.minimum || aTarget.value.exclusiveMinimum < bTarget.value.minimum) &&
