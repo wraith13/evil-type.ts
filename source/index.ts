@@ -1237,9 +1237,20 @@ export namespace Build
                         (aTarget.value.uniqueItems ?? false) === (bTarget.value.uniqueItems ?? false)
                     )
                     {
+                        return "same";
+                    }
+                    if
+                    (
+                        ["same", "wide"].includes(items) &&
+                        (undefined === aTarget.value.minItems || (undefined !== bTarget.value.minItems && aTarget.value.minItems <= bTarget.value.minItems)) &&
+                        (undefined === aTarget.value.maxItems || (undefined !== bTarget.value.maxItems && bTarget.value.maxItems <= aTarget.value.maxItems)) &&
+                        true !== aTarget.value.uniqueItems || true === bTarget.value.uniqueItems
+                    )
+                    {
                         return "wide";
                     }
                     // 🚧
+                    return "exclusive";
                 }
                 else
                 if (Type.isLiteralElement(bTarget.value))
