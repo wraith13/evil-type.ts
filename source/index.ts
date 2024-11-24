@@ -1259,8 +1259,16 @@ export namespace Build
                     {
                         return "narrow";
                     }
-                    // 🚧
-                    return "exclusive";
+                    if
+                    (
+                        ! ["same", "wide", "narrow", "overlapping"].includes(items) ||
+                        (undefined !== aTarget.value.minItems && undefined !== bTarget.value.maxItems && bTarget.value.maxItems < aTarget.value.minItems) ||
+                        (undefined !== aTarget.value.maxItems && undefined !== bTarget.value.minItems && aTarget.value.maxItems < bTarget.value.minItems)
+                    )
+                    {
+                        return "exclusive";
+                    }
+                    return "overlapping";
                 }
                 else
                 if (Type.isLiteralElement(bTarget.value))
