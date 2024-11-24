@@ -1244,10 +1244,20 @@ export namespace Build
                         ["same", "wide"].includes(items) &&
                         (undefined === aTarget.value.minItems || (undefined !== bTarget.value.minItems && aTarget.value.minItems <= bTarget.value.minItems)) &&
                         (undefined === aTarget.value.maxItems || (undefined !== bTarget.value.maxItems && bTarget.value.maxItems <= aTarget.value.maxItems)) &&
-                        true !== aTarget.value.uniqueItems || true === bTarget.value.uniqueItems
+                        (true !== aTarget.value.uniqueItems || true === bTarget.value.uniqueItems)
                     )
                     {
                         return "wide";
+                    }
+                    if
+                    (
+                        ["same", "narrow"].includes(items) &&
+                        (undefined === bTarget.value.minItems || (undefined !== aTarget.value.minItems && bTarget.value.minItems <= aTarget.value.minItems)) &&
+                        (undefined === bTarget.value.maxItems || (undefined !== aTarget.value.maxItems && aTarget.value.maxItems <= bTarget.value.maxItems)) &&
+                        (true !== bTarget.value.uniqueItems || true === aTarget.value.uniqueItems)
+                    )
+                    {
+                        return "narrow";
                     }
                     // 🚧
                     return "exclusive";
