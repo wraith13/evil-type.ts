@@ -1296,6 +1296,66 @@ export namespace Build
                     return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
                 }
                 return "exclusive";
+            case "dictionary":
+                if (Type.isDictionaryDefinition(bTarget.value))
+                {
+                    const aKeys = undefined === aTarget.value.keyin ? null: getActualKeys(nextProcess(aTarget, null, aTarget.value.keyin));
+                    const bKeys = undefined === bTarget.value.keyin ? null: getActualKeys(nextProcess(bTarget, null, bTarget.value.keyin));
+                    const items = compareType(nextProcess(aTarget, null, aTarget.value.valueType), nextProcess(bTarget, null, bTarget.value.valueType));
+                    if
+                    (
+                        "same" === items &&
+                        Jsonable.stringify(aKeys) === Jsonable.stringify(bKeys) &&
+                        getAdditionalProperties(nextProcess(aTarget, null, aTarget.value)) === getAdditionalProperties(nextProcess(bTarget, null, bTarget.value)) &&
+                        (aTarget.value.optionality ?? "as-is") === (bTarget.value.optionality ?? "as-is")
+                    )
+                    {
+                        return "same";
+                    }
+                    if
+                    (
+                        ["same", "wide"].includes(items) &&
+                        (undefined === aTarget.value.minItems || (undefined !== bTarget.value.minItems && aTarget.value.minItems <= bTarget.value.minItems)) &&
+                        (undefined === aTarget.value.maxItems || (undefined !== bTarget.value.maxItems && bTarget.value.maxItems <= aTarget.value.maxItems)) &&
+                        (true !== aTarget.value.uniqueItems || true === bTarget.value.uniqueItems)
+                    )
+                    {
+                        return "wide";
+                    }
+                    if
+                    (
+                        ["same", "narrow"].includes(items) &&
+                        (undefined === bTarget.value.minItems || (undefined !== aTarget.value.minItems && bTarget.value.minItems <= aTarget.value.minItems)) &&
+                        (undefined === bTarget.value.maxItems || (undefined !== aTarget.value.maxItems && aTarget.value.maxItems <= bTarget.value.maxItems)) &&
+                        (true !== bTarget.value.uniqueItems || true === aTarget.value.uniqueItems)
+                    )
+                    {
+                        return "narrow";
+                    }
+                    if
+                    (
+                        ! ["same", "wide", "narrow", "overlapping"].includes(items) ||
+                        (undefined !== aTarget.value.minItems && undefined !== bTarget.value.maxItems && bTarget.value.maxItems < aTarget.value.minItems) ||
+                        (undefined !== aTarget.value.maxItems && undefined !== bTarget.value.minItems && aTarget.value.maxItems < bTarget.value.minItems)
+                    )
+                    {
+                        return "exclusive";
+                    }
+                    return "overlapping";
+                }
+                else
+                if (Type.isLiteralElement(bTarget.value))
+                {
+
+                    // 🚧
+                    
+                }
+                else
+                if (Type.isOrElement(bTarget.value))
+                {
+                    return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
+                }
+                return "exclusive";
         
             // 🚧
 
