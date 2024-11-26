@@ -1306,7 +1306,7 @@ export namespace Build
                     (
                         "same" === items &&
                         Jsonable.stringify(aKeys) === Jsonable.stringify(bKeys) &&
-                        getAdditionalProperties(nextProcess(aTarget, null, aTarget.value)) === getAdditionalProperties(nextProcess(bTarget, null, bTarget.value)) &&
+                        (getAdditionalProperties(nextProcess(aTarget, null, aTarget.value)) ?? true) === (getAdditionalProperties(nextProcess(bTarget, null, bTarget.value)) ?? true) &&
                         (aTarget.value.optionality ?? "as-is") === (bTarget.value.optionality ?? "as-is")
                     )
                     {
@@ -1315,9 +1315,9 @@ export namespace Build
                     if
                     (
                         ["same", "wide"].includes(items) &&
-                        (undefined === aTarget.value.minItems || (undefined !== bTarget.value.minItems && aTarget.value.minItems <= bTarget.value.minItems)) &&
-                        (undefined === aTarget.value.maxItems || (undefined !== bTarget.value.maxItems && bTarget.value.maxItems <= aTarget.value.maxItems)) &&
-                        (true !== aTarget.value.uniqueItems || true === bTarget.value.uniqueItems)
+                        (null === aKeys || (null !== bKeys && aKeys.every(i => bKeys.includes(i)))) &&
+                        (true === (getAdditionalProperties(nextProcess(aTarget, null, aTarget.value)) ?? true) || false === (getAdditionalProperties(nextProcess(bTarget, null, bTarget.value)) ?? true)) &&
+                        ("required" !== (aTarget.value.optionality ?? "as-is") || "required" === (bTarget.value.optionality ?? "as-is"))
                     )
                     {
                         return "wide";
