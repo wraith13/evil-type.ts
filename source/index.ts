@@ -1325,9 +1325,9 @@ export namespace Build
                     if
                     (
                         ["same", "narrow"].includes(items) &&
-                        (undefined === bTarget.value.minItems || (undefined !== aTarget.value.minItems && bTarget.value.minItems <= aTarget.value.minItems)) &&
-                        (undefined === bTarget.value.maxItems || (undefined !== aTarget.value.maxItems && aTarget.value.maxItems <= bTarget.value.maxItems)) &&
-                        (true !== bTarget.value.uniqueItems || true === aTarget.value.uniqueItems)
+                        (null === bKeys || (null !== aKeys && bKeys.every(i => aKeys.includes(i)))) &&
+                        (true === (getAdditionalProperties(nextProcess(bTarget, null, bTarget.value)) ?? true) || false === (getAdditionalProperties(nextProcess(aTarget, null, aTarget.value)) ?? true)) &&
+                        ("required" !== (bTarget.value.optionality ?? "as-is") || "required" === (aTarget.value.optionality ?? "as-is"))
                     )
                     {
                         return "narrow";
