@@ -1335,8 +1335,13 @@ export namespace Build
                     if
                     (
                         ! ["same", "wide", "narrow", "overlapping"].includes(items) ||
-                        (undefined !== aTarget.value.minItems && undefined !== bTarget.value.maxItems && bTarget.value.maxItems < aTarget.value.minItems) ||
-                        (undefined !== aTarget.value.maxItems && undefined !== bTarget.value.minItems && aTarget.value.maxItems < bTarget.value.minItems)
+                        (
+                            null !== aKeys && null !== bKeys && aKeys.every(i => ! bKeys.includes(i)) &&
+                            (getAdditionalProperties(nextProcess(aTarget, null, aTarget.value)) ?? true) &&
+                            (getAdditionalProperties(nextProcess(bTarget, null, bTarget.value)) ?? true) &&
+                            "required" === (bTarget.value.optionality ?? "as-is") &&
+                            "required" === (aTarget.value.optionality ?? "as-is")
+                        )
                     )
                     {
                         return "exclusive";
