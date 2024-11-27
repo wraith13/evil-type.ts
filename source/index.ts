@@ -1351,9 +1351,19 @@ export namespace Build
                 else
                 if (Type.isLiteralElement(bTarget.value))
                 {
-
-                    // 🚧
-                    
+                    const aValue = aTarget.value;
+                    const aKeys = undefined === aTarget.value.keyin ? null: getActualKeys(nextProcess(aTarget, null, aTarget.value.keyin));
+                    if
+                    (
+                        EvilType.Validator.isObject(bTarget.value.const) &&
+                        Object.values(bTarget.value.const).every((i, ix) => ["same", "wide"].includes(compareType(nextProcess(aTarget, null, aValue.valueType), nextProcess(bTarget, `${ix}`, { const: i, })))) &&
+                        (null === aKeys || "partial" === (aTarget.value.optionality ?? "as-is") || aKeys.every(i => i in ((bTarget.value as Type.LiteralElement).const as EvilType.Validator.ActualObject))) &&
+                        (null === aKeys || false === (getAdditionalProperties(nextProcess(aTarget, null, aTarget.value)) ?? true) || Object.keys(bTarget.value.const).every(i => aKeys.includes(i)))
+                    )
+                    {
+                        return "wide";
+                    }
+                    return "exclusive";
                 }
                 else
                 if (Type.isOrElement(bTarget.value))
