@@ -1363,7 +1363,10 @@ export namespace Build
                     {
                         return "wide";
                     }
-                    return "exclusive";
+                    else
+                    {
+                        return "exclusive";
+                    }
                 }
                 else
                 if (Type.isOrElement(bTarget.value))
@@ -1371,7 +1374,35 @@ export namespace Build
                     return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
                 }
                 return "exclusive";
-        
+            case "interface":
+                if (Type.isInterfaceDefinition(bTarget.value))
+                {
+                    // 🚧
+                    return "overlapping";
+                }
+                else
+                if (Type.isLiteralElement(bTarget.value))
+                {
+                    if
+                    (
+                        EvilType.Validator.isObject(bTarget.value.const) &&
+                        // 🚧
+                    )
+                    {
+                        return "wide";
+                    }
+                    else
+                    {
+                        return "exclusive";
+                    }
+                }
+                else
+                if (Type.isOrElement(bTarget.value))
+                {
+                    return orTypeCompatibility(bTarget.value.types.map(i => compareType(aTarget, <Process>nextProcess(bTarget, null, i))));
+                }
+                return "exclusive";
+                
             // 🚧
 
             case "or":
