@@ -321,7 +321,6 @@ var Build;
         return Build.nextProcess(data, null, result);
     };
     Build.isKindofNeverType = function (data) {
-        var _a, _b, _c;
         var target = Build.resolveRefer(data);
         if (type_1.Type.isLiteralElement(target.value)) {
             return false;
@@ -387,9 +386,11 @@ var Build;
                 case "or":
                     return 0 === target.value.types.length || target.value.types.every(function (i) { return Build.isKindofNeverType(Build.nextProcess(target, null, i)); });
                 case "interface":
-                    return (_c = (_b = (_a = target.value.extends) === null || _a === void 0 ? void 0 : _a.some) === null || _b === void 0 ? void 0 : _b.call(_a, function (i) { return Build.isKindofNeverType(Build.nextProcess(target, null, i)); })) !== null && _c !== void 0 ? _c : false;
+                    //return target.value.extends?.some?.(i => isKindofNeverType(nextProcess(target, null, i))) ?? false;
+                    return false;
                 case "dictionary":
-                    return Build.isKindofNeverType(Build.nextProcess(target, null, target.value.valueType));
+                    //return isKindofNeverType(nextProcess(target, null, target.value.valueType));
+                    return false;
             }
         }
         return false;

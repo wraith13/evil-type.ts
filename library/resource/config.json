@@ -4,10 +4,6 @@
     "safeNumber": false,
     "safeInteger": false,
     "regexpFlags": "u",
-    "regulateType": {
-        "sortBy": "define",
-        "merge": true
-    },
     "lineUnbreakableTokens": {
         "heads": [
             "async"

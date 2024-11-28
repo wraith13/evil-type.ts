@@ -126,24 +126,6 @@
                             "default": false,
                             "description": "[TypeScript]"
                         },
-                        "regulateType?": {
-                            "type": "interface",
-                            "members": {
-                                "sortBy?": {
-                                    "type": "enum-type",
-                                    "members": [
-                                        "none",
-                                        "define",
-                                        "alphabet"
-                                    ],
-                                    "default": "define"
-                                },
-                                "merge?": {
-                                    "type": "boolean",
-                                    "default": true
-                                }
-                            }
-                        },
                         "maxLineLength?": {
                             "type": "or",
                             "types": [

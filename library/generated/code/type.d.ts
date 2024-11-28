@@ -23,10 +23,6 @@ export declare namespace Type {
         validatorOption: ValidatorOptionType;
         safeNumber?: boolean;
         safeInteger?: boolean;
-        regulateType?: {
-            sortBy?: "none" | "define" | "alphabet";
-            merge?: boolean;
-        };
         maxLineLength?: null | number;
         StringFormatMap?: {
             [key in keyof typeof StringFormatMap]?: string;
@@ -151,7 +147,7 @@ export declare namespace Type {
         maximum?: number;
         exclusiveMaximum?: number;
         multipleOf?: number;
-        safeNumber?: number;
+        safeNumber?: boolean;
         default?: number;
     }
     interface BasicStringType extends CommonProperties {

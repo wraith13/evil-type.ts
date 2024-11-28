@@ -29,7 +29,6 @@ export namespace Type
         validatorOption: ValidatorOptionType;
         safeNumber?: boolean;
         safeInteger?: boolean;
-        regulateType?: { sortBy?: "none" | "define" | "alphabet"; merge?: boolean; };
         maxLineLength?: null | number;
         StringFormatMap?: { [ key in keyof typeof StringFormatMap ] ?: string; };
         default?: { export?: boolean; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?: string; };
@@ -296,9 +295,7 @@ export namespace Type
     export const outputOptionsValidatorObject: EvilType.Validator.ObjectValidator<OutputOptions> = ({ outputFile:
         EvilType.Validator.isString, indentUnit: EvilType.Validator.isEnum([ 0, 1, 2, 3, 4, 5, 6, 7, 8, "tab" ] as const), indentStyle:
         isIndentStyleType, validatorOption: isValidatorOptionType, safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean),
-        safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regulateType: EvilType.Validator.isOptional(({ sortBy:
-        EvilType.Validator.isOptional(EvilType.Validator.isEnum([ "none", "define", "alphabet" ] as const)), merge:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), })), maxLineLength: EvilType.Validator.isOptional(
+        safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), maxLineLength: EvilType.Validator.isOptional(
         EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), StringFormatMap: EvilType.Validator.isOptional((
         { "date-time": EvilType.Validator.isOptional(EvilType.Validator.isString), date: EvilType.Validator.isOptional(
         EvilType.Validator.isString), time: EvilType.Validator.isOptional(EvilType.Validator.isString), duration:
