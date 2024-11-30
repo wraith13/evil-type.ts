@@ -1206,7 +1206,7 @@ export namespace Build
                             $expression("{"),
                             ...integerOptions,
                             $expression("},"),
-                            $expression(`${Jsonable.stringify(getSafeNumber(data))},`),
+                            $expression(`${Jsonable.stringify(getSafeNumber(data))}`),
                             $expression(")"),
                         ];
                     }
@@ -1234,7 +1234,7 @@ export namespace Build
                             $expression("{"),
                             ...numberOptions,
                             $expression("},"),
-                            $expression(`${Jsonable.stringify(getSafeNumber(data))},`),
+                            $expression(`${Jsonable.stringify(getSafeNumber(data))}`),
                             $expression(")"),
                         ];
                     }
@@ -1261,7 +1261,7 @@ export namespace Build
                             $expression("{"),
                             ...stringOptions,
                             $expression("},"),
-                            $expression(`regexpFlags:${Jsonable.stringify(getRegexpFlags(data))},`),
+                            $expression(`regexpFlags:${Jsonable.stringify(getRegexpFlags(data))}`),
                             $expression(")"),
                         ];
                     }

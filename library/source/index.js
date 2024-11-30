@@ -919,7 +919,7 @@ var Build;
                                 (0, exports.$expression)("{")
                             ], integerOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)), ",")),
+                                (0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)))),
                                 (0, exports.$expression)(")"),
                             ], false);
                         }
@@ -939,7 +939,7 @@ var Build;
                                 (0, exports.$expression)("{")
                             ], numberOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)), ",")),
+                                (0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)))),
                                 (0, exports.$expression)(")"),
                             ], false);
                         }
@@ -959,7 +959,7 @@ var Build;
                                 (0, exports.$expression)("{")
                             ], stringOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)("regexpFlags:".concat(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data)), ",")),
+                                (0, exports.$expression)("regexpFlags:".concat(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data)))),
                                 (0, exports.$expression)(")"),
                             ], false);
                         }
