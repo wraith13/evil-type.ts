@@ -959,7 +959,7 @@ var Build;
                                 (0, exports.$expression)("{")
                             ], stringOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)("regexpFlags:".concat(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data)))),
+                                (0, exports.$expression)(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data))),
                                 (0, exports.$expression)(")"),
                             ], false);
                         }

@@ -1261,7 +1261,7 @@ export namespace Build
                             $expression("{"),
                             ...stringOptions,
                             $expression("},"),
-                            $expression(`regexpFlags:${Jsonable.stringify(getRegexpFlags(data))}`),
+                            $expression(Jsonable.stringify(getRegexpFlags(data))),
                             $expression(")"),
                         ];
                     }
