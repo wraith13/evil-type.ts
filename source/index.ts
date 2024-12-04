@@ -561,9 +561,14 @@ export namespace Build
             {
             case "integer":
                 return $expression("number");
-            default:
-                return $expression(value.type);
+            case "string":
+                if (Type.isPatternStringType(value) && undefined !== value.tsPattern)
+                {
+                    return $expression(`\`${value.tsPattern}\``);
+                }
+                break;
             }
+            return $expression(value.type);
         };
         export const enParenthesis = <T extends CodeInlineEntry>(expressions: T[]) =>
             [ $expression("("), ...expressions, $expression(")"), ];

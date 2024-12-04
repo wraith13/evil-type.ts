@@ -158,6 +158,7 @@ export declare namespace Type {
     }
     interface PatternStringType extends BasicStringType {
         pattern: string;
+        tsPattern?: string;
         regexpFlags?: string;
     }
     interface FormatStringType extends BasicStringType {

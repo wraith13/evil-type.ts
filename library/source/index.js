@@ -418,9 +418,13 @@ var Build;
             switch (value.type) {
                 case "integer":
                     return (0, exports.$expression)("number");
-                default:
-                    return (0, exports.$expression)(value.type);
+                case "string":
+                    if (type_1.Type.isPatternStringType(value) && undefined !== value.tsPattern) {
+                        return (0, exports.$expression)("`".concat(value.tsPattern, "`"));
+                    }
+                    break;
             }
+            return (0, exports.$expression)(value.type);
         };
         Define.enParenthesis = function (expressions) {
             return __spreadArray(__spreadArray([(0, exports.$expression)("(")], expressions, true), [(0, exports.$expression)(")"),], false);

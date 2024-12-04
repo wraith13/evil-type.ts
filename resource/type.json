@@ -722,6 +722,9 @@
                         "pattern": {
                             "type": "string"
                         },
+                        "tsPattern?": {
+                            "type": "string"
+                        },
                         "regexpFlags?": {
                             "type": "string"
                         }
