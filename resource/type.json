@@ -723,7 +723,13 @@
                             "type": "string"
                         },
                         "tsPattern?": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "minItems": 1,
+                            "uniqueItems": true,
+                            "description": "[TypeScript] You can define Template Literal Types. Arrays are OR-combined. You need to match the regular expression in `pattern` and Template Literal Types."
                         },
                         "regexpFlags?": {
                             "type": "string"

@@ -178,7 +178,7 @@ export namespace Type
     export interface PatternStringType extends BasicStringType
     {
         pattern: string;
-        tsPattern?: string;
+        tsPattern?: string[];
         regexpFlags?: string;
     }
     export interface FormatStringType extends BasicStringType
@@ -393,8 +393,8 @@ export namespace Type
         EvilType.Validator.isString), });
     export const patternStringTypeValidatorObject: EvilType.Validator.ObjectValidator<PatternStringType> =
         EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { pattern: EvilType.Validator.isString, tsPattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString)
-        , });
+        EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
+        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const formatStringTypeValidatorObject: EvilType.Validator.ObjectValidator<FormatStringType> =
         EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { format: EvilType.Validator.isEnum([ "date-time", "date",
         "time", "duration", "email", "idn-email", "hostname", "idn-hostname", "ipv4", "ipv6", "uuid", "uri", "uri-reference", "iri",

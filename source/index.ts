@@ -564,7 +564,7 @@ export namespace Build
             case "string":
                 if (Type.isPatternStringType(value) && undefined !== value.tsPattern)
                 {
-                    return $expression(`\`${value.tsPattern}\``);
+                    return $expression(value.tsPattern.map(i => `\`${i}\``).join(" | "));
                 }
                 break;
             }
@@ -1286,7 +1286,7 @@ export namespace Build
                     const arrayOptions = [
                         ...(undefined !== data.value.minItems ? [ $expression(`minItems:${data.value.minItems},`), ]: []),
                         ...(undefined !== data.value.maxItems ? [ $expression(`maxItems:${data.value.maxItems},`), ]: []),
-                        ...(undefined !== data.value.uniqueItems ? [ $expression(`maxItems:${data.value.maxItems},`), ]: []),
+                        ...(undefined !== data.value.uniqueItems ? [ $expression(`uniqueItems:${data.value.uniqueItems},`), ]: []),
                     ];
                     if (0 < arrayOptions.length)
                     {

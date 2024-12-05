@@ -420,7 +420,7 @@ var Build;
                     return (0, exports.$expression)("number");
                 case "string":
                     if (type_1.Type.isPatternStringType(value) && undefined !== value.tsPattern) {
-                        return (0, exports.$expression)("`".concat(value.tsPattern, "`"));
+                        return (0, exports.$expression)(value.tsPattern.map(function (i) { return "`".concat(i, "`"); }).join(" | "));
                     }
                     break;
             }
@@ -975,7 +975,7 @@ var Build;
                     case "enum-type":
                         return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(data.value.members),]);
                     case "array":
-                        var arrayOptions = __spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minItems ? [(0, exports.$expression)("minItems:".concat(data.value.minItems, ",")),] : []), true), (undefined !== data.value.maxItems ? [(0, exports.$expression)("maxItems:".concat(data.value.maxItems, ",")),] : []), true), (undefined !== data.value.uniqueItems ? [(0, exports.$expression)("maxItems:".concat(data.value.maxItems, ",")),] : []), true);
+                        var arrayOptions = __spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minItems ? [(0, exports.$expression)("minItems:".concat(data.value.minItems, ",")),] : []), true), (undefined !== data.value.maxItems ? [(0, exports.$expression)("maxItems:".concat(data.value.maxItems, ",")),] : []), true), (undefined !== data.value.uniqueItems ? [(0, exports.$expression)("uniqueItems:".concat(data.value.uniqueItems, ",")),] : []), true);
                         if (0 < arrayOptions.length) {
                             return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isArray"),], [
                                 Validator.buildObjectValidatorGetterCoreEntry(Build.nextProcess(data, null, data.value.items)),
