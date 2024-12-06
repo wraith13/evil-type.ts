@@ -341,14 +341,14 @@ export namespace EvilType
         };
         export const isString = (value: unknown, listner?: ErrorListener): value is string =>
             Error.withErrorHandling("string" === typeof value, listner, "string", value);
-        export const isDetailedString = (data: { minLength?: number, maxLength?: number, pattern?: string, format?: string, regexpFlags?: string}, regexpFlags?: string): IsType<string> =>
+        export const isDetailedString = <Type extends string = string>(data: { minLength?: number, maxLength?: number, pattern?: string, format?: string, regexpFlags?: string}, regexpFlags?: string): IsType<Type> =>
         {
             if ([ data.minLength, data.maxLength, data.pattern, data.format ].every(i => undefined === i))
             {
-                return isString;
+                return <IsType<Type>>isString;
             }
             const pattern = data.pattern;
-            const result = (value: unknown, listner?: ErrorListener): value is string => Error.withErrorHandling
+            const result = (value: unknown, listner?: ErrorListener): value is Type => Error.withErrorHandling
             (
                 "string" === typeof value &&
                 (undefined === data.minLength || data.minLength <= value.length) &&

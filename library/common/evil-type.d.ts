@@ -62,13 +62,13 @@ export declare namespace EvilType {
             multipleOf?: number;
         }, safeNumber?: boolean) => IsType<number>;
         const isString: (value: unknown, listner?: ErrorListener) => value is string;
-        const isDetailedString: (data: {
+        const isDetailedString: <Type extends string = string>(data: {
             minLength?: number;
             maxLength?: number;
             pattern?: string;
             format?: string;
             regexpFlags?: string;
-        }, regexpFlags?: string) => IsType<string>;
+        }, regexpFlags?: string) => IsType<Type>;
         type ActualObject = Exclude<object, null>;
         const isObject: (value: unknown) => value is ActualObject;
         const isEnum: <T>(list: readonly T[]) => (value: unknown, listner?: ErrorListener) => value is T;
