@@ -83,6 +83,7 @@ export namespace Type
     {
         type: "type";
         define: TypeOrRefer;
+        validator?: boolean;
     }
     export interface InterfaceDefinition extends AlphaDefinition
     {
@@ -337,7 +338,7 @@ export namespace Type
         });
     export const typeDefinitionValidatorObject: EvilType.Validator.ObjectValidator<TypeDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("type" as const), define:
-        isTypeOrRefer, });
+        isTypeOrRefer, validator: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const interfaceDefinitionValidatorObject: EvilType.Validator.ObjectValidator<InterfaceDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("interface" as const),
         extends: EvilType.Validator.isOptional(EvilType.Validator.isArray(isReferElement)), members: EvilType.Validator.isDictionaryObject(

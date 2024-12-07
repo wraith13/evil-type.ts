@@ -538,6 +538,10 @@
                 },
                 "define": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
+                },
+                "validator": {
+                    "type": "boolean",
+                    "default": true
                 }
             },
             "required": [

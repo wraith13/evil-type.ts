@@ -392,6 +392,10 @@
                         },
                         "define": {
                             "$ref": "TypeOrRefer"
+                        },
+                        "validator?": {
+                            "type": "boolean",
+                            "default": true
                         }
                     }
                 },

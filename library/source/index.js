@@ -1064,8 +1064,9 @@ var Build;
         };
         Validator.buildFullValidator = function (data) { return Validator.isLazyValidator(data) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(data), true),]), true) :
             Validator.buildObjectValidatorGetterCoreEntry(data); };
+        Validator.hasValidatorOption = evil_type_1.EvilType.Validator.isOr(type_1.Type.isTypeDefinition, type_1.Type.isValueDefinition);
         Validator.isValidatorTarget = function (define) {
-            return !(type_1.Type.isValueDefinition(define) && false === define.validator);
+            return !(Validator.hasValidatorOption(define) && false === define.validator);
         };
         Validator.buildValidator = function (data) {
             if ("simple" === data.options.validatorOption) {

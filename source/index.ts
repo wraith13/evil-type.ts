@@ -1427,8 +1427,9 @@ export namespace Build
                 // ),
             ]:
             buildObjectValidatorGetterCoreEntry(data);
+        export const hasValidatorOption = EvilType.Validator.isOr(Type.isTypeDefinition, Type.isValueDefinition);
         export const isValidatorTarget = (define: Type.TypeOrValue) =>
-            ! (Type.isValueDefinition(define) && false === define.validator);
+            ! (hasValidatorOption(define) && false === define.validator);
         export const buildValidator = (data: Define.Process<Type.TypeOrValue & Type.Definition>): CodeLine[] =>
         {
             if ("simple" === data.options.validatorOption)

@@ -77,6 +77,7 @@ export declare namespace Type {
     interface TypeDefinition extends AlphaDefinition {
         type: "type";
         define: TypeOrRefer;
+        validator?: boolean;
     }
     interface InterfaceDefinition extends AlphaDefinition {
         type: "interface";
