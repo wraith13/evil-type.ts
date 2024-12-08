@@ -293,7 +293,7 @@ export namespace Type
         EvilType.Validator.isOptional(EvilType.Validator.isString), });
     export const typeSchemaValidatorObject: EvilType.Validator.ObjectValidator<TypeSchema> = EvilType.Validator.mergeObjectValidator(
         commentPropertyValidatorObject, { $schema: isSchema, imports: EvilType.Validator.isOptional(EvilType.Validator.isArray(
-        isImportDefinition)), defines: isDefinitionMap, options: isOutputOptions, });
+        isImportDefinition, { uniqueItems:true, },)), defines: isDefinitionMap, options: isOutputOptions, });
     export const outputOptionsValidatorObject: EvilType.Validator.ObjectValidator<OutputOptions> = ({ outputFile:
         EvilType.Validator.isString, indentUnit: EvilType.Validator.isEnum([ 0, 1, 2, 3, 4, 5, 6, 7, 8, "tab" ] as const), indentStyle:
         isIndentStyleType, validatorOption: isValidatorOptionType, safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean),
@@ -341,8 +341,9 @@ export namespace Type
         isTypeOrRefer, validator: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const interfaceDefinitionValidatorObject: EvilType.Validator.ObjectValidator<InterfaceDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("interface" as const),
-        extends: EvilType.Validator.isOptional(EvilType.Validator.isArray(isReferElement)), members: EvilType.Validator.isDictionaryObject(
-        isTypeOrRefer), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
+        extends: EvilType.Validator.isOptional(EvilType.Validator.isArray(isReferElement, { uniqueItems:true, },)), members:
+        EvilType.Validator.isDictionaryObject(isTypeOrRefer), additionalProperties: EvilType.Validator.isOptional(
+        EvilType.Validator.isBoolean), });
     export const dictionaryDefinitionValidatorObject: EvilType.Validator.ObjectValidator<DictionaryDefinition> =
         EvilType.Validator.mergeObjectValidator(alphaDefinitionValidatorObject, { type: EvilType.Validator.isJust("dictionary" as const),
         keyin: EvilType.Validator.isOptional(isTypeOrRefer), optionality: EvilType.Validator.isOptional(EvilType.Validator.isEnum([
@@ -354,10 +355,11 @@ export namespace Type
         (EvilType.Validator.isDetailedInteger({ minimum:0, }, false)), uniqueItems: EvilType.Validator.isOptional(
         EvilType.Validator.isBoolean), });
     export const orElementValidatorObject: EvilType.Validator.ObjectValidator<OrElement> = EvilType.Validator.mergeObjectValidator(
-        alphaElementValidatorObject, { type: EvilType.Validator.isJust("or" as const), types: EvilType.Validator.isArray(isTypeOrRefer), });
+        alphaElementValidatorObject, { type: EvilType.Validator.isJust("or" as const), types: EvilType.Validator.isArray(isTypeOrRefer, {
+        uniqueItems:true, },), });
     export const andElementValidatorObject: EvilType.Validator.ObjectValidator<AndElement> = EvilType.Validator.mergeObjectValidator(
-        alphaElementValidatorObject, { type: EvilType.Validator.isJust("and" as const), types: EvilType.Validator.isArray(isTypeOrRefer), }
-        );
+        alphaElementValidatorObject, { type: EvilType.Validator.isJust("and" as const), types: EvilType.Validator.isArray(isTypeOrRefer, {
+        uniqueItems:true, },), });
     export const literalElementValidatorObject: EvilType.Validator.ObjectValidator<LiteralElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { const: Jsonable.isJsonable, });
     export const referElementValidatorObject: EvilType.Validator.ObjectValidator<ReferElement> = EvilType.Validator.mergeObjectValidator(
@@ -404,7 +406,7 @@ export namespace Type
     export const enumTypeElementValidatorObject: EvilType.Validator.ObjectValidator<EnumTypeElement> =
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("enum-type" as const),
         members: EvilType.Validator.isArray(EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isBoolean,
-        EvilType.Validator.isNumber, EvilType.Validator.isString)), });
+        EvilType.Validator.isNumber, EvilType.Validator.isString), { uniqueItems:true, },), });
     export const typeofElementValidatorObject: EvilType.Validator.ObjectValidator<TypeofElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("typeof" as const), value: isReferElement, });
     export const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement> = EvilType.Validator.mergeObjectValidator(

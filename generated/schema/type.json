@@ -57,6 +57,7 @@
                     "items": {
                         "$ref": "#/definitions/Type.ImportDefinition"
                     },
+                    "uniqueItems": true,
                     "description": "[TypeScript] Specify imports that your code depends on. If you use `full` for `validatorOption`, you need to specify import as `evil-type` as `{ EvilType }` here."
                 },
                 "defines": {
@@ -582,7 +583,8 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/Type.ReferElement"
-                    }
+                    },
+                    "uniqueItems": true
                 },
                 "members": {
                     "type": "object",
@@ -712,7 +714,8 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/Type.TypeOrRefer"
-                    }
+                    },
+                    "uniqueItems": true
                 }
             },
             "required": [
@@ -743,7 +746,8 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/Type.TypeOrRefer"
-                    }
+                    },
+                    "uniqueItems": true
                 }
             },
             "required": [
@@ -1264,7 +1268,8 @@
                                 "type": "string"
                             }
                         ]
-                    }
+                    },
+                    "uniqueItems": true
                 }
             },
             "required": [

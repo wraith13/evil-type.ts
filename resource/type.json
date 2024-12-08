@@ -68,6 +68,7 @@
                         },
                         "imports?": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "$ref": "ImportDefinition"
                             },
@@ -412,6 +413,7 @@
                         },
                         "extends?": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "$ref": "ReferElement"
                             }
@@ -498,6 +500,7 @@
                         },
                         "types": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "$ref": "TypeOrRefer"
                             }
@@ -517,6 +520,7 @@
                         },
                         "types": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "$ref": "TypeOrRefer"
                             }
@@ -728,11 +732,11 @@
                         },
                         "tsPattern?": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "type": "string"
                             },
                             "minItems": 1,
-                            "uniqueItems": true,
                             "description": "[TypeScript] You can define Template Literal Types. Arrays are OR-combined. You need to match the regular expression in `pattern` and Template Literal Types."
                         },
                         "regexpFlags?": {
@@ -871,6 +875,7 @@
                         },
                         "members": {
                             "type": "array",
+                            "uniqueItems": true,
                             "items": {
                                 "type": "or",
                                 "types": [
