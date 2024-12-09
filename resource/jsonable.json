@@ -10,6 +10,15 @@
         }
     ],
     "defines": {
+        "EvilType": {
+            "type": "code",
+            "export": true,
+            "tokens": [
+                "{",
+                "EvilType",
+                "}"
+            ]
+        },
         "Jsonable": {
             "type": "namespace",
             "members": {

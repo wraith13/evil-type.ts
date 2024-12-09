@@ -1,4 +1,5 @@
 import { EvilType } from "../../common/evil-type";
+export { EvilType };
 export declare namespace Jsonable {
     type JsonableValue = null | boolean | number | string;
     type JsonableArray = Jsonable[];

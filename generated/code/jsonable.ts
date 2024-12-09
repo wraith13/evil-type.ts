@@ -1,5 +1,6 @@
 // This file is generated.
 import { EvilType } from "../../common/evil-type";
+export { EvilType };
 export namespace Jsonable
 {
     export type JsonableValue = null | boolean | number | string;

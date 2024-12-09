@@ -15,8 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Format = exports.Build = exports.$block = exports.$iblock = exports.$comment = exports.$line = exports.$expression = exports.convertToExpression = void 0;
 var startAt = new Date();
 var fs_1 = __importDefault(require("fs"));
-var evil_type_1 = require("../common/evil-type");
-var jsonable_1 = require("../generated/code/jsonable");
 var type_1 = require("../generated/code/type");
 var text_1 = require("./text");
 var config_json_1 = __importDefault(require("../resource/config.json"));
@@ -74,7 +72,7 @@ exports.$iblock = $iblock;
 var $block = function (header, lines) { return ({ $code: "block", header: header, lines: lines, }); };
 exports.$block = $block;
 var stringifyTokens = function (json) {
-    return jsonable_1.Jsonable.stringify(json, null, 1).split(/[\r\n]+[\t ]*/)
+    return type_1.Jsonable.stringify(json, null, 1).split(/[\r\n]+[\t ]*/)
         .map(function (i) { return (0, exports.$expression)(i); });
 };
 var Build;
@@ -166,9 +164,9 @@ var Build;
         var _a;
         var entry = Build.resolveRefer(Build.nextProcess(data, null, data.value.value));
         if (type_1.Type.isLiteralElement(entry.value)) {
-            if (evil_type_1.EvilType.Validator.isObject(entry.value.const) && data.value.key in entry.value.const) {
+            if (type_1.EvilType.Validator.isObject(entry.value.const) && data.value.key in entry.value.const) {
                 var value = entry.value.const[data.value.key];
-                if (jsonable_1.Jsonable.isJsonable(value)) {
+                if (type_1.Jsonable.isJsonable(value)) {
                     return Build.nextProcess(entry, "".concat(data.value.key), { const: value });
                 }
             }
@@ -250,7 +248,7 @@ var Build;
     Build.getActualKeys = function (data) {
         var target = Build.resolveRefer(data);
         if (type_1.Type.isLiteralElement(target.value)) {
-            if (evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)(target.value.const)) {
+            if (type_1.EvilType.Validator.isArray(type_1.EvilType.Validator.isString)(target.value.const)) {
                 return target.value.const;
             }
             else {
@@ -271,7 +269,7 @@ var Build;
                             }
                         }
                         else if (type_1.Type.isLiteralElement(entry.value)) {
-                            if (evil_type_1.EvilType.Validator.isObject(entry.value.const)) {
+                            if (type_1.EvilType.Validator.isObject(entry.value.const)) {
                                 return Object.keys(entry.value.const);
                             }
                         }
@@ -281,7 +279,7 @@ var Build;
                     {
                         var entry = Build.resolveRefer(Build.nextProcess(target, null, target.value.value));
                         if (type_1.Type.isLiteralElement(entry.value)) {
-                            if (evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)(entry.value.const)) {
+                            if (type_1.EvilType.Validator.isArray(type_1.EvilType.Validator.isString)(entry.value.const)) {
                                 return entry.value.const;
                             }
                         }
@@ -339,7 +337,7 @@ var Build;
                             return undefined !== entry_1.value.keyin && 0 === Build.getActualKeys(Build.nextProcess(entry_1, null, entry_1.value.keyin)).length;
                         }
                         else if (type_1.Type.isLiteralElement(entry_1.value)) {
-                            return !evil_type_1.EvilType.Validator.isObject(entry_1.value.const) || Object.keys(entry_1.value.const).length <= 0;
+                            return !type_1.EvilType.Validator.isObject(entry_1.value.const) || Object.keys(entry_1.value.const).length <= 0;
                         }
                         else {
                             return false;
@@ -465,7 +463,7 @@ var Build;
             return Define.isNeedParenthesis(expressions) ? Define.enParenthesis(expressions) : expressions;
         };
         Define.buildInlineDefineEnum = function (value) {
-            return kindofJoinExpression(value.members.map(function (i) { return (0, exports.$expression)(jsonable_1.Jsonable.stringify(i)); }), (0, exports.$expression)("|"));
+            return kindofJoinExpression(value.members.map(function (i) { return (0, exports.$expression)(type_1.Jsonable.stringify(i)); }), (0, exports.$expression)("|"));
         };
         Define.buildInlineDefineArray = function (data) {
             return __spreadArray(__spreadArray([], Define.enParenthesisIfNeed(Define.buildInlineDefine(Build.nextProcess(data, null, data.value.items))), true), [(0, exports.$expression)("[]"),], false);
@@ -525,7 +523,7 @@ var Build;
             return (0, exports.$block)(header, lines);
         };
         Define.buildImports = function (imports) {
-            return undefined === imports ? [] : imports.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("import"), (0, exports.$expression)(i.import), (0, exports.$expression)("from"), (0, exports.$expression)(jsonable_1.Jsonable.stringify(i.from))]); });
+            return undefined === imports ? [] : imports.map(function (i) { return (0, exports.$line)([(0, exports.$expression)("import"), (0, exports.$expression)(i.import), (0, exports.$expression)("from"), (0, exports.$expression)(type_1.Jsonable.stringify(i.from))]); });
         };
         Define.buildDefine = function (data) {
             switch (data.value.type) {
@@ -597,7 +595,7 @@ var Build;
                 /^[$\w]+$/.test(key);
         };
         Validator.buildObjectMember = function (name, key) {
-            return Validator.isRegularIdentifier(key) ? "".concat(name, ".").concat(key) : "".concat(name, "[").concat(jsonable_1.Jsonable.stringify(key), "]");
+            return Validator.isRegularIdentifier(key) ? "".concat(name, ".").concat(key) : "".concat(name, "[").concat(type_1.Jsonable.stringify(key), "]");
         };
         Validator.buildCall = function (method, args) {
             return __spreadArray(__spreadArray([], method, true), Define.enParenthesis(kindofJoinExpression(args, (0, exports.$expression)(","))), true);
@@ -622,7 +620,7 @@ var Build;
                     list_2.push((0, exports.$expression)("\"object\" === typeof ".concat(name)));
                     Object.keys(value).forEach(function (key) {
                         list_2.push((0, exports.$expression)("&&"));
-                        list_2.push((0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(key), " in ").concat(name)));
+                        list_2.push((0, exports.$expression)("".concat(type_1.Jsonable.stringify(key), " in ").concat(name)));
                         list_2.push((0, exports.$expression)("&&"));
                         list_2.push.apply(list_2, Validator.buildLiterarlValidatorExpression(Validator.buildObjectMember(name, key), value[key]));
                     });
@@ -633,10 +631,10 @@ var Build;
                 return [(0, exports.$expression)("undefined"), (0, exports.$expression)("==="), (0, exports.$expression)(name),];
             }
             else if (null !== value && "object" === typeof value) {
-                return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(jsonable_1.Jsonable.stringify(value))), (0, exports.$expression)("==="), (0, exports.$expression)("JSON.stringify(".concat(name, ")")),];
+                return [(0, exports.$expression)(type_1.Jsonable.stringify(type_1.Jsonable.stringify(value))), (0, exports.$expression)("==="), (0, exports.$expression)("JSON.stringify(".concat(name, ")")),];
             }
             else {
-                return [(0, exports.$expression)(jsonable_1.Jsonable.stringify(value)), (0, exports.$expression)("==="), (0, exports.$expression)(name),];
+                return [(0, exports.$expression)(type_1.Jsonable.stringify(value)), (0, exports.$expression)("==="), (0, exports.$expression)(name),];
             }
         };
         Validator.buildObjectValidatorObjectName = function (name) {
@@ -694,7 +692,7 @@ var Build;
                     case "string":
                         return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
                             (0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name))
-                        ], (undefined !== data.value.minLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minLength)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name, ".length")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name, ".length")), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maxLength)),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("new"), (0, exports.$expression)("RegExp"), (0, exports.$expression)("("), (0, exports.$expression)(jsonable_1.Jsonable.stringify(data.value.pattern)), (0, exports.$expression)(","), (0, exports.$expression)(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data))), (0, exports.$expression)(")"), (0, exports.$expression)(".test(".concat(name, ")"))] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("new"), (0, exports.$expression)("RegExp"), (0, exports.$expression)("("), (0, exports.$expression)(jsonable_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format])), (0, exports.$expression)(","), (0, exports.$expression)(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data))), (0, exports.$expression)(")"), (0, exports.$expression)(".test(".concat(name, ")"))] : []), true);
+                        ], (undefined !== data.value.minLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minLength)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name, ".length")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name, ".length")), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maxLength)),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("new"), (0, exports.$expression)("RegExp"), (0, exports.$expression)("("), (0, exports.$expression)(type_1.Jsonable.stringify(data.value.pattern)), (0, exports.$expression)(","), (0, exports.$expression)(type_1.Jsonable.stringify(Build.getRegexpFlags(data))), (0, exports.$expression)(")"), (0, exports.$expression)(".test(".concat(name, ")"))] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("new"), (0, exports.$expression)("RegExp"), (0, exports.$expression)("("), (0, exports.$expression)(type_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format])), (0, exports.$expression)(","), (0, exports.$expression)(type_1.Jsonable.stringify(Build.getRegexpFlags(data))), (0, exports.$expression)(")"), (0, exports.$expression)(".test(".concat(name, ")"))] : []), true);
                     case "type":
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
@@ -719,7 +717,7 @@ var Build;
                             (0, exports.$expression)(")")
                         ], false);
                     case "and":
-                        return kindofJoinExpression(data.value.types.map(function (i) { return evil_type_1.EvilType.Validator.isObject(i) ?
+                        return kindofJoinExpression(data.value.types.map(function (i) { return type_1.EvilType.Validator.isObject(i) ?
                             Define.enParenthesis(Validator.buildValidatorExpression(name, Build.nextProcess(data, null, i))) :
                             Validator.buildValidatorExpression(name, i); }), (0, exports.$expression)("&&"));
                     case "or":
@@ -763,7 +761,7 @@ var Build;
                 }
             }
             else if (type_1.Type.isLiteralElement(target.value)) {
-                if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
+                if (type_1.EvilType.Validator.isObject(target.value.const)) {
                     return __spreadArray(__spreadArray([], stringifyTokens(Object.keys(target.value.const)), true), [(0, exports.$expression)("."), (0, exports.$expression)("includes(".concat(name, " as any)")),], false);
                 }
                 else {
@@ -822,7 +820,7 @@ var Build;
                 var value = members[k];
                 if (Build.isKindofNeverType(Build.nextProcess(data, key, value))) {
                     list.push((0, exports.$expression)("&&"));
-                    list.push((0, exports.$expression)("! ".concat(jsonable_1.Jsonable.stringify(key), " in ").concat(name)));
+                    list.push((0, exports.$expression)("! ".concat(type_1.Jsonable.stringify(key), " in ").concat(name)));
                 }
                 else {
                     var base = (0, exports.convertToExpression)(Validator.buildValidatorExpression(Validator.buildObjectMember(name, key), Build.nextProcess(data, key, value)));
@@ -831,14 +829,14 @@ var Build;
                         base;
                     if (k === key) {
                         list.push((0, exports.$expression)("&&"));
-                        list.push((0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(key), " in ").concat(name)));
+                        list.push((0, exports.$expression)("".concat(type_1.Jsonable.stringify(key), " in ").concat(name)));
                         list.push((0, exports.$expression)("&&"));
                         list.push.apply(list, current);
                     }
                     else {
                         list.push((0, exports.$expression)("&&"));
                         list.push((0, exports.$expression)("("));
-                        list.push((0, exports.$expression)("! (".concat(jsonable_1.Jsonable.stringify(key), " in ").concat(name, ")")));
+                        list.push((0, exports.$expression)("! (".concat(type_1.Jsonable.stringify(key), " in ").concat(name, ")")));
                         list.push((0, exports.$expression)("||"));
                         list.push.apply(list, current);
                         list.push((0, exports.$expression)(")"));
@@ -881,7 +879,7 @@ var Build;
                                 }
                             }
                             else if (type_1.Type.isLiteralElement(target.value)) {
-                                if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
+                                if (type_1.EvilType.Validator.isObject(target.value.const)) {
                                     return Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isEnum"),], [Build.buildLiteralAsConst(Object.keys(target.value.const)),]);
                                 }
                                 else {
@@ -923,7 +921,7 @@ var Build;
                                 (0, exports.$expression)("{")
                             ], integerOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)))),
+                                (0, exports.$expression)("".concat(type_1.Jsonable.stringify(Build.getSafeNumber(data)))),
                                 (0, exports.$expression)(")"),
                             ], false);
                         }
@@ -943,7 +941,7 @@ var Build;
                                 (0, exports.$expression)("{")
                             ], numberOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)("".concat(jsonable_1.Jsonable.stringify(Build.getSafeNumber(data)))),
+                                (0, exports.$expression)("".concat(type_1.Jsonable.stringify(Build.getSafeNumber(data)))),
                                 (0, exports.$expression)(")"),
                             ], false);
                         }
@@ -955,7 +953,7 @@ var Build;
                             ];
                         }
                     case "string":
-                        var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format]), ",")), (0, exports.$expression)("pattern:".concat(jsonable_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
+                        var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format]), ",")), (0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
                         if (0 < stringOptions.length) {
                             return __spreadArray(__spreadArray([
                                 (0, exports.$expression)("EvilType.Validator.isDetailedString"),
@@ -963,7 +961,7 @@ var Build;
                                 (0, exports.$expression)("{")
                             ], stringOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)(jsonable_1.Jsonable.stringify(Build.getRegexpFlags(data))),
+                                (0, exports.$expression)(type_1.Jsonable.stringify(Build.getRegexpFlags(data))),
                                 (0, exports.$expression)(")"),
                             ], false);
                         }
@@ -1064,7 +1062,7 @@ var Build;
         };
         Validator.buildFullValidator = function (data) { return Validator.isLazyValidator(data) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(data), true),]), true) :
             Validator.buildObjectValidatorGetterCoreEntry(data); };
-        Validator.hasValidatorOption = evil_type_1.EvilType.Validator.isOr(type_1.Type.isTypeDefinition, type_1.Type.isValueDefinition);
+        Validator.hasValidatorOption = type_1.EvilType.Validator.isOr(type_1.Type.isTypeDefinition, type_1.Type.isValueDefinition);
         Validator.isValidatorTarget = function (define) {
             return !(Validator.hasValidatorOption(define) && false === define.validator);
         };
@@ -1157,7 +1155,7 @@ var Build;
             if (data.schema.externalReferMapping) {
                 var key = Object.keys(data.schema.externalReferMapping)
                     .filter(function (i) { return i === absolutePath || absolutePath.startsWith("".concat(i, ".")); })
-                    .sort(evil_type_1.EvilType.comparer(function (i) { return -i.length; }))[0];
+                    .sort(type_1.EvilType.comparer(function (i) { return -i.length; }))[0];
                 if (key) {
                     return data.schema.externalReferMapping[key] + absolutePath.slice(key.length);
                 }
@@ -1349,9 +1347,9 @@ var Build;
                         var required_1 = result["required"];
                         required_1.push.apply(required_1, base["required"].filter(function (j) { return !required_1.includes(j); }));
                         var not = base["not"];
-                        if (jsonable_1.Jsonable.isJsonableObject(not)) {
+                        if (type_1.Jsonable.isJsonableObject(not)) {
                             var baseNotRequired = not["required"];
-                            if (evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString)(baseNotRequired)) {
+                            if (type_1.EvilType.Validator.isArray(type_1.EvilType.Validator.isString)(baseNotRequired)) {
                                 notRequired.push.apply(notRequired, baseNotRequired);
                             }
                         }
@@ -1451,7 +1449,7 @@ var Build;
                 }
             }
             else if (type_1.Type.isLiteralElement(target.value)) {
-                if (evil_type_1.EvilType.Validator.isObject(target.value.const)) {
+                if (type_1.EvilType.Validator.isObject(target.value.const)) {
                     result["enum"] = Object.keys(target.value.const);
                 }
                 else {
@@ -1537,7 +1535,7 @@ var Format;
 (function (Format) {
     // data:code(object) to data:output(text)
     Format.getMaxLineLength = function (options) {
-        return evil_type_1.EvilType.Validator.isUndefined(options.maxLineLength) ? config_json_1.default.maxLineLength : options.maxLineLength;
+        return type_1.EvilType.Validator.isUndefined(options.maxLineLength) ? config_json_1.default.maxLineLength : options.maxLineLength;
     };
     Format.buildIndent = function (options, indentDepth) {
         return Array.from({ length: indentDepth, })
@@ -1680,8 +1678,8 @@ var build = function (jsonPath) {
     try {
         var fget = function (path) { return fs_1.default.readFileSync(path, { encoding: "utf-8" }); };
         var rawSource = fget(jsonPath);
-        var typeSource = jsonable_1.Jsonable.parse(rawSource);
-        var errorListner = evil_type_1.EvilType.Validator.makeErrorListener(jsonPath);
+        var typeSource = type_1.Jsonable.parse(rawSource);
+        var errorListner = type_1.EvilType.Validator.makeErrorListener(jsonPath);
         var resolvePath = function (path) {
             if (path.startsWith("./") || path.startsWith("../")) {
                 var base = jsonPath.split("/").slice(0, -1);
@@ -1709,7 +1707,7 @@ var build = function (jsonPath) {
             fs_1.default.writeFileSync(resolvePath(typeSource.options.outputFile), result_7, { encoding: "utf-8" });
             if (typeSource.options.schema) {
                 var schema = Build.Schema.build(Build.Schema.makeProcess(typeSource, typeSource.options.schema));
-                fs_1.default.writeFileSync(resolvePath(typeSource.options.schema.outputFile), jsonable_1.Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
+                fs_1.default.writeFileSync(resolvePath(typeSource.options.schema.outputFile), type_1.Jsonable.stringify(schema, null, 4), { encoding: "utf-8" });
             }
             return true;
         }

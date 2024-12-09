@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Type = void 0;
+exports.Type = exports.Jsonable = exports.EvilType = void 0;
 // This file is generated.
 var evil_type_1 = require("../../common/evil-type");
+Object.defineProperty(exports, "EvilType", { enumerable: true, get: function () { return evil_type_1.EvilType; } });
 var jsonable_1 = require("./jsonable");
+Object.defineProperty(exports, "Jsonable", { enumerable: true, get: function () { return jsonable_1.Jsonable; } });
 var Type;
 (function (Type) {
     Type.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";

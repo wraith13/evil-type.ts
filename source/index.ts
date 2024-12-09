@@ -1,9 +1,7 @@
 'use strict';
 const startAt = new Date();
 import fs from "fs";
-import { EvilType } from "../common/evil-type";
-import { Jsonable } from "../generated/code/jsonable";
-import { Type } from "../generated/code/type";
+import { EvilType, Jsonable, Type } from "../generated/code/type";
 import { Text } from "./text";
 import config from "../resource/config.json";
 if (3 !== process.argv.length)

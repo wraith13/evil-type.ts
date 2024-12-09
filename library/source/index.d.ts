@@ -1,6 +1,4 @@
-import { EvilType } from "../common/evil-type";
-import { Jsonable } from "../generated/code/jsonable";
-import { Type } from "../generated/code/type";
+import { EvilType, Jsonable, Type } from "../generated/code/type";
 interface Code {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
 }

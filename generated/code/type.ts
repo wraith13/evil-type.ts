@@ -1,6 +1,8 @@
 // This file is generated.
 import { EvilType } from "../../common/evil-type";
 import { Jsonable } from "./jsonable";
+export { EvilType };
+export { Jsonable };
 export namespace Type
 {
     export const schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#" as const;

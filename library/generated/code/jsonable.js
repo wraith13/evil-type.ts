@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Jsonable = void 0;
+exports.Jsonable = exports.EvilType = void 0;
 // This file is generated.
 var evil_type_1 = require("../../common/evil-type");
+Object.defineProperty(exports, "EvilType", { enumerable: true, get: function () { return evil_type_1.EvilType; } });
 var Jsonable;
 (function (Jsonable) {
     Jsonable.parse = function (json) { return JSON.parse(json); };
