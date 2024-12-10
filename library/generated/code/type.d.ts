@@ -1,7 +1,6 @@
 import { EvilType } from "../../common/evil-type";
 import { Jsonable } from "./jsonable";
-export { EvilType };
-export { Jsonable };
+export { EvilType, Jsonable };
 export declare namespace Type {
     const schema: "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";
     interface CommentProperty {

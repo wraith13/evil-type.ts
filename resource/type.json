@@ -20,14 +20,7 @@
             "tokens": [
                 "{",
                 "EvilType",
-                "}"
-            ]
-        },
-        "Jsonable": {
-            "type": "code",
-            "export": true,
-            "tokens": [
-                "{",
+                ",",
                 "Jsonable",
                 "}"
             ]
