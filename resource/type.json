@@ -14,7 +14,7 @@
         }
     ],
     "defines": {
-        "EvilType": {
+        "export": {
             "type": "code",
             "export": true,
             "tokens": [
