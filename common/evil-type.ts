@@ -341,7 +341,33 @@ export namespace EvilType
         };
         export const isString = (value: unknown, listner?: ErrorListener): value is string =>
             Error.withErrorHandling("string" === typeof value, listner, "string", value);
-        export const isDetailedString = <Type extends string = string>(data: { minLength?: number, maxLength?: number, pattern?: string, format?: string, regexpFlags?: string}, regexpFlags?: string): IsType<Type> =>
+        export const makeStringTypeName = (data: { minLength?: number; maxLength?: number; pattern?: string; format?: string; regexpFlags?: string; }) =>
+        {
+            const details: string[] = [];
+            if (undefined !== data.minLength)
+            {
+                details.push(`minLength:${data.minLength}`);
+            }
+            if (undefined !== data.maxLength)
+            {
+                details.push(`maxLength:${data.maxLength}`);
+            }
+            if (undefined !== data.format)
+            {
+                details.push(`format:${data.format}`);
+            }
+            else
+            if (undefined !== data.pattern)
+            {
+                details.push(`pattern:${data.pattern}`);
+            }
+            if (undefined !== data.regexpFlags)
+            {
+                details.push(`regexpFlags:${data.regexpFlags}`);
+            }
+            return `string(${details.join(",")})`
+        };
+        export const isDetailedString = <Type extends string = string>(data: { minLength?: number; maxLength?: number; pattern?: string; format?: string; regexpFlags?: string }, regexpFlags?: string): IsType<Type> =>
         {
             if ([ data.minLength, data.maxLength, data.pattern, data.format ].every(i => undefined === i))
             {
@@ -355,32 +381,7 @@ export namespace EvilType
                 (undefined === data.maxLength || value.length <= data.maxLength) &&
                 (undefined === pattern || new RegExp(pattern, data.regexpFlags ?? regexpFlags ?? "u").test(value)),
                 listner,
-                () =>
-                {
-                    const details: string[] = [];
-                    if (undefined !== data.minLength)
-                    {
-                        details.push(`minLength:${data.minLength}`);
-                    }
-                    if (undefined !== data.maxLength)
-                    {
-                        details.push(`maxLength:${data.maxLength}`);
-                    }
-                    if (undefined !== data.format)
-                    {
-                        details.push(`format:${data.format}`);
-                    }
-                    else
-                    if (undefined !== data.pattern)
-                    {
-                        details.push(`pattern:${data.pattern}`);
-                    }
-                    if (undefined !== data.regexpFlags)
-                    {
-                        details.push(`regexpFlags:${data.regexpFlags}`);
-                    }
-                    return `string(${details.join(",")})`
-                },
+                () => makeStringTypeName(data),
                 value
             );
             return result;
@@ -393,7 +394,7 @@ export namespace EvilType
                 Error.withErrorHandling(list.includes(value as T), listner, () => list.map(i => Error.valueToString(i)).join(" | "), value);
         export const isUniqueItems = (list: unknown[]) =>
             list.map(i => JSON.stringify(i)).every((i, ix, list) => ix === list.indexOf(i));
-        export const isArray = <T>(isType: IsType<T>, data?: { minItems?: number; maxItems?: number; uniqueItems?: boolean; }) =>
+        export const makeArrayTypeName = (data?: { minItems?: number; maxItems?: number; uniqueItems?: boolean; }) =>
         {
             const details: string[] = [];
             if (undefined !== data?.minItems)
@@ -408,7 +409,10 @@ export namespace EvilType
             {
                 details.push(`uniqueItems:${data.uniqueItems}`);
             }
-            const type = details.length <= 0 ? "array": `array(${details.join(",")})`
+            return details.length <= 0 ? "array": `array(${details.join(",")})`
+        };
+        export const isArray = <T>(isType: IsType<T>, data?: { minItems?: number; maxItems?: number; uniqueItems?: boolean; }) =>
+        {
             return (value: unknown, listner?: ErrorListener): value is T[] =>
             {
                 if
@@ -435,7 +439,7 @@ export namespace EvilType
                 }
                 else
                 {
-                    return undefined !== listner && Error.raiseError(listner, type, value);
+                    return undefined !== listner && Error.raiseError(listner, () => makeArrayTypeName(data), value);
                 }
             };
         };
@@ -755,26 +759,5 @@ export namespace EvilType
                     return undefined !== listner && Error.raiseError(listner, "object", value);
                 }
             };
-        // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。
-        // VS Coce + TypeScript の挙動がいまよりマシになったらこれベースのコードの採用を再検討
-        // https://x.com/wraith13/status/1804464507755884969
-        // export type GuardType<T> = T extends (value: unknown) => value is infer U ? U : never;
-        // export type BuildInterface<T extends { [key: string]: (value: unknown) => value is any}> = { -readonly [key in keyof T]: GuardType<T[key]>; };
-        // export const isSpecificObjectX = <T extends { [key: string]: (value: unknown) => value is any}>(memberSpecification: { [key: string]: ((v: unknown) => boolean) }) => (value: unknown): value is BuildInterface<T> =>
-        //     isObject(value) &&
-        //     Object.entries(memberSpecification).every
-        //     (
-        //         kv => kv[0].endsWith("?") ?
-        //                 isMemberTypeOrUndefined<BuildInterface<T>>(value, kv[0].slice(0, -1) as keyof BuildInterface<T>, kv[1]):
-        //                 isMemberType<BuildInterface<T>>(value, kv[0] as keyof BuildInterface<T>, kv[1])
-        //     );
-        // export const TypeOptionsTypeSource =
-        // {
-        //     indentUnit: isOr(isNumber, isJust("tab" as const)),
-        //     indentStyle: isIndentStyleType,
-        //     validatorOption: isValidatorOptionType,
-        // } as const;
-        // export type GenericTypeOptions = BuildInterface<typeof TypeOptionsTypeSource>;
-        // export const isGenericTypeOptions = isSpecificObjectX(TypeOptionsTypeSource);
     }
 }

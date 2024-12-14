@@ -298,6 +298,25 @@ var EvilType;
         Validator.isString = function (value, listner) {
             return Error.withErrorHandling("string" === typeof value, listner, "string", value);
         };
+        Validator.makeStringTypeName = function (data) {
+            var details = [];
+            if (undefined !== data.minLength) {
+                details.push("minLength:".concat(data.minLength));
+            }
+            if (undefined !== data.maxLength) {
+                details.push("maxLength:".concat(data.maxLength));
+            }
+            if (undefined !== data.format) {
+                details.push("format:".concat(data.format));
+            }
+            else if (undefined !== data.pattern) {
+                details.push("pattern:".concat(data.pattern));
+            }
+            if (undefined !== data.regexpFlags) {
+                details.push("regexpFlags:".concat(data.regexpFlags));
+            }
+            return "string(".concat(details.join(","), ")");
+        };
         Validator.isDetailedString = function (data, regexpFlags) {
             if ([data.minLength, data.maxLength, data.pattern, data.format].every(function (i) { return undefined === i; })) {
                 return Validator.isString;
@@ -308,25 +327,7 @@ var EvilType;
                 return Error.withErrorHandling("string" === typeof value &&
                     (undefined === data.minLength || data.minLength <= value.length) &&
                     (undefined === data.maxLength || value.length <= data.maxLength) &&
-                    (undefined === pattern || new RegExp(pattern, (_b = (_a = data.regexpFlags) !== null && _a !== void 0 ? _a : regexpFlags) !== null && _b !== void 0 ? _b : "u").test(value)), listner, function () {
-                    var details = [];
-                    if (undefined !== data.minLength) {
-                        details.push("minLength:".concat(data.minLength));
-                    }
-                    if (undefined !== data.maxLength) {
-                        details.push("maxLength:".concat(data.maxLength));
-                    }
-                    if (undefined !== data.format) {
-                        details.push("format:".concat(data.format));
-                    }
-                    else if (undefined !== data.pattern) {
-                        details.push("pattern:".concat(data.pattern));
-                    }
-                    if (undefined !== data.regexpFlags) {
-                        details.push("regexpFlags:".concat(data.regexpFlags));
-                    }
-                    return "string(".concat(details.join(","), ")");
-                }, value);
+                    (undefined === pattern || new RegExp(pattern, (_b = (_a = data.regexpFlags) !== null && _a !== void 0 ? _a : regexpFlags) !== null && _b !== void 0 ? _b : "u").test(value)), listner, function () { return Validator.makeStringTypeName(data); }, value);
             };
             return result;
         };
@@ -341,7 +342,7 @@ var EvilType;
         Validator.isUniqueItems = function (list) {
             return list.map(function (i) { return JSON.stringify(i); }).every(function (i, ix, list) { return ix === list.indexOf(i); });
         };
-        Validator.isArray = function (isType, data) {
+        Validator.makeArrayTypeName = function (data) {
             var details = [];
             if (undefined !== (data === null || data === void 0 ? void 0 : data.minItems)) {
                 details.push("minItems:".concat(data.minItems));
@@ -352,7 +353,9 @@ var EvilType;
             if (true === (data === null || data === void 0 ? void 0 : data.uniqueItems)) {
                 details.push("uniqueItems:".concat(data.uniqueItems));
             }
-            var type = details.length <= 0 ? "array" : "array(".concat(details.join(","), ")");
+            return details.length <= 0 ? "array" : "array(".concat(details.join(","), ")");
+        };
+        Validator.isArray = function (isType, data) {
             return function (value, listner) {
                 if (Array.isArray(value) &&
                     (undefined === (data === null || data === void 0 ? void 0 : data.minItems) || data.minItems <= value.length) &&
@@ -370,7 +373,7 @@ var EvilType;
                     return result;
                 }
                 else {
-                    return undefined !== listner && Error.raiseError(listner, type, value);
+                    return undefined !== listner && Error.raiseError(listner, function () { return Validator.makeArrayTypeName(data); }, value);
                 }
             };
         };
@@ -617,27 +620,6 @@ var EvilType;
                 }
             };
         };
-        // 現状ではこのコードで生成された型のエディタ上での入力保管や型検査が機能しなくなるので使い物にならない。
-        // VS Coce + TypeScript の挙動がいまよりマシになったらこれベースのコードの採用を再検討
-        // https://x.com/wraith13/status/1804464507755884969
-        // export type GuardType<T> = T extends (value: unknown) => value is infer U ? U : never;
-        // export type BuildInterface<T extends { [key: string]: (value: unknown) => value is any}> = { -readonly [key in keyof T]: GuardType<T[key]>; };
-        // export const isSpecificObjectX = <T extends { [key: string]: (value: unknown) => value is any}>(memberSpecification: { [key: string]: ((v: unknown) => boolean) }) => (value: unknown): value is BuildInterface<T> =>
-        //     isObject(value) &&
-        //     Object.entries(memberSpecification).every
-        //     (
-        //         kv => kv[0].endsWith("?") ?
-        //                 isMemberTypeOrUndefined<BuildInterface<T>>(value, kv[0].slice(0, -1) as keyof BuildInterface<T>, kv[1]):
-        //                 isMemberType<BuildInterface<T>>(value, kv[0] as keyof BuildInterface<T>, kv[1])
-        //     );
-        // export const TypeOptionsTypeSource =
-        // {
-        //     indentUnit: isOr(isNumber, isJust("tab" as const)),
-        //     indentStyle: isIndentStyleType,
-        //     validatorOption: isValidatorOptionType,
-        // } as const;
-        // export type GenericTypeOptions = BuildInterface<typeof TypeOptionsTypeSource>;
-        // export const isGenericTypeOptions = isSpecificObjectX(TypeOptionsTypeSource);
     })(Validator = EvilType.Validator || (EvilType.Validator = {}));
 })(EvilType || (exports.EvilType = EvilType = {}));
 //# sourceMappingURL=evil-type.js.map
