@@ -1208,8 +1208,8 @@ export namespace Build
                             $expression("("),
                             $expression("{"),
                             ...integerOptions,
-                            $expression("},"),
-                            $expression(`${Jsonable.stringify(getSafeNumber(data))}`),
+                            $expression("}"),
+                            ...(getSafeNumber(data) ? [ $expression(","), $expression(Jsonable.stringify("safe")), ]: []),
                             $expression(")"),
                         ];
                     }
@@ -1236,8 +1236,8 @@ export namespace Build
                             $expression("("),
                             $expression("{"),
                             ...numberOptions,
-                            $expression("},"),
-                            $expression(`${Jsonable.stringify(getSafeNumber(data))}`),
+                            $expression("}"),
+                            ...(getSafeNumber(data) ? [ $expression(","), $expression(Jsonable.stringify("safe")), ]: []),
                             $expression(")"),
                         ];
                     }

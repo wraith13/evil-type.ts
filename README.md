@@ -33,7 +33,7 @@ npm install @wraith13/evil-type.ts --save-dev
 - [template: full validator](./template/full.json)
 - [example: Jsonable](./resource/jsonable.json)
 - [example: Type](./resource/type.json)
-- [example: flounder.style.js](https://github.com/wraith13/flounder.style.js/blob/master/source/type.json)
+- [example: flounder.style.js](https://github.com/wraith13/flounder.style.js/blob/master/type.json)
 
 ## How to use
 

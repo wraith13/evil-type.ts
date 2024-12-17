@@ -915,13 +915,13 @@ var Build;
                     case "integer":
                         var integerOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minimum ? [(0, exports.$expression)("minimum:".concat(data.value.minimum, ",")),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("exclusiveMinimum:".concat(data.value.exclusiveMinimum, ",")),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("maximum:".concat(data.value.maximum, ",")),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("exclusiveMaximum:".concat(data.value.exclusiveMaximum, ",")),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("multipleOf:".concat(data.value.multipleOf, ",")),] : []), true);
                         if (0 < integerOptions.length) {
-                            return __spreadArray(__spreadArray([
+                            return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
                                 (0, exports.$expression)("EvilType.Validator.isDetailedInteger"),
                                 (0, exports.$expression)("("),
                                 (0, exports.$expression)("{")
                             ], integerOptions, true), [
-                                (0, exports.$expression)("},"),
-                                (0, exports.$expression)("".concat(type_1.Jsonable.stringify(Build.getSafeNumber(data)))),
+                                (0, exports.$expression)("}")
+                            ], false), (Build.getSafeNumber(data) ? [(0, exports.$expression)(","), (0, exports.$expression)(type_1.Jsonable.stringify("safe")),] : []), true), [
                                 (0, exports.$expression)(")"),
                             ], false);
                         }
@@ -935,13 +935,13 @@ var Build;
                     case "number":
                         var numberOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minimum ? [(0, exports.$expression)("minimum:".concat(data.value.minimum, ",")),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("exclusiveMinimum:".concat(data.value.exclusiveMinimum, ",")),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("maximum:".concat(data.value.maximum, ",")),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("exclusiveMaximum:".concat(data.value.exclusiveMaximum, ",")),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("multipleOf:".concat(data.value.multipleOf, ",")),] : []), true);
                         if (0 < numberOptions.length) {
-                            return __spreadArray(__spreadArray([
+                            return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
                                 (0, exports.$expression)("EvilType.Validator.isDetailedNumber"),
                                 (0, exports.$expression)("("),
                                 (0, exports.$expression)("{")
                             ], numberOptions, true), [
-                                (0, exports.$expression)("},"),
-                                (0, exports.$expression)("".concat(type_1.Jsonable.stringify(Build.getSafeNumber(data)))),
+                                (0, exports.$expression)("}")
+                            ], false), (Build.getSafeNumber(data) ? [(0, exports.$expression)(","), (0, exports.$expression)(type_1.Jsonable.stringify("safe")),] : []), true), [
                                 (0, exports.$expression)(")"),
                             ], false);
                         }

@@ -51,7 +51,7 @@ export declare namespace EvilType {
             maximum?: number;
             exclusiveMaximum?: number;
             multipleOf?: number;
-        }, safeInteger?: boolean) => IsType<number>;
+        }, safeInteger?: "safe") => IsType<number>;
         const isNumber: (value: unknown, listner?: ErrorListener) => value is number;
         const isSafeNumber: (value: unknown, listner?: ErrorListener) => value is number;
         const isDetailedNumber: (data: {
@@ -60,7 +60,7 @@ export declare namespace EvilType {
             maximum?: number;
             exclusiveMaximum?: number;
             multipleOf?: number;
-        }, safeNumber?: boolean) => IsType<number>;
+        }, safeNumber?: "safe") => IsType<number>;
         const isString: (value: unknown, listner?: ErrorListener) => value is string;
         const makeStringTypeName: (data: {
             minLength?: number;

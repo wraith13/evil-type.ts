@@ -224,7 +224,7 @@ var EvilType;
             return Error.withErrorHandling(Number.isSafeInteger(value), listner, "safe-integer", value);
         };
         Validator.isDetailedInteger = function (data, safeInteger) {
-            var base = true === safeInteger ? Validator.isSafeInteger : Validator.isInteger;
+            var base = "safe" === safeInteger ? Validator.isSafeInteger : Validator.isInteger;
             if ([data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf].every(function (i) { return undefined === i; })) {
                 return base;
             }
@@ -251,7 +251,7 @@ var EvilType;
                     if (undefined !== data.multipleOf) {
                         details.push("multipleOf:".concat(data.multipleOf));
                     }
-                    return "".concat(true === safeInteger ? "safe-integer" : "integer", "(").concat(details.join(","), ")");
+                    return "".concat("safe" === safeInteger ? "safe-integer" : "integer", "(").concat(details.join(","), ")");
                 }, value); };
                 return result;
             }
@@ -263,7 +263,7 @@ var EvilType;
             return Error.withErrorHandling(Number.isFinite(value), listner, "safe-number", value);
         };
         Validator.isDetailedNumber = function (data, safeNumber) {
-            var base = true === safeNumber ? Validator.isSafeNumber : Validator.isNumber;
+            var base = "safe" === safeNumber ? Validator.isSafeNumber : Validator.isNumber;
             if ([data.minimum, data.exclusiveMinimum, data.maximum, data.exclusiveMaximum, data.multipleOf].every(function (i) { return undefined === i; })) {
                 return base;
             }
@@ -290,7 +290,7 @@ var EvilType;
                     if (undefined !== data.multipleOf) {
                         details.push("multipleOf:".concat(data.multipleOf));
                     }
-                    return "".concat(true === safeNumber ? "safe-number" : "number", "(").concat(details.join(","), ")");
+                    return "".concat("safe" === safeNumber ? "safe-number" : "number", "(").concat(details.join(","), ")");
                 }, value); };
                 return result;
             }
