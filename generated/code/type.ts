@@ -31,7 +31,7 @@ export namespace Type
         safeNumber?: boolean;
         safeInteger?: boolean;
         maxLineLength?: null | number;
-        StringFormatMap?: { [ key in keyof typeof StringFormatMap ] ?: { pattern?: string; tsPattern?: string[]; regexpFlags?: string; }; };
+        StringFormatMap?: { [ key in keyof typeof StringFormatMap ] ?: StringFormatEntry; };
         default?: { export?: boolean; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?: string; };
         schema?: SchemaOptions;
     }
@@ -227,6 +227,12 @@ export namespace Type
         "ipv6": "^ipv6$", "uuid": "^uuid$", "uri": "^uri$", "uri-reference": "^uri-reference$", "iri": "^iri$",
         "iri-reference": "^iri-reference$", "uri-template": "^uri-template$", "json-pointer": "^json-pointer$",
         "relative-json-pointer": "^relative-json-pointer$", "regex": "^regex$" } as const;
+    export interface StringFormatEntry
+    {
+        pattern?: string;
+        tsPattern?: string[];
+        regexpFlags?: string;
+    }
     export const isSchema = EvilType.Validator.isJust(schema);
     export const isCommentProperty = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commentPropertyValidatorObject, false));
     export const isCommonProperties = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commonPropertiesValidatorObject, false));
@@ -287,6 +293,7 @@ export namespace Type
         isTypeOrValue, isReferElement));
     export const isTypeOrLiteralOfRefer: EvilType.Validator.IsType<TypeOrLiteralOfRefer> = EvilType.lazy(() => EvilType.Validator.isOr(
         isTypeOrRefer, isLiteralElement));
+    export const isStringFormatEntry = EvilType.lazy(() => EvilType.Validator.isSpecificObject(stringFormatEntryValidatorObject, false));
     export const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty> = ({ comment:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString)), });
     export const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties> = ({ default:
@@ -300,62 +307,20 @@ export namespace Type
         isIndentStyleType, validatorOption: isValidatorOptionType, safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean),
         safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), maxLineLength: EvilType.Validator.isOptional(
         EvilType.Validator.isOr(EvilType.Validator.isNull, EvilType.Validator.isInteger)), StringFormatMap: EvilType.Validator.isOptional((
-        { "date-time": EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
-        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), date: EvilType.Validator.isOptional(({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(
-        EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), })), time: EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, {
-        minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), duration:
-        EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
-        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), email: EvilType.Validator.isOptional(({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(
-        EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), })), "idn-email": EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, {
-        minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), hostname:
-        EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
-        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), "idn-hostname": EvilType.Validator.isOptional(({
-        pattern: EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(
-        EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), })), ipv4: EvilType.Validator.isOptional(({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(
-        EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), })), ipv6: EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, {
-        minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), uuid:
-        EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
-        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), uri: EvilType.Validator.isOptional(({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(
-        EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), })), "uri-reference": EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, {
-        minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), iri:
-        EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
-        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), "iri-reference": EvilType.Validator.isOptional(({
-        pattern: EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(
-        EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), })), "uri-template": EvilType.Validator.isOptional(({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(
-        EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), })), "json-pointer": EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, {
-        minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })),
-        "relative-json-pointer": EvilType.Validator.isOptional(({ pattern: EvilType.Validator.isOptional(EvilType.Validator.isString),
-        tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },
-        )), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), regex: EvilType.Validator.isOptional(({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(
-        EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), })), })), default: EvilType.Validator.isOptional(({ export: EvilType.Validator.isOptional(
-        EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeInteger:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean
-        ), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), })), schema: EvilType.Validator.isOptional(
-        isSchemaOptions), });
+        { "date-time": EvilType.Validator.isOptional(isStringFormatEntry), date: EvilType.Validator.isOptional(isStringFormatEntry), time:
+        EvilType.Validator.isOptional(isStringFormatEntry), duration: EvilType.Validator.isOptional(isStringFormatEntry), email:
+        EvilType.Validator.isOptional(isStringFormatEntry), "idn-email": EvilType.Validator.isOptional(isStringFormatEntry), hostname:
+        EvilType.Validator.isOptional(isStringFormatEntry), "idn-hostname": EvilType.Validator.isOptional(isStringFormatEntry), ipv4:
+        EvilType.Validator.isOptional(isStringFormatEntry), ipv6: EvilType.Validator.isOptional(isStringFormatEntry), uuid:
+        EvilType.Validator.isOptional(isStringFormatEntry), uri: EvilType.Validator.isOptional(isStringFormatEntry), "uri-reference":
+        EvilType.Validator.isOptional(isStringFormatEntry), iri: EvilType.Validator.isOptional(isStringFormatEntry), "iri-reference":
+        EvilType.Validator.isOptional(isStringFormatEntry), "uri-template": EvilType.Validator.isOptional(isStringFormatEntry),
+        "json-pointer": EvilType.Validator.isOptional(isStringFormatEntry), "relative-json-pointer": EvilType.Validator.isOptional(
+        isStringFormatEntry), regex: EvilType.Validator.isOptional(isStringFormatEntry), })), default: EvilType.Validator.isOptional(({
+        export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(
+        EvilType.Validator.isBoolean), safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeNumber:
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString
+        ), })), schema: EvilType.Validator.isOptional(isSchemaOptions), });
     export const schemaOptionsValidatorObject: EvilType.Validator.ObjectValidator<SchemaOptions> = ({ outputFile:
         EvilType.Validator.isString, $id: EvilType.Validator.isOptional(EvilType.Validator.isString), $ref: EvilType.Validator.isOptional(
         EvilType.Validator.isString), externalReferMapping: EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(
@@ -458,4 +423,8 @@ export namespace Type
         EvilType.Validator.mergeObjectValidator(commonPropertiesValidatorObject, { type: EvilType.Validator.isJust("memberof" as const),
         value: isReferElement, key: EvilType.Validator.isOr(EvilType.Validator.isString, EvilType.Validator.isDetailedInteger({ minimum:0,
         })), });
+    export const stringFormatEntryValidatorObject: EvilType.Validator.ObjectValidator<StringFormatEntry> = ({ pattern:
+        EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(
+        EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(
+        EvilType.Validator.isString), });
 }

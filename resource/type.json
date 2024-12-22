@@ -164,24 +164,7 @@
                             },
                             "optionality": "partial",
                             "valueType": {
-                                "type": "interface",
-                                "members": {
-                                    "pattern?": {
-                                        "type": "string"
-                                    },
-                                    "tsPattern?": {
-                                        "type": "array",
-                                        "uniqueItems": true,
-                                        "items": {
-                                            "type": "string"
-                                        },
-                                        "minItems": 1,
-                                        "description": "[TypeScript] You can define Template Literal Types. Arrays are OR-combined. You need to match the regular expression in `pattern` and Template Literal Types."
-                                    },
-                                    "regexpFlags?": {
-                                        "type": "string"
-                                    }
-                                }
+                                "$ref": "StringFormatEntry"
                             },
                             "additionalProperties": false
                         },
@@ -1090,6 +1073,27 @@
                         }
                     },
                     "validator": false
+                },
+                "StringFormatEntry": {
+                    "type": "interface",
+                    "members": {
+                        "pattern?": {
+                            "type": "string"
+                        },
+                        "tsPattern?": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "string"
+                            },
+                            "minItems": 1,
+                            "description": "[TypeScript] You can define Template Literal Types. Arrays are OR-combined. You need to match the regular expression in `pattern` and Template Literal Types."
+                        },
+                        "regexpFlags?": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
                 }
             }
         }

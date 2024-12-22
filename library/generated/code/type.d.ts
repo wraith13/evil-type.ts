@@ -26,7 +26,7 @@ export declare namespace Type {
         safeInteger?: boolean;
         maxLineLength?: null | number;
         StringFormatMap?: {
-            [key in keyof typeof StringFormatMap]?: string;
+            [key in keyof typeof StringFormatMap]?: StringFormatEntry;
         };
         default?: {
             export?: boolean;
@@ -216,6 +216,11 @@ export declare namespace Type {
         readonly "relative-json-pointer": "^relative-json-pointer$";
         readonly regex: "^regex$";
     };
+    interface StringFormatEntry {
+        pattern?: string;
+        tsPattern?: string[];
+        regexpFlags?: string;
+    }
     const isSchema: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";
     const isCommentProperty: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is CommentProperty;
     const isCommonProperties: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is CommonProperties;
@@ -262,6 +267,7 @@ export declare namespace Type {
     const isTypeOrValue: EvilType.Validator.IsType<TypeOrValue>;
     const isTypeOrValueOfRefer: EvilType.Validator.IsType<TypeOrValueOfRefer>;
     const isTypeOrLiteralOfRefer: EvilType.Validator.IsType<TypeOrLiteralOfRefer>;
+    const isStringFormatEntry: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is StringFormatEntry;
     const commentPropertyValidatorObject: EvilType.Validator.ObjectValidator<CommentProperty>;
     const commonPropertiesValidatorObject: EvilType.Validator.ObjectValidator<CommonProperties>;
     const typeSchemaValidatorObject: EvilType.Validator.ObjectValidator<TypeSchema>;
@@ -296,4 +302,5 @@ export declare namespace Type {
     const keyofElementValidatorObject: EvilType.Validator.ObjectValidator<KeyofElement>;
     const itemofElementValidatorObject: EvilType.Validator.ObjectValidator<ItemofElement>;
     const memberofElementValidatorObject: EvilType.Validator.ObjectValidator<MemberofElement>;
+    const stringFormatEntryValidatorObject: EvilType.Validator.ObjectValidator<StringFormatEntry>;
 }
