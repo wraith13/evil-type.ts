@@ -10,11 +10,17 @@ var Type;
 (function (Type) {
     Type.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";
     Type.indentStyleTypeMember = ["allman", "egyptian"];
-    Type.StringFormatMap = { "date-time": "^date-time$", "date": "^date$", "time": "^time$", "duration": "^duration$",
-        "email": "^email$", "idn-email": "^idn-email$", "hostname": "^hostname$", "idn-hostname": "^idn-hostname$", "ipv4": "^ipv4$",
-        "ipv6": "^ipv6$", "uuid": "^uuid$", "uri": "^uri$", "uri-reference": "^uri-reference$", "iri": "^iri$",
-        "iri-reference": "^iri-reference$", "uri-template": "^uri-template$", "json-pointer": "^json-pointer$",
-        "relative-json-pointer": "^relative-json-pointer$", "regex": "^regex$" };
+    Type.StringFormatMap = { "date-time": { "pattern": "^date-time$" }, "date": { "pattern": "^date$" }, "time": {
+            "pattern": "^time$"
+        }, "duration": { "pattern": "^duration$" }, "email": { "pattern": "^email$" }, "idn-email": {
+            "pattern": "^idn-email$"
+        }, "hostname": { "pattern": "^hostname$" }, "idn-hostname": { "pattern": "^idn-hostname$" }, "ipv4": {
+            "pattern": "^ipv4$"
+        }, "ipv6": { "pattern": "^ipv6$" }, "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" },
+        "uri-reference": { "pattern": "^uri-reference$" }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$"
+        }, "uri-template": { "pattern": "^uri-template$" }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
+            "pattern": "^relative-json-pointer$"
+        }, "regex": { "pattern": "^regex$" } };
     Type.isSchema = evil_type_1.EvilType.Validator.isJust(Type.schema);
     Type.isCommentProperty = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.commentPropertyValidatorObject, false); });
     Type.isCommonProperties = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.commonPropertiesValidatorObject, false); });

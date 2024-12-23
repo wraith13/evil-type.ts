@@ -196,25 +196,63 @@ export declare namespace Type {
     type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
     const StringFormatMap: {
-        readonly "date-time": "^date-time$";
-        readonly date: "^date$";
-        readonly time: "^time$";
-        readonly duration: "^duration$";
-        readonly email: "^email$";
-        readonly "idn-email": "^idn-email$";
-        readonly hostname: "^hostname$";
-        readonly "idn-hostname": "^idn-hostname$";
-        readonly ipv4: "^ipv4$";
-        readonly ipv6: "^ipv6$";
-        readonly uuid: "^uuid$";
-        readonly uri: "^uri$";
-        readonly "uri-reference": "^uri-reference$";
-        readonly iri: "^iri$";
-        readonly "iri-reference": "^iri-reference$";
-        readonly "uri-template": "^uri-template$";
-        readonly "json-pointer": "^json-pointer$";
-        readonly "relative-json-pointer": "^relative-json-pointer$";
-        readonly regex: "^regex$";
+        readonly "date-time": {
+            readonly pattern: "^date-time$";
+        };
+        readonly date: {
+            readonly pattern: "^date$";
+        };
+        readonly time: {
+            readonly pattern: "^time$";
+        };
+        readonly duration: {
+            readonly pattern: "^duration$";
+        };
+        readonly email: {
+            readonly pattern: "^email$";
+        };
+        readonly "idn-email": {
+            readonly pattern: "^idn-email$";
+        };
+        readonly hostname: {
+            readonly pattern: "^hostname$";
+        };
+        readonly "idn-hostname": {
+            readonly pattern: "^idn-hostname$";
+        };
+        readonly ipv4: {
+            readonly pattern: "^ipv4$";
+        };
+        readonly ipv6: {
+            readonly pattern: "^ipv6$";
+        };
+        readonly uuid: {
+            readonly pattern: "^uuid$";
+        };
+        readonly uri: {
+            readonly pattern: "^uri$";
+        };
+        readonly "uri-reference": {
+            readonly pattern: "^uri-reference$";
+        };
+        readonly iri: {
+            readonly pattern: "^iri$";
+        };
+        readonly "iri-reference": {
+            readonly pattern: "^iri-reference$";
+        };
+        readonly "uri-template": {
+            readonly pattern: "^uri-template$";
+        };
+        readonly "json-pointer": {
+            readonly pattern: "^json-pointer$";
+        };
+        readonly "relative-json-pointer": {
+            readonly pattern: "^relative-json-pointer$";
+        };
+        readonly regex: {
+            readonly pattern: "^regex$";
+        };
     };
     interface StringFormatEntry {
         pattern?: string;

@@ -222,11 +222,13 @@ export namespace Type
     export type TypeOrValue = Type | ValueDefinition;
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
-    export const StringFormatMap = { "date-time": "^date-time$", "date": "^date$", "time": "^time$", "duration": "^duration$",
-        "email": "^email$", "idn-email": "^idn-email$", "hostname": "^hostname$", "idn-hostname": "^idn-hostname$", "ipv4": "^ipv4$",
-        "ipv6": "^ipv6$", "uuid": "^uuid$", "uri": "^uri$", "uri-reference": "^uri-reference$", "iri": "^iri$",
-        "iri-reference": "^iri-reference$", "uri-template": "^uri-template$", "json-pointer": "^json-pointer$",
-        "relative-json-pointer": "^relative-json-pointer$", "regex": "^regex$" } as const;
+    export const StringFormatMap = { "date-time": { "pattern": "^date-time$" }, "date": { "pattern": "^date$" }, "time": {
+        "pattern": "^time$" }, "duration": { "pattern": "^duration$" }, "email": { "pattern": "^email$" }, "idn-email": {
+        "pattern": "^idn-email$" }, "hostname": { "pattern": "^hostname$" }, "idn-hostname": { "pattern": "^idn-hostname$" }, "ipv4": {
+        "pattern": "^ipv4$" }, "ipv6": { "pattern": "^ipv6$" }, "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" },
+        "uri-reference": { "pattern": "^uri-reference$" }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$"
+        }, "uri-template": { "pattern": "^uri-template$" }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
+        "pattern": "^relative-json-pointer$" }, "regex": { "pattern": "^regex$" } } as const;
     export interface StringFormatEntry
     {
         pattern?: string;

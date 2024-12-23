@@ -213,6 +213,10 @@ var Build;
         }
         return (_b = (_a = data.options.default) === null || _a === void 0 ? void 0 : _a.safeNumber) !== null && _b !== void 0 ? _b : config_json_1.default.safeNumber;
     };
+    Build.getPattern = function (data) {
+        var _a, _b, _c;
+        return (_c = (_b = (_a = data.options.StringFormatMap) === null || _a === void 0 ? void 0 : _a[data.value.format]) === null || _b === void 0 ? void 0 : _b.pattern) !== null && _c !== void 0 ? _c : type_1.Type.StringFormatMap[data.value.format].pattern;
+    };
     Build.getRegexpFlags = function (data) {
         var _a, _b;
         if ((type_1.Type.isPatternStringType(data.value) || type_1.Type.isFormatStringType(data.value)) && undefined !== data.value.regexpFlags) {
@@ -953,7 +957,7 @@ var Build;
                             ];
                         }
                     case "string":
-                        var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(type_1.Type.StringFormatMap[data.value.format]), ",")), (0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
+                        var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(Build.getPattern(Build.nextProcess(data, null, data.value))), ",")), (0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
                         if (0 < stringOptions.length) {
                             return __spreadArray(__spreadArray([
                                 (0, exports.$expression)("EvilType.Validator.isDetailedString"),

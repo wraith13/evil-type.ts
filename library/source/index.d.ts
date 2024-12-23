@@ -58,6 +58,7 @@ export declare namespace Build {
     const getMemberofTarget: <Process extends BaseProcess<Type.MemberofElement>>(data: Process) => NextProcess<Process, Type.TypeOrLiteralOfRefer>;
     const getSafeInteger: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
     const getSafeNumber: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
+    const getPattern: <Process extends BaseProcess<Type.FormatStringType>>(data: Process) => string;
     const getRegexpFlags: <Process extends BaseProcess<unknown>>(data: Process) => string;
     const getLiteral: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => Type.LiteralElement | null;
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];

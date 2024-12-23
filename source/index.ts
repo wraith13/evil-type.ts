@@ -312,17 +312,9 @@ export namespace Build
         }
         return data.options.default?.safeNumber ?? config.safeNumber;
     }
-    export const getPattern = <Process extends BaseProcess<unknown>>(data: Process) =>
+    export const getPattern = <Process extends BaseProcess<Type.FormatStringType>>(data: Process) =>
     {
-        if (Type.isPatternStringType(data.value))
-        {
-            return data.value.pattern;
-        }
-        if (Type.isFormatStringType(data.value))
-        {
-            return data.options.StringFormatMap?.[data.value.format]?.pattern ?? Type.StringFormatMap[data.value.format];
-        }
-        return undefined;
+        return data.options.StringFormatMap?.[data.value.format]?.pattern ?? Type.StringFormatMap[data.value.format].pattern;
     }
     export const getRegexpFlags = <Process extends BaseProcess<unknown>>(data: Process) =>
     {
@@ -1266,7 +1258,7 @@ export namespace Build
                         ...(undefined !== data.value.minLength ? [ $expression(`minLength:${data.value.minLength},`), ]: []),
                         ...(undefined !== data.value.maxLength ? [ $expression(`maxLength:${data.value.maxLength},`), ]: []),
                         ...(Type.isPatternStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(data.value.pattern)},`), ]: []),
-                        ...(Type.isFormatStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(Type.StringFormatMap[data.value.format])},`), $expression(`pattern:${Jsonable.stringify(data.value.format)},`), ]: []),
+                        ...(Type.isFormatStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(getPattern(nextProcess(data, null, data.value)))},`), $expression(`pattern:${Jsonable.stringify(data.value.format)},`), ]: []),
                     ];
                     if (0 < stringOptions.length)
                     {
