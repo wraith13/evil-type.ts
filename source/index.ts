@@ -312,6 +312,18 @@ export namespace Build
         }
         return data.options.default?.safeNumber ?? config.safeNumber;
     }
+    export const getPattern = <Process extends BaseProcess<unknown>>(data: Process) =>
+    {
+        if (Type.isPatternStringType(data.value))
+        {
+            return data.value.pattern;
+        }
+        if (Type.isFormatStringType(data.value))
+        {
+            return data.options.StringFormatMap?.[data.value.format]?.pattern ?? Type.StringFormatMap[data.value.format];
+        }
+        return undefined;
+    }
     export const getRegexpFlags = <Process extends BaseProcess<unknown>>(data: Process) =>
     {
         if ((Type.isPatternStringType(data.value) || Type.isFormatStringType(data.value)) && undefined !== data.value.regexpFlags)
