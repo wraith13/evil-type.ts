@@ -1474,7 +1474,7 @@ export namespace Build
                                         [ $expression("EvilType.Validator.isSpecificObject"), ],
                                         [
                                             $expression(buildObjectValidatorObjectName(data.key)),
-                                            ...(false === getAdditionalProperties(nextProcess(data, null, data.value)) ? [ $expression("false"), ]: [])
+                                            ...(false === getAdditionalProperties(nextProcess(data, null, data.value)) ? [[ $expression("{"), $expression("additionalProperties"), $expression(":"), $expression("false"), $expression("}"), ]]: [])
                                         ]
                                     ),
                                 ]

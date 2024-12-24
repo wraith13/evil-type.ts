@@ -678,7 +678,7 @@ export namespace EvilType
             A;
         export const mergeObjectValidator = <A, B extends ObjectValidator<unknown>[]>(target: ObjectValidator<A>, ...sources: B) =>
             Object.assign(...[{ }, target, ...sources]) as MergeMultipleType<ObjectValidator<A>, B>;
-        export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>), additionalProperties?: boolean) =>
+        export const isSpecificObject = <ObjectType extends ActualObject>(memberValidator: ObjectValidator<ObjectType> | (() => ObjectValidator<ObjectType>), options?: { additionalProperties?: boolean; }) =>
             (value: unknown, listner?: ErrorListener): value is ObjectType =>
             {
                 if (isObject(value))
@@ -694,7 +694,7 @@ export namespace EvilType
                         )
                     )
                     .every(i => i);
-                    if (false === additionalProperties)
+                    if (false === options?.additionalProperties)
                     {
                         const regularKeys = Object.keys(memberValidator);
                         const additionalKeys = (Object.keys(value) as (keyof typeof value)[])
@@ -723,7 +723,7 @@ export namespace EvilType
                     return undefined !== listner && Error.raiseError(listner, "object", value);
                 }
             };
-        export const isDictionaryObject = <MemberType, Keys extends string>(isType: IsType<MemberType>, keys?: Keys[], additionalProperties?: boolean) =>
+        export const isDictionaryObject = <MemberType, Keys extends string>(isType: IsType<MemberType>, keys?: Keys[], options?: { additionalProperties?: boolean; }) =>
             (value: unknown, listner?: ErrorListener): value is { [key in Keys]: MemberType } =>
             {
                 if (isObject(value))
@@ -731,7 +731,7 @@ export namespace EvilType
                     let result = undefined === keys ?
                         Object.entries(value).map(kv => isType(kv[1], Error.nextListener(kv[0], listner))).every(i => i):
                         keys.map(key => isType(value, Error.nextListener(key, listner))).every(i => i);
-                    if (undefined !== keys && false === additionalProperties)
+                    if (undefined !== keys && false === options?.additionalProperties)
                     {
                         const additionalKeys = (Object.keys(value) as (keyof typeof value)[])
                             .filter(key => ! keys.includes(key));

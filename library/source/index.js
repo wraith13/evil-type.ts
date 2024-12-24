@@ -1093,7 +1093,7 @@ var Build;
                             (0, exports.$expression)("=>")
                         ], Validator.buildCall([(0, exports.$expression)("EvilType.Validator.isSpecificObject"),], __spreadArray([
                             (0, exports.$expression)(Validator.buildObjectValidatorObjectName(data.key))
-                        ], (false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? [(0, exports.$expression)("false"),] : []), true)), true)
+                        ], (false === Build.getAdditionalProperties(Build.nextProcess(data, null, data.value)) ? [[(0, exports.$expression)("{"), (0, exports.$expression)("additionalProperties"), (0, exports.$expression)(":"), (0, exports.$expression)("false"), (0, exports.$expression)("}"),]] : []), true)), true)
                     ])
                     // $expression(`(value: unknown, listner?: EvilType.Validator.ErrorListener): value is ${name} =>`),
                     // ...buildCall
