@@ -316,6 +316,10 @@ export namespace Build
     {
         return data.options.StringFormatMap?.[data.value.format]?.pattern ?? Type.StringFormatMap[data.value.format].pattern;
     }
+    export const getTsPattern = <Process extends BaseProcess<Type.FormatStringType>>(data: Process) =>
+    {
+        return data.options.StringFormatMap?.[data.value.format]?.tsPattern ?? (Type.StringFormatMap[data.value.format] as Type.StringFormatEntry).tsPattern;
+    }
     export const getRegexpFlags = <Process extends BaseProcess<unknown>>(data: Process) =>
     {
         if ((Type.isPatternStringType(data.value) || Type.isFormatStringType(data.value)) && undefined !== data.value.regexpFlags)
