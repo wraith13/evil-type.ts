@@ -316,9 +316,17 @@ export namespace Build
     {
         return data.options.StringFormatMap?.[data.value.format]?.pattern ?? Type.StringFormatMap[data.value.format].pattern;
     }
-    export const getTsPattern = <Process extends BaseProcess<Type.FormatStringType>>(data: Process) =>
+    export const getTsPattern = <Process extends BaseProcess<Type.StringType>>(data: Process): string[] | undefined =>
     {
-        return data.options.StringFormatMap?.[data.value.format]?.tsPattern ?? (Type.StringFormatMap[data.value.format] as Type.StringFormatEntry).tsPattern;
+        if (Type.isPatternStringType(data.value))
+        {
+            return data.value.tsPattern;
+        }
+        if (Type.isFormatStringType(data.value))
+        {
+            return data.options.StringFormatMap?.[data.value.format]?.tsPattern ?? (Type.StringFormatMap[data.value.format] as Type.StringFormatEntry).tsPattern;
+        }
+        return undefined;
     }
     export const getRegexpFlags = <Process extends BaseProcess<unknown>>(data: Process) =>
     {
@@ -561,20 +569,21 @@ export namespace Build
             $line([ ...buildExport(data), $expression(declarator), $expression(data.key), $expression("="), ...convertToExpression(buildInlineDefine(data)), ...postEpressions, ]);
         export const buildInlineDefineLiteral = (define: Type.LiteralElement) =>
             [ ...stringifyTokens(define.const) ];
-        export const buildInlineDefinePrimitiveType = (value: Type.PrimitiveTypeElement) =>
+        export const buildInlineDefinePrimitiveType = <Process extends BaseProcess<Type.PrimitiveTypeElement>>(data: Process) =>
         {
-            switch(value.type)
+            switch(data.value.type)
             {
             case "integer":
                 return $expression("number");
             case "string":
-                if (Type.isPatternStringType(value) && undefined !== value.tsPattern)
+                const tsPattern = getTsPattern(nextProcess(data, null, data.value));
+                if (undefined !== tsPattern)
                 {
-                    return $expression(value.tsPattern.map(i => `\`${i}\``).join(" | "));
+                    return $expression(tsPattern.map(i => `\`${i}\``).join(" | "));
                 }
                 break;
             }
-            return $expression(value.type);
+            return $expression(data.value.type);
         };
         export const enParenthesis = <T extends CodeInlineEntry>(expressions: T[]) =>
             [ $expression("("), ...expressions, $expression(")"), ];
@@ -745,7 +754,7 @@ export namespace Build
                 case "integer":
                 case "number":
                 case "string":
-                    return [ buildInlineDefinePrimitiveType(data.value), ];
+                    return [ buildInlineDefinePrimitiveType(nextProcess(data, null, data.value)), ];
                 case "type":
                     return buildInlineDefine(nextProcess(data, null, data.value.define));
                 case "enum-type":

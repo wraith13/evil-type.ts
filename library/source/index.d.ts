@@ -59,6 +59,7 @@ export declare namespace Build {
     const getSafeInteger: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
     const getSafeNumber: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
     const getPattern: <Process extends BaseProcess<Type.FormatStringType>>(data: Process) => string;
+    const getTsPattern: <Process extends BaseProcess<Type.StringType>>(data: Process) => string[] | undefined;
     const getRegexpFlags: <Process extends BaseProcess<unknown>>(data: Process) => string;
     const getLiteral: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => Type.LiteralElement | null;
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
@@ -81,7 +82,7 @@ export declare namespace Build {
         const makeProcess: (source: Type.TypeSchema) => Process<Type.DefinitionMap>;
         const buildDefineLine: (declarator: string, data: Process<Type.TypeOrValue & Type.Definition>, postEpressions?: CodeExpression[]) => CodeLine;
         const buildInlineDefineLiteral: (define: Type.LiteralElement) => CodeExpression[];
-        const buildInlineDefinePrimitiveType: (value: Type.PrimitiveTypeElement) => CodeExpression;
+        const buildInlineDefinePrimitiveType: <Process extends BaseProcess<Type.PrimitiveTypeElement>>(data: Process) => CodeExpression;
         const enParenthesis: <T extends CodeInlineEntry>(expressions: T[]) => (CodeExpression | T)[];
         const isNeedParenthesis: (expressions: (CodeExpression | CodeInlineBlock)[]) => boolean;
         const enParenthesisIfNeed: <T extends (CodeExpression | CodeInlineBlock)[]>(expressions: T) => (CodeExpression | CodeInlineBlock)[];

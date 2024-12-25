@@ -217,6 +217,16 @@ var Build;
         var _a, _b, _c;
         return (_c = (_b = (_a = data.options.StringFormatMap) === null || _a === void 0 ? void 0 : _a[data.value.format]) === null || _b === void 0 ? void 0 : _b.pattern) !== null && _c !== void 0 ? _c : type_1.Type.StringFormatMap[data.value.format].pattern;
     };
+    Build.getTsPattern = function (data) {
+        var _a, _b, _c;
+        if (type_1.Type.isPatternStringType(data.value)) {
+            return data.value.tsPattern;
+        }
+        if (type_1.Type.isFormatStringType(data.value)) {
+            return (_c = (_b = (_a = data.options.StringFormatMap) === null || _a === void 0 ? void 0 : _a[data.value.format]) === null || _b === void 0 ? void 0 : _b.tsPattern) !== null && _c !== void 0 ? _c : type_1.Type.StringFormatMap[data.value.format].tsPattern;
+        }
+        return undefined;
+    };
     Build.getRegexpFlags = function (data) {
         var _a, _b;
         if ((type_1.Type.isPatternStringType(data.value) || type_1.Type.isFormatStringType(data.value)) && undefined !== data.value.regexpFlags) {
@@ -416,17 +426,18 @@ var Build;
         Define.buildInlineDefineLiteral = function (define) {
             return __spreadArray([], stringifyTokens(define.const), true);
         };
-        Define.buildInlineDefinePrimitiveType = function (value) {
-            switch (value.type) {
+        Define.buildInlineDefinePrimitiveType = function (data) {
+            switch (data.value.type) {
                 case "integer":
                     return (0, exports.$expression)("number");
                 case "string":
-                    if (type_1.Type.isPatternStringType(value) && undefined !== value.tsPattern) {
-                        return (0, exports.$expression)(value.tsPattern.map(function (i) { return "`".concat(i, "`"); }).join(" | "));
+                    var tsPattern = Build.getTsPattern(Build.nextProcess(data, null, data.value));
+                    if (undefined !== tsPattern) {
+                        return (0, exports.$expression)(tsPattern.map(function (i) { return "`".concat(i, "`"); }).join(" | "));
                     }
                     break;
             }
-            return (0, exports.$expression)(value.type);
+            return (0, exports.$expression)(data.value.type);
         };
         Define.enParenthesis = function (expressions) {
             return __spreadArray(__spreadArray([(0, exports.$expression)("(")], expressions, true), [(0, exports.$expression)(")"),], false);
@@ -572,7 +583,7 @@ var Build;
                     case "integer":
                     case "number":
                     case "string":
-                        return [Define.buildInlineDefinePrimitiveType(data.value),];
+                        return [Define.buildInlineDefinePrimitiveType(Build.nextProcess(data, null, data.value)),];
                     case "type":
                         return Define.buildInlineDefine(Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
