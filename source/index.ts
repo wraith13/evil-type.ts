@@ -911,7 +911,7 @@ export namespace Build
                         ...(undefined !== data.value.minLength ? [ $expression("&&"), $expression(`${data.value.minLength}`), $expression("<="), $expression(`${name}.length`), ]: []),
                         ...(undefined !== data.value.maxLength ? [ $expression("&&"), $expression(`${name}.length`), $expression("<="), $expression(`${data.value.maxLength}`), ]: []),
                         ...(Type.isPatternStringType(data.value) ? [ $expression("new"), $expression("RegExp"), $expression("("), $expression(Jsonable.stringify(data.value.pattern)), $expression(","), $expression(Jsonable.stringify(getRegexpFlags(data))), $expression(")"), $expression(`.test(${name})`) ]: []),
-                        ...(Type.isFormatStringType(data.value) ? [ $expression("new"), $expression("RegExp"), $expression("("), $expression(Jsonable.stringify(Type.StringFormatMap[data.value.format])), $expression(","), $expression(Jsonable.stringify(getRegexpFlags(data))), $expression(")"), $expression(`.test(${name})`) ]: []),
+                        ...(Type.isFormatStringType(data.value) ? [ $expression("new"), $expression("RegExp"), $expression("("), $expression(Jsonable.stringify(getPattern(nextProcess(data, null, data.value)))), $expression(","), $expression(Jsonable.stringify(getRegexpFlags(data))), $expression(")"), $expression(`.test(${name})`) ]: []),
                     ];
                 case "type":
                     return buildValidatorExpression(name, nextProcess(data, null, data.value.define));
@@ -1271,7 +1271,7 @@ export namespace Build
                         ...(undefined !== data.value.minLength ? [ $expression(`minLength:${data.value.minLength},`), ]: []),
                         ...(undefined !== data.value.maxLength ? [ $expression(`maxLength:${data.value.maxLength},`), ]: []),
                         ...(Type.isPatternStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(data.value.pattern)},`), ]: []),
-                        ...(Type.isFormatStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(getPattern(nextProcess(data, null, data.value)))},`), $expression(`pattern:${Jsonable.stringify(data.value.format)},`), ]: []),
+                        ...(Type.isFormatStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(getPattern(nextProcess(data, null, data.value)))},`), $expression(`format:${Jsonable.stringify(data.value.format)},`), ]: []),
                     ];
                     if (0 < stringOptions.length)
                     {
@@ -1787,7 +1787,7 @@ export namespace Build
                 }
                 if ("format" in data.value)
                 {
-                    result["pattern"] = Type.StringFormatMap[data.value.format];
+                    result["pattern"] = getPattern(nextProcess(data, null, data.value));
                     result["format"] = data.value.format;
                 }
                 // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない

@@ -209,10 +209,12 @@ export declare namespace Type {
             readonly pattern: "^duration$";
         };
         readonly email: {
-            readonly pattern: "^email$";
+            readonly pattern: "^[^@\\s]+@[^@\\s]+$";
+            readonly tsPattern: readonly ["${string}@${string}"];
         };
         readonly "idn-email": {
-            readonly pattern: "^idn-email$";
+            readonly pattern: "^[^@\\s]+@[^@\\s]+$";
+            readonly tsPattern: readonly ["${string}@${string}"];
         };
         readonly hostname: {
             readonly pattern: "^hostname$";

@@ -12,13 +12,17 @@ var Type;
     Type.indentStyleTypeMember = ["allman", "egyptian"];
     Type.StringFormatMap = { "date-time": { "pattern": "^date-time$" }, "date": { "pattern": "^date$" }, "time": {
             "pattern": "^time$"
-        }, "duration": { "pattern": "^duration$" }, "email": { "pattern": "^email$" }, "idn-email": {
-            "pattern": "^idn-email$"
-        }, "hostname": { "pattern": "^hostname$" }, "idn-hostname": { "pattern": "^idn-hostname$" }, "ipv4": {
-            "pattern": "^ipv4$"
-        }, "ipv6": { "pattern": "^ipv6$" }, "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" },
-        "uri-reference": { "pattern": "^uri-reference$" }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$"
-        }, "uri-template": { "pattern": "^uri-template$" }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
+        }, "duration": { "pattern": "^duration$" }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [
+                "${string}@${string}"
+            ] }, "idn-email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": ["${string}@${string}"] }, "hostname": {
+            "pattern": "^hostname$"
+        }, "idn-hostname": { "pattern": "^idn-hostname$" }, "ipv4": { "pattern": "^ipv4$" }, "ipv6": {
+            "pattern": "^ipv6$"
+        }, "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" }, "uri-reference": {
+            "pattern": "^uri-reference$"
+        }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": {
+            "pattern": "^uri-template$"
+        }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
             "pattern": "^relative-json-pointer$"
         }, "regex": { "pattern": "^regex$" } };
     Type.isSchema = evil_type_1.EvilType.Validator.isJust(Type.schema);

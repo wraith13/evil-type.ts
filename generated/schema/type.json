@@ -1464,10 +1464,16 @@
                     "pattern": "^duration$"
                 },
                 "email": {
-                    "pattern": "^email$"
+                    "pattern": "^[^@\\s]+@[^@\\s]+$",
+                    "tsPattern": [
+                        "${string}@${string}"
+                    ]
                 },
                 "idn-email": {
-                    "pattern": "^idn-email$"
+                    "pattern": "^[^@\\s]+@[^@\\s]+$",
+                    "tsPattern": [
+                        "${string}@${string}"
+                    ]
                 },
                 "hostname": {
                     "pattern": "^hostname$"
