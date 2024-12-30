@@ -223,13 +223,15 @@ export namespace Type
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
     export const StringFormatMap = { "date-time": { "pattern": "^date-time$" }, "date": { "pattern": "^date$" }, "time": {
-        "pattern": "^time$" }, "duration": { "pattern": "^duration$" }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [
+        "pattern": "^time$" }, "duration": {
+        "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",
+        "tsPattern": [ "P${string}T${string}", "P${string}", "PT${string}" ] }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [
         "${string}@${string}" ] }, "idn-email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [ "${string}@${string}" ] }, "hostname": {
-        "pattern": "^hostname$" }, "idn-hostname": { "pattern": "^idn-hostname$" }, "ipv4": { "pattern": "^ipv4$" }, "ipv6": {
-        "pattern": "^ipv6$" }, "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" }, "uri-reference": {
-        "pattern": "^uri-reference$" }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": {
-        "pattern": "^uri-template$" }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
-        "pattern": "^relative-json-pointer$" }, "regex": { "pattern": "^regex$" } } as const;
+        "pattern": "^\\S+$" }, "idn-hostname": { "pattern": "^\\S+$" }, "ipv4": { "pattern": "^ipv4$" }, "ipv6": { "pattern": "^ipv6$" },
+        "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" }, "uri-reference": { "pattern": "^uri-reference$" }, "iri": {
+        "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": { "pattern": "^uri-template$" },
+        "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": { "pattern": "^relative-json-pointer$" }, "regex": {
+        "pattern": "^.*$" } } as const;
     export interface StringFormatEntry
     {
         pattern?: string;
@@ -459,7 +461,7 @@ export namespace Type
         value: isReferElement, key: EvilType.Validator.isOr(EvilType.Validator.isString, EvilType.Validator.isDetailedInteger({ minimum:0,
         })), });
     export const stringFormatEntryValidatorObject: EvilType.Validator.ObjectValidator<StringFormatEntry> = ({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), tsPattern: EvilType.Validator.isOptional(EvilType.Validator.isArray(
-        EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)), regexpFlags: EvilType.Validator.isOptional(
-        EvilType.Validator.isString), });
+        EvilType.Validator.isOptional(EvilType.Validator.isDetailedString({ pattern:"^.*$", format:"regex", }, "u")), tsPattern:
+        EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
+        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), });
 }

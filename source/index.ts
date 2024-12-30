@@ -1787,7 +1787,7 @@ export namespace Build
                 }
                 if ("format" in data.value)
                 {
-                    result["pattern"] = getPattern(nextProcess(data, null, data.value));
+                    //result["pattern"] = getPattern(nextProcess(data, null, data.value));
                     result["format"] = data.value.format;
                 }
                 // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない

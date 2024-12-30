@@ -12,19 +12,20 @@ var Type;
     Type.indentStyleTypeMember = ["allman", "egyptian"];
     Type.StringFormatMap = { "date-time": { "pattern": "^date-time$" }, "date": { "pattern": "^date$" }, "time": {
             "pattern": "^time$"
-        }, "duration": { "pattern": "^duration$" }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [
+        }, "duration": {
+            "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",
+            "tsPattern": ["P${string}T${string}", "P${string}", "PT${string}"]
+        }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [
                 "${string}@${string}"
             ] }, "idn-email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": ["${string}@${string}"] }, "hostname": {
-            "pattern": "^hostname$"
-        }, "idn-hostname": { "pattern": "^idn-hostname$" }, "ipv4": { "pattern": "^ipv4$" }, "ipv6": {
-            "pattern": "^ipv6$"
-        }, "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" }, "uri-reference": {
-            "pattern": "^uri-reference$"
-        }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": {
-            "pattern": "^uri-template$"
-        }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
-            "pattern": "^relative-json-pointer$"
-        }, "regex": { "pattern": "^regex$" } };
+            "pattern": "^\\S+$"
+        }, "idn-hostname": { "pattern": "^\\S+$" }, "ipv4": { "pattern": "^ipv4$" }, "ipv6": { "pattern": "^ipv6$" },
+        "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" }, "uri-reference": { "pattern": "^uri-reference$" }, "iri": {
+            "pattern": "^iri$"
+        }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": { "pattern": "^uri-template$" },
+        "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": { "pattern": "^relative-json-pointer$" }, "regex": {
+            "pattern": "^.*$"
+        } };
     Type.isSchema = evil_type_1.EvilType.Validator.isJust(Type.schema);
     Type.isCommentProperty = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.commentPropertyValidatorObject, {
         additionalProperties: false
@@ -179,6 +180,7 @@ var Type;
     Type.memberofElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("memberof"),
         value: Type.isReferElement, key: evil_type_1.EvilType.Validator.isOr(evil_type_1.EvilType.Validator.isString, evil_type_1.EvilType.Validator.isDetailedInteger({ minimum: 0,
         })), });
-    Type.stringFormatEntryValidatorObject = ({ pattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), tsPattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString, { minItems: 1, uniqueItems: true, })), regexpFlags: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
+    Type.stringFormatEntryValidatorObject = ({ pattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isDetailedString({ pattern: "^.*$", format: "regex", }, "u")), tsPattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString, { minItems: 1, uniqueItems: true, })),
+        regexpFlags: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
 })(Type || (exports.Type = Type = {}));
 //# sourceMappingURL=type.js.map

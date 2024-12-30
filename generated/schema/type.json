@@ -1461,7 +1461,12 @@
                     "pattern": "^time$"
                 },
                 "duration": {
-                    "pattern": "^duration$"
+                    "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",
+                    "tsPattern": [
+                        "P${string}T${string}",
+                        "P${string}",
+                        "PT${string}"
+                    ]
                 },
                 "email": {
                     "pattern": "^[^@\\s]+@[^@\\s]+$",
@@ -1476,10 +1481,10 @@
                     ]
                 },
                 "hostname": {
-                    "pattern": "^hostname$"
+                    "pattern": "^\\S+$"
                 },
                 "idn-hostname": {
-                    "pattern": "^idn-hostname$"
+                    "pattern": "^\\S+$"
                 },
                 "ipv4": {
                     "pattern": "^ipv4$"
@@ -1512,7 +1517,7 @@
                     "pattern": "^relative-json-pointer$"
                 },
                 "regex": {
-                    "pattern": "^regex$"
+                    "pattern": "^.*$"
                 }
             }
         },
@@ -1520,7 +1525,8 @@
             "type": "object",
             "properties": {
                 "pattern": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "regex"
                 },
                 "tsPattern": {
                     "type": "array",

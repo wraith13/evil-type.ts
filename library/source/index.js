@@ -1331,7 +1331,7 @@ var Build;
                     result["pattern"] = data.value.pattern;
                 }
                 if ("format" in data.value) {
-                    result["pattern"] = Build.getPattern(Build.nextProcess(data, null, data.value));
+                    //result["pattern"] = getPattern(nextProcess(data, null, data.value));
                     result["format"] = data.value.format;
                 }
                 // これは TypeScript のコードでしか使わない値なので JSON Schema には吐かない

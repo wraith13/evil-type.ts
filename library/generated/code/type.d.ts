@@ -206,7 +206,8 @@ export declare namespace Type {
             readonly pattern: "^time$";
         };
         readonly duration: {
-            readonly pattern: "^duration$";
+            readonly pattern: "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$";
+            readonly tsPattern: readonly ["P${string}T${string}", "P${string}", "PT${string}"];
         };
         readonly email: {
             readonly pattern: "^[^@\\s]+@[^@\\s]+$";
@@ -217,10 +218,10 @@ export declare namespace Type {
             readonly tsPattern: readonly ["${string}@${string}"];
         };
         readonly hostname: {
-            readonly pattern: "^hostname$";
+            readonly pattern: "^\\S+$";
         };
         readonly "idn-hostname": {
-            readonly pattern: "^idn-hostname$";
+            readonly pattern: "^\\S+$";
         };
         readonly ipv4: {
             readonly pattern: "^ipv4$";
@@ -253,7 +254,7 @@ export declare namespace Type {
             readonly pattern: "^relative-json-pointer$";
         };
         readonly regex: {
-            readonly pattern: "^regex$";
+            readonly pattern: "^.*$";
         };
     };
     interface StringFormatEntry {
