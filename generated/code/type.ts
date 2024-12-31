@@ -222,8 +222,9 @@ export namespace Type
     export type TypeOrValue = Type | ValueDefinition;
     export type TypeOrValueOfRefer = TypeOrValue | ReferElement;
     export type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
-    export const StringFormatMap = { "date-time": { "pattern": "^date-time$" }, "date": { "pattern": "^date$" }, "time": {
-        "pattern": "^time$" }, "duration": {
+    export const StringFormatMap = { "date-time": { "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{2}\\:\\d{2}$",
+        "tsPattern": [ "${number}-${number}-${number}T${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}" ] }, "date": {
+        "pattern": "^date$" }, "time": { "pattern": "^time$" }, "duration": {
         "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",
         "tsPattern": [ "P${string}T${string}", "P${string}", "PT${string}" ] }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [
         "${string}@${string}" ] }, "idn-email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [ "${string}@${string}" ] }, "hostname": {

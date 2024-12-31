@@ -197,7 +197,8 @@ export declare namespace Type {
     type TypeOrLiteralOfRefer = TypeOrRefer | LiteralElement;
     const StringFormatMap: {
         readonly "date-time": {
-            readonly pattern: "^date-time$";
+            readonly pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{2}\\:\\d{2}$";
+            readonly tsPattern: readonly ["${number}-${number}-${number}T${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}"];
         };
         readonly date: {
             readonly pattern: "^date$";

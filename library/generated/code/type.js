@@ -10,9 +10,10 @@ var Type;
 (function (Type) {
     Type.schema = "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";
     Type.indentStyleTypeMember = ["allman", "egyptian"];
-    Type.StringFormatMap = { "date-time": { "pattern": "^date-time$" }, "date": { "pattern": "^date$" }, "time": {
-            "pattern": "^time$"
-        }, "duration": {
+    Type.StringFormatMap = { "date-time": { "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{2}\\:\\d{2}$",
+            "tsPattern": ["${number}-${number}-${number}T${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}"] }, "date": {
+            "pattern": "^date$"
+        }, "time": { "pattern": "^time$" }, "duration": {
             "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",
             "tsPattern": ["P${string}T${string}", "P${string}", "PT${string}"]
         }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [
