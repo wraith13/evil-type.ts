@@ -224,7 +224,8 @@ export declare namespace Type {
             readonly pattern: "^\\S+$";
         };
         readonly ipv4: {
-            readonly pattern: "^ipv4$";
+            readonly pattern: "^[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}$";
+            readonly tsPattern: readonly ["${number}.${number}.${number}.${number}"];
         };
         readonly ipv6: {
             readonly pattern: "^ipv6$";

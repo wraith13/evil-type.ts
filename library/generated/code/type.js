@@ -19,13 +19,16 @@ var Type;
                 "${string}@${string}"
             ] }, "idn-email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": ["${string}@${string}"] }, "hostname": {
             "pattern": "^\\S+$"
-        }, "idn-hostname": { "pattern": "^\\S+$" }, "ipv4": { "pattern": "^ipv4$" }, "ipv6": { "pattern": "^ipv6$" },
-        "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" }, "uri-reference": { "pattern": "^uri-reference$" }, "iri": {
-            "pattern": "^iri$"
-        }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": { "pattern": "^uri-template$" },
-        "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": { "pattern": "^relative-json-pointer$" }, "regex": {
-            "pattern": "^.*$"
-        } };
+        }, "idn-hostname": { "pattern": "^\\S+$" }, "ipv4": {
+            "pattern": "^[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}$", "tsPattern": [
+                "${number}.${number}.${number}.${number}"
+            ]
+        }, "ipv6": { "pattern": "^ipv6$" }, "uuid": { "pattern": "^uuid$" }, "uri": {
+            "pattern": "^uri$"
+        }, "uri-reference": { "pattern": "^uri-reference$" }, "iri": { "pattern": "^iri$" }, "iri-reference": {
+            "pattern": "^iri-reference$"
+        }, "uri-template": { "pattern": "^uri-template$" }, "json-pointer": { "pattern": "^json-pointer$" },
+        "relative-json-pointer": { "pattern": "^relative-json-pointer$" }, "regex": { "pattern": "^.*$" } };
     Type.isSchema = evil_type_1.EvilType.Validator.isJust(Type.schema);
     Type.isCommentProperty = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.commentPropertyValidatorObject, {
         additionalProperties: false

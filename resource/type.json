@@ -1087,7 +1087,8 @@
                                 "pattern": "^\\S+$"
                             },
                             "ipv4": {
-                                "pattern": "^ipv4$"
+                                "pattern": "^[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}$",
+                                "tsPattern": [ "${number}.${number}.${number}.${number}" ]
                             },
                             "ipv6": {
                                 "pattern": "^ipv6$"

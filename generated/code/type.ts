@@ -227,11 +227,12 @@ export namespace Type
         "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",
         "tsPattern": [ "P${string}T${string}", "P${string}", "PT${string}" ] }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [
         "${string}@${string}" ] }, "idn-email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [ "${string}@${string}" ] }, "hostname": {
-        "pattern": "^\\S+$" }, "idn-hostname": { "pattern": "^\\S+$" }, "ipv4": { "pattern": "^ipv4$" }, "ipv6": { "pattern": "^ipv6$" },
-        "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" }, "uri-reference": { "pattern": "^uri-reference$" }, "iri": {
-        "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": { "pattern": "^uri-template$" },
-        "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": { "pattern": "^relative-json-pointer$" }, "regex": {
-        "pattern": "^.*$" } } as const;
+        "pattern": "^\\S+$" }, "idn-hostname": { "pattern": "^\\S+$" }, "ipv4": {
+        "pattern": "^[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}$", "tsPattern": [
+        "${number}.${number}.${number}.${number}" ] }, "ipv6": { "pattern": "^ipv6$" }, "uuid": { "pattern": "^uuid$" }, "uri": {
+        "pattern": "^uri$" }, "uri-reference": { "pattern": "^uri-reference$" }, "iri": { "pattern": "^iri$" }, "iri-reference": {
+        "pattern": "^iri-reference$" }, "uri-template": { "pattern": "^uri-template$" }, "json-pointer": { "pattern": "^json-pointer$" },
+        "relative-json-pointer": { "pattern": "^relative-json-pointer$" }, "regex": { "pattern": "^.*$" } } as const;
     export interface StringFormatEntry
     {
         pattern?: string;
