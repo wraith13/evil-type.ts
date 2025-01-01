@@ -1458,10 +1458,16 @@
                     ]
                 },
                 "date": {
-                    "pattern": "^date$"
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "tsPattern": [
+                        "${number}-${number}-${number}"
+                    ]
                 },
                 "time": {
-                    "pattern": "^time$"
+                    "pattern": "^\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{2}\\:\\d{2}$",
+                    "tsPattern": [
+                        "${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}"
+                    ]
                 },
                 "duration": {
                     "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",

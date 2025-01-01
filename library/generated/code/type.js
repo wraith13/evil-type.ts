@@ -12,8 +12,12 @@ var Type;
     Type.indentStyleTypeMember = ["allman", "egyptian"];
     Type.StringFormatMap = { "date-time": { "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{2}\\:\\d{2}$",
             "tsPattern": ["${number}-${number}-${number}T${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}"] }, "date": {
-            "pattern": "^date$"
-        }, "time": { "pattern": "^time$" }, "duration": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "tsPattern": ["${number}-${number}-${number}"]
+        }, "time": {
+            "pattern": "^\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{2}\\:\\d{2}$", "tsPattern": [
+                "${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}"
+            ]
+        }, "duration": {
             "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",
             "tsPattern": ["P${string}T${string}", "P${string}", "PT${string}"]
         }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+$", "tsPattern": [

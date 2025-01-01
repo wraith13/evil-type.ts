@@ -201,10 +201,12 @@ export declare namespace Type {
             readonly tsPattern: readonly ["${number}-${number}-${number}T${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}"];
         };
         readonly date: {
-            readonly pattern: "^date$";
+            readonly pattern: "^\\d{4}-\\d{2}-\\d{2}$";
+            readonly tsPattern: readonly ["${number}-${number}-${number}"];
         };
         readonly time: {
-            readonly pattern: "^time$";
+            readonly pattern: "^\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{2}\\:\\d{2}$";
+            readonly tsPattern: readonly ["${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}"];
         };
         readonly duration: {
             readonly pattern: "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$";
