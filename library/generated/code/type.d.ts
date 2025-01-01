@@ -213,12 +213,12 @@ export declare namespace Type {
             readonly tsPattern: readonly ["P${string}T${string}", "P${string}", "PT${string}"];
         };
         readonly email: {
-            readonly pattern: "^[^@\\s]+@[^@\\s]+$";
-            readonly tsPattern: readonly ["${string}@${string}"];
+            readonly pattern: "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+            readonly tsPattern: readonly ["${string}@${string}.${string}"];
         };
         readonly "idn-email": {
-            readonly pattern: "^[^@\\s]+@[^@\\s]+$";
-            readonly tsPattern: readonly ["${string}@${string}"];
+            readonly pattern: "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+            readonly tsPattern: readonly ["${string}@${string}.${string}"];
         };
         readonly hostname: {
             readonly pattern: "^\\S+$";
@@ -231,7 +231,8 @@ export declare namespace Type {
             readonly tsPattern: readonly ["${number}.${number}.${number}.${number}"];
         };
         readonly ipv6: {
-            readonly pattern: "^ipv6$";
+            readonly pattern: "^(?=.*\\:.*\\:.*)(?!.*\\:\\:\\:.*)(?!.*\\:\\:.*\\:\\:.*)(?:[0-9A-Fa-f]{1,4}\\:){0,7}\\:((?:[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2})|[0-9A-Fa-f]{0,4})$";
+            readonly tsPattern: readonly ["${string}:${string}:${string}"];
         };
         readonly uuid: {
             readonly pattern: "^uuid$";

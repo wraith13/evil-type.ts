@@ -1078,15 +1078,15 @@
                                 ]
                             },
                             "email": {
-                                "pattern": "^[^@\\s]+@[^@\\s]+$",
+                                "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
                                 "tsPattern": [
-                                    "${string}@${string}"
+                                    "${string}@${string}.${string}"
                                 ]
                             },
                             "idn-email": {
-                                "pattern": "^[^@\\s]+@[^@\\s]+$",
+                                "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
                                 "tsPattern": [
-                                    "${string}@${string}"
+                                    "${string}@${string}.${string}"
                                 ]
                             },
                             "hostname": {
@@ -1100,7 +1100,10 @@
                                 "tsPattern": [ "${number}.${number}.${number}.${number}" ]
                             },
                             "ipv6": {
-                                "pattern": "^ipv6$"
+                                "pattern": "^(?=.*\\:.*\\:.*)(?!.*\\:\\:\\:.*)(?!.*\\:\\:.*\\:\\:.*)(?:[0-9A-Fa-f]{1,4}\\:){0,7}\\:((?:[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2})|[0-9A-Fa-f]{0,4})$",
+                                "tsPattern": [
+                                    "${string}:${string}:${string}"
+                                ]
                             },
                             "uuid": {
                                 "pattern": "^uuid$"
