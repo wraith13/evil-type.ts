@@ -231,7 +231,7 @@ export declare namespace Type {
             readonly tsPattern: readonly ["${number}.${number}.${number}.${number}"];
         };
         readonly ipv6: {
-            readonly pattern: "^(?=.*\\:.*\\:.*)(?!.*\\:\\:\\:.*)(?!.*\\:\\:.*\\:\\:.*)(?:[0-9A-Fa-f]{1,4}\\:){0,7}\\:((?:[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2})|[0-9A-Fa-f]{0,4})$";
+            readonly pattern: "^(?=.*\\:.*\\:.*)(?!.*\\:{3}.*)(?!.*\\:{2}.*\\:{2}.*)(?!.*[0-9A-Fa-f]{5,}.*)(?:(?:(?=.*\\:\\:.*)(?:(?:[0-9A-Fa-f]{0,4}\\:){2,7}[0-9A-Fa-f]{0,4}|(?:[0-9A-Fa-f]{0,4}\\:){2,6}[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}))|(?:(?!.*\\:\\:.*)(?:(?:[0-9A-Fa-f]{1,4}\\:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}\\:){6}[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2})))$";
             readonly tsPattern: readonly ["${string}:${string}:${string}"];
         };
         readonly uuid: {
@@ -259,7 +259,7 @@ export declare namespace Type {
             readonly pattern: "^relative-json-pointer$";
         };
         readonly regex: {
-            readonly pattern: "^.*$";
+            readonly pattern: "^[:regex:]$";
         };
     };
     interface StringFormatEntry {

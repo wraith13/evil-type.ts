@@ -233,11 +233,11 @@ export namespace Type
         "${string}@${string}.${string}" ] }, "hostname": { "pattern": "^\\S+$" }, "idn-hostname": { "pattern": "^\\S+$" }, "ipv4": {
         "pattern": "^[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}$", "tsPattern": [
         "${number}.${number}.${number}.${number}" ] }, "ipv6": {
-        "pattern": "^(?=.*\\:.*\\:.*)(?!.*\\:\\:\\:.*)(?!.*\\:\\:.*\\:\\:.*)(?:[0-9A-Fa-f]{1,4}\\:){0,7}\\:((?:[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2})|[0-9A-Fa-f]{0,4})$",
+        "pattern": "^(?=.*\\:.*\\:.*)(?!.*\\:{3}.*)(?!.*\\:{2}.*\\:{2}.*)(?!.*[0-9A-Fa-f]{5,}.*)(?:(?:(?=.*\\:\\:.*)(?:(?:[0-9A-Fa-f]{0,4}\\:){2,7}[0-9A-Fa-f]{0,4}|(?:[0-9A-Fa-f]{0,4}\\:){2,6}[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}))|(?:(?!.*\\:\\:.*)(?:(?:[0-9A-Fa-f]{1,4}\\:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}\\:){6}[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2})))$",
         "tsPattern": [ "${string}:${string}:${string}" ] }, "uuid": { "pattern": "^uuid$" }, "uri": { "pattern": "^uri$" },
         "uri-reference": { "pattern": "^uri-reference$" }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$"
         }, "uri-template": { "pattern": "^uri-template$" }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
-        "pattern": "^relative-json-pointer$" }, "regex": { "pattern": "^.*$" } } as const;
+        "pattern": "^relative-json-pointer$" }, "regex": { "pattern": "^[:regex:]$" } } as const;
     export interface StringFormatEntry
     {
         pattern?: string;
@@ -467,7 +467,7 @@ export namespace Type
         value: isReferElement, key: EvilType.Validator.isOr(EvilType.Validator.isString, EvilType.Validator.isDetailedInteger({ minimum:0,
         })), });
     export const stringFormatEntryValidatorObject: EvilType.Validator.ObjectValidator<StringFormatEntry> = ({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isDetailedString({ pattern:"^.*$", format:"regex", }, "u")), tsPattern:
+        EvilType.Validator.isOptional(EvilType.Validator.isDetailedString({ pattern:"^[:regex:]$", format:"regex", }, "u")), tsPattern:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
         regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), });
 }
