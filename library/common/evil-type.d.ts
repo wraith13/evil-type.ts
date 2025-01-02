@@ -69,6 +69,7 @@ export declare namespace EvilType {
             format?: string;
             regexpFlags?: string;
         }) => string;
+        const regexpTest: (pattern: string, flags: string, text: string) => boolean;
         const isDetailedString: <Type extends string = string>(data: {
             minLength?: number;
             maxLength?: number;
