@@ -213,6 +213,10 @@
                             "type": "string",
                             "default": "u",
                             "description": "[TypeScript]"
+                        },
+                        "regexpTest": {
+                            "type": "string",
+                            "description": "[TypeScript] Custom RegExp Test Function like (pattern: string, flags: string, text: string): boolean => new RegExp(pattern, flags).test(text)"
                         }
                     },
                     "required": [],
@@ -1081,7 +1085,12 @@
                     "description": "[TypeScript] You can define Template Literal Types. Arrays are OR-combined. You need to match the regular expression in `pattern` and Template Literal Types."
                 },
                 "regexpFlags": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "[TypeScript]"
+                },
+                "regexpTest": {
+                    "type": "string",
+                    "description": "[TypeScript] Custom RegExp Test Function like (pattern: string, flags: string, text: string): boolean => new RegExp(pattern, flags).test(text)"
                 }
             },
             "required": [
@@ -1553,7 +1562,12 @@
                     "description": "[TypeScript] You can define Template Literal Types. Arrays are OR-combined. You need to match the regular expression in `pattern` and Template Literal Types."
                 },
                 "regexpFlags": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "[TypeScript]"
+                },
+                "regexpTest": {
+                    "type": "string",
+                    "description": "[TypeScript] Custom RegExp Test Function like (pattern: string, flags: string, text: string): boolean => new RegExp(pattern, flags).test(text)"
                 }
             },
             "required": [],

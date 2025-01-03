@@ -234,6 +234,16 @@ var Build;
         }
         return (_b = (_a = data.options.default) === null || _a === void 0 ? void 0 : _a.regexpFlags) !== null && _b !== void 0 ? _b : config_json_1.default.regexpFlags;
     };
+    Build.getRegexpTest = function (data) {
+        var _a, _b, _c, _d, _e;
+        if (type_1.Type.isPatternStringType(data.value) && "string" === typeof data.value.regexpTest) {
+            return data.value.regexpTest;
+        }
+        if (type_1.Type.isFormatStringType(data.value) && "string" === typeof ((_b = (_a = data.options.StringFormatMap) === null || _a === void 0 ? void 0 : _a[data.value.format]) === null || _b === void 0 ? void 0 : _b.regexpTest)) {
+            return (_d = (_c = data.options.StringFormatMap) === null || _c === void 0 ? void 0 : _c[data.value.format]) === null || _d === void 0 ? void 0 : _d.regexpTest;
+        }
+        return (_e = data.options.default) === null || _e === void 0 ? void 0 : _e.regexpTest;
+    };
     Build.getLiteral = function (data) {
         var definition = Build.getDefinition(data);
         if (type_1.Type.isValueDefinition(definition.value)) {
@@ -970,13 +980,15 @@ var Build;
                     case "string":
                         var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(Build.getPattern(Build.nextProcess(data, null, data.value))), ",")), (0, exports.$expression)("format:".concat(type_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
                         if (0 < stringOptions.length) {
-                            return __spreadArray(__spreadArray([
+                            var regexpTest = Build.getRegexpTest(data);
+                            return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
                                 (0, exports.$expression)("EvilType.Validator.isDetailedString"),
                                 (0, exports.$expression)("("),
                                 (0, exports.$expression)("{")
                             ], stringOptions, true), [
                                 (0, exports.$expression)("},"),
-                                (0, exports.$expression)(type_1.Jsonable.stringify(Build.getRegexpFlags(data))),
+                                (0, exports.$expression)(type_1.Jsonable.stringify(Build.getRegexpFlags(data)))
+                            ], false), ("string" === typeof regexpTest ? [(0, exports.$expression)(","), (0, exports.$expression)(regexpTest)] : []), true), [
                                 (0, exports.$expression)(")"),
                             ], false);
                         }

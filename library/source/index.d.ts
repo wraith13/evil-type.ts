@@ -61,6 +61,7 @@ export declare namespace Build {
     const getPattern: <Process extends BaseProcess<Type.FormatStringType>>(data: Process) => string;
     const getTsPattern: <Process extends BaseProcess<Type.StringType>>(data: Process) => string[] | undefined;
     const getRegexpFlags: <Process extends BaseProcess<unknown>>(data: Process) => string;
+    const getRegexpTest: <Process extends BaseProcess<unknown>>(data: Process) => string | undefined;
     const getLiteral: <Process extends BaseProcess<Type.ReferElement>>(data: Process) => Type.LiteralElement | null;
     const getKeys: (data: BaseProcess<Type.InterfaceDefinition>) => string[];
     const getActualKeys: (data: BaseProcess<Type.TypeOrRefer>) => string[];

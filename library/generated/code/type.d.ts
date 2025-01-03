@@ -34,6 +34,7 @@ export declare namespace Type {
             safeInteger?: boolean;
             safeNumber?: boolean;
             regexpFlags?: string;
+            regexpTest?: string;
         };
         schema?: SchemaOptions;
     }
@@ -162,6 +163,7 @@ export declare namespace Type {
         pattern: string;
         tsPattern?: string[];
         regexpFlags?: string;
+        regexpTest?: string;
     }
     interface FormatStringType extends BasicStringType {
         format: keyof typeof StringFormatMap;
@@ -266,6 +268,7 @@ export declare namespace Type {
         pattern?: string;
         tsPattern?: string[];
         regexpFlags?: string;
+        regexpTest?: string;
     }
     const isSchema: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is "https://raw.githubusercontent.com/wraith13/evil-type.ts/master/generated/schema/type.json#";
     const isCommentProperty: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is CommentProperty;

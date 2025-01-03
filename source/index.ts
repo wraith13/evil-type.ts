@@ -336,6 +336,18 @@ export namespace Build
         }
         return data.options.default?.regexpFlags ?? config.regexpFlags;
     }
+    export const getRegexpTest = <Process extends BaseProcess<unknown>>(data: Process) =>
+    {
+        if (Type.isPatternStringType(data.value) && "string" === typeof data.value.regexpTest)
+        {
+            return data.value.regexpTest;
+        }
+        if (Type.isFormatStringType(data.value) && "string" === typeof data.options.StringFormatMap?.[data.value.format]?.regexpTest)
+        {
+            return data.options.StringFormatMap?.[data.value.format]?.regexpTest;
+        }
+        return data.options.default?.regexpTest;
+    }
     export const getLiteral = <Process extends BaseProcess<Type.ReferElement>>(data: Process): Type.LiteralElement | null =>
     {
         const definition = getDefinition(data);
@@ -1275,6 +1287,7 @@ export namespace Build
                     ];
                     if (0 < stringOptions.length)
                     {
+                        const regexpTest = getRegexpTest(data);
                         return [
                             $expression("EvilType.Validator.isDetailedString"),
                             $expression("("),
@@ -1282,6 +1295,7 @@ export namespace Build
                             ...stringOptions,
                             $expression("},"),
                             $expression(Jsonable.stringify(getRegexpFlags(data))),
+                            ...("string" === typeof regexpTest ? [$expression(","), $expression(regexpTest)]: []),
                             $expression(")"),
                         ];
                     }

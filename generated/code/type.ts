@@ -32,7 +32,8 @@ export namespace Type
         safeInteger?: boolean;
         maxLineLength?: null | number;
         StringFormatMap?: { [ key in keyof typeof StringFormatMap ] ?: StringFormatEntry; };
-        default?: { export?: boolean; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?: string; };
+        default?: { export?: boolean; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?: string;
+            regexpTest?: string; };
         schema?: SchemaOptions;
     }
     export interface SchemaOptions
@@ -182,6 +183,7 @@ export namespace Type
         pattern: string;
         tsPattern?: string[];
         regexpFlags?: string;
+        regexpTest?: string;
     }
     export interface FormatStringType extends BasicStringType
     {
@@ -243,6 +245,7 @@ export namespace Type
         pattern?: string;
         tsPattern?: string[];
         regexpFlags?: string;
+        regexpTest?: string;
     }
     export const isSchema = EvilType.Validator.isJust(schema);
     export const isCommentProperty = EvilType.lazy(() => EvilType.Validator.isSpecificObject(commentPropertyValidatorObject, {
@@ -363,7 +366,8 @@ export namespace Type
         export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), additionalProperties: EvilType.Validator.isOptional(
         EvilType.Validator.isBoolean), safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeNumber:
         EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString
-        ), })), schema: EvilType.Validator.isOptional(isSchemaOptions), });
+        ), regexpTest: EvilType.Validator.isOptional(EvilType.Validator.isString), })), schema: EvilType.Validator.isOptional(
+        isSchemaOptions), });
     export const schemaOptionsValidatorObject: EvilType.Validator.ObjectValidator<SchemaOptions> = ({ outputFile:
         EvilType.Validator.isString, $id: EvilType.Validator.isOptional(EvilType.Validator.isString), $ref: EvilType.Validator.isOptional(
         EvilType.Validator.isString), externalReferMapping: EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(
@@ -445,7 +449,8 @@ export namespace Type
     export const patternStringTypeValidatorObject: EvilType.Validator.ObjectValidator<PatternStringType> =
         EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { pattern: EvilType.Validator.isString, tsPattern:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
-        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), });
+        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), regexpTest: EvilType.Validator.isOptional(
+        EvilType.Validator.isString), });
     export const formatStringTypeValidatorObject: EvilType.Validator.ObjectValidator<FormatStringType> =
         EvilType.Validator.mergeObjectValidator(basicStringTypeValidatorObject, { format: EvilType.Validator.isEnum([ "date-time", "date",
         "time", "duration", "email", "idn-email", "hostname", "idn-hostname", "ipv4", "ipv6", "uuid", "uri", "uri-reference", "iri",
@@ -469,5 +474,6 @@ export namespace Type
     export const stringFormatEntryValidatorObject: EvilType.Validator.ObjectValidator<StringFormatEntry> = ({ pattern:
         EvilType.Validator.isOptional(EvilType.Validator.isDetailedString({ pattern:"^[:regex:]$", format:"regex", }, "u")), tsPattern:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
-        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), });
+        regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), regexpTest: EvilType.Validator.isOptional(
+        EvilType.Validator.isString), });
 }
