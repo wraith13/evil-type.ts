@@ -337,11 +337,11 @@ var EvilType;
             }
             var pattern = data.pattern;
             var result = function (value, listner) {
-                var _a, _b;
+                var _a, _b, _c;
                 return Error.withErrorHandling("string" === typeof value &&
                     (undefined === data.minLength || data.minLength <= value.length) &&
                     (undefined === data.maxLength || value.length <= data.maxLength) &&
-                    (undefined === pattern || Validator.regexpTest(pattern, (_b = (_a = data.regexpFlags) !== null && _a !== void 0 ? _a : regexpFlags) !== null && _b !== void 0 ? _b : "u", value)), listner, function () { return Validator.makeStringTypeName(data); }, value);
+                    (undefined === pattern || ((_a = data.regexpTest) !== null && _a !== void 0 ? _a : Validator.regexpTest)(pattern, (_c = (_b = data.regexpFlags) !== null && _b !== void 0 ? _b : regexpFlags) !== null && _c !== void 0 ? _c : "u", value)), listner, function () { return Validator.makeStringTypeName(data); }, value);
             };
             return result;
         };

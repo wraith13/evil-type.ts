@@ -367,7 +367,7 @@ export namespace EvilType
             }
             return `string(${details.join(",")})`
         };
-        export const regexpTest = (pattern: string, flags: string, text: string) =>
+        export const regexpTest = (pattern: string, flags: string, text: string): boolean =>
         {
             switch(pattern)
             {
@@ -385,7 +385,7 @@ export namespace EvilType
                 return new RegExp(pattern, flags).test(text);
             }
         };
-        export const isDetailedString = <Type extends string = string>(data: { minLength?: number; maxLength?: number; pattern?: string; format?: string; regexpFlags?: string }, regexpFlags?: string): IsType<Type> =>
+        export const isDetailedString = <Type extends string = string>(data: { minLength?: number; maxLength?: number; pattern?: string; format?: string; regexpFlags?: string, regexpTest?: (pattern: string, flags: string, text: string) => boolean }, regexpFlags?: string): IsType<Type> =>
         {
             if ([ data.minLength, data.maxLength, data.pattern, data.format ].every(i => undefined === i))
             {
@@ -397,7 +397,7 @@ export namespace EvilType
                 "string" === typeof value &&
                 (undefined === data.minLength || data.minLength <= value.length) &&
                 (undefined === data.maxLength || value.length <= data.maxLength) &&
-                (undefined === pattern || regexpTest(pattern, data.regexpFlags ?? regexpFlags ?? "u", value)),
+                (undefined === pattern || (data.regexpTest ?? regexpTest)(pattern, data.regexpFlags ?? regexpFlags ?? "u", value)),
                 listner,
                 () => makeStringTypeName(data),
                 value

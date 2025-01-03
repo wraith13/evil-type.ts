@@ -76,6 +76,7 @@ export declare namespace EvilType {
             pattern?: string;
             format?: string;
             regexpFlags?: string;
+            regexpTest?: (pattern: string, flags: string, text: string) => boolean;
         }, regexpFlags?: string) => IsType<Type>;
         type ActualObject = Exclude<object, null>;
         const isObject: (value: unknown) => value is ActualObject;
