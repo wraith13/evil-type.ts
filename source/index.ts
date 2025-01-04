@@ -852,6 +852,59 @@ export namespace Build
             [ ...Text.getNameSpace(name).split("."), `${Text.toLowerCamelCase(Text.getNameBody(name))}ValidatorObject`, ].filter(i => "" !== i).join(".");
         export const buildValidatorName = (name: string) =>
             [ ...Text.getNameSpace(name).split("."), `is${Text.toUpperCamelCase(Text.getNameBody(name))}`, ].filter(i => "" !== i).join(".");
+        export const buildCallRegExpTest = (regexpTest: string | undefined, pattern: string, flags: string, name: string): CodeExpression[] =>
+        {
+            if ("string" === typeof regexpTest)
+            {
+                return [
+                    $expression("new"),
+                    $expression("RegExp"),
+                    $expression("("),
+                    $expression(Jsonable.stringify(pattern)),
+                    $expression(","),
+                    $expression(Jsonable.stringify(flags)),
+                    $expression(")"),
+                    $expression(`.test(${name})`)
+                ];
+            }
+            else
+            {
+                return [
+                    $expression("new"),
+                    $expression("RegExp"),
+                    $expression("("),
+                    $expression(Jsonable.stringify(pattern)),
+                    $expression(","),
+                    $expression(Jsonable.stringify(flags)),
+                    $expression(")"),
+                    $expression(`.test(${name})`)
+                ];
+            }
+        };
+        export const buildCallRegExpTestOrEmpty = (name: string, data: Define.Process<Type.StringType>): CodeExpression[] =>
+        {
+            if (Type.isPatternStringType(data.value))
+            {
+                return buildCallRegExpTest
+                (
+                    getRegexpTest(data),
+                    data.value.pattern,
+                    getRegexpFlags(data),
+                    name
+                );
+            }
+            if (Type.isFormatStringType(data.value))
+            {
+                return buildCallRegExpTest
+                (
+                    getRegexpTest(data),
+                    getPattern(nextProcess(data, null, data.value)),
+                    getRegexpFlags(data),
+                    name
+                );
+            }
+            return [];
+        };
         export const buildValidatorExpression = (name: string, data: Define.Process<Type.TypeOrValueOfRefer>): CodeExpression[] =>
         {
             if (Type.isReferElement(data.value))
@@ -922,8 +975,7 @@ export namespace Build
                         $expression(`"${data.value.type}" === typeof ${name}`),
                         ...(undefined !== data.value.minLength ? [ $expression("&&"), $expression(`${data.value.minLength}`), $expression("<="), $expression(`${name}.length`), ]: []),
                         ...(undefined !== data.value.maxLength ? [ $expression("&&"), $expression(`${name}.length`), $expression("<="), $expression(`${data.value.maxLength}`), ]: []),
-                        ...(Type.isPatternStringType(data.value) ? [ $expression("new"), $expression("RegExp"), $expression("("), $expression(Jsonable.stringify(data.value.pattern)), $expression(","), $expression(Jsonable.stringify(getRegexpFlags(data))), $expression(")"), $expression(`.test(${name})`) ]: []),
-                        ...(Type.isFormatStringType(data.value) ? [ $expression("new"), $expression("RegExp"), $expression("("), $expression(Jsonable.stringify(getPattern(nextProcess(data, null, data.value)))), $expression(","), $expression(Jsonable.stringify(getRegexpFlags(data))), $expression(")"), $expression(`.test(${name})`) ]: []),
+                        ...buildCallRegExpTestOrEmpty(name, nextProcess(data, null, data.value)),
                     ];
                 case "type":
                     return buildValidatorExpression(name, nextProcess(data, null, data.value.define));

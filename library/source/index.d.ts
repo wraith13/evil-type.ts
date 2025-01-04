@@ -110,6 +110,8 @@ export declare namespace Build {
         const buildLiterarlValidatorExpression: (name: string, value: Jsonable.Jsonable) => CodeExpression[];
         const buildObjectValidatorObjectName: (name: string) => string;
         const buildValidatorName: (name: string) => string;
+        const buildCallRegExpTest: (regexpTest: string | undefined, pattern: string, flags: string, name: string) => CodeExpression[];
+        const buildCallRegExpTestOrEmpty: (name: string, data: Define.Process<Type.StringType>) => CodeExpression[];
         const buildValidatorExpression: (name: string, data: Define.Process<Type.TypeOrValueOfRefer>) => CodeExpression[];
         const buildKeyofValidator: (name: string, data: Define.Process<Type.KeyofElement>) => CodeExpression[];
         const rejectAdditionalProperties: (name: string, regularKeys: string[]) => CodeExpression[];

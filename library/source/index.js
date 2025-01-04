@@ -668,6 +668,41 @@ var Build;
         Validator.buildValidatorName = function (name) {
             return __spreadArray(__spreadArray([], text_1.Text.getNameSpace(name).split("."), true), ["is".concat(text_1.Text.toUpperCamelCase(text_1.Text.getNameBody(name))),], false).filter(function (i) { return "" !== i; }).join(".");
         };
+        Validator.buildCallRegExpTest = function (regexpTest, pattern, flags, name) {
+            if ("string" === typeof regexpTest) {
+                return [
+                    (0, exports.$expression)("new"),
+                    (0, exports.$expression)("RegExp"),
+                    (0, exports.$expression)("("),
+                    (0, exports.$expression)(type_1.Jsonable.stringify(pattern)),
+                    (0, exports.$expression)(","),
+                    (0, exports.$expression)(type_1.Jsonable.stringify(flags)),
+                    (0, exports.$expression)(")"),
+                    (0, exports.$expression)(".test(".concat(name, ")"))
+                ];
+            }
+            else {
+                return [
+                    (0, exports.$expression)("new"),
+                    (0, exports.$expression)("RegExp"),
+                    (0, exports.$expression)("("),
+                    (0, exports.$expression)(type_1.Jsonable.stringify(pattern)),
+                    (0, exports.$expression)(","),
+                    (0, exports.$expression)(type_1.Jsonable.stringify(flags)),
+                    (0, exports.$expression)(")"),
+                    (0, exports.$expression)(".test(".concat(name, ")"))
+                ];
+            }
+        };
+        Validator.buildCallRegExpTestOrEmpty = function (name, data) {
+            if (type_1.Type.isPatternStringType(data.value)) {
+                return Validator.buildCallRegExpTest(Build.getRegexpTest(data), data.value.pattern, Build.getRegexpFlags(data), name);
+            }
+            if (type_1.Type.isFormatStringType(data.value)) {
+                return Validator.buildCallRegExpTest(Build.getRegexpTest(data), Build.getPattern(Build.nextProcess(data, null, data.value)), Build.getRegexpFlags(data), name);
+            }
+            return [];
+        };
         Validator.buildValidatorExpression = function (name, data) {
             if (type_1.Type.isReferElement(data.value)) {
                 return [(0, exports.$expression)("".concat(Validator.buildValidatorName(data.value.$ref), "(").concat(name, ")")),];
@@ -715,9 +750,9 @@ var Build;
                             (0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name))
                         ], (true !== Build.getSafeNumber(data) ? [(0, exports.$expression)("&&"), (0, exports.$expression)("Number.isFinite"), (0, exports.$expression)("("), (0, exports.$expression)(name), (0, exports.$expression)(")"),] : []), true), (undefined !== data.value.minimum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minimum)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name)),] : []), true), (undefined !== data.value.exclusiveMinimum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.exclusiveMinimum)), (0, exports.$expression)("<"), (0, exports.$expression)("".concat(name)),] : []), true), (undefined !== data.value.maximum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maximum)),] : []), true), (undefined !== data.value.exclusiveMaximum ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("<"), (0, exports.$expression)("".concat(data.value.exclusiveMaximum)),] : []), true), (undefined !== data.value.multipleOf ? [(0, exports.$expression)("&&"), (0, exports.$expression)("0"), (0, exports.$expression)("==="), (0, exports.$expression)("".concat(name)), (0, exports.$expression)("%"), (0, exports.$expression)("".concat(data.value.multipleOf)),] : []), true);
                     case "string":
-                        return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
+                        return __spreadArray(__spreadArray(__spreadArray([
                             (0, exports.$expression)("\"".concat(data.value.type, "\" === typeof ").concat(name))
-                        ], (undefined !== data.value.minLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minLength)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name, ".length")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name, ".length")), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maxLength)),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("new"), (0, exports.$expression)("RegExp"), (0, exports.$expression)("("), (0, exports.$expression)(type_1.Jsonable.stringify(data.value.pattern)), (0, exports.$expression)(","), (0, exports.$expression)(type_1.Jsonable.stringify(Build.getRegexpFlags(data))), (0, exports.$expression)(")"), (0, exports.$expression)(".test(".concat(name, ")"))] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("new"), (0, exports.$expression)("RegExp"), (0, exports.$expression)("("), (0, exports.$expression)(type_1.Jsonable.stringify(Build.getPattern(Build.nextProcess(data, null, data.value)))), (0, exports.$expression)(","), (0, exports.$expression)(type_1.Jsonable.stringify(Build.getRegexpFlags(data))), (0, exports.$expression)(")"), (0, exports.$expression)(".test(".concat(name, ")"))] : []), true);
+                        ], (undefined !== data.value.minLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(data.value.minLength)), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(name, ".length")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("&&"), (0, exports.$expression)("".concat(name, ".length")), (0, exports.$expression)("<="), (0, exports.$expression)("".concat(data.value.maxLength)),] : []), true), Validator.buildCallRegExpTestOrEmpty(name, Build.nextProcess(data, null, data.value)), true);
                     case "type":
                         return Validator.buildValidatorExpression(name, Build.nextProcess(data, null, data.value.define));
                     case "enum-type":
