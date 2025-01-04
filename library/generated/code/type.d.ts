@@ -237,7 +237,8 @@ export declare namespace Type {
             readonly tsPattern: readonly ["${string}:${string}:${string}"];
         };
         readonly uuid: {
-            readonly pattern: "^uuid$";
+            readonly pattern: "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$";
+            readonly tsPattern: readonly ["${string}-${string}-${string}-${string}-${string}"];
         };
         readonly uri: {
             readonly pattern: "^uri$";
