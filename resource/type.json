@@ -1087,7 +1087,7 @@
                                 ]
                             },
                             "email": {
-                                "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+                                "pattern": "^(?:[\\x21-\\x3F]|[\\x41-\\x7E])+@(?:[\\x21-0x3F]|[\\x41-\\x7E])+\\.(?:[\\x21-\\x3F]|[\\x41-\\x7E])+$",
                                 "tsPattern": [
                                     "${string}@${string}.${string}"
                                 ]
@@ -1099,7 +1099,7 @@
                                 ]
                             },
                             "hostname": {
-                                "pattern": "^\\S+$"
+                                "pattern": "^(?:[\\x21-\\x3F]|[\\x41-\\x7E])+$"
                             },
                             "idn-hostname": {
                                 "pattern": "^\\S+$"
@@ -1144,7 +1144,7 @@
                                 "pattern": "^relative-json-pointer$"
                             },
                             "regex": {
-                                "pattern": "^[:regex:]$"
+                                "pattern": "^[[:regex:]]$"
                             }
                         }
                     },

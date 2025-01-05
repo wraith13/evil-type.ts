@@ -319,7 +319,7 @@ var EvilType;
         };
         Validator.regexpTest = function (pattern, flags, text) {
             switch (pattern) {
-                case "^[:regex:]$":
+                case "^[[:regex:]]$":
                     try {
                         new RegExp(text, flags);
                         return true;

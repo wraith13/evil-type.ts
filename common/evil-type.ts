@@ -371,7 +371,7 @@ export namespace EvilType
         {
             switch(pattern)
             {
-            case "^[:regex:]$":
+            case "^[[:regex:]]$":
                 try
                 {
                     new RegExp(text, flags);

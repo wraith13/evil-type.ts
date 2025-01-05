@@ -230,10 +230,11 @@ export namespace Type
         "pattern": "^\\d{2}\\:\\d{2}\\:\\d{2}[+-]\\d{2}\\:\\d{2}$", "tsPattern": [
         "${number}:${number}:${number}${ \"+\" | \"-\" }${number}:${number}" ] }, "duration": {
         "pattern": "^P(?:\\d+W|(?:\\d+Y(?:\\d+M(?:\\d+D)?)?)|(?:\\d+M(?:\\d+D)?)|\\d+D)?(?:T(?:\\d+H(?:\\d+M(?:\\d+S)?)?)|(?:\\d+M(?:\\d+S)?)|\\d+S)?$",
-        "tsPattern": [ "P${string}T${string}", "P${string}", "PT${string}" ] }, "email": { "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
-        "tsPattern": [ "${string}@${string}.${string}" ] }, "idn-email": { "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", "tsPattern": [
-        "${string}@${string}.${string}" ] }, "hostname": { "pattern": "^\\S+$" }, "idn-hostname": { "pattern": "^\\S+$" }, "ipv4": {
-        "pattern": "^[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}$", "tsPattern": [
+        "tsPattern": [ "P${string}T${string}", "P${string}", "PT${string}" ] }, "email": {
+        "pattern": "^(?:[\\x21-\\x3F]|[\\x41-\\x7E])+@(?:[\\x21-0x3F]|[\\x41-\\x7E])+\\.(?:[\\x21-\\x3F]|[\\x41-\\x7E])+$", "tsPattern": [
+        "${string}@${string}.${string}" ] }, "idn-email": { "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", "tsPattern": [
+        "${string}@${string}.${string}" ] }, "hostname": { "pattern": "^(?:[\\x21-\\x3F]|[\\x41-\\x7E])+$" }, "idn-hostname": {
+        "pattern": "^\\S+$" }, "ipv4": { "pattern": "^[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}$", "tsPattern": [
         "${number}.${number}.${number}.${number}" ] }, "ipv6": {
         "pattern": "^(?=.*\\:.*\\:.*)(?!.*\\:{3}.*)(?!.*\\:{2}.*\\:{2}.*)(?!.*[0-9A-Fa-f]{5,}.*)(?:(?:(?=.*\\:\\:.*)(?:(?:[0-9A-Fa-f]{0,4}\\:){2,7}[0-9A-Fa-f]{0,4}|(?:[0-9A-Fa-f]{0,4}\\:){2,6}[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}))|(?:(?!.*\\:\\:.*)(?:(?:[0-9A-Fa-f]{1,4}\\:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}\\:){6}[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2}\\.[12]?\\d{1,2})))$",
         "tsPattern": [ "${string}:${string}:${string}" ] }, "uuid": {
@@ -241,7 +242,7 @@ export namespace Type
         "${string}-${string}-${string}-${string}-${string}" ] }, "uri": { "pattern": "^uri$" }, "uri-reference": {
         "pattern": "^uri-reference$" }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": {
         "pattern": "^uri-template$" }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
-        "pattern": "^relative-json-pointer$" }, "regex": { "pattern": "^[:regex:]$" } } as const;
+        "pattern": "^relative-json-pointer$" }, "regex": { "pattern": "^[[:regex:]]$" } } as const;
     export interface StringFormatEntry
     {
         pattern?: string;
@@ -474,7 +475,7 @@ export namespace Type
         value: isReferElement, key: EvilType.Validator.isOr(EvilType.Validator.isString, EvilType.Validator.isDetailedInteger({ minimum:0,
         })), });
     export const stringFormatEntryValidatorObject: EvilType.Validator.ObjectValidator<StringFormatEntry> = ({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isDetailedString({ pattern:"^[:regex:]$", format:"regex", }, "u")), tsPattern:
+        EvilType.Validator.isOptional(EvilType.Validator.isDetailedString({ pattern:"^[[:regex:]]$", format:"regex", }, "u")), tsPattern:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
         regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), regexpTest: EvilType.Validator.isOptional(
         EvilType.Validator.isString), });
