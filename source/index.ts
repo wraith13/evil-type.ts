@@ -314,7 +314,7 @@ export namespace Build
     }
     export const getPattern = <Process extends BaseProcess<Type.FormatStringType>>(data: Process) =>
     {
-        return data.options.StringFormatMap?.[data.value.format]?.pattern ?? Type.StringFormatMap[data.value.format].pattern;
+        return data.options.StringFormatMap?.[data.value.format]?.pattern ?? (Type.StringFormatMap[data.value.format] as Type.StringFormatEntry).pattern;
     }
     export const getTsPattern = <Process extends BaseProcess<Type.StringType>>(data: Process): string[] | undefined =>
     {
