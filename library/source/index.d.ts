@@ -58,7 +58,7 @@ export declare namespace Build {
     const getMemberofTarget: <Process extends BaseProcess<Type.MemberofElement>>(data: Process) => NextProcess<Process, Type.TypeOrLiteralOfRefer>;
     const getSafeInteger: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
     const getSafeNumber: <Process extends BaseProcess<unknown>>(data: Process) => boolean;
-    const getPattern: <Process extends BaseProcess<Type.FormatStringType>>(data: Process) => string;
+    const getPattern: <Process extends BaseProcess<Type.FormatStringType>>(data: Process) => string | undefined;
     const getTsPattern: <Process extends BaseProcess<Type.StringType>>(data: Process) => string[] | undefined;
     const getRegexpFlags: <Process extends BaseProcess<unknown>>(data: Process) => string;
     const getRegexpTest: <Process extends BaseProcess<unknown>>(data: Process) => string | undefined;
@@ -117,6 +117,7 @@ export declare namespace Build {
         const rejectAdditionalProperties: (name: string, regularKeys: string[]) => CodeExpression[];
         const buildInterfaceValidator: (name: string, data: Define.Process<Type.InterfaceDefinition>) => CodeExpression[];
         const buildInlineValidator: (name: string, data: Define.Process<Type.TypeOrValue>) => CodeExpression[];
+        const buildPatternPropertyOrEmpty: (data: Define.Process<Type.StringType>) => CodeExpression[];
         const buildObjectValidatorGetterCoreEntry: (data: Define.Process<Type.TypeOrRefer>) => CodeInlineEntry[];
         const buildObjectValidatorGetterCore: (data: Define.Process<Type.InterfaceDefinition>) => CodeInlineBlock;
         const buildObjectValidator: (data: Define.Process<Type.InterfaceDefinition>) => (CodeExpression | CodeInlineBlock)[];

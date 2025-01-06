@@ -895,13 +895,17 @@ export namespace Build
             }
             if (Type.isFormatStringType(data.value))
             {
-                return buildCallRegExpTest
-                (
-                    getRegexpTest(data),
-                    getPattern(nextProcess(data, null, data.value)),
-                    getRegexpFlags(data),
-                    name
-                );
+                const pattern = getPattern(nextProcess(data, null, data.value));
+                if ("string" === typeof pattern)
+                {
+                    return buildCallRegExpTest
+                    (
+                        getRegexpTest(data),
+                        pattern,
+                        getRegexpFlags(data),
+                        name
+                    );
+                }
             }
             return [];
         };
@@ -1185,6 +1189,22 @@ export namespace Build
             $expression(`(value: unknown): value is ${Type.isValueDefinition(data.value) ? "typeof " +name: name} =>`),
             ...buildValidatorExpression("value", data),
         ];
+        export const buildPatternPropertyOrEmpty = (data: Define.Process<Type.StringType>): CodeExpression[] =>
+        {
+            if (Type.isPatternStringType(data.value))
+            {
+                return [ $expression(`pattern:${Jsonable.stringify(data.value.pattern)},`), ];
+            }
+            if (Type.isFormatStringType(data.value))
+            {
+                const pattern = getPattern(nextProcess(data, null, data.value));
+                if ("string" === typeof pattern)
+                {
+                    return [ $expression(`pattern:${Jsonable.stringify(pattern)},`), ];
+                }
+            }
+            return [];
+        };
         export const buildObjectValidatorGetterCoreEntry = (data: Define.Process<Type.TypeOrRefer>): CodeInlineEntry[] =>
         {
             if (Type.isReferElement(data.value))
@@ -1334,8 +1354,7 @@ export namespace Build
                     const stringOptions = [
                         ...(undefined !== data.value.minLength ? [ $expression(`minLength:${data.value.minLength},`), ]: []),
                         ...(undefined !== data.value.maxLength ? [ $expression(`maxLength:${data.value.maxLength},`), ]: []),
-                        ...(Type.isPatternStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(data.value.pattern)},`), ]: []),
-                        ...(Type.isFormatStringType(data.value) ? [ $expression(`pattern:${Jsonable.stringify(getPattern(nextProcess(data, null, data.value)))},`), $expression(`format:${Jsonable.stringify(data.value.format)},`), ]: []),
+                        ...buildPatternPropertyOrEmpty(nextProcess(data, null, data.value)),
                     ];
                     if (0 < stringOptions.length)
                     {

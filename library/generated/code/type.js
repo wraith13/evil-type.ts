@@ -198,7 +198,7 @@ var Type;
     Type.memberofElementValidatorObject = evil_type_1.EvilType.Validator.mergeObjectValidator(Type.commonPropertiesValidatorObject, { type: evil_type_1.EvilType.Validator.isJust("memberof"),
         value: Type.isReferElement, key: evil_type_1.EvilType.Validator.isOr(evil_type_1.EvilType.Validator.isString, evil_type_1.EvilType.Validator.isDetailedInteger({ minimum: 0,
         })), });
-    Type.stringFormatEntryValidatorObject = ({ pattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isDetailedString({ pattern: "^[:regex:]$", format: "regex", }, "u")), tsPattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString, { minItems: 1, uniqueItems: true, })),
+    Type.stringFormatEntryValidatorObject = ({ pattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isDetailedString({ pattern: "^[[:regex:]]$", }, "u")), tsPattern: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isArray(evil_type_1.EvilType.Validator.isString, { minItems: 1, uniqueItems: true, })),
         regexpFlags: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), regexpTest: evil_type_1.EvilType.Validator.isOptional(evil_type_1.EvilType.Validator.isString), });
 })(Type || (exports.Type = Type = {}));
 //# sourceMappingURL=type.js.map

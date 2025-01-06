@@ -475,7 +475,7 @@ export namespace Type
         value: isReferElement, key: EvilType.Validator.isOr(EvilType.Validator.isString, EvilType.Validator.isDetailedInteger({ minimum:0,
         })), });
     export const stringFormatEntryValidatorObject: EvilType.Validator.ObjectValidator<StringFormatEntry> = ({ pattern:
-        EvilType.Validator.isOptional(EvilType.Validator.isDetailedString({ pattern:"^[[:regex:]]$", format:"regex", }, "u")), tsPattern:
+        EvilType.Validator.isOptional(EvilType.Validator.isDetailedString({ pattern:"^[[:regex:]]$", }, "u")), tsPattern:
         EvilType.Validator.isOptional(EvilType.Validator.isArray(EvilType.Validator.isString, { minItems:1, uniqueItems:true, },)),
         regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), regexpTest: EvilType.Validator.isOptional(
         EvilType.Validator.isString), });

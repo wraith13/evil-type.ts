@@ -699,7 +699,10 @@ var Build;
                 return Validator.buildCallRegExpTest(Build.getRegexpTest(data), data.value.pattern, Build.getRegexpFlags(data), name);
             }
             if (type_1.Type.isFormatStringType(data.value)) {
-                return Validator.buildCallRegExpTest(Build.getRegexpTest(data), Build.getPattern(Build.nextProcess(data, null, data.value)), Build.getRegexpFlags(data), name);
+                var pattern = Build.getPattern(Build.nextProcess(data, null, data.value));
+                if ("string" === typeof pattern) {
+                    return Validator.buildCallRegExpTest(Build.getRegexpTest(data), pattern, Build.getRegexpFlags(data), name);
+                }
             }
             return [];
         };
@@ -913,6 +916,18 @@ var Build;
                 (0, exports.$expression)("(value: unknown): value is ".concat(type_1.Type.isValueDefinition(data.value) ? "typeof " + name : name, " =>"))
             ], Validator.buildValidatorExpression("value", data), true);
         };
+        Validator.buildPatternPropertyOrEmpty = function (data) {
+            if (type_1.Type.isPatternStringType(data.value)) {
+                return [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.pattern), ",")),];
+            }
+            if (type_1.Type.isFormatStringType(data.value)) {
+                var pattern = Build.getPattern(Build.nextProcess(data, null, data.value));
+                if ("string" === typeof pattern) {
+                    return [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(pattern), ",")),];
+                }
+            }
+            return [];
+        };
         Validator.buildObjectValidatorGetterCoreEntry = function (data) {
             if (type_1.Type.isReferElement(data.value)) {
                 return [(0, exports.$expression)(Validator.buildValidatorName(data.value.$ref)),];
@@ -1013,7 +1028,7 @@ var Build;
                             ];
                         }
                     case "string":
-                        var stringOptions = __spreadArray(__spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), (type_1.Type.isPatternStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(data.value.pattern), ",")),] : []), true), (type_1.Type.isFormatStringType(data.value) ? [(0, exports.$expression)("pattern:".concat(type_1.Jsonable.stringify(Build.getPattern(Build.nextProcess(data, null, data.value))), ",")), (0, exports.$expression)("format:".concat(type_1.Jsonable.stringify(data.value.format), ",")),] : []), true);
+                        var stringOptions = __spreadArray(__spreadArray(__spreadArray([], (undefined !== data.value.minLength ? [(0, exports.$expression)("minLength:".concat(data.value.minLength, ",")),] : []), true), (undefined !== data.value.maxLength ? [(0, exports.$expression)("maxLength:".concat(data.value.maxLength, ",")),] : []), true), Validator.buildPatternPropertyOrEmpty(Build.nextProcess(data, null, data.value)), true);
                         if (0 < stringOptions.length) {
                             var regexpTest = Build.getRegexpTest(data);
                             return __spreadArray(__spreadArray(__spreadArray(__spreadArray([
