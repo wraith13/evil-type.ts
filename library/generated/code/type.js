@@ -37,13 +37,8 @@ var Type;
             "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$", "tsPattern": [
                 "${string}-${string}-${string}-${string}-${string}"
             ]
-        }, "uri": { "pattern": "^uri$" }, "uri-reference": {
-            "pattern": "^uri-reference$"
-        }, "iri": { "pattern": "^iri$" }, "iri-reference": { "pattern": "^iri-reference$" }, "uri-template": {
-            "pattern": "^uri-template$"
-        }, "json-pointer": { "pattern": "^json-pointer$" }, "relative-json-pointer": {
-            "pattern": "^relative-json-pointer$"
-        }, "regex": { "pattern": "^[[:regex:]]$" } };
+        }, "uri": {}, "uri-reference": {}, "iri": {}, "iri-reference": {},
+        "uri-template": {}, "json-pointer": {}, "relative-json-pointer": {}, "regex": { "pattern": "^[[:regex:]]$" } };
     Type.isSchema = evil_type_1.EvilType.Validator.isJust(Type.schema);
     Type.isCommentProperty = evil_type_1.EvilType.lazy(function () { return evil_type_1.EvilType.Validator.isSpecificObject(Type.commentPropertyValidatorObject, {
         additionalProperties: false

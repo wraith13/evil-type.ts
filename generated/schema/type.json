@@ -1522,27 +1522,13 @@
                         "${string}-${string}-${string}-${string}-${string}"
                     ]
                 },
-                "uri": {
-                    "pattern": "^uri$"
-                },
-                "uri-reference": {
-                    "pattern": "^uri-reference$"
-                },
-                "iri": {
-                    "pattern": "^iri$"
-                },
-                "iri-reference": {
-                    "pattern": "^iri-reference$"
-                },
-                "uri-template": {
-                    "pattern": "^uri-template$"
-                },
-                "json-pointer": {
-                    "pattern": "^json-pointer$"
-                },
-                "relative-json-pointer": {
-                    "pattern": "^relative-json-pointer$"
-                },
+                "uri": {},
+                "uri-reference": {},
+                "iri": {},
+                "iri-reference": {},
+                "uri-template": {},
+                "json-pointer": {},
+                "relative-json-pointer": {},
                 "regex": {
                     "pattern": "^[[:regex:]]$"
                 }

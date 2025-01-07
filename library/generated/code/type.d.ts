@@ -240,27 +240,13 @@ export declare namespace Type {
             readonly pattern: "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$";
             readonly tsPattern: readonly ["${string}-${string}-${string}-${string}-${string}"];
         };
-        readonly uri: {
-            readonly pattern: "^uri$";
-        };
-        readonly "uri-reference": {
-            readonly pattern: "^uri-reference$";
-        };
-        readonly iri: {
-            readonly pattern: "^iri$";
-        };
-        readonly "iri-reference": {
-            readonly pattern: "^iri-reference$";
-        };
-        readonly "uri-template": {
-            readonly pattern: "^uri-template$";
-        };
-        readonly "json-pointer": {
-            readonly pattern: "^json-pointer$";
-        };
-        readonly "relative-json-pointer": {
-            readonly pattern: "^relative-json-pointer$";
-        };
+        readonly uri: {};
+        readonly "uri-reference": {};
+        readonly iri: {};
+        readonly "iri-reference": {};
+        readonly "uri-template": {};
+        readonly "json-pointer": {};
+        readonly "relative-json-pointer": {};
         readonly regex: {
             readonly pattern: "^[[:regex:]]$";
         };
