@@ -63,7 +63,7 @@ export namespace EvilType
         };
         export const getPathDepth = (path: string) =>
         {
-            const valuePath = path.replace(/[^#]*#/, "#").replace(/\[(\d+)\]/g, ".$1");
+            const valuePath = path.replace(/\[(\d+)\]/g, ".$1");
             return valuePath.split(/[#\.]/).filter(i => 0 < i.length).length;
         };
         export const getType = (isType: ((v: unknown, listner?: Listener) => boolean)) =>
