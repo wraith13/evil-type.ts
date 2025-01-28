@@ -33,7 +33,7 @@ export declare namespace Build {
     }>) => CodeExpression[];
     const getAdditionalProperties: (data: BaseProcess<{
         additionalProperties?: boolean;
-    }>) => boolean | undefined;
+    }>) => boolean;
     const buildExtends: (define: Type.InterfaceDefinition) => CodeExpression[];
     const asConst: CodeExpression[];
     const buildLiteralAsConst: (literal: Jsonable.Jsonable) => CodeExpression[];

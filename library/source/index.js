@@ -78,7 +78,7 @@ var stringifyTokens = function (json) {
 var Build;
 (function (Build) {
     Build.buildExport = function (data) { var _a, _b, _c; return ((_c = (_a = data.value.export) !== null && _a !== void 0 ? _a : (_b = data.options.default) === null || _b === void 0 ? void 0 : _b.export) !== null && _c !== void 0 ? _c : true) ? [(0, exports.$expression)("export"),] : []; };
-    Build.getAdditionalProperties = function (data) { var _a, _b; return (_a = data.value.additionalProperties) !== null && _a !== void 0 ? _a : (_b = data.options.default) === null || _b === void 0 ? void 0 : _b.additionalProperties; };
+    Build.getAdditionalProperties = function (data) { var _a, _b, _c; return (_c = (_a = data.value.additionalProperties) !== null && _a !== void 0 ? _a : (_b = data.options.default) === null || _b === void 0 ? void 0 : _b.additionalProperties) !== null && _c !== void 0 ? _c : true; };
     Build.buildExtends = function (define) {
         return undefined !== define.extends ? __spreadArray([(0, exports.$expression)("extends")], define.extends.map(function (i, ix, list) { return (0, exports.$expression)(ix < (list.length - 1) ? "".concat(i.$ref, ",") : "".concat(i.$ref)); }), true) : [];
     };

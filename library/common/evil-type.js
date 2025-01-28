@@ -69,7 +69,7 @@ var EvilType;
             return base + separator + tail;
         };
         Error.getPathDepth = function (path) {
-            var valuePath = path.replace(/[^#]*#/, "#").replace(/\[(\d+)\]/g, ".$1");
+            var valuePath = path.replace(/\[(\d+)\]/g, ".$1");
             return valuePath.split(/[#\.]/).filter(function (i) { return 0 < i.length; }).length;
         };
         Error.getType = function (isType) {
@@ -116,7 +116,7 @@ var EvilType;
                 .reduce(function (a, b) { return a + b; }, 0.0);
             var result = 0 < length ? sum / length : true;
             if (true === result || 1.0 <= result) {
-                console.error("🦋 FIXME: \"MatchWithErrors\": " + JSON.stringify({ sum: sum, length: length, result: result, childrenKeys: childrenKeys, listner: listner }));
+                console.error("🦋 FIXME: \"MatchWithErrors\": " + JSON.stringify({ sum: sum, length: length, result: result, listner: listner }));
             }
             return listner.matchRate[path] = result;
         };

@@ -92,7 +92,7 @@ export namespace Build
     export const buildExport = (data: BaseProcess<{ export?: boolean; }>): CodeExpression[] =>
         (data.value.export ?? data.options.default?.export ?? true) ? [ $expression("export"), ]: [];
     export const getAdditionalProperties = (data: BaseProcess<{ additionalProperties?: boolean; }>) =>
-        data.value.additionalProperties ?? data.options.default?.additionalProperties;
+        data.value.additionalProperties ?? data.options.default?.additionalProperties ?? true;
     export const buildExtends = (define: Type.InterfaceDefinition): CodeExpression[] =>
         undefined !== define.extends ? [$expression("extends"), ...define.extends.map((i, ix, list) => $expression(ix < (list.length -1) ? `${i.$ref},`: `${i.$ref}`))]: [];
     export const asConst = [ $expression("as"), $expression("const"), ];

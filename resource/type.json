@@ -178,7 +178,7 @@
                                 },
                                 "additionalProperties?": {
                                     "type": "boolean",
-                                    "default": false
+                                    "default": true
                                 },
                                 "safeInteger?": {
                                     "type": "boolean",

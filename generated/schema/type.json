@@ -201,7 +201,8 @@
                             "description": "[TypeScript]"
                         },
                         "additionalProperties": {
-                            "type": "boolean"
+                            "type": "boolean",
+                            "default": true
                         },
                         "safeInteger": {
                             "type": "boolean"
