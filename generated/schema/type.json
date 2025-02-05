@@ -200,6 +200,10 @@
                             "default": true,
                             "description": "[TypeScript]"
                         },
+                        "target": {
+                            "$ref": "#/definitions/Type.DefinitionTarget",
+                            "default": "all"
+                        },
                         "additionalProperties": {
                             "type": "boolean",
                             "default": true
@@ -307,6 +311,14 @@
             ],
             "additionalProperties": false
         },
+        "Type.DefinitionTarget": {
+            "enum": [
+                "none",
+                "typescript",
+                "json-schema",
+                "all"
+            ]
+        },
         "Type.AlphaDefinition": {
             "type": "object",
             "properties": {
@@ -334,6 +346,10 @@
                 },
                 "export": {
                     "type": "boolean"
+                },
+                "target": {
+                    "$ref": "#/definitions/Type.DefinitionTarget",
+                    "default": "all"
                 }
             },
             "required": [
@@ -413,6 +429,10 @@
                 "export": {
                     "type": "boolean"
                 },
+                "target": {
+                    "$ref": "#/definitions/Type.DefinitionTarget",
+                    "default": "all"
+                },
                 "tokens": {
                     "type": "array",
                     "items": {
@@ -455,6 +475,10 @@
                 "export": {
                     "type": "boolean"
                 },
+                "target": {
+                    "$ref": "#/definitions/Type.DefinitionTarget",
+                    "default": "all"
+                },
                 "members": {
                     "$ref": "#/definitions/Type.DefinitionMap"
                 }
@@ -492,6 +516,10 @@
                 },
                 "export": {
                     "type": "boolean"
+                },
+                "target": {
+                    "$ref": "#/definitions/Type.DefinitionTarget",
+                    "default": "all"
                 },
                 "value": {
                     "oneOf": [
@@ -542,6 +570,10 @@
                 "export": {
                     "type": "boolean"
                 },
+                "target": {
+                    "$ref": "#/definitions/Type.DefinitionTarget",
+                    "default": "all"
+                },
                 "define": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
                 },
@@ -583,6 +615,10 @@
                 },
                 "export": {
                     "type": "boolean"
+                },
+                "target": {
+                    "$ref": "#/definitions/Type.DefinitionTarget",
+                    "default": "all"
                 },
                 "extends": {
                     "type": "array",
@@ -634,6 +670,10 @@
                 },
                 "export": {
                     "type": "boolean"
+                },
+                "target": {
+                    "$ref": "#/definitions/Type.DefinitionTarget",
+                    "default": "all"
                 },
                 "keyin": {
                     "$ref": "#/definitions/Type.TypeOrRefer"

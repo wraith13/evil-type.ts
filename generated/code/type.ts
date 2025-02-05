@@ -32,7 +32,8 @@ export namespace Type
         safeInteger?: boolean;
         maxLineLength?: null | number;
         StringFormatMap?: { [ key in keyof typeof StringFormatMap ] ?: StringFormatEntry; };
-        default?: { export?: boolean; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?: string; regexpTest?: string; };
+        default?: { export?: boolean; target?: DefinitionTarget; additionalProperties?: boolean; safeInteger?: boolean; safeNumber?: boolean; regexpFlags?:
+            string; regexpTest?: string; };
         schema?: SchemaOptions;
     }
     export interface SchemaOptions
@@ -49,9 +50,11 @@ export namespace Type
     {
         type: string;
     }
+    export type DefinitionTarget = "none" | "typescript" | "json-schema" | "all";
     export interface AlphaDefinition extends AlphaElement, CommentProperty
     {
         export?: boolean;
+        target?: DefinitionTarget;
     }
     export interface ImportDefinition
     {
@@ -254,6 +257,8 @@ export namespace Type
     export const isIndentStyleType: EvilType.Validator.IsType<IndentStyleType> = EvilType.Validator.isEnum(indentStyleTypeMember);
     export const isValidatorOptionType: EvilType.Validator.IsType<ValidatorOptionType> = EvilType.Validator.isEnum([ "none", "simple", "full" ] as const);
     export const isAlphaElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(alphaElementValidatorObject, { additionalProperties: false }));
+    export const isDefinitionTarget: EvilType.Validator.IsType<DefinitionTarget> = EvilType.Validator.isEnum([ "none", "typescript", "json-schema", "all" ] as
+        const);
     export const isAlphaDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(alphaDefinitionValidatorObject, { additionalProperties: false }));
     export const isImportDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(importDefinitionValidatorObject, { additionalProperties: false })
         );
@@ -327,17 +332,19 @@ export namespace Type
         : EvilType.Validator.isOptional(isStringFormatEntry), "iri-reference": EvilType.Validator.isOptional(isStringFormatEntry), "uri-template":
         EvilType.Validator.isOptional(isStringFormatEntry), "json-pointer": EvilType.Validator.isOptional(isStringFormatEntry), "relative-json-pointer":
         EvilType.Validator.isOptional(isStringFormatEntry), regex: EvilType.Validator.isOptional(isStringFormatEntry), })), default:
-        EvilType.Validator.isOptional(({ export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), additionalProperties:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeInteger: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeNumber:
-        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regexpFlags: EvilType.Validator.isOptional(EvilType.Validator.isString), regexpTest:
-        EvilType.Validator.isOptional(EvilType.Validator.isString), })), schema: EvilType.Validator.isOptional(isSchemaOptions), });
+        EvilType.Validator.isOptional(({ export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), target: EvilType.Validator.isOptional(
+        isDefinitionTarget), additionalProperties: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), safeInteger: EvilType.Validator.isOptional(
+        EvilType.Validator.isBoolean), safeNumber: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), regexpFlags: EvilType.Validator.isOptional(
+        EvilType.Validator.isString), regexpTest: EvilType.Validator.isOptional(EvilType.Validator.isString), })), schema: EvilType.Validator.isOptional(
+        isSchemaOptions), });
     export const schemaOptionsValidatorObject: EvilType.Validator.ObjectValidator<SchemaOptions> = ({ outputFile: EvilType.Validator.isString, $id:
         EvilType.Validator.isOptional(EvilType.Validator.isString), $ref: EvilType.Validator.isOptional(EvilType.Validator.isString), externalReferMapping:
         EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(EvilType.Validator.isString)), });
     export const alphaElementValidatorObject: EvilType.Validator.ObjectValidator<AlphaElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isString, });
     export const alphaDefinitionValidatorObject: EvilType.Validator.ObjectValidator<AlphaDefinition> = EvilType.Validator.mergeObjectValidator(
-        alphaElementValidatorObject, commentPropertyValidatorObject, { export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
+        alphaElementValidatorObject, commentPropertyValidatorObject, { export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), target:
+        EvilType.Validator.isOptional(isDefinitionTarget), });
     export const importDefinitionValidatorObject: EvilType.Validator.ObjectValidator<ImportDefinition> = ({ import: EvilType.Validator.isString, from:
         EvilType.Validator.isString, });
     export const codeDefinitionValidatorObject: EvilType.Validator.ObjectValidator<CodeDefinition> = EvilType.Validator.mergeObjectValidator(

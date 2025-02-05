@@ -176,6 +176,10 @@
                                     "default": true,
                                     "description": "[TypeScript]"
                                 },
+                                "target?": {
+                                    "$ref": "DefinitionTarget",
+                                    "default": "all"
+                                },
                                 "additionalProperties?": {
                                     "type": "boolean",
                                     "default": true
@@ -272,6 +276,19 @@
                         }
                     }
                 },
+                "DefinitionTarget": {
+                    "type": "type",
+                    "define": {
+                        "type": "enum-type",
+                        "members": [
+                            "none",
+                            "typescript",
+                            "json-schema",
+                            "all"
+                        ]
+                    },
+                    "default": "all"
+                },
                 "AlphaDefinition": {
                     "type": "interface",
                     "extends": [
@@ -285,6 +302,10 @@
                     "members": {
                         "export?": {
                             "type": "boolean"
+                        },
+                        "target?": {
+                            "$ref": "DefinitionTarget",
+                            "default": "all"
                         }
                     }
                 },
