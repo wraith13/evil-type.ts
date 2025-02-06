@@ -177,8 +177,7 @@
                                     "description": "[TypeScript]"
                                 },
                                 "target?": {
-                                    "$ref": "DefinitionTarget",
-                                    "default": "all"
+                                    "$ref": "DefinitionTarget"
                                 },
                                 "additionalProperties?": {
                                     "type": "boolean",
@@ -277,17 +276,26 @@
                     }
                 },
                 "DefinitionTarget": {
-                    "type": "type",
-                    "define": {
-                        "type": "enum-type",
-                        "members": [
-                            "none",
-                            "typescript",
-                            "json-schema",
-                            "all"
-                        ]
-                    },
-                    "default": "all"
+                    "type": "interface",
+                    "members": {
+                        "typescript?": {
+                            "type": "interface",
+                            "members": {
+                                "definition": {
+                                    "type": "boolean",
+                                    "default": true
+                                },
+                                "validator": {
+                                    "type": "boolean",
+                                    "default": true
+                                }
+                            }
+                        },
+                        "json-schema?": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
                 },
                 "AlphaDefinition": {
                     "type": "interface",
@@ -304,8 +312,7 @@
                             "type": "boolean"
                         },
                         "target?": {
-                            "$ref": "DefinitionTarget",
-                            "default": "all"
+                            "$ref": "DefinitionTarget"
                         }
                     }
                 },
@@ -409,10 +416,6 @@
                                     "$ref": "ReferElement"
                                 }
                             ]
-                        },
-                        "validator?": {
-                            "type": "boolean",
-                            "default": true
                         }
                     }
                 },
@@ -429,10 +432,6 @@
                         },
                         "define": {
                             "$ref": "TypeOrRefer"
-                        },
-                        "validator?": {
-                            "type": "boolean",
-                            "default": true
                         }
                     }
                 },

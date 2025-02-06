@@ -201,8 +201,7 @@
                             "description": "[TypeScript]"
                         },
                         "target": {
-                            "$ref": "#/definitions/Type.DefinitionTarget",
-                            "default": "all"
+                            "$ref": "#/definitions/Type.DefinitionTarget"
                         },
                         "additionalProperties": {
                             "type": "boolean",
@@ -312,12 +311,33 @@
             "additionalProperties": false
         },
         "Type.DefinitionTarget": {
-            "enum": [
-                "none",
-                "typescript",
-                "json-schema",
-                "all"
-            ]
+            "type": "object",
+            "properties": {
+                "typescript": {
+                    "type": "object",
+                    "properties": {
+                        "definition": {
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "validator": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    },
+                    "required": [
+                        "definition",
+                        "validator"
+                    ],
+                    "additionalProperties": false
+                },
+                "json-schema": {
+                    "type": "boolean",
+                    "default": true
+                }
+            },
+            "required": [],
+            "additionalProperties": false
         },
         "Type.AlphaDefinition": {
             "type": "object",
@@ -348,8 +368,7 @@
                     "type": "boolean"
                 },
                 "target": {
-                    "$ref": "#/definitions/Type.DefinitionTarget",
-                    "default": "all"
+                    "$ref": "#/definitions/Type.DefinitionTarget"
                 }
             },
             "required": [
@@ -430,8 +449,7 @@
                     "type": "boolean"
                 },
                 "target": {
-                    "$ref": "#/definitions/Type.DefinitionTarget",
-                    "default": "all"
+                    "$ref": "#/definitions/Type.DefinitionTarget"
                 },
                 "tokens": {
                     "type": "array",
@@ -476,8 +494,7 @@
                     "type": "boolean"
                 },
                 "target": {
-                    "$ref": "#/definitions/Type.DefinitionTarget",
-                    "default": "all"
+                    "$ref": "#/definitions/Type.DefinitionTarget"
                 },
                 "members": {
                     "$ref": "#/definitions/Type.DefinitionMap"
@@ -518,8 +535,7 @@
                     "type": "boolean"
                 },
                 "target": {
-                    "$ref": "#/definitions/Type.DefinitionTarget",
-                    "default": "all"
+                    "$ref": "#/definitions/Type.DefinitionTarget"
                 },
                 "value": {
                     "oneOf": [
@@ -530,10 +546,6 @@
                             "$ref": "#/definitions/Type.ReferElement"
                         }
                     ]
-                },
-                "validator": {
-                    "type": "boolean",
-                    "default": true
                 }
             },
             "required": [
@@ -571,15 +583,10 @@
                     "type": "boolean"
                 },
                 "target": {
-                    "$ref": "#/definitions/Type.DefinitionTarget",
-                    "default": "all"
+                    "$ref": "#/definitions/Type.DefinitionTarget"
                 },
                 "define": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
-                },
-                "validator": {
-                    "type": "boolean",
-                    "default": true
                 }
             },
             "required": [
@@ -617,8 +624,7 @@
                     "type": "boolean"
                 },
                 "target": {
-                    "$ref": "#/definitions/Type.DefinitionTarget",
-                    "default": "all"
+                    "$ref": "#/definitions/Type.DefinitionTarget"
                 },
                 "extends": {
                     "type": "array",
@@ -672,8 +678,7 @@
                     "type": "boolean"
                 },
                 "target": {
-                    "$ref": "#/definitions/Type.DefinitionTarget",
-                    "default": "all"
+                    "$ref": "#/definitions/Type.DefinitionTarget"
                 },
                 "keyin": {
                     "$ref": "#/definitions/Type.TypeOrRefer"
