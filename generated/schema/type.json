@@ -325,10 +325,7 @@
                             "default": true
                         }
                     },
-                    "required": [
-                        "definition",
-                        "validator"
-                    ],
+                    "required": [],
                     "additionalProperties": false
                 },
                 "json-schema": {

@@ -281,11 +281,11 @@
                         "typescript?": {
                             "type": "interface",
                             "members": {
-                                "definition": {
+                                "definition?": {
                                     "type": "boolean",
                                     "default": true
                                 },
-                                "validator": {
+                                "validator?": {
                                     "type": "boolean",
                                     "default": true
                                 }

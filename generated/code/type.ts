@@ -52,7 +52,7 @@ export namespace Type
     }
     export interface DefinitionTarget
     {
-        typescript?: { definition: boolean; validator: boolean; };
+        typescript?: { definition?: boolean; validator?: boolean; };
         json-schema?: boolean;
     }
     export interface AlphaDefinition extends AlphaElement, CommentProperty
@@ -345,8 +345,8 @@ export namespace Type
     export const alphaElementValidatorObject: EvilType.Validator.ObjectValidator<AlphaElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isString, });
     export const definitionTargetValidatorObject: EvilType.Validator.ObjectValidator<DefinitionTarget> = ({ typescript: EvilType.Validator.isOptional(({
-        definition: EvilType.Validator.isBoolean, validator: EvilType.Validator.isBoolean, })), "json-schema": EvilType.Validator.isOptional(
-        EvilType.Validator.isBoolean), });
+        definition: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), validator: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), })),
+        "json-schema": EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const alphaDefinitionValidatorObject: EvilType.Validator.ObjectValidator<AlphaDefinition> = EvilType.Validator.mergeObjectValidator(
         alphaElementValidatorObject, commentPropertyValidatorObject, { export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), target:
         EvilType.Validator.isOptional(isDefinitionTarget), });
