@@ -279,17 +279,26 @@
                     "type": "interface",
                     "members": {
                         "typescript?": {
-                            "type": "interface",
-                            "members": {
-                                "definition?": {
-                                    "type": "boolean",
-                                    "default": true
+                            "type": "or",
+                            "types": [
+                                {
+                                    "type": "interface",
+                                    "members": {
+                                        "definition?": {
+                                            "type": "boolean",
+                                            "default": true
+                                        },
+                                        "validator?": {
+                                            "type": "boolean",
+                                            "default": true
+                                        }
+                                    }
                                 },
-                                "validator?": {
+                                {
                                     "type": "boolean",
                                     "default": true
                                 }
-                            }
+                            ]
                         },
                         "json-schema?": {
                             "type": "boolean",

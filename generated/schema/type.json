@@ -314,19 +314,27 @@
             "type": "object",
             "properties": {
                 "typescript": {
-                    "type": "object",
-                    "properties": {
-                        "definition": {
-                            "type": "boolean",
-                            "default": true
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "definition": {
+                                    "type": "boolean",
+                                    "default": true
+                                },
+                                "validator": {
+                                    "type": "boolean",
+                                    "default": true
+                                }
+                            },
+                            "required": [],
+                            "additionalProperties": false
                         },
-                        "validator": {
+                        {
                             "type": "boolean",
                             "default": true
                         }
-                    },
-                    "required": [],
-                    "additionalProperties": false
+                    ]
                 },
                 "json-schema": {
                     "type": "boolean",
