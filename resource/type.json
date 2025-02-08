@@ -234,13 +234,17 @@
                 },
                 "indentStyleTypeMember": {
                     "type": "value",
+                    "target": {
+                        "typescript": {
+                            "validator": false
+                        }
+                    },
                     "value": {
                         "const": [
                             "allman",
                             "egyptian"
                         ]
-                    },
-                    "validator": false
+                    }
                 },
                 "IndentStyleType": {
                     "type": "type",
@@ -1090,6 +1094,11 @@
                 },
                 "StringFormatMap": {
                     "type": "value",
+                    "target": {
+                        "typescript": {
+                            "validator": false
+                        }
+                    },
                     "value": {
                         "const": {
                             "date-time": {
@@ -1172,8 +1181,7 @@
                                 "pattern": "^[[:regex:]]$"
                             }
                         }
-                    },
-                    "validator": false
+                    }
                 },
                 "StringFormatEntry": {
                     "type": "interface",

@@ -30,6 +30,7 @@ export declare namespace Type {
         };
         default?: {
             export?: boolean;
+            target?: DefinitionTarget;
             additionalProperties?: boolean;
             safeInteger?: boolean;
             safeNumber?: boolean;
@@ -52,8 +53,17 @@ export declare namespace Type {
     interface AlphaElement extends CommonProperties {
         type: string;
     }
+    interface TypeScriptDefinitionTarget {
+        definition?: boolean;
+        validator?: boolean;
+    }
+    interface DefinitionTarget {
+        typescript?: TypeScriptDefinitionTarget | boolean;
+        json_schema?: boolean;
+    }
     interface AlphaDefinition extends AlphaElement, CommentProperty {
         export?: boolean;
+        target?: DefinitionTarget;
     }
     interface ImportDefinition {
         import: string;
@@ -74,12 +84,10 @@ export declare namespace Type {
     interface ValueDefinition extends AlphaDefinition {
         type: "value";
         value: LiteralElement | ReferElement;
-        validator?: boolean;
     }
     interface TypeDefinition extends AlphaDefinition {
         type: "type";
         define: TypeOrRefer;
-        validator?: boolean;
     }
     interface InterfaceDefinition extends AlphaDefinition {
         type: "interface";
@@ -266,6 +274,8 @@ export declare namespace Type {
     const isIndentStyleType: EvilType.Validator.IsType<IndentStyleType>;
     const isValidatorOptionType: EvilType.Validator.IsType<ValidatorOptionType>;
     const isAlphaElement: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is AlphaElement;
+    const isTypeScriptDefinitionTarget: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is TypeScriptDefinitionTarget;
+    const isDefinitionTarget: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is DefinitionTarget;
     const isAlphaDefinition: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is AlphaDefinition;
     const isImportDefinition: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is ImportDefinition;
     const isDefinition: EvilType.Validator.IsType<Definition>;
@@ -310,6 +320,8 @@ export declare namespace Type {
     const outputOptionsValidatorObject: EvilType.Validator.ObjectValidator<OutputOptions>;
     const schemaOptionsValidatorObject: EvilType.Validator.ObjectValidator<SchemaOptions>;
     const alphaElementValidatorObject: EvilType.Validator.ObjectValidator<AlphaElement>;
+    const typeScriptDefinitionTargetValidatorObject: EvilType.Validator.ObjectValidator<TypeScriptDefinitionTarget>;
+    const definitionTargetValidatorObject: EvilType.Validator.ObjectValidator<DefinitionTarget>;
     const alphaDefinitionValidatorObject: EvilType.Validator.ObjectValidator<AlphaDefinition>;
     const importDefinitionValidatorObject: EvilType.Validator.ObjectValidator<ImportDefinition>;
     const codeDefinitionValidatorObject: EvilType.Validator.ObjectValidator<CodeDefinition>;

@@ -1,4 +1,4 @@
-import { EvilType, Jsonable, Type } from "../generated/code/type";
+import { Jsonable, Type } from "../generated/code/type";
 interface Code {
     $code: (CodeExpression | CodeLine | CodeInlineBlock | CodeBlock)["$code"];
 }
@@ -123,7 +123,6 @@ export declare namespace Build {
         const buildObjectValidator: (data: Define.Process<Type.InterfaceDefinition>) => (CodeExpression | CodeInlineBlock)[];
         const isLazyValidator: (data: Define.Process<Type.TypeOrRefer>) => boolean;
         const buildFullValidator: (data: Define.Process<Type.Type>) => CodeInlineEntry[];
-        const hasValidatorOption: (value: unknown, listner?: EvilType.Validator.ErrorListener) => value is Type.ValueDefinition | Type.TypeDefinition;
         const isValidatorTarget: (define: Type.TypeOrValue) => boolean;
         const buildValidator: (data: Define.Process<Type.TypeOrValue & Type.Definition>) => CodeLine[];
         const buildValidatorObject: (data: Define.Process<Type.InterfaceDefinition>) => CodeLine[];

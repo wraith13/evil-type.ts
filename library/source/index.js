@@ -1139,9 +1139,22 @@ var Build;
         };
         Validator.buildFullValidator = function (data) { return Validator.isLazyValidator(data) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(data), true),]), true) :
             Validator.buildObjectValidatorGetterCoreEntry(data); };
-        Validator.hasValidatorOption = type_1.EvilType.Validator.isOr(type_1.Type.isTypeDefinition, type_1.Type.isValueDefinition);
         Validator.isValidatorTarget = function (define) {
-            return !(Validator.hasValidatorOption(define) && false === define.validator);
+            var _a, _b, _c;
+            if (type_1.Type.isDefinition(define)) {
+                if (define.target) {
+                    if (type_1.EvilType.Validator.isBoolean((_a = define.target) === null || _a === void 0 ? void 0 : _a.typescript)) {
+                        return (_b = define.target) === null || _b === void 0 ? void 0 : _b.typescript;
+                    }
+                    if (type_1.Type.isTypeScriptDefinitionTarget((_c = define.target) === null || _c === void 0 ? void 0 : _c.typescript)) {
+                        if (type_1.EvilType.Validator.isBoolean(define.target.typescript.validator)) {
+                            return define.target.typescript.validator;
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
         };
         Validator.buildValidator = function (data) {
             if ("simple" === data.options.validatorOption) {
