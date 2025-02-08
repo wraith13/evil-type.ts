@@ -310,25 +310,28 @@
             ],
             "additionalProperties": false
         },
+        "Type.TypeScriptDefinitionTarget": {
+            "type": "object",
+            "properties": {
+                "definition": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "validator": {
+                    "type": "boolean",
+                    "default": true
+                }
+            },
+            "required": [],
+            "additionalProperties": false
+        },
         "Type.DefinitionTarget": {
             "type": "object",
             "properties": {
                 "typescript": {
                     "oneOf": [
                         {
-                            "type": "object",
-                            "properties": {
-                                "definition": {
-                                    "type": "boolean",
-                                    "default": true
-                                },
-                                "validator": {
-                                    "type": "boolean",
-                                    "default": true
-                                }
-                            },
-                            "required": [],
-                            "additionalProperties": false
+                            "$ref": "#/definitions/Type.TypeScriptDefinitionTarget"
                         },
                         {
                             "type": "boolean",
@@ -336,7 +339,7 @@
                         }
                     ]
                 },
-                "json-schema": {
+                "json_schema": {
                     "type": "boolean",
                     "default": true
                 }

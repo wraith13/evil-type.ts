@@ -50,10 +50,15 @@ export namespace Type
     {
         type: string;
     }
+    export interface TypeScriptDefinitionTarget
+    {
+        definition?: boolean;
+        validator?: boolean;
+    }
     export interface DefinitionTarget
     {
-        typescript?: { definition?: boolean; validator?: boolean; } | boolean;
-        json-schema?: boolean;
+        typescript?: TypeScriptDefinitionTarget | boolean;
+        json_schema?: boolean;
     }
     export interface AlphaDefinition extends AlphaElement, CommentProperty
     {
@@ -259,6 +264,8 @@ export namespace Type
     export const isIndentStyleType: EvilType.Validator.IsType<IndentStyleType> = EvilType.Validator.isEnum(indentStyleTypeMember);
     export const isValidatorOptionType: EvilType.Validator.IsType<ValidatorOptionType> = EvilType.Validator.isEnum([ "none", "simple", "full" ] as const);
     export const isAlphaElement = EvilType.lazy(() => EvilType.Validator.isSpecificObject(alphaElementValidatorObject, { additionalProperties: false }));
+    export const isTypeScriptDefinitionTarget = EvilType.lazy(() => EvilType.Validator.isSpecificObject(typeScriptDefinitionTargetValidatorObject, {
+        additionalProperties: false }));
     export const isDefinitionTarget = EvilType.lazy(() => EvilType.Validator.isSpecificObject(definitionTargetValidatorObject, { additionalProperties: false })
         );
     export const isAlphaDefinition = EvilType.lazy(() => EvilType.Validator.isSpecificObject(alphaDefinitionValidatorObject, { additionalProperties: false }));
@@ -344,9 +351,11 @@ export namespace Type
         EvilType.Validator.isOptional(EvilType.Validator.isDictionaryObject(EvilType.Validator.isString)), });
     export const alphaElementValidatorObject: EvilType.Validator.ObjectValidator<AlphaElement> = EvilType.Validator.mergeObjectValidator(
         commonPropertiesValidatorObject, { type: EvilType.Validator.isString, });
+    export const typeScriptDefinitionTargetValidatorObject: EvilType.Validator.ObjectValidator<TypeScriptDefinitionTarget> = ({ definition:
+        EvilType.Validator.isOptional(EvilType.Validator.isBoolean), validator: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
     export const definitionTargetValidatorObject: EvilType.Validator.ObjectValidator<DefinitionTarget> = ({ typescript: EvilType.Validator.isOptional(
-        EvilType.Validator.isOr(({ definition: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), validator: EvilType.Validator.isOptional(
-        EvilType.Validator.isBoolean), }), EvilType.Validator.isBoolean)), "json-schema": EvilType.Validator.isOptional(EvilType.Validator.isBoolean), });
+        EvilType.Validator.isOr(isTypeScriptDefinitionTarget, EvilType.Validator.isBoolean)), json_schema: EvilType.Validator.isOptional(
+        EvilType.Validator.isBoolean), });
     export const alphaDefinitionValidatorObject: EvilType.Validator.ObjectValidator<AlphaDefinition> = EvilType.Validator.mergeObjectValidator(
         alphaElementValidatorObject, commentPropertyValidatorObject, { export: EvilType.Validator.isOptional(EvilType.Validator.isBoolean), target:
         EvilType.Validator.isOptional(isDefinitionTarget), });
