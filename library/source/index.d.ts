@@ -123,7 +123,7 @@ export declare namespace Build {
         const buildObjectValidator: (data: Define.Process<Type.InterfaceDefinition>) => (CodeExpression | CodeInlineBlock)[];
         const isLazyValidator: (data: Define.Process<Type.TypeOrRefer>) => boolean;
         const buildFullValidator: (data: Define.Process<Type.Type>) => CodeInlineEntry[];
-        const isValidatorTarget: (define: Type.TypeOrValue) => boolean;
+        const isValidatorTarget: (define: BaseProcess<Type.TypeOrValue>) => boolean;
         const buildValidator: (data: Define.Process<Type.TypeOrValue & Type.Definition>) => CodeLine[];
         const buildValidatorObject: (data: Define.Process<Type.InterfaceDefinition>) => CodeLine[];
     }

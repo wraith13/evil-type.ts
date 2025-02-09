@@ -702,7 +702,7 @@ export namespace Build
             ...Object.entries(data.value)
                 .map(i => Build.Define.buildDefine(nextProcess(data, i[0], i[1]))),
             ...Object.entries(data.value)
-                .map(i => Type.isTypeOrValue(i[1]) && Build.Validator.isValidatorTarget(i[1]) ? Build.Validator.buildValidator(nextProcess(data, i[0], i[1])): []),
+                .map(i => Type.isTypeOrValue(i[1]) && Build.Validator.isValidatorTarget(nextProcess(data, i[0], i[1])) ? Build.Validator.buildValidator(nextProcess(data, i[0], i[1])): []),
             ...Object.entries(data.value)
                 .map(i => Type.isInterfaceDefinition(i[1]) ? Build.Validator.buildValidatorObject(nextProcess(data, i[0], i[1])): []),
         ]
@@ -1527,28 +1527,31 @@ export namespace Build
                 // ),
             ]:
             buildObjectValidatorGetterCoreEntry(data);
-        export const isValidatorTarget = (define: Type.TypeOrValue): boolean =>
+        const isValidatorTargetCore = (target: Type.AlphaDefinition["target"]): boolean | null =>
         {
-            if (Type.isDefinition(define))
+            if (target)
             {
-                if (define.target)
+                if (EvilType.Validator.isBoolean(target.typescript))
                 {
-                    if (EvilType.Validator.isBoolean(define.target?.typescript))
+                    return target.typescript;
+                }
+                if (Type.isTypeScriptDefinitionTarget(target.typescript))
+                {
+                    if (EvilType.Validator.isBoolean(target.typescript.validator))
                     {
-                        return define.target?.typescript;
-                    }
-                    if (Type.isTypeScriptDefinitionTarget(define.target?.typescript))
-                    {
-                        if (EvilType.Validator.isBoolean(define.target.typescript.validator))
-                        {
-                            return define.target.typescript.validator;
-                        }
+                        return target.typescript.validator;
                     }
                 }
-                return true;
             }
-            return false;
-        }
+            return null;
+        };
+        export const isValidatorTarget = (define: BaseProcess<Type.TypeOrValue>): boolean =>
+            Type.isDefinition(define.value) &&
+            (
+                isValidatorTargetCore(define.value.target) ??
+                isValidatorTargetCore(define.options.default?.target) ??
+                true
+            );
         export const buildValidator = (data: Define.Process<Type.TypeOrValue & Type.Definition>): CodeLine[] =>
         {
             if ("simple" === data.options.validatorOption)
