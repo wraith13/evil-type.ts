@@ -417,6 +417,30 @@ var Build;
         }
         return false;
     };
+    var isTypeScriptTargetCore = function (key) {
+        return function (target) {
+            if (target) {
+                if (type_1.EvilType.Validator.isBoolean(target.typescript)) {
+                    return target.typescript;
+                }
+                if (type_1.Type.isTypeScriptDefinitionTarget(target.typescript)) {
+                    if (type_1.EvilType.Validator.isBoolean(target.typescript[key])) {
+                        return target.typescript[key];
+                    }
+                }
+            }
+            return null;
+        };
+    };
+    var isTypeScriptTarget = function (key) {
+        return function (define) {
+            var _a, _b, _c;
+            return type_1.Type.isDefinition(define.value) &&
+                ((_c = (_a = isTypeScriptTargetCore(key)(define.value.target)) !== null && _a !== void 0 ? _a : isTypeScriptTargetCore(key)((_b = define.options.default) === null || _b === void 0 ? void 0 : _b.target)) !== null && _c !== void 0 ? _c : true);
+        };
+    };
+    Build.isValidatorTarget = isTypeScriptTarget("validator");
+    Build.isDefinitionTarget = isTypeScriptTarget("definition");
     var Define;
     (function (Define) {
         Define.makeProcess = function (source) {
@@ -538,9 +562,9 @@ var Build;
         };
         Define.buildDefineNamespaceCore = function (data) {
             return __spreadArray(__spreadArray(__spreadArray([], Object.entries(data.value)
-                .map(function (i) { return Build.Define.buildDefine(Build.nextProcess(data, i[0], i[1])); }), true), Object.entries(data.value)
-                .map(function (i) { return type_1.Type.isTypeOrValue(i[1]) && Build.Validator.isValidatorTarget(Build.nextProcess(data, i[0], i[1])) ? Build.Validator.buildValidator(Build.nextProcess(data, i[0], i[1])) : []; }), true), Object.entries(data.value)
-                .map(function (i) { return type_1.Type.isInterfaceDefinition(i[1]) ? Build.Validator.buildValidatorObject(Build.nextProcess(data, i[0], i[1])) : []; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
+                .map(function (i) { return Build.isDefinitionTarget(Build.nextProcess(data, i[0], i[1])) ? Build.Define.buildDefine(Build.nextProcess(data, i[0], i[1])) : []; }), true), Object.entries(data.value)
+                .map(function (i) { return type_1.Type.isTypeOrValue(i[1]) && Build.isValidatorTarget(Build.nextProcess(data, i[0], i[1])) ? Build.Validator.buildValidator(Build.nextProcess(data, i[0], i[1])) : []; }), true), Object.entries(data.value)
+                .map(function (i) { return type_1.Type.isInterfaceDefinition(i[1]) && Build.isDefinitionTarget(Build.nextProcess(data, i[0], i[1])) ? Build.Validator.buildValidatorObject(Build.nextProcess(data, i[0], i[1])) : []; }), true).reduce(function (a, b) { return __spreadArray(__spreadArray([], a, true), b, true); }, []);
         };
         Define.buildDefineNamespace = function (data) {
             var header = __spreadArray(__spreadArray([], Build.buildExport(data), true), [(0, exports.$expression)("namespace"), (0, exports.$expression)(data.key),], false);
@@ -1139,24 +1163,6 @@ var Build;
         };
         Validator.buildFullValidator = function (data) { return Validator.isLazyValidator(data) ? __spreadArray([], Validator.buildCall([(0, exports.$expression)("EvilType.lazy"),], [__spreadArray([(0, exports.$expression)("()"), (0, exports.$expression)("=>")], Validator.buildObjectValidatorGetterCoreEntry(data), true),]), true) :
             Validator.buildObjectValidatorGetterCoreEntry(data); };
-        var isValidatorTargetCore = function (target) {
-            if (target) {
-                if (type_1.EvilType.Validator.isBoolean(target.typescript)) {
-                    return target.typescript;
-                }
-                if (type_1.Type.isTypeScriptDefinitionTarget(target.typescript)) {
-                    if (type_1.EvilType.Validator.isBoolean(target.typescript.validator)) {
-                        return target.typescript.validator;
-                    }
-                }
-            }
-            return null;
-        };
-        Validator.isValidatorTarget = function (define) {
-            var _a, _b, _c;
-            return type_1.Type.isDefinition(define.value) &&
-                ((_c = (_a = isValidatorTargetCore(define.value.target)) !== null && _a !== void 0 ? _a : isValidatorTargetCore((_b = define.options.default) === null || _b === void 0 ? void 0 : _b.target)) !== null && _c !== void 0 ? _c : true);
-        };
         Validator.buildValidator = function (data) {
             if ("simple" === data.options.validatorOption) {
                 var result_2 = [

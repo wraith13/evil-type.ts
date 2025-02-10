@@ -77,6 +77,8 @@ export declare namespace Build {
         };
     }>(data: Process) => NextProcess<Process, Type.InterfaceDefinition>;
     const isKindofNeverType: (data: BaseProcess<Type.TypeOrRefer>) => boolean;
+    const isValidatorTarget: (define: BaseProcess<unknown>) => boolean;
+    const isDefinitionTarget: (define: BaseProcess<unknown>) => boolean;
     namespace Define {
         interface Process<ValueType> extends BaseProcess<ValueType> {
         }
@@ -123,7 +125,6 @@ export declare namespace Build {
         const buildObjectValidator: (data: Define.Process<Type.InterfaceDefinition>) => (CodeExpression | CodeInlineBlock)[];
         const isLazyValidator: (data: Define.Process<Type.TypeOrRefer>) => boolean;
         const buildFullValidator: (data: Define.Process<Type.Type>) => CodeInlineEntry[];
-        const isValidatorTarget: (define: BaseProcess<Type.TypeOrValue>) => boolean;
         const buildValidator: (data: Define.Process<Type.TypeOrValue & Type.Definition>) => CodeLine[];
         const buildValidatorObject: (data: Define.Process<Type.InterfaceDefinition>) => CodeLine[];
     }
