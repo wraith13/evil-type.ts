@@ -441,6 +441,11 @@ var Build;
     };
     Build.isValidatorTarget = isTypeScriptTarget("validator");
     Build.isDefinitionTarget = isTypeScriptTarget("definition");
+    Build.isSchemaTarget = function (define) {
+        var _a, _b, _c, _d, _e;
+        return type_1.Type.isDefinition(define.value) &&
+            ((_e = (_b = (_a = define.value.target) === null || _a === void 0 ? void 0 : _a.json_schema) !== null && _b !== void 0 ? _b : (_d = (_c = define.options.default) === null || _c === void 0 ? void 0 : _c.target) === null || _d === void 0 ? void 0 : _d.json_schema) !== null && _e !== void 0 ? _e : true);
+    };
     var Define;
     (function (Define) {
         Define.makeProcess = function (source) {
@@ -1276,21 +1281,23 @@ var Build;
             Object.entries(data.value).forEach(function (i) {
                 var key = i[0];
                 var value = i[1];
-                switch (value.type) {
-                    case "value":
-                        result[key] = Schema.buildValue(Build.nextProcess(data, null, value));
-                        break;
-                    case "code":
-                        //  nothing
-                        break;
-                    case "namespace":
-                        {
-                            var members = Schema.buildDefinitions(Build.nextProcess(data, key, value.members));
-                            Object.entries(members).forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
-                        }
-                        break;
-                    default:
-                        result[key] = Schema.buildType(Build.nextProcess(data, null, value));
+                if (Build.isSchemaTarget(Build.nextProcess(data, key, value))) {
+                    switch (value.type) {
+                        case "value":
+                            result[key] = Schema.buildValue(Build.nextProcess(data, null, value));
+                            break;
+                        case "code":
+                            //  nothing
+                            break;
+                        case "namespace":
+                            {
+                                var members = Schema.buildDefinitions(Build.nextProcess(data, key, value.members));
+                                Object.entries(members).forEach(function (j) { return result["".concat(key, ".").concat(j[0])] = j[1]; });
+                            }
+                            break;
+                        default:
+                            result[key] = Schema.buildType(Build.nextProcess(data, null, value));
+                    }
                 }
             });
             return result;

@@ -592,6 +592,13 @@ export namespace Build
             );
     export const isValidatorTarget = isTypeScriptTarget("validator");
     export const isDefinitionTarget = isTypeScriptTarget("definition");
+    export const isSchemaTarget = (define: BaseProcess<unknown>): boolean =>
+        Type.isDefinition(define.value) &&
+        (
+            define.value.target?.json_schema ??
+            define.options.default?.target?.json_schema ??
+            true
+        );
     export namespace Define
     {
         export interface Process<ValueType> extends BaseProcess<ValueType>
@@ -1732,22 +1739,25 @@ export namespace Build
                 {
                     const key = i[0];
                     const value = i[1];
-                    switch(value.type)
+                    if (isSchemaTarget(nextProcess(data, key, value)))
                     {
-                    case "value":
-                        result[key] = buildValue(nextProcess(data, null, value));
-                        break;
-                    case "code":
-                        //  nothing
-                        break;
-                    case "namespace":
+                        switch(value.type)
                         {
-                            const members = buildDefinitions(nextProcess(data, key, value.members));
-                            Object.entries(members).forEach(j => result[`${key}.${j[0]}`] = j[1]);
+                        case "value":
+                            result[key] = buildValue(nextProcess(data, null, value));
+                            break;
+                        case "code":
+                            //  nothing
+                            break;
+                        case "namespace":
+                            {
+                                const members = buildDefinitions(nextProcess(data, key, value.members));
+                                Object.entries(members).forEach(j => result[`${key}.${j[0]}`] = j[1]);
+                            }
+                            break;
+                        default:
+                            result[key] = buildType(nextProcess(data, null, value));
                         }
-                        break;
-                    default:
-                        result[key] = buildType(nextProcess(data, null, value));
                     }
                 }
             );

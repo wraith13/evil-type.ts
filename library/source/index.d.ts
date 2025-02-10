@@ -79,6 +79,7 @@ export declare namespace Build {
     const isKindofNeverType: (data: BaseProcess<Type.TypeOrRefer>) => boolean;
     const isValidatorTarget: (define: BaseProcess<unknown>) => boolean;
     const isDefinitionTarget: (define: BaseProcess<unknown>) => boolean;
+    const isSchemaTarget: (define: BaseProcess<unknown>) => boolean;
     namespace Define {
         interface Process<ValueType> extends BaseProcess<ValueType> {
         }
